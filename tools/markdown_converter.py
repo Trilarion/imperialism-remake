@@ -1,14 +1,18 @@
-# -*- coding: utf-8 -*-
-
-#-------------------------------------------------------------------------------
-# Name:		markdown_converter
-# Purpose: Convert the documentation content in the ../help folder to html.
+# Markdown converter for our help files
+# Copyright (C) 2012 Trilarion
 #
-# Author:	  Trilarion
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# Created:	 20/07/2012
-# Licence:	 GPLv3
-#-------------------------------------------------------------------------------
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os, fnmatch, sys, shutil, codecs
 from datetime import datetime
