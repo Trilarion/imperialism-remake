@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import sys, os
+import sys, os, random
 from PySide import QtCore, QtGui
 
 test_map = [['se', 'se', 'sw', 'sw', 'b', 'b', 'm', 'm', 'sh'],
@@ -175,12 +175,125 @@ def scene_texture_simple():
 
     return scene
 
+def load_objects(name):
+    path = os.path.join('.', 'terrain_tiles_procedural_data', 'objects', name)
+    if not os.path.isfile(path):
+        raise Exception('Could not find: {}.'.format(path))
+    pixmap = QtGui.QPixmap(path)
+    return pixmap
+
+def scene_texture_with_objects():
+    scene = QtGui.QGraphicsScene()
+
+    textures = {
+        'se': 'tex_Water.jpg',
+        'sw': 'Swamp.png',
+        't': 'Tundra.png',
+        'p': 'Plains.png',
+        'd': 'Desert.png'
+    }
+
+    # translate textures to brush
+    for key, name in textures.items():
+        img = load_texture(name)
+        textures[key] = QtGui.QBrush(img)
+
+    objects = {
+        'h1': 'hill_1.png',
+        'h2': 'hill_2.png',
+        'm1': 'mountain_1.png',
+        'm2': 'mountain_2.png',
+        'f1': 'tree_1.png',
+        'f2': 'tree_2.png'
+    }
+
+    # translate objects to pixmaps
+    for key, name in objects.items():
+        img = load_objects(name)
+        objects[key] = img
+
+    # maps tiles to a texture
+    map_tiles = {
+        'b': 'p',
+        'c': 'p',
+        'd': 'd',
+        'f': 'p',
+        'g': 'p',
+        'hi': 'p',
+        'ho': 'p',
+        'm': 'p',
+        'o': 'p',
+        'p': 'p',
+        'sc': 'p',
+        'se': 'se',
+        'sh': 'p',
+        'sw': 'sw',
+        't': 't'
+    }
+
+    S = 80
+
+    # paint grid
+    for x in range(0, 9):
+        for y in range(0, 6):
+            pass
+            item = scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
+            item.setZValue(1000)
+
+    # paint terrain textures
+    for x in range(0, 9):
+        for y in range(0, 6):
+            key = test_map[y][x]
+            item = scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
+            item.setBrush(textures[map_tiles[key]])
+            pen = QtGui.QPen(QtCore.Qt.transparent)
+            item.setPen(pen)
+            item.setZValue(1)
+
+    # paint some random objects
+    for x in range(0, 9):
+        for y in range(0, 6):
+            pos = (x * S + y % 2 * S / 2, y * S)
+            key = test_map[y][x]
+            if key == 'f':
+                # forest
+                for h in range(0, 7):
+                    item = scene.addPixmap(objects['f1'])
+                    item.setOffset(pos[0] + S * random.random()-0.1*S, pos[1] + S * random.random()-0.1*S)
+                    item.setZValue(2)
+                for h in range(0, 7):
+                    item = scene.addPixmap(objects['f2'])
+                    item.setOffset(pos[0] + S * random.random()-0.1*S, pos[1] + S * random.random()-0.1*S)
+                    item.setZValue(2)
+            if key == 'm':
+                # mountains
+                for h in range(0, 4):
+                    item = scene.addPixmap(objects['m1'])
+                    item.setOffset(pos[0] + S * random.random()-0.2*S, pos[1] + S * random.random()-0.2*S)
+                    item.setZValue(2)
+                for h in range(0, 3):
+                    item = scene.addPixmap(objects['m2'])
+                    item.setOffset(pos[0] + S * random.random()-0.2*S, pos[1] + S * random.random()-0.2*S)
+                    item.setZValue(2)
+            if key == 'hi':
+                # hills
+                for h in range(0, 4):
+                    item = scene.addPixmap(objects['h1'])
+                    item.setOffset(pos[0] + S * random.random()-0.2*S, pos[1] + S * random.random()-0.2*S)
+                    item.setZValue(2)
+                for h in range(0, 3):
+                    item = scene.addPixmap(objects['h2'])
+                    item.setOffset(pos[0] + S * random.random()-0.2*S, pos[1] + S * random.random()-0.2*S)
+                    item.setZValue(2)
+    return scene
+
 if __name__ == '__main__':
     app = QtGui.QApplication([])
 
     # scene = scene_80x80()
     # scene = scene_colors_simple()
-    scene = scene_texture_simple()
+    # scene = scene_texture_simple()
+    scene = scene_texture_with_objects()
 
     size = scene.sceneRect()
     item = scene.addRect(size)
