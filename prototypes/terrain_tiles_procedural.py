@@ -204,7 +204,9 @@ def scene_texture_with_objects():
         'm1': 'mountain_1.png',
         'm2': 'mountain_2.png',
         'f1': 'tree_1.png',
-        'f2': 'tree_2.png'
+        'f2': 'tree_2.png',
+        'sc1': 'scrubtree_1.png',
+        'sc2': 'scrubtree_2.png'
     }
 
     # translate objects to pixmaps
@@ -257,12 +259,22 @@ def scene_texture_with_objects():
             key = test_map[y][x]
             if key == 'f':
                 # forest
-                for h in range(0, 7):
+                for h in range(0, 17):
                     item = scene.addPixmap(objects['f1'])
                     item.setOffset(pos[0] + S * random.random()-0.1*S, pos[1] + S * random.random()-0.1*S)
                     item.setZValue(2)
-                for h in range(0, 7):
+                for h in range(0, 17):
                     item = scene.addPixmap(objects['f2'])
+                    item.setOffset(pos[0] + S * random.random()-0.1*S, pos[1] + S * random.random()-0.1*S)
+                    item.setZValue(2)
+            if key == 'sc':
+                # scrub forest
+                for h in range(0, 17):
+                    item = scene.addPixmap(objects['sc1'])
+                    item.setOffset(pos[0] + S * random.random()-0.1*S, pos[1] + S * random.random()-0.1*S)
+                    item.setZValue(2)
+                for h in range(0, 17):
+                    item = scene.addPixmap(objects['sc2'])
                     item.setOffset(pos[0] + S * random.random()-0.1*S, pos[1] + S * random.random()-0.1*S)
                     item.setZValue(2)
             if key == 'm':
@@ -287,13 +299,113 @@ def scene_texture_with_objects():
                     item.setZValue(2)
     return scene
 
+def scene_river_simple():
+
+    # the begin is like texture_simple()
+    scene = QtGui.QGraphicsScene()
+
+    textures = {
+        'se': 'tex_Water.jpg',
+        'sw': 'Swamp.png',
+        't': 'Tundra.png',
+        'p': 'Plains.png',
+        'd': 'Desert.png'
+    }
+
+    # translate textures to brush
+    for key, name in textures.items():
+        img = load_texture(name)
+        textures[key] = QtGui.QBrush(img)
+
+    # maps tiles to a texture
+    map_tiles = {
+        'b': 'p',
+        'c': 'p',
+        'd': 'd',
+        'f': 'p',
+        'g': 'p',
+        'hi': 'p',
+        'ho': 'p',
+        'm': 'p',
+        'o': 'p',
+        'p': 'p',
+        'sc': 'p',
+        'se': 'se',
+        'sh': 'p',
+        'sw': 'sw',
+        't': 't'
+    }
+
+    S = 80
+
+    # grid
+    for x in range(0, 9):
+        for y in range(0, 6):
+            pass
+            item = scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
+            item.setZValue(1000)
+
+    # textures
+    for x in range(0, 9):
+        for y in range(0, 6):
+            key = test_map[y][x]
+            item = scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
+            item.setBrush(textures[map_tiles[key]])
+            pen = QtGui.QPen(QtCore.Qt.transparent)
+            item.setPen(pen)
+            item.setZValue(1)
+
+    # river
+    river_texture = load_texture('brushwalker437.jpg')
+    river_brush = QtGui.QBrush(river_texture)
+    river_tiles = [(6,2), (5,2), (5,1), (5,0), (4,0), (3,1), (2,1), (1,1), (0.5, 1)]
+    scale = lambda x: (x[0] * S + x[1] % 2 * S/2 + S/2, x[1] * S + S/2)
+    start = scale(river_tiles[0])
+    river = []
+    po = start
+    for x in range(1, len(river_tiles)):
+        pn = scale(river_tiles[x])
+        for y in range(2, 11, 3):
+            river.append((po[0]+y/10*(pn[0]-po[0]), po[1]+y/10*(pn[1]-po[1])))
+        po = pn
+
+    path = QtGui.QPainterPath()
+    path.moveTo(start[0], start[1])
+    po = start
+    for p in river:
+        pn = p
+        pc = ((po[0] + pn[0]) / 2 + random.uniform(-10, 10),(po[1] + pn[1]) / 2 + random.uniform(-10, 10))
+        path.quadTo(pc[0], pc[1], pn[0], pn[1])
+        # path.lineTo(p[0], p[1])
+        po = pn
+
+    pen = QtGui.QPen(river_brush, 8, c=QtCore.Qt.RoundCap, j=QtCore.Qt.RoundJoin)
+    item = scene.addPath(path, pen)
+    item.setZValue(2)
+
+    # border
+    border_tiles = [(4.5, 3), (3.5,3), (2.5,3), (2.5, 4), (3.5, 4), (4.5, 4), (4.5, 3)]
+    border_tiles = [(x[0] * S, x[1] * S) for x in border_tiles]
+    start = border_tiles[0]
+    path = QtGui.QPainterPath()
+    path.moveTo(start[0], start[1])
+    for p in border_tiles[1:]:
+        path.lineTo(p[0], p[1])
+    brush = QtGui.QBrush(QtGui.QColor(255, 128, 0, 192), bs=QtCore.Qt.Dense3Pattern)
+    pen = QtGui.QPen(brush, 16, j=QtCore.Qt.MiterJoin)
+    item = scene.addPath(path, pen)
+    item.setZValue(2)
+
+    return scene
+
 if __name__ == '__main__':
     app = QtGui.QApplication([])
 
     # scene = scene_80x80()
     # scene = scene_colors_simple()
     # scene = scene_texture_simple()
-    scene = scene_texture_with_objects()
+    # scene = scene_texture_with_objects()
+    scene = scene_river_simple()
 
     size = scene.sceneRect()
     item = scene.addRect(size)
