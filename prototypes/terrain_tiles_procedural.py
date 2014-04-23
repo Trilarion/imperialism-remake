@@ -398,6 +398,90 @@ def scene_river_simple():
 
     return scene
 
+def scene_texture_custom_shape():
+    scene = QtGui.QGraphicsScene()
+
+    textures = {
+        'se': 'tex_Water.jpg',
+        'sw': 'Swamp.png',
+        't': 'Tundra.png',
+        'p': 'Plains.png',
+        'd': 'Desert.png'
+    }
+
+    # translate textures to brush
+    for key, name in textures.items():
+        img = load_texture(name)
+        textures[key] = QtGui.QBrush(img)
+
+    # maps tiles to a texture
+    map_tiles = {
+        'b': 'p',
+        'c': 'p',
+        'd': 'd',
+        'f': 'p',
+        'g': 'p',
+        'hi': 'p',
+        'ho': 'p',
+        'm': 'p',
+        'o': 'p',
+        'p': 'p',
+        'sc': 'p',
+        'se': 'se',
+        'sh': 'p',
+        'sw': 'sw',
+        't': 't'
+    }
+
+    S = 80
+
+    # draw the grid
+#    for x in range(0, 9):
+#        for y in range(0, 6):
+#            item = scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
+#            item.setZValue(1000)
+
+    # pen = QtGui.QPen(QtCore.Qt.transparent, 0)
+    pen = QtGui.QPen()
+
+    # get paths
+    paths = {}
+    for x in range(0, 9):
+        for y in range(0, 6):
+            key = map_tiles[test_map[y][x]]
+            if key not in paths:
+                paths[key] = QtGui.QPainterPath()
+            paths[key].addRect(x * S + y % 2 * S / 2, y * S, S, S)
+
+    # delete the 'p' path (we don't do it)
+    del(paths['p'])
+
+    # simplify paths, and change randomly
+    for key, path in paths.items():
+        path = path.simplified()
+        polygons = path.toSubpathPolygons()
+        path = QtGui.QPainterPath()
+        for i in range(0, len(polygons)):
+            polygon = polygons[i]
+            path.moveTo(polygon[0])
+            for j in range(1, len(polygon)):
+                path.quadTo(polygon[j], polygon[j] + QtCore.QPointF(random.uniform(-15, 15), random.uniform(-15, 15)))
+
+
+        paths[key] = path
+
+    # add to scene and fill with texture
+    for key, path in paths.items():
+        item = scene.addPath(path, pen, textures[map_tiles[key]])
+        item.setZValue(100)
+
+    # just fill everything with 'p' texture below
+    item = scene.addRect(0, 0, 9.5*S, 6*S, pen, textures['p'])
+    item.setZValue(1)
+
+
+    return scene
+
 if __name__ == '__main__':
     app = QtGui.QApplication([])
 
@@ -405,7 +489,8 @@ if __name__ == '__main__':
     # scene = scene_colors_simple()
     # scene = scene_texture_simple()
     # scene = scene_texture_with_objects()
-    scene = scene_river_simple()
+    # scene = scene_river_simple()
+    scene = scene_texture_custom_shape()
 
     size = scene.sceneRect()
     item = scene.addRect(size)
