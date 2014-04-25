@@ -13,24 +13,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-
-import glob, os
-from PySide import QtCore, QtGui
-from client import audio
-
-if __name__ == '__main__':
-    app = QtGui.QApplication([])
-
-    window = QtGui.QWidget()
-    window.show()
-
-    search_mask = os.path.join('artwork', 'music', 'soundtrack', '*.ogg')
-    soundtrack_files = glob.glob(search_mask)
-    print(soundtrack_files)
-
-    player = audio.Player()
-    player.set_song_list(soundtrack_files)
-    player.start()
-    player.title_changed.connect(print)
-
-    app.exec_()

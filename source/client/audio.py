@@ -47,34 +47,42 @@ class Player(QtCore.QObject):
         Phonon.createPath(self.media_object, self.audio_output)
 
         # some connections
-        self.media_object.setTickInterval(500) # every second it updates the time
+        self.media_object.setTickInterval(5000) # every second it updates the time
         self.media_object.tick.connect(self.tick)
-        self.media_object.stateChanged.connect(self.stateChanged)
+        self.media_object.stateChanged.connect(self.state_changed)
 
         # connections
         self.media_object.metaDataChanged.connect(self.update_title)
+
+    def set_song_list(self, songs):
+        QtCore.QMetaObject.invokeMethod(self.media_object, 'stop')
+        self.media_object.setQueue(songs)
 
     def tick(self, time):
         """
 
         """
         pass
+        #if self.media_object.currentTime() > 0:
+        #    self.media_object.seek(self.media_object.totalTime())
 
     def update_title(self):
         """
             According to the Phonon documentation meta data is only reliably existing after metaDataChanged was emitted.
             Here we extract the title and re-emit a signal containing the title.
         """
+        print(self.media_object.metaData())
         title = self.media_object.metaData('TITLE')
+        print('title: {}, source {}'.format(title, self.media_object.currentSource().fileName()))
         self.title_changed.emit(title)
 
     def start(self):
-        self.media_object.play()
+        QtCore.QMetaObject.invokeMethod(self.media_object, 'play')
 
     def seek(self):
         self.media_object.seek(20000)
 
-    def stateChanged(self, newState, oldState):
+    def state_changed(self, newState, oldState):
         """
             The state (Phonon.State) changed.
 
@@ -83,7 +91,10 @@ class Player(QtCore.QObject):
 
             See Phonon.MediaObject.stateChanged
         """
+        print('{} to {}'.format(oldState, newState))
         if newState == Phonon.ErrorState:
             print(self.media_object.errorType())
             print(self.media_object.errorString())
             # TODO turn off music and tell the user about the error
+
+        print(self.media_object.metaData())
