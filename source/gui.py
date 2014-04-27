@@ -35,8 +35,11 @@ class ClickableWidget(QtGui.QWidget):
         """
         self.clicked.emit(event)
 
-def show_notification(parent, bg_color, text, fade_duration, stay_duration, callback=None):
+Notification_Default_Style = 'border: 1px solid black; padding: 5px 10px 5px 10px; background-color: rgba(128, 128, 128, 128); color: white;'
+
+def show_notification(parent, text, style=Notification_Default_Style, fade_duration=2000, stay_duration=2000, callback=None):
     """
+        border_style example: "border: 1px solid black"
         Please only use a color that is fully opaque (alpha = 255) for bg_color, otherwise a black background will appear.
     """
     # create a clickable widget as standalone window and without a frame
@@ -46,22 +49,18 @@ def show_notification(parent, bg_color, text, fade_duration, stay_duration, call
     if callback:
         widget.clicked.connect(callback)
 
-    # if a background color is given, set it, otherwise set a translucent background
-    if bg_color:
-        palette = widget.palette()
-        palette.setColor(widget.backgroundRole(), bg_color)
-        widget.setPalette(palette)
-    else:
-        widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+    # widget must be translucent, otherwise when setting semi-transparent background colors
+    widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
     # create a label and set the text
-    label = QtGui.QLabel()
+    label = QtGui.QLabel(widget)
     label.setText(text)
 
-    # any layout will do, just add the label
-    layout = QtGui.QHBoxLayout()
-    layout.addWidget(label)
-    widget.setLayout(layout)
+    # set style (border, padding, background color, text color
+    label.setStyleSheet(style)
+
+    # we need to manually tell the widget that it should be exactly as big as the label it contains
+    widget.resize(label.sizeHint())
 
     # fade in animation
     widget.fade_in = QtCore.QPropertyAnimation(widget, 'windowOpacity')
@@ -92,5 +91,3 @@ def show_notification(parent, bg_color, text, fade_duration, stay_duration, call
     widget.setWindowOpacity(0)
     widget.show()
     widget.fade_in.start()
-
-    # widget.sizeHint()

@@ -14,18 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import json
-import constants
+import os
 
-if __name__ == '__main__':
+def extend(path, part):
+    return os.path.join(path, part)
 
-    # create the playlist, a list of (filename, title)
-    playlist = [('01 Imperialism Theme.ogg', 'Imperialism Theme'),
-                ('02 Silent Ashes.ogg', 'Silent Ashes')]
+Data_Folder = os.path.join('.', 'data')
 
-    # write
-    print('write to {}'.format(constants.Soundtrack_Playlist))
-    file = open(constants.Soundtrack_Playlist, 'w')
-    json.dump(playlist, file, indent=2, separators=(',', ': '))
+Soundtrack_Folder = os.path.join('.', 'data', 'artwork', 'music', 'soundtrack')
+Soundtrack_Playlist = extend(Soundtrack_Folder, 'playlist.info')
+
+Options_Default = extend(Data_Folder, 'options.info.default')
 
 

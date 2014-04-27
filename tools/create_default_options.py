@@ -13,3 +13,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+import json
+import constants
+
+if __name__ == '__main__':
+
+    # options are stored as a dictionary
+    options = {}
+    options['general.version'] = '0.2'
+
+    # save
+    print('write to {}'.format(constants.Options_Default))
+    file = open(constants.Options_Default, 'w')
+    json.dump(options, file, indent=2, separators=(',', ': '))

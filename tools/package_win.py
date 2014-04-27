@@ -14,13 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-
-'''
-
-    Start with working directory equals base directory of project.
-
+"""
+    Start with working directory equals base directory of project and script parameter build.
     See also: http://cx-freeze.readthedocs.org/en/latest/index.html
-'''
+"""
 
 import os
 import shutil
@@ -45,17 +42,15 @@ base = None
 if sys.platform == 'win32':
     base = 'Win32GUI'
 
-executables = [Executable(os.path.join('source', 'omnitux2.py'),
-                          targetName='Omnitux2.exe',
-                          base=base)]
+executables = [Executable(os.path.join('source', 'start.py'), targetName='Remake.exe', base=base)]
 
 # delete previous build directory completely
-path = os.path.join('build', 'exe.win-amd64-3.3')
+path = os.path.join('build', 'exe.win-amd64-3.4')
 if os.path.isdir(path):
     shutil.rmtree(path)
 
 # freeze
-setup(name='Omnitux 2', version='0.1', description='description',
+setup(name='Imperialism Remake', version='0.2', description='Open Source remake of the classic SSI strategy game: Imperialism',
       options=options, executables=executables)
 
 # delete some files we do not need
