@@ -14,7 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from client import setup
+from PySide import QtCore, QtGui
+import constants, gui
 
-if __name__ == '__main__':
-    setup.start()
+def start():
+    app = QtGui.QApplication([])
+
+    scene = QtGui.QGraphicsScene()
+
+    background = QtGui.QPixmap(constants.extend(constants.Graphics_UI_Folder, 'start.background.jpg'))
+    background_item = QtGui.QGraphicsPixmapItem(background)
+    background_item.setZValue(1)
+    scene.addItem(background_item)
+
+
+    view = QtGui.QGraphicsView(scene)
+    view.setStyleSheet('background-color: black;')
+    view.resize(1200, 900)
+    view.show()
+
+    app.exec_()

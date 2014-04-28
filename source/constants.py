@@ -16,14 +16,26 @@
 
 import os
 
-def extend(path, part):
-    return os.path.join(path, part)
+def extend(path, *parts):
+    extended = os.path.join(path, *parts)
+    if not os.path.exists(extended):
+        raise RuntimeError('constructed path {} does not exist'.format(extended))
+    return extended
 
+# general folder (do not directly contain data)
 Data_Folder = os.path.join('.', 'data')
+Artwork_Folder = extend(Data_Folder, 'artwork')
 
-Soundtrack_Folder = os.path.join('.', 'data', 'artwork', 'music', 'soundtrack')
+# music related folder
+Music_Folder = extend(Artwork_Folder, 'music')
+Soundtrack_Folder = extend(Music_Folder, 'soundtrack')
 Soundtrack_Playlist = extend(Soundtrack_Folder, 'playlist.info')
 
+# graphics related folder
+Graphics_Folder = extend(Artwork_Folder, 'graphics')
+Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
+
+# special locations
 Options_Default = extend(Data_Folder, 'options.info.default')
 
 

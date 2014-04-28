@@ -35,6 +35,26 @@ class ClickableWidget(QtGui.QWidget):
         """
         self.clicked.emit(event)
 
+class ExtendedGraphicsPixmapItem(QtGui.QGraphicsPixmapItem):
+
+    entered = QtCore.Signal()
+    left = QtCore.Signal
+    clicked = QtCore.Signal(QtGui.QGraphicsSceneMouseEvent)
+
+    def __init__(self, pixmap):
+        super().__init__(pixmap)
+        self.setAcceptHoverEvents(True)
+        self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
+
+    def hoverEnterEvent(self, event):
+        self.entered.emit(event)
+
+    def hoverLeaveEvent(self, event):
+        self.left.emit(event)
+
+    def mousePressEvent(self, event):
+        self.clicked.emit(event)
+
 Notification_Default_Style = 'border: 1px solid black; padding: 5px 10px 5px 10px; background-color: rgba(128, 128, 128, 128); color: white;'
 
 def show_notification(parent, text, style=Notification_Default_Style, fade_duration=2000, stay_duration=2000, callback=None):
