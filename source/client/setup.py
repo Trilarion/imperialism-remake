@@ -15,7 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PySide import QtCore, QtGui
-import constants, gui
+import constants, tools
+import gui.browser as browser
 
 def start():
     app = QtGui.QApplication([])
@@ -32,5 +33,10 @@ def start():
     view.setStyleSheet('background-color: black;')
     view.resize(1200, 900)
     view.show()
+
+    home_url = QtCore.QUrl(constants.Manual_Index)
+    help = browser.BrowserWindow(home_url, tools.load_icon, parent=view)
+    help.setStyleSheet('background-color: white;')
+    help.show()
 
     app.exec_()

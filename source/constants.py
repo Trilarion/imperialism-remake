@@ -37,5 +37,6 @@ Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 
 # special locations
 Options_Default = extend(Data_Folder, 'options.info.default')
+Manual_Index = extend(Data_Folder, 'manual', 'index.html')
 
 

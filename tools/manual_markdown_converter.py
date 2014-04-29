@@ -14,10 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import os, shutil, glob
+import os, shutil
 import markdown  # https://pypi.python.org/pypi/Markdown
 
-if __name__ == '__main__':
+def convert():
+    """
+
+    """
 
     # set input and output directory
     lookup_dir = os.path.join('.', 'resources', 'manual')
@@ -37,7 +40,7 @@ if __name__ == '__main__':
     shutil.copyfile(os.path.join(lookup_dir, 'style.css'), os.path.join(install_dir, 'style.css'))
 
     # search for all markdown files
-    md_files = glob.glob(os.path.join(lookup_dir, '*.md'))
+    md_files = [x for x in os.listdir(lookup_dir) if x.endswith('.md') and not x.startswith('README')]
     print('convert {} files'.format(len(md_files)))
 
     # create new Markdown parser
@@ -48,7 +51,7 @@ if __name__ == '__main__':
         print('processing {}'.format(md_file))
 
         # read it
-        with open(md_file, 'rt') as file:
+        with open(os.path.join(lookup_dir, md_file), 'rt') as file:
             text = file.read()
 
         # convert and add header and body tag (\n as newline)
@@ -59,8 +62,11 @@ if __name__ == '__main__':
         out_file = os.path.join(install_dir, md_file.rsplit(".", 1)[0] + '.html')
 
         # write to output
-        with open(md_file.rsplit(".", 1)[0] + '.html', 'wt') as file:
+        with open(out_file, 'wt') as file:
             file.write(html)
 
         # reset state of converter
         md.reset
+
+if __name__ == '__main__':
+    convert()

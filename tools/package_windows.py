@@ -19,14 +19,13 @@
     See also: http://cx-freeze.readthedocs.org/en/latest/index.html
 """
 
-import os
-import shutil
-import sys
-
+import os, shutil, sys
 from cx_Freeze import setup, Executable
 
-
 # TODO define icon
+
+# run manual_markdown_converter to create newest help version
+
 
 # set options
 options = {'build_exe': {

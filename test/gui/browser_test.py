@@ -14,11 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import gui.browser as browser
 import constants
-from PySide import QtGui
 
-def load_icon(name):
-    """
-        Load an icon from a base icon path.
-    """
-    return QtGui.QIcon(constants.extend(constants.Graphics_UI_Folder, name))
+if __name__ == '__main__':
+
+    help = browser.BrowserWindow()

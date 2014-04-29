@@ -1,13 +1,10 @@
-﻿# Imperialism Remake Help
+﻿# Imperialism Remake Manual
 
-Version 0.1.4 (2013-07-16)
+Current version: 0.2.0 (2014-xxx)
 
 Content
 
--  &bull; [Getting Started](tutorial.html)
+-  &bull; [Tutorial](tutorial.html)
 -  &bull; [Contribute](contribute.html)
 
 [Credits](credits.html)
-
-
-

@@ -1,13 +1,4 @@
-help documentation as available in the ingame help browser and maybe also on the website.
-
-just edit the markdown (*.md) files to your liking
+In this folder are markdown files for the Manual which are available ingame.
 
 markdown syntax: http://daringfireball.net/projects/markdown/syntax
-
-
-
-Workflow for releases:
-
-1. Use Python and convert markdown to html (SVN tools/markdown_converter.py)
-
-2. Copy folder help/**.* to "current version/data"
+convert to html with $project-folder/tools/manual_markdown_converter.py
