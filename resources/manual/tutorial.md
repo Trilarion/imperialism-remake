@@ -1,6 +1,6 @@
 # Getting Started
 
-> The tutorial section will be filled with content, once the game is in a more stable state.
+The tutorial section will be filled with content, once the game is in a more stable state.
 
 ## The Start Screen
 

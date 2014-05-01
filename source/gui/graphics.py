@@ -111,3 +111,44 @@ def show_notification(parent, text, style=Notification_Default_Style, fade_durat
     widget.setWindowOpacity(0)
     widget.show()
     widget.fade_in.start()
+
+def relative_layout(ax, bx, cx, ay, by, cy, parent_size, own_size):
+    """
+        parent_size, own_size = QtCore.QSize
+    """
+    x = ax * parent_size.width() + bx * own_size.width() + cx
+    y = ay * parent_size.height() + by * own_size.height() + cy
+    return QtCore.QPointF(x, y)
+
+def relative_layout_relative(ax, ay, parent_size, own_size):
+    """
+        Convenience method.
+    """
+    return relative_layout(ax, -0.5, 0, ay, -0.5, 0, parent_size, own_size)
+
+def relative_layout_centered(parent_size, own_size):
+    """
+        Convenience method.
+    """
+    return relative_layout_relative(0.5, 0.5, parent_size, own_size)
+
+def relative_layout_northwest(parent_size, own_size, gap_x = 0, gap_y = 0):
+    """
+        Convenience method.
+    """
+    return relative_layout(1, -1, -gap_x, 0, 0, gap_y, parent_size, own_size)
+
+def relative_layout_northeast(parent_size, own_size, gap_x = 0, gap_y = 0):
+    """
+        Convenience method.
+    """
+    return relative_layout(1, -1, -gap_x, 0, 0, gap_y, parent_size, own_size)
+
+def relative_layout_southwest(parent_size, own_size, gap_x = 0, gap_y = 0):
+    """
+        Convenience method.
+    """
+    return relative_layout(1, -1, -gap_x, 0, 0, gap_y, parent_size, own_size)
+
+def relative_layout_southeast(parent_size, own_size, gap_x = 0, gap_y = 0):
+    return relative_layout(1, -1, -gap_x, 0, 0, gap_y, parent_size, own_size)

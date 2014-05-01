@@ -16,27 +16,60 @@
 
 from PySide import QtCore, QtGui
 import constants, tools
-import gui.browser as browser
+from client import audio
+from gui import browser, graphics
+
+def show_notification(text):
+    graphics.show_notification(main_window, text)
 
 def start():
     app = QtGui.QApplication([])
 
-    scene = QtGui.QGraphicsScene()
+    main_window = QtGui.QWidget(f=QtCore.Qt.FramelessWindowHint)
+    main_window.showFullScreen()
+    main_window.show()
+    size = main_window.size()
+
+    #child = QtGui.QWidget(main_window)
+    #child.setAttribute(QtCore.Qt.WA_StyledBackground)
+    #child.setAutoFillBackground(True)
+    #child.setStyleSheet('background-color:green;')
+    #child.show()
+
+    start_scene = QtGui.QGraphicsScene()
+
+    start_screen = QtGui.QGraphicsView(start_scene, main_window)
+    start_screen.setObjectName('start_screen')
+    start_screen.setStyleSheet('#start_screen{background-color: black;border: 0px;}')
+    start_screen.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+    start_screen.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+    #start_screen.setContentsMargins(0, 0, 0, 0)
+    #start_screen.setViewportMargins(0, 0, 0, 0)
+    start_screen.setSceneRect(0, 0, size.width(), size.height())
 
     background = QtGui.QPixmap(constants.extend(constants.Graphics_UI_Folder, 'start.background.jpg'))
     background_item = QtGui.QGraphicsPixmapItem(background)
+    background_item.setOffset(graphics.relative_layout_centered(size, background.size()))
     background_item.setZValue(1)
-    scene.addItem(background_item)
+    start_scene.addItem(background_item)
 
-
-    view = QtGui.QGraphicsView(scene)
-    view.setStyleSheet('background-color: black;')
-    view.resize(1200, 900)
-    view.show()
+    layout = QtGui.QHBoxLayout()
+    layout.setContentsMargins(0, 0, 0, 0)
+    layout.addWidget(start_screen)
+    main_window.setLayout(layout)
+    start_screen.show()
 
     home_url = QtCore.QUrl(constants.Manual_Index)
-    help = browser.BrowserWindow(home_url, tools.load_icon, parent=view)
-    help.setStyleSheet('background-color: white;')
+    help = browser.BrowserWindow(home_url, tools.load_icon, parent=main_window)
     help.show()
+
+
+    playlist = audio.load_soundtrack_playlist()
+
+    player = audio.Player()
+    player.song_title.connect(show_notification)
+    player.set_playlist(playlist)
+    player.start()
+
 
     app.exec_()

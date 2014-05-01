@@ -37,3 +37,4 @@ nosetests.xml
 
 # custom
 /.idea/workspace.xml
+/data/manual
