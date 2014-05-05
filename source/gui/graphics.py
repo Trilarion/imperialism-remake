@@ -35,29 +35,30 @@ class ClickableWidget(QtGui.QWidget):
         """
         self.clicked.emit(event)
 
-class ExtendedGraphicsPixmapItem(QtGui.QGraphicsPixmapItem):
+class ExtendedGraphicsPixmapItem(QtGui.QGraphicsPixmapItem, QtCore.QObject):
 
     entered = QtCore.Signal()
-    left = QtCore.Signal
-    clicked = QtCore.Signal(QtGui.QGraphicsSceneMouseEvent)
+    left = QtCore.Signal()
+    clicked = QtCore.Signal()
 
     def __init__(self, pixmap):
-        super().__init__(pixmap)
+        QtGui.QGraphicsPixmapItem.__init__(self, pixmap)
+        QtCore.QObject.__init__(self)
         self.setAcceptHoverEvents(True)
         self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
 
     def hoverEnterEvent(self, event):
-        self.entered.emit(event)
+        self.entered.emit()
 
     def hoverLeaveEvent(self, event):
-        self.left.emit(event)
+        self.left.emit()
 
     def mousePressEvent(self, event):
-        self.clicked.emit(event)
+        self.clicked.emit()
 
 Notification_Default_Style = 'border: 1px solid black; padding: 5px 10px 5px 10px; background-color: rgba(128, 128, 128, 128); color: white;'
 
-def show_notification(parent, text, style=Notification_Default_Style, fade_duration=2000, stay_duration=2000, callback=None):
+def show_notification(parent, text, style=Notification_Default_Style, fade_duration=2000, stay_duration=2000, positioner=None, callback=None):
     """
         border_style example: "border: 1px solid black"
         Please only use a color that is fully opaque (alpha = 255) for bg_color, otherwise a black background will appear.
@@ -107,48 +108,74 @@ def show_notification(parent, text, style=Notification_Default_Style, fade_durat
         # start the timer as soon as the fading in animation has finished
         widget.fade_in.finished.connect(widget.timer.start)
 
+    # if given, position
+    if parent and positioner:
+        position = positioner.calculate(parent.size(), widget.size())
+        widget.move(position)
+
     # to avoid short blinking show transparent and start animation
     widget.setWindowOpacity(0)
     widget.show()
     widget.fade_in.start()
 
-def relative_layout(ax, bx, cx, ay, by, cy, parent_size, own_size):
-    """
-        parent_size, own_size = QtCore.QSize
-    """
-    x = ax * parent_size.width() + bx * own_size.width() + cx
-    y = ay * parent_size.height() + by * own_size.height() + cy
-    return QtCore.QPointF(x, y)
+class Relative_Positioner():
 
-def relative_layout_relative(ax, ay, parent_size, own_size):
+    def __init__(self, ax = 0.5, bx = -0.5, cx = 0, ay = 0.5, by = -0.5, cy = 0):
+        self.ax = ax
+        self.bx = bx
+        self.cx = cx
+        self.ay = ay
+        self.by = by
+        self.cy = cy
+
+    def calculate(self, parent_size, own_size):
+        x = self.ax * parent_size.width() + self.bx * own_size.width() + self.cx
+        y = self.ay * parent_size.height() + self.by * own_size.height() + self.cy
+        return QtCore.QPoint(x, y)
+
+def create_positioner_northwest(gap_x = 0, gap_y = 0):
     """
         Convenience method.
     """
-    return relative_layout(ax, -0.5, 0, ay, -0.5, 0, parent_size, own_size)
+    return Relative_Positioner(1, -1, -gap_x, 0, 0, gap_y)
 
-def relative_layout_centered(parent_size, own_size):
+def create_positioner_northeast(gap_x = 0, gap_y = 0):
     """
         Convenience method.
     """
-    return relative_layout_relative(0.5, 0.5, parent_size, own_size)
+    return Relative_Positioner(1, -1, -gap_x, 0, 0, gap_y)
 
-def relative_layout_northwest(parent_size, own_size, gap_x = 0, gap_y = 0):
+def create_positioner_southwest(gap_x = 0, gap_y = 0):
     """
         Convenience method.
     """
-    return relative_layout(1, -1, -gap_x, 0, 0, gap_y, parent_size, own_size)
+    return Relative_Positioner(1, -1, -gap_x, 0, 0, gap_y)
 
-def relative_layout_northeast(parent_size, own_size, gap_x = 0, gap_y = 0):
+def create_positioner_southeast(gap_x = 0, gap_y = 0):
     """
         Convenience method.
     """
-    return relative_layout(1, -1, -gap_x, 0, 0, gap_y, parent_size, own_size)
+    return Relative_Positioner(1, -1, -gap_x, 0, 0, gap_y)
 
-def relative_layout_southwest(parent_size, own_size, gap_x = 0, gap_y = 0):
-    """
-        Convenience method.
-    """
-    return relative_layout(1, -1, -gap_x, 0, 0, gap_y, parent_size, own_size)
+class FadeAnimation():
 
-def relative_layout_southeast(parent_size, own_size, gap_x = 0, gap_y = 0):
-    return relative_layout(1, -1, -gap_x, 0, 0, gap_y, parent_size, own_size)
+    def __init__(self, graphics_item, duration):
+
+        # create opacity effect
+        self.effect = QtGui.QGraphicsOpacityEffect()
+        self.effect.setOpacity(0)
+        graphics_item.setGraphicsEffect(self.effect)
+
+        # create animation
+        self.animation = QtCore.QPropertyAnimation(self.effect, 'opacity')
+        self.animation.setDuration(duration)  # in ms
+        self.animation.setStartValue(0)
+        self.animation.setEndValue(1)
+
+    def fade_in(self):
+        self.animation.setDirection(QtCore.QAbstractAnimation.Forward)
+        self.animation.start()
+
+    def fade_out(self):
+        self.animation.setDirection(QtCore.QAbstractAnimation.Backward)
+        self.animation.start()
