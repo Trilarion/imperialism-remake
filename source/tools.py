@@ -14,11 +14,79 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import constants
+import zipfile, json, sys, datetime
 from PySide import QtGui
+import constants
 
-def load_icon(name):
+def load_ui_icon(name):
     """
         Load an icon from a base icon path.
     """
-    return QtGui.QIcon(constants.extend(constants.Graphics_UI_Folder, name))
+    file_name = constants.extend(constants.Graphics_UI_Folder, name)
+    return QtGui.QIcon(file_name)
+
+def log_info(text, exception=None):
+    log_write_entry(sys.stdout, "INFO", text, exception)
+
+
+def log_error(text, exception=None):
+    log_write_entry(sys.stderr, "ERROR", text, exception)
+
+
+def log_write_entry(writer, type, text, exception):
+    now = datetime.datetime.now()
+    header = now.isoformat(" ") + '\t' + type + '\t'
+
+    print(header + text, end='\r\n', file=writer)
+
+    if exception != None:
+        print(header + exception, end='\r\n', file=writer)
+
+class Options():
+    def __init__(self):
+        self.options = {}
+
+    def load(self):
+        with open(constants.Options_File, 'r') as f:
+            self.options = json.load(f)
+
+    def save(self, file):
+        with open(constants.Options_File, 'w') as f:
+            json.dump(self.options, f, indent=2, separators=(',', ': '))
+
+    def get(self, key):
+        return self.options[key]
+
+    def set(self, key, value):
+        self.options[key] = value
+
+options = Options()
+
+class ZipArchiveReader():
+    def __init__(self, file):
+        self.zip = zipfile.ZipFile(file, mode='r')
+
+    def read(self, name):
+        return self.zip.read(name)
+
+    def read_as_json(self, name):
+        bytes = self.read(name)
+        obj = json.loads(bytes.decode())
+        return obj
+
+    def __del__(self):
+        self.zip.close()
+
+class ZipArchiveWriter():
+    def __init__(self, file):
+        self.zip = zipfile.ZipFile(file, mode='w', compression=zipfile.ZIP_DEFLATED)
+
+    def write(self, name, bytes):
+        self.zip.writestr(name, bytes)
+
+    def write_json(self, name, obj):
+        bytes = json.dumps(obj).encode()
+        self.write(name, bytes)
+
+    def __del__(self):
+        self.zip.close()

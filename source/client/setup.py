@@ -36,8 +36,8 @@ class StartScreen():
 
         background = QtGui.QPixmap(constants.extend(constants.Graphics_UI_Folder, 'start.background.jpg'))
         background_item = QtGui.QGraphicsPixmapItem(background)
-        positioner = graphics.Relative_Positioner()
-        background_item.setOffset(positioner.calculate(size, background.size()))
+        pos = graphics.Relative_Positioner().centerH().centerV()
+        background_item.setOffset(pos.calculate(size, background.size()))
         background_item.setZValue(1)
         self.scene.addItem(background_item)
 
@@ -82,6 +82,14 @@ class StartScreen():
             frame_item.setZValue(4)
         self.map = map
 
+        version_item = QtGui.QGraphicsSimpleTextItem(tools.options.get('general.version'))
+        brush_white = QtGui.QBrush(QtCore.Qt.white)
+        version_item.setBrush(brush_white)
+        version_item.setZValue(5)
+        pos = graphics.Relative_Positioner().east(20).south(20)
+        version_item.setPos(pos.calculate(size, version_item.boundingRect()))
+        self.scene.addItem(version_item)
+
         self.layout = QtGui.QHBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.addWidget(self.screen)
@@ -95,10 +103,10 @@ class Client():
         self.main_window.show()
 
     def show_notification(self, text):
-        graphics.show_notification(self.main_window, 'Playing {}'.format(text), positioner=graphics.Relative_Positioner(ay=0.9))
+        graphics.show_notification(self.main_window, 'Playing {}'.format(text), positioner=graphics.Relative_Positioner().centerH().south(50))
 
     def show_help_browser(self, url=QtCore.QUrl(constants.Manual_Index)):
-        help = browser.BrowserWindow(url, tools.load_icon, parent=self.main_window)
+        help = browser.BrowserWindow(url, tools.load_ui_icon, parent=self.main_window)
         help.show()
 
     def show_start_screen(self):
@@ -108,7 +116,12 @@ class Client():
         pass
 
     def show_options(self):
-        pass
+        options_window = QtGui.QTabWidget(self.main_window)
+        options_window.setWindowTitle('Preferences')
+        options_window.resize(QtCore.QSize(800, 600))
+        options_window.setMinimumSize(600, 400)
+        options_window.show()
+
 
     def quit(self):
         self.main_window.close()
@@ -126,5 +139,5 @@ def start():
     player.set_playlist(playlist)
     player.start()
 
-
+    tools.log_info('client initialized, start Qt app execution')
     app.exec_()

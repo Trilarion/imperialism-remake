@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import time, json
+import json
 
 from PySide import QtCore
 import constants
@@ -102,7 +102,7 @@ class Player(QtCore.QObject):
 
         """
         next_source = self.playlist[self.song_index][0]
-        print(next_source)
+        # print(next_source)
         self.media_object.enqueue(Phonon.MediaSource(next_source))
 
         next_title = self.playlist[self.song_index][1]
@@ -125,7 +125,7 @@ class Player(QtCore.QObject):
 
             See Phonon.MediaObject.stateChanged
         """
-        print('time {} state {} to {}'.format(time.clock(), oldState, newState))
+        # print('time {} state {} to {}'.format(time.clock(), oldState, newState))
         if newState == Phonon.ErrorState:
             print(self.media_object.errorType())
             print(self.media_object.errorString())

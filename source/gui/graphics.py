@@ -120,42 +120,39 @@ def show_notification(parent, text, style=Notification_Default_Style, fade_durat
 
 class Relative_Positioner():
 
-    def __init__(self, ax = 0.5, bx = -0.5, cx = 0, ay = 0.5, by = -0.5, cy = 0):
-        self.ax = ax
-        self.bx = bx
-        self.cx = cx
-        self.ay = ay
-        self.by = by
-        self.cy = cy
+    def __init__(self, x=(0, 0, 0), y=(0, 0, 0)):
+        self.x = x
+        self.y = y
+
+    def south(self, gap):
+        self.y = (1, -1, -gap)
+        return self
+
+    def north(self, gap):
+        self.y = (0, 0, gap)
+        return self
+
+    def west(self, gap):
+        self.x = (0, 0, gap)
+        return self
+
+    def east(self, gap):
+        self.x = (1, -1, -gap)
+        return self
+
+    def centerH(self):
+        self.x = (0.5, -0.5, 0)
+        return self
+
+    def centerV(self):
+        self.y = (0.5, -0.5, 0)
+        return self
+
 
     def calculate(self, parent_size, own_size):
-        x = self.ax * parent_size.width() + self.bx * own_size.width() + self.cx
-        y = self.ay * parent_size.height() + self.by * own_size.height() + self.cy
-        return QtCore.QPoint(x, y)
-
-def create_positioner_northwest(gap_x = 0, gap_y = 0):
-    """
-        Convenience method.
-    """
-    return Relative_Positioner(1, -1, -gap_x, 0, 0, gap_y)
-
-def create_positioner_northeast(gap_x = 0, gap_y = 0):
-    """
-        Convenience method.
-    """
-    return Relative_Positioner(1, -1, -gap_x, 0, 0, gap_y)
-
-def create_positioner_southwest(gap_x = 0, gap_y = 0):
-    """
-        Convenience method.
-    """
-    return Relative_Positioner(1, -1, -gap_x, 0, 0, gap_y)
-
-def create_positioner_southeast(gap_x = 0, gap_y = 0):
-    """
-        Convenience method.
-    """
-    return Relative_Positioner(1, -1, -gap_x, 0, 0, gap_y)
+        pos_x = self.x[0] * parent_size.width() + self.x[1] * own_size.width() + self.x[2]
+        pos_y = self.y[0] * parent_size.height() + self.y[1] * own_size.height() + self.y[2]
+        return QtCore.QPoint(pos_x, pos_y)
 
 class FadeAnimation():
 
@@ -179,3 +176,61 @@ class FadeAnimation():
     def fade_out(self):
         self.animation.setDirection(QtCore.QAbstractAnimation.Backward)
         self.animation.start()
+
+class GraphicsItemSet():
+    """
+        A set (internally a list because a list might be less overhead) of QGraphicsItem elements.
+        Some collective actions are possible like setting a Z-value to each of them.
+    """
+
+    def __init__(self):
+        self.content = []
+
+    def add_item(self, item):
+        """
+            item -- QGraphicsItem
+        """
+        if not isinstance(item, QtGui.QGraphicsItem):
+            raise RuntimeError('Expected instance of QGraphicsItem!')
+        self.content.append(item)
+
+    def set_level(self, level):
+        """
+
+        """
+        for item in self.content:
+            item.setZValue(level)
+
+class ZStackingManager():
+    """
+
+    """
+
+    def __init__(self):
+        self.floors = []
+
+    def new_floor(self, floor=None, above=True):
+        """
+
+        """
+        # if a floor is given, it should exist
+        if floor and floor not in self.floors:
+            raise RuntimeError('Specified floor unknown!')
+        if floor:
+            # insert above or below the given floor
+            insert_position = self.floors.index(floor) + (1 if above else 0)
+        else:
+            # insert at the end or the beginning of the floors
+            insert_position = len(self.floors) if above else 0
+        # create new floor, insert in list and return it
+        new_floor = GraphicsItemSet()
+        self.floors.insert(insert_position, new_floor)
+        return new_floor
+
+
+    def stack(self):
+        """
+
+        """
+        for z in range(0, len(self.floors)):
+            self.floors[z].set_level(z)

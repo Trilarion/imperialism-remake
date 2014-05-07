@@ -38,3 +38,4 @@ nosetests.xml
 # custom
 /.idea/workspace.xml
 /data/manual
+/tools/imperialism_map_import.py
