@@ -41,7 +41,7 @@ base = None
 if sys.platform == 'win32':
     base = 'Win32GUI'
 
-executables = [Executable(os.path.join('source', 'start.py'), targetName='Remake.exe', base=base)]
+executables = [Executable(os.path.join('source', 'start.py'), targetName='ImperialismRemake.exe', base=base)]
 
 # delete previous build directory completely
 path = os.path.join('build', 'exe.win-amd64-3.4')
@@ -49,7 +49,7 @@ if os.path.isdir(path):
     shutil.rmtree(path)
 
 # freeze
-setup(name='Imperialism Remake', version='0.2', description='Open Source remake of the classic SSI strategy game: Imperialism',
+setup(name='Imperialism Remake', version='0.2.0', description='Open Source remake of the classic SSI strategy game: Imperialism',
       options=options, executables=executables)
 
 # delete some files we do not need

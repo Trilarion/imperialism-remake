@@ -18,9 +18,9 @@
 
 import json
 from PySide import QtCore, QtGui
-import constants, tools
+import constants as c, tools as t
 from client import audio
-from gui import browser, graphics
+from gui import browser, graphics as g
 
 class StartScreen():
     def __init__(self, client):
@@ -34,9 +34,9 @@ class StartScreen():
         size = client.main_window.size()
         self.screen.setSceneRect(0, 0, size.width(), size.height())
 
-        background = QtGui.QPixmap(constants.extend(constants.Graphics_UI_Folder, 'start.background.jpg'))
+        background = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, 'start.background.jpg'))
         background_item = QtGui.QGraphicsPixmapItem(background)
-        pos = graphics.Relative_Positioner().centerH().centerV()
+        pos = g.Relative_Positioner().centerH().centerV()
         background_item.setOffset(pos.calculate(size, background.size()))
         background_item.setZValue(1)
         self.scene.addItem(background_item)
@@ -49,7 +49,7 @@ class StartScreen():
             'options': client.show_options
         }
 
-        map_file = constants.extend(constants.Graphics_UI_Folder, 'start.overlay.info')
+        map_file = c.extend(c.Graphics_UI_Folder, 'start.overlay.info')
         with open(map_file, 'r') as f:
             map = json.load(f)
 
@@ -58,13 +58,13 @@ class StartScreen():
 
         for k, v in map.items():
             # add action from our predefined action dictionary
-            pixmap = QtGui.QPixmap(constants.extend(constants.Graphics_UI_Folder, v['overlay']))
-            pixmap_item = graphics.ExtendedGraphicsPixmapItem(pixmap)
+            pixmap = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, v['overlay']))
+            pixmap_item = g.ExtendedGraphicsPixmapItem(pixmap)
             pixmap_item.setZValue(3)
             self.scene.addItem(pixmap_item)
             v['item'] = pixmap_item
 
-            fade_animation = graphics.FadeAnimation(pixmap_item, 300)
+            fade_animation = g.FadeAnimation(pixmap_item, 300)
             pixmap_item.entered.connect(fade_animation.fade_in)
             pixmap_item.left.connect(fade_animation.fade_out)
             pixmap_item.clicked.connect(actions[k])
@@ -82,11 +82,11 @@ class StartScreen():
             frame_item.setZValue(4)
         self.map = map
 
-        version_item = QtGui.QGraphicsSimpleTextItem(tools.options.get('general.version'))
+        version_item = QtGui.QGraphicsSimpleTextItem(t.options.get('general.version'))
         brush_white = QtGui.QBrush(QtCore.Qt.white)
         version_item.setBrush(brush_white)
         version_item.setZValue(5)
-        pos = graphics.Relative_Positioner().east(20).south(20)
+        pos = g.Relative_Positioner().east(20).south(20)
         version_item.setPos(pos.calculate(size, version_item.boundingRect()))
         self.scene.addItem(version_item)
 
@@ -103,10 +103,10 @@ class Client():
         self.main_window.show()
 
     def show_notification(self, text):
-        graphics.show_notification(self.main_window, 'Playing {}'.format(text), positioner=graphics.Relative_Positioner().centerH().south(50))
+        g.show_notification(self.main_window, 'Playing {}'.format(text), positioner=g.Relative_Positioner().centerH().south(50))
 
-    def show_help_browser(self, url=QtCore.QUrl(constants.Manual_Index)):
-        help = browser.BrowserWindow(url, tools.load_ui_icon, parent=self.main_window)
+    def show_help_browser(self, url=QtCore.QUrl(c.Manual_Index)):
+        help = browser.BrowserWindow(url, t.load_ui_icon, parent=self.main_window)
         help.show()
 
     def show_start_screen(self):
@@ -139,5 +139,5 @@ def start():
     player.set_playlist(playlist)
     player.start()
 
-    tools.log_info('client initialized, start Qt app execution')
+    t.log_info('client initialized, start Qt app execution')
     app.exec_()

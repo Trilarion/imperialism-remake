@@ -13,3 +13,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+from PySide import QtCore
+
+class Scenario(QtCore.QObject):
+    def __init__(self):
+        super().__init__()
+        pass
+
+    def load(self, file):
+        pass
+
+    def save(self, file):
+        pass

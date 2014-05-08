@@ -16,70 +16,54 @@
 
 from PySide import QtCore, QtGui, QtWebKit
 
-class BrowserWindow(QtGui.QWidget):
-    """
-        QWidget derived class encapsulating the QWebView and a QToolBar with forward, backward and home button
-        to create a convenient browser
-    """
-    def __init__(self, home_url, icon_provider, title='Help', size=QtCore.QSize(800, 600), parent=None):
-        """
-            Initialization of the class, set the layout and finally load the home URL
+class Browser(QtCore.QObject):
+    def __init__(self, home_url, icon_provider):
+        super().__init__()
 
-            home_url -- QtCore.QUrl: URL of the first loaded page and also set when hitting the home button
-            icon_provider -- callable: takes a name (string) and returns an icon (QtGui.QIcon)
-            title -- string: Prefix of the window title
-            size -- QtCore.QSize: Initial size of the window (should be larger than the minimum size (600, 400))
-            parent -- QtGui.QWidget: Parent widget for keeping references
-        """
-        super().__init__(parent, QtCore.Qt.Window)
-        self.title = title
-        self.setWindowTitle(title)
-        self.setWindowIcon(icon_provider('icon.help.png'))
-        self.resize(size)
-        self.setMinimumSize(600, 400)
-
-        # Store home url
+        # store home url
         self.home_url = home_url
 
-        # Create and add tool bar on top (non floatable or movable)
-        tool_bar = QtGui.QToolBar(self)
+        # setup widget
+        self.widget = QtGui.QWidget()
+
+        # create and add tool bar on top (non floatable or movable)
+        tool_bar = QtGui.QToolBar(self.widget)
         tool_bar.setMovable(False)
         tool_bar.setFloatable(False)
 
-        # Create actions, connect to methods, add to tool bar
-        action_home = QtGui.QAction(self)
+        # create actions, connect to methods, add to tool bar
+        action_home = QtGui.QAction(self.widget)
         action_home.setIcon(icon_provider('icon.home.png'))
         action_home.setToolTip('Home')
         action_home.triggered.connect(self.actionHomeTriggered)
         tool_bar.addAction(action_home)
 
-        action_backward = QtGui.QAction(self)
+        action_backward = QtGui.QAction(self.widget)
         action_backward.setEnabled(False)
         action_backward.setIcon(icon_provider('icon.backward.png'))
         action_backward.triggered.connect(self.actionBackwardTriggered)
         tool_bar.addAction(action_backward)
         self.action_backward = action_backward
 
-        action_forward = QtGui.QAction(self)
+        action_forward = QtGui.QAction(self.widget)
         action_forward.setEnabled(False)
         action_forward.setIcon(icon_provider('icon.forward.png'))
         action_forward.triggered.connect(self.actionForwardTriggered)
         tool_bar.addAction(action_forward)
         self.action_forward = action_forward
 
-        # Create and add web view, connect linkClicked signal with our newPage method
+        # create and add web view, connect linkClicked signal with our newPage method
         web_view = QtWebKit.QWebView()
         # must set DelegationPolicy to include all links
         web_view.page().setLinkDelegationPolicy(QtWebKit.QWebPage.DelegateAllLinks)
         web_view.linkClicked.connect(self.newPage)
         self.web_view = web_view
 
-        # Set Layout
+        # set Layout
         layout = QtGui.QVBoxLayout()
-        layout.setContentsMargins(5, 2, 5, 2)
         layout.addWidget(tool_bar)
         layout.addWidget(web_view)
-        self.setLayout(layout)
+        self.widget.setLayout(layout)
 
         # Initialize history (initially there is no current page)
         self.history = []
@@ -153,11 +137,12 @@ class BrowserWindow(QtGui.QWidget):
         self.web_view.load(url)
 
         # update title of window, only show extended version if the page has a title
-        page_title = self.web_view.title()
-        if not page_title:
-            self.setWindowTitle(self.title)
-        else:
-            self.setWindowTitle('{} - {}'.format(self.title, self.web_view.title()))
+        # TODO title?
+        #page_title = self.web_view.title()
+        #if not page_title:
+        #    self.widget.setWindowTitle(self.title)
+        #else:
+        #    self.widget.setWindowTitle('{} - {}'.format(self.title, self.web_view.title()))
 
         # update tooltips of forward/backward button
         if self.action_backward.isEnabled():

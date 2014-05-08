@@ -17,13 +17,8 @@
 import json
 
 from PySide import QtCore
-import constants
-
-try:
-    from PySide.phonon import Phonon
-except ImportError:
-    print('Phonon not available')
-    # TODO should turn off music and tell the user why
+from PySide.phonon import Phonon
+import constants as c
 
 def is_mime_type_ogg_available():
     """
@@ -36,11 +31,11 @@ def load_soundtrack_playlist():
     """
 
     """
-    file = open(constants.Soundtrack_Playlist, 'r')
+    file = open(c.Soundtrack_Playlist, 'r')
     playlist = json.load(file)
     # add the soundtrack folder to each file name
     for entry in playlist:
-        entry[0] = constants.extend(constants.Soundtrack_Folder, entry[0])
+        entry[0] = c.extend(c.Soundtrack_Folder, entry[0])
     return playlist
 
 class Player(QtCore.QObject):

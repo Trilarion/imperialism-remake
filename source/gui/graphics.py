@@ -234,3 +234,23 @@ class ZStackingManager():
         """
         for z in range(0, len(self.floors)):
             self.floors[z].set_level(z)
+
+def create_dialog(self, parent, content_widget, title=None, icon=None, size=None, minimum_size=None, background=None):
+        dlg = QtGui.QWidget(parent, QtCore.Qt.Window)
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(content_widget)
+        dlg.setLayout(layout)
+        if title:
+            dlg.setWindowTitle(title)
+        if icon:
+            dlg.setWindowIcon(icon)
+        if size:
+            dlg.resize(size)
+        if minimum_size:
+            dlg.setMinimumSize(minimum_size)
+        if background:
+            dlg.setObjectName('dialogx')
+            dlg.setAttribute(QtCore.Qt.WA_StyledBackground)
+            style = '#dialogx{background-image: url({});}'.format(background)
+            dlg.setStyleSheet(style)
+        return dlg

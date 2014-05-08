@@ -15,9 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os, sys, codecs, shutil
-import tools
 
-Debug_Mode = True
+# determine Debug_Mode from runtime
+if len(sys.argv) > 1 and sys.argv[1] == 'debug':
+    Debug_Mode = True
+    print('debug mode on')
+else:
+    Debug_Mode = False
 
 def extend(path, *parts):
     extended = os.path.join(path, *parts)
@@ -68,6 +72,3 @@ if not Debug_Mode:
 Options_File = os.path.join(User_Folder, 'options.info')
 if not os.path.exists(Options_File):
     shutil.copyfile(Options_Default_File, Options_File)
-tools.options.load()
-
-tools.log_info('options loaded from user folder ({})'.format(User_Folder))

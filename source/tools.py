@@ -16,13 +16,13 @@
 
 import zipfile, json, sys, datetime
 from PySide import QtGui
-import constants
+import constants as c
 
 def load_ui_icon(name):
     """
         Load an icon from a base icon path.
     """
-    file_name = constants.extend(constants.Graphics_UI_Folder, name)
+    file_name = c.extend(c.Graphics_UI_Folder, name)
     return QtGui.QIcon(file_name)
 
 def log_info(text, exception=None):
@@ -47,11 +47,11 @@ class Options():
         self.options = {}
 
     def load(self):
-        with open(constants.Options_File, 'r') as f:
+        with open(c.Options_File, 'r') as f:
             self.options = json.load(f)
 
     def save(self, file):
-        with open(constants.Options_File, 'w') as f:
+        with open(c.Options_File, 'w') as f:
             json.dump(self.options, f, indent=2, separators=(',', ': '))
 
     def get(self, key):
@@ -60,7 +60,10 @@ class Options():
     def set(self, key, value):
         self.options[key] = value
 
+# create the single options object, load options and send the first log message
 options = Options()
+options.load()
+log_info('options loaded from user folder ({})'.format(c.User_Folder))
 
 class ZipArchiveReader():
     def __init__(self, file):

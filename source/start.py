@@ -14,7 +14,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from client import setup
+# test for python version
+import sys
+if sys.version_info < (3, 3):
+    raise RuntimeError('Python version must be 3.3 at least.')
 
-if __name__ == '__main__':
-    setup.start()
+# test for existence of PySide
+try:
+    from PySide import QtCore
+except ImportError:
+    raise RuntimeError('PySide must be installed.')
+
+# get constants and log up and running
+import tools as t
+
+# test for phonon availability
+try:
+    from PySide.phonon import Phonon
+except ImportError:
+    t.log_error('Phonon backend not available, no sound.')
+    # TODO set mute in options
+
+# now we can safely assume that the environment is good to us
+# and we simply start the client
+from client import setup
+setup.start()

@@ -1,0 +1,9 @@
+1. Install Python 3
+   https://www.python.org/downloads/
+
+2. Install PySide 
+   http://qt-project.org/wiki/Get-PySide
+
+3. Execute "start.py" in this folder with Python 3
+
+Contact: http://remake.twelvepm.de/
