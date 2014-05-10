@@ -14,20 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import json
-import constants
+"""
+    Generates the default options.
+"""
 
-if __name__ == '__main__':
+import os
+os.chdir('..')
 
-    # options are stored as a dictionary
-    options = {}
-    options['general.version'] = 'v0.2.0 (2014-xx-xx)'
+# options are stored as a dictionary
+options = {
+    'general.version': 'v0.2.0 (2014-xx-xx)',
 
-    options['graphics.full_screen_mode'] = True
+    'graphics.full_screen_mode': True,
 
-    options['music.soundtrack.mute'] = False
+    'music.soundtrack.mute': False
+}
 
-    # save
-    print('write to {}'.format(constants.Options_Default_File))
-    file = open(constants.Options_Default_File, 'w')
-    json.dump(options, file, indent=2, separators=(',', ': '))
+# save
+import constants as c, tools as t
+print('write to {}'.format(c.Options_Default_File))
+t.write_json(c.Options_Default_File, options)

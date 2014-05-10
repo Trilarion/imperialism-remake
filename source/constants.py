@@ -14,14 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import os, sys, codecs, shutil
+"""
+    Game specific path locations for artwork, music, ...
+"""
 
-# determine Debug_Mode from runtime
-if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-    Debug_Mode = True
-    print('debug mode on')
-else:
-    Debug_Mode = False
+import os
 
 def extend(path, *parts):
     extended = os.path.join(path, *parts)
@@ -30,7 +27,7 @@ def extend(path, *parts):
     return extended
 
 # general folder (do not directly contain data)
-Data_Folder = os.path.join('.', 'data')
+Data_Folder = os.path.join('data')
 Artwork_Folder = extend(Data_Folder, 'artwork')
 
 # music related folder
@@ -45,30 +42,3 @@ Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 # special locations
 Options_Default_File = extend(Data_Folder, 'options.info.default')
 Manual_Index = extend(Data_Folder, 'manual', 'index.html')
-
-# determine home dir
-folder = 'Imperialism Remake'
-if os.name == 'posix':
-    # Linux / Unix
-    User_Folder = os.path.join(os.getenv('HOME'), folder)
-elif (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
-    # MS Windows
-    User_Folder = os.path.join(os.getenv('USERPROFILE'), folder)
-else:
-    User_Folder = '..'
-
-# if not exists, create home dir
-if not os.path.isdir(User_Folder):
-    os.mkdir(User_Folder)
-
-# redirect output to log files (will be overwritten each time)
-Log_File = os.path.join(User_Folder, 'remake.log')
-Error_File = os.path.join(User_Folder, 'remake.error.log')
-if not Debug_Mode:
-    sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
-    sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
-
-# search for existing options file, load it
-Options_File = os.path.join(User_Folder, 'options.info')
-if not os.path.exists(Options_File):
-    shutil.copyfile(Options_Default_File, Options_File)

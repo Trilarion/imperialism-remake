@@ -15,21 +15,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Start with working directory equals base directory of project and script parameter build.
+    Creates a Windows standalone package (including Python3 and PySide) via cx_Freeze.
+    Run with script parameter build
     See also: http://cx-freeze.readthedocs.org/en/latest/index.html
 """
 
 import os, shutil, sys
 from cx_Freeze import setup, Executable
+import  manual_markdown_converter
 
-# TODO define icon
+# version string
+version = '0.2.0'
 
-# run manual_markdown_converter to create newest help version
+# change to project root
+os.chdir('..')
 
+# run conversion of help files from markdown
+manual_markdown_converter.convert()
 
 # set options
 options = {'build_exe': {
     'optimize': 2,
+    'icon': os.path.join('data', 'artwork', 'graphics', 'ui', 'icon.ico'),
     'compressed': True,
     'include_in_shared_zip': True,
     'include_msvcr': True,
@@ -49,8 +56,8 @@ if os.path.isdir(path):
     shutil.rmtree(path)
 
 # freeze
-setup(name='Imperialism Remake', version='0.2.0', description='Open Source remake of the classic SSI strategy game: Imperialism',
+setup(name='Imperialism Remake', version=version, description='Open Source remake of the classic SSI strategy game: Imperialism',
       options=options, executables=executables)
 
-# delete some files we do not need
-os.remove(os.path.join(path, 'data', 'sources_and_licenses.ods'))
+# add some more files
+shutil.copyfile('LICENSE', os.path.join(path, 'LICENSE'))

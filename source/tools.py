@@ -14,8 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Non-specific independent helper functions.
+"""
+
 import zipfile, json, sys, datetime
-from PySide import QtGui
+from PySide import QtGui, QtCore
 import constants as c
 
 def load_ui_icon(name):
@@ -24,6 +28,14 @@ def load_ui_icon(name):
     """
     file_name = c.extend(c.Graphics_UI_Folder, name)
     return QtGui.QIcon(file_name)
+
+def read_json(file_name):
+    with open(file_name, 'r') as file:
+        return json.load(file)
+
+def write_json(file_name, value):
+    with open(file_name, 'w') as file:
+        json.dump(value, file, indent=2, separators=(',', ': '))
 
 def log_info(text, exception=None):
     log_write_entry(sys.stdout, "INFO", text, exception)
@@ -46,24 +58,17 @@ class Options():
     def __init__(self):
         self.options = {}
 
-    def load(self):
-        with open(c.Options_File, 'r') as f:
-            self.options = json.load(f)
+    def load(self, file_name):
+        self.options = read_json(file_name)
 
-    def save(self, file):
-        with open(c.Options_File, 'w') as f:
-            json.dump(self.options, f, indent=2, separators=(',', ': '))
+    def save(self, file_name):
+        write_json(file_name, self.options)
 
     def get(self, key):
         return self.options[key]
 
     def set(self, key, value):
         self.options[key] = value
-
-# create the single options object, load options and send the first log message
-options = Options()
-options.load()
-log_info('options loaded from user folder ({})'.format(c.User_Folder))
 
 class ZipArchiveReader():
     def __init__(self, file):
@@ -93,3 +98,43 @@ class ZipArchiveWriter():
 
     def __del__(self):
         self.zip.close()
+
+class List2D():
+    def __init__(self, dimension):
+        # create empty list
+        size = 1
+        for v in dimension:
+            size *= v
+        self.array = [0] * size
+        # store dimension
+        self.dimension = dimension
+        self.nx = dimension[0]
+
+    def get(self, x, y):
+        index = x + self.nx * y
+        return self.array[index]
+
+    def set(self, x, y, v):
+        index = x + self.nx * y
+        self.array[index] = v
+
+    def dimension(self):
+        return self.dimension
+
+class Worker(QtCore.QObject):
+    def __init__(self):
+        super().__init__()
+        self.thread = QtCore.QThread()
+        self.moveToThread(self.thread)
+        self.thread.start()
+
+    def check_thread(self):
+        current_thread = QtCore.QThread.currentThread()
+        if current_thread is not self.thread:
+            raise RuntimeError('Not running in internal Thread!')
+
+    def kill(self):
+        current_thread = QtCore.QThread.currentThread()
+        self.thread.quit()
+        while self.thread.isRunning():
+            current_thread.msleep(10)

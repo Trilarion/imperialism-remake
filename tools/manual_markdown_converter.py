@@ -14,6 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Converts the help files written in Markdown syntax to html using the markdown
+    converter.
+"""
+
 import os, shutil
 import markdown  # https://pypi.python.org/pypi/Markdown
 
@@ -23,8 +28,8 @@ def convert():
     """
 
     # set input and output directory
-    lookup_dir = os.path.join('.', 'resources', 'manual')
-    install_dir = os.path.join('.', 'data', 'manual')
+    lookup_dir = os.path.join('resources', 'manual')
+    install_dir = os.path.join('data', 'manual')
 
     # clean and re-create install directory
     if os.path.isdir(install_dir):
@@ -69,4 +74,6 @@ def convert():
         md.reset
 
 if __name__ == '__main__':
+    # change to project root
+    os.chdir('..')
     convert()

@@ -14,53 +14,53 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import json, os
-import constants
+"""
+    Generates the hot image areas map of the start screen.
+"""
 
-if __name__ == '__main__':
+import os
+os.chdir('..')
 
-    # hot areas map
-    map = {}
+# hot areas map
+map = {}
 
-    # exit
-    map['exit'] = {
-        'overlay': 'start.overlay.door.right.png',
-        'offset': (575, 412),
-        'label': 'Exit'
-    }
+# exit
+map['exit'] = {
+    'overlay': 'start.overlay.door.right.png',
+    'offset': (575, 412),
+    'label': 'Exit'
+}
 
-    # help browser
-    map['help'] = {
-        'overlay': 'start.overlay.window.left.png',
-        'offset': (127, 397),
-        'label': 'Help'
-    }
+# help browser
+map['help'] = {
+    'overlay': 'start.overlay.window.left.png',
+    'offset': (127, 397),
+    'label': 'Help'
+}
 
-    # game lobby
-    map['lobby'] = {
-        'overlay': 'start.overlay.throne.png',
-        'offset': (421, 459),
-        'label': 'Game Lobby'
-    }
+# game lobby
+map['lobby'] = {
+    'overlay': 'start.overlay.throne.png',
+    'offset': (421, 459),
+    'label': 'Game Lobby'
+}
 
-    # editor
-    map['editor'] = {
-        'overlay': 'start.overlay.map.png',
-        'offset': (821, 60),
-        'label': 'Scenario Editor'
-    }
+# editor
+map['editor'] = {
+    'overlay': 'start.overlay.map.png',
+    'offset': (821, 60),
+    'label': 'Scenario Editor'
+}
 
-    # options
-    map['options'] = {
-        'overlay': 'start.overlay.fireplace.png',
-        'offset': (832, 505),
-        'label': 'Preferences'
-    }
+# options
+map['options'] = {
+    'overlay': 'start.overlay.fireplace.png',
+    'offset': (832, 505),
+    'label': 'Preferences'
+}
 
-    # write
-    file_name = os.path.join(constants.Graphics_UI_Folder, 'start.overlay.info')
-    print('write to {}'.format(file_name))
-    file = open(file_name, 'w')
-    json.dump(map, file, indent=2, separators=(',', ': '))
-
-
+# write
+import constants as c, tools as t
+file_name = os.path.join(c.Graphics_UI_Folder, 'start.overlay.info')
+print('write to {}'.format(file_name))
+t.write_json(file_name, map)

@@ -14,18 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import json
-import constants
+"""
+    Generates the playlist of the soundtrack (file names and titles displayed
+    in the game). Phonon cannot read metadata under Windows sometimes, see:
+    http://stackoverflow.com/questions/23288557/phonon-cant-get-meta-data-of-audio-files-in-python
+"""
 
-if __name__ == '__main__':
+import os
+os.chdir('..')
 
-    # create the playlist, a list of (filename, title)
-    playlist = [('01 Imperialism Theme.ogg', 'Imperialism Theme'),
-                ('02 Silent Ashes.ogg', 'Silent Ashes')]
+# create the playlist, a list of (filename, title)
+playlist = [('01 Imperialism Theme.ogg', 'Imperialism Theme'),
+            ('02 Silent Ashes.ogg', 'Silent Ashes')]
 
-    # write
-    print('write to {}'.format(constants.Soundtrack_Playlist))
-    file = open(constants.Soundtrack_Playlist, 'w')
-    json.dump(playlist, file, indent=2, separators=(',', ': '))
-
-
+# write
+import constants as c, tools as t
+print('write to {}'.format(c.Soundtrack_Playlist))
+t.write_json(c.Soundtrack_Playlist, playlist)
