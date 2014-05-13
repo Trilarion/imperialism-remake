@@ -42,3 +42,6 @@ Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 # special locations
 Options_Default_File = extend(Data_Folder, 'options.info.default')
 Manual_Index = extend(Data_Folder, 'manual', 'index.html')
+
+# network
+Network_Port = 42932
