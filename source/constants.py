@@ -27,8 +27,11 @@ def extend(path, *parts):
     return extended
 
 # general folder (do not directly contain data)
-Data_Folder = os.path.join('data')
+Data_Folder = extend('.', 'data')
 Artwork_Folder = extend(Data_Folder, 'artwork')
+
+# scenario
+Scenario_Folder = extend(Data_Folder, 'scenarios')
 
 # music related folder
 Music_Folder = extend(Artwork_Folder, 'music')

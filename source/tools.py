@@ -93,7 +93,7 @@ class ZipArchiveWriter():
         self.zip.writestr(name, bytes)
 
     def write_json(self, name, obj):
-        bytes = json.dumps(obj).encode()
+        bytes = json.dumps(obj, indent=2, separators=(',', ': ')).encode()
         self.write(name, bytes)
 
     def __del__(self):

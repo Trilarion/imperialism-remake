@@ -15,14 +15,102 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PySide import QtCore
+import tools as t
 
 class Scenario(QtCore.QObject):
     def __init__(self):
         super().__init__()
-        pass
+        self._properties = {}
+        self._provinces = {}
+        self._nations = {}
+        self._map = []
 
-    def load(self, file):
-        pass
+    def create_map(self, size):
+        self._properties['map_size'] = size
+        number_tiles = size[0] * size[1]
+        self._map = [[0]*number_tiles]*2
 
-    def save(self, file):
-        pass
+    def set_terrain_at(self, position, terrain):
+        self._map[0][self.map_index(position)] = terrain
+
+    def terrain_at(self, position):
+        return self._map[0][self.map_index(position)]
+
+    def set_resource_at(self, position, resource):
+        self._map[1][self.map_index(position)] = resource
+
+    def resource_at(self, position):
+        return self._map[1][self.map_index(position)]
+
+    def map_index(self, position):
+        print(position)
+        index = position[0] * self._properties['map_size'][0] + position[1]
+        return index
+
+    def set_scenario_property(self, key, value):
+        self._properties[key] = value
+
+    def get_scenario_property(self, key):
+        """
+            One can only obtain properties that have been set before.
+        """
+        if key in self._properties:
+            return self._properties[key]
+        else:
+            raise RuntimeError('Unknown property {}.'.format(key))
+
+    def new_province(self):
+        province = len(self._provinces) # this always works because we check after loading
+        self._provinces[province] = {}
+        return province
+
+    def set_province_property(self, province, key, value):
+        if province in self._provinces:
+            self._provinces[province][key] = value
+        else:
+            raise RuntimeError('Unknown province {}.'.format(province))
+
+    def get_province_property(self, province, key):
+        if province in self._provinces and key in self._provinces[province]:
+            return self._provinces[province][key]
+        else:
+            raise RuntimeError('Unknown province {} or property {}.'.format(province, key))
+
+    def new_nation(self):
+        nation = len(self._nations) # this always gives a new unique number because we check after loading
+        self._nations[nation] = {}
+        self._nations[nation]['properties'] = {}
+        self._nations[nation]['provinces'] = []
+        return nation
+
+    def set_nation_property(self, nation, key, value):
+        if nation in self._nations:
+            self._nations[nation]['properties'][key] = value
+        else:
+            raise RuntimeError('Unknown nation {}.'.format(nation))
+
+    def get_nation_property(self, nation, key):
+        if nation in self._nations and key in self._nations[nation]['properties']:
+            return self._nations[nation]['properties'][key]
+        else:
+            raise RuntimeError('Unknown nation {} or property {}.'.format(nation, key))
+
+    def transfer_province_to_nation(self, province, nation):
+        # TODO this is not right yet
+        self._nations[nation]['provinces'].append(province)
+
+    def load(self, file_name):
+        reader = t.ZipArchiveReader(file_name)
+        self._properties = reader.read_as_json('properties')
+        self._map = reader.read_as_json('map')
+        self._provinces = reader.read_as_json('provinces')
+        # TODO check all ids are smaller then len()
+        self._nations = reader.read_as_json('nations')
+        # TODO check all ids are smaller then len()
+
+    def save(self, file_name):
+        writer = t.ZipArchiveWriter(file_name)
+        writer.write_json('properties', self._properties)
+        writer.write_json('map', self._map)
+        writer.write_json('provinces', self._provinces)
+        writer.write_json('nations', self._nations)
