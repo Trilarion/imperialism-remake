@@ -235,7 +235,7 @@ class ZStackingManager():
         for z in range(0, len(self.floors)):
             self.floors[z].set_level(z)
 
-def create_dialog(self, parent, content_widget, title=None, icon=None, size=None, minimum_size=None, background=None):
+def create_dialog(parent, content_widget, title=None, icon=None, size=None, minimum_size=None, background=None):
         dlg = QtGui.QWidget(parent, QtCore.Qt.Window)
         layout = QtGui.QVBoxLayout()
         layout.addWidget(content_widget)
@@ -254,3 +254,12 @@ def create_dialog(self, parent, content_widget, title=None, icon=None, size=None
             style = '#dialogx{background-image: url({});}'.format(background)
             dlg.setStyleSheet(style)
         return dlg
+
+class Screen(QtCore.QObject):
+    quit = QtCore.Signal()
+
+    def __init__(self):
+        super().__init__()
+
+    def screen_widget(self):
+        raise NotImplementedError()

@@ -18,21 +18,22 @@
 
 import json
 from PySide import QtCore, QtGui
-import constants as c, tools as t
-from client import audio
-from gui import browser, graphics as g
+import constants as c, tools as t, gui.graphics as g
+import client.audio as audio
+from gui.browser import Browser
 
-class StartScreen():
-    def __init__(self, client):
+class StartScreen(g.Screen):
+    def __init__(self, size, client):
+        super().__init__()
+
         self.scene = QtGui.QGraphicsScene()
 
-        self.screen = QtGui.QGraphicsView(self.scene, client.main_window)
-        self.screen.setObjectName('start_screen')
-        self.screen.setStyleSheet('#start_screen{background-color: black;border: 0px;}')
-        self.screen.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.screen.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        size = client.main_window.size()
-        self.screen.setSceneRect(0, 0, size.width(), size.height())
+        self.widget = QtGui.QGraphicsView(self.scene)
+        self.widget.setObjectName('start_screen')
+        self.widget.setStyleSheet('#start_screen{background-color: black;border: 0px;}')
+        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.widget.setSceneRect(0, 0, size.width(), size.height())
 
         background = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, 'start.background.jpg'))
         background_item = QtGui.QGraphicsPixmapItem(background)
@@ -90,27 +91,33 @@ class StartScreen():
         version_item.setPos(pos.calculate(size, version_item.boundingRect()))
         self.scene.addItem(version_item)
 
-        self.layout = QtGui.QHBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.addWidget(self.screen)
-        client.main_window.setLayout(self.layout)
-        self.screen.show()
+    def screen_widget(self):
+        return self.widget
 
 class Client():
     def __init__(self):
         self.main_window = QtGui.QWidget(f=QtCore.Qt.FramelessWindowHint)
         self.main_window.showFullScreen()
         self.main_window.show()
+        self.size = self.main_window.size()
+
+        self.layout = QtGui.QHBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.main_window.setLayout(self.layout)
+
+        self.help_dialog = g.create_dialog(self.main_window, c.help_browser.widget, 'Help', minimum_size=QtCore.QSize(700, 600))
 
     def show_notification(self, text):
         g.show_notification(self.main_window, 'Playing {}'.format(text), positioner=g.Relative_Positioner().centerH().south(50))
 
-    def show_help_browser(self, url=QtCore.QUrl(c.Manual_Index)):
-        help = browser.BrowserWindow(url, t.load_ui_icon, parent=self.main_window)
-        help.show()
+    def show_help_browser(self, url=None):
+        if url:
+            c.help_browser.displayPage(url)
+        self.help_dialog.show()
 
     def show_start_screen(self):
-        self.screen = StartScreen(self)
+        self.screen = StartScreen(self.size, self)
+        self.layout.addWidget(self.screen.screen_widget())
 
     def show_game_lobby(self):
         pass
@@ -128,6 +135,9 @@ class Client():
 
 def start():
     app = QtGui.QApplication([])
+
+    # some constants
+    c.help_browser = Browser(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
 
     client = Client()
     client.show_start_screen()
