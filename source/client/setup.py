@@ -18,22 +18,22 @@
 
 import json
 from PySide import QtCore, QtGui
-import constants as c, tools as t, gui.graphics as g
+import constants as c, tools as t, lib.graphics as g
 import client.audio as audio
-from gui.browser import Browser
+from lib.browser import BrowserWidget
 
-class StartScreen(g.Screen):
+class StartScreen(QtGui.QGraphicsView):
     def __init__(self, size, client):
         super().__init__()
 
         self.scene = QtGui.QGraphicsScene()
+        self.setScene(self.scene)
 
-        self.widget = QtGui.QGraphicsView(self.scene)
-        self.widget.setObjectName('start_screen')
-        self.widget.setStyleSheet('#start_screen{background-color: black;border: 0px;}')
-        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.widget.setSceneRect(0, 0, size.width(), size.height())
+        self.setObjectName('start_screen')
+        self.setStyleSheet('#start_screen{background-color: black;border: 0px;}')
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setSceneRect(0, 0, size.width(), size.height())
 
         background = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, 'start.background.jpg'))
         background_item = QtGui.QGraphicsPixmapItem(background)
@@ -91,53 +91,101 @@ class StartScreen(g.Screen):
         version_item.setPos(pos.calculate(size, version_item.boundingRect()))
         self.scene.addItem(version_item)
 
-    def screen_widget(self):
-        return self.widget
+class OptionsContentWidget(QtGui.QTabWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        # empty lists
+        self.checkboxes = []
+
+        # add tabs
+        self.add_tab_general()
+        self.add_tab_music()
+
+    def add_tab_general(self):
+        tab = QtGui.QWidget()
+        tab_layout = QtGui.QVBoxLayout(tab)
+
+        # Graphics box
+        box = QtGui.QGroupBox('Graphics')
+        checkbox = QtGui.QCheckBox('Full screen mode')
+        self.register_checkbox(checkbox, 'graphics.full_screen_mode')
+        layout = QtGui.QVBoxLayout(box)
+        layout.addWidget(checkbox)
+        tab_layout.addWidget(box)
+
+        # vertical stretch
+        tab_layout.addStretch()
+
+        # add tab
+        self.addTab(tab, 'General')
+
+    def add_tab_music(self):
+        tab = QtGui.QWidget()
+        layout = QtGui.QVBoxLayout(tab)
+
+        # add tab
+        self.addTab(tab, 'Music')
+
+    def register_checkbox(self, checkbox, option):
+        checkbox.setChecked(t.options.get(option))
+        self.checkboxes.append((checkbox, option))
+
+    def close_request(self, widget):
+        return True
+
+class MainWindow(QtGui.QWidget):
+    def __init__(self):
+        super().__init__(f=QtCore.Qt.FramelessWindowHint)
+        self.showFullScreen()
+        self.layout = QtGui.QHBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.content = None
+
+    def change_content_widget(self, widget):
+        if self.content:
+            self.layout.removeWidget(self.content)
+            del(self.content)
+        self.content = widget
+        self.layout.addWidget(widget)
 
 class Client():
     def __init__(self):
-        self.main_window = QtGui.QWidget(f=QtCore.Qt.FramelessWindowHint)
-        self.main_window.showFullScreen()
-        self.main_window.show()
-        self.size = self.main_window.size()
+        self.main_window = MainWindow()
+        # set icon
 
-        self.layout = QtGui.QHBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.main_window.setLayout(self.layout)
-
-        self.help_dialog = g.create_dialog(self.main_window, c.help_browser.widget, 'Help', minimum_size=QtCore.QSize(700, 600))
+        content_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
+        self.help_dialog = g.Dialog(self.main_window, title='Help', size=QtCore.QSize(800, 600), content_widget=content_widget)
 
     def show_notification(self, text):
         g.show_notification(self.main_window, 'Playing {}'.format(text), positioner=g.Relative_Positioner().centerH().south(50))
 
     def show_help_browser(self, url=None):
         if url:
-            c.help_browser.displayPage(url)
+            pass
+            # c.help_browser.displayPage(url)
         self.help_dialog.show()
 
     def show_start_screen(self):
-        self.screen = StartScreen(self.size, self)
-        self.layout.addWidget(self.screen.screen_widget())
+        widget = StartScreen(self.main_window.size(), self)
+        self.main_window.change_content_widget(widget)
 
     def show_game_lobby(self):
         pass
 
     def show_options(self):
-        options_window = QtGui.QTabWidget(self.main_window)
-        options_window.setWindowTitle('Preferences')
-        options_window.resize(QtCore.QSize(800, 600))
-        options_window.setMinimumSize(600, 400)
-        options_window.show()
-
+        content_widget = OptionsContentWidget()
+        dialog_window = g.Dialog(self.main_window, title='Preferences', size=QtCore.QSize(800, 600), content_widget=content_widget, close_callback=content_widget.close_request)
+        print(len(self.main_window.findChildren(QtGui.QWidget)))
+        print(dialog_window.testAttribute(QtCore.Qt.WA_DeleteOnClose))
+        dialog_window.show()
 
     def quit(self):
         self.main_window.close()
 
 def start():
     app = QtGui.QApplication([])
-
-    # some constants
-    c.help_browser = Browser(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
 
     client = Client()
     client.show_start_screen()

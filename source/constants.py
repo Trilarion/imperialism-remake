@@ -16,6 +16,7 @@
 
 """
     Game specific path locations for artwork, music, ...
+    Only real constant constants.
 """
 
 import os

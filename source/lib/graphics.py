@@ -235,31 +235,47 @@ class ZStackingManager():
         for z in range(0, len(self.floors)):
             self.floors[z].set_level(z)
 
-def create_dialog(parent, content_widget, title=None, icon=None, size=None, minimum_size=None, background=None):
-        dlg = QtGui.QWidget(parent, QtCore.Qt.Window)
-        layout = QtGui.QVBoxLayout()
-        layout.addWidget(content_widget)
-        dlg.setLayout(layout)
+class Dialog(QtGui.QWidget):
+
+    def __init__(self, parent, modal=True, delete_on_close=False):
+        super().__init__(parent, QtCore.Qt.Dialog)
+        # no context help button in the title bar (Qt.Dialog has it by default)
+        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
+
+        if modal:
+            self.setWindowModality(QtCore.Qt.WindowModal)
+        if delete_on_close:
+            self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
+        self.close_callback = None
+
+    def set_style(self, title=None, icon=None, size=None, minimum_size=None, resizable=True, background_image=None):
         if title:
-            dlg.setWindowTitle(title)
+            self.setWindowTitle(title)
         if icon:
-            dlg.setWindowIcon(icon)
+            self.setWindowIcon(icon)
         if size:
-            dlg.resize(size)
+            self.resize(size)
         if minimum_size:
-            dlg.setMinimumSize(minimum_size)
-        if background:
-            dlg.setObjectName('dialogx')
-            dlg.setAttribute(QtCore.Qt.WA_StyledBackground)
-            style = '#dialogx{background-image: url({});}'.format(background)
-            dlg.setStyleSheet(style)
-        return dlg
+            self.setMinimumSize(minimum_size)
+        if not resizable:
+            pass # todo
+        if background_image:
+            id = 'dialog'
+            self.setObjectName(id)
+            self.setAttribute(QtCore.Qt.WA_StyledBackground)
+            style = '#{}{background-image: url({});}'.format(id, background_image)
+            self.setStyleSheet(style)
 
-class Screen(QtCore.QObject):
-    quit = QtCore.Signal()
+    def set_close_callback(self, close_callback):
+        self.close_callback = close_callback
 
-    def __init__(self):
-        super().__init__()
+    def set_content(self, widget, no_margins=True):
+        layout = QtGui.QVBoxLayout(self)
+        layout.addWidget(widget)
+        if no_margins:
+            layout.setContentsMargins(0, 0, 0, 0)
 
-    def screen_widget(self):
-        raise NotImplementedError()
+    def closeEvent(self, event):
+        if self.close_callback and not self.close_callback(self):
+            event.reject()

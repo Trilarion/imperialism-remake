@@ -16,36 +16,33 @@
 
 from PySide import QtCore, QtGui, QtWebKit
 
-class Browser(QtCore.QObject):
+class BrowserWidget(QtGui.QWidget):
     def __init__(self, home_url, icon_provider):
         super().__init__()
 
         # store home url
         self.home_url = home_url
 
-        # setup widget
-        self.widget = QtGui.QWidget()
-
         # create and add tool bar on top (non floatable or movable)
-        tool_bar = QtGui.QToolBar(self.widget)
+        tool_bar = QtGui.QToolBar(self)
         tool_bar.setMovable(False)
         tool_bar.setFloatable(False)
 
         # create actions, connect to methods, add to tool bar
-        action_home = QtGui.QAction(self.widget)
+        action_home = QtGui.QAction(self)
         action_home.setIcon(icon_provider('icon.home.png'))
         action_home.setToolTip('Home')
         action_home.triggered.connect(self.actionHomeTriggered)
         tool_bar.addAction(action_home)
 
-        action_backward = QtGui.QAction(self.widget)
+        action_backward = QtGui.QAction(self)
         action_backward.setEnabled(False)
         action_backward.setIcon(icon_provider('icon.backward.png'))
         action_backward.triggered.connect(self.actionBackwardTriggered)
         tool_bar.addAction(action_backward)
         self.action_backward = action_backward
 
-        action_forward = QtGui.QAction(self.widget)
+        action_forward = QtGui.QAction(self)
         action_forward.setEnabled(False)
         action_forward.setIcon(icon_provider('icon.forward.png'))
         action_forward.triggered.connect(self.actionForwardTriggered)
@@ -60,10 +57,9 @@ class Browser(QtCore.QObject):
         self.web_view = web_view
 
         # set Layout
-        layout = QtGui.QVBoxLayout()
+        layout = QtGui.QVBoxLayout(self)
         layout.addWidget(tool_bar)
         layout.addWidget(web_view)
-        self.widget.setLayout(layout)
 
         # Initialize history (initially there is no current page)
         self.history = []
