@@ -65,6 +65,9 @@ class Options():
         write_json(file_name, self.options)
 
     def get(self, key):
+        """
+            Will throw KeyError if the key is not existing (the dictionary does by default).
+        """
         return self.options[key]
 
     def set(self, key, value):

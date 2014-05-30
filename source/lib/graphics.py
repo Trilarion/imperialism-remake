@@ -235,39 +235,29 @@ class ZStackingManager():
         for z in range(0, len(self.floors)):
             self.floors[z].set_level(z)
 
+
 class Dialog(QtGui.QWidget):
 
-    def __init__(self, parent, modal=True, delete_on_close=False):
+    def __init__(self, parent, title=None, icon=None, delete_on_close=False, modal=False, style=None, close_callback=None):
         super().__init__(parent, QtCore.Qt.Dialog)
         # no context help button in the title bar (Qt.Dialog has it by default)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
 
-        if modal:
-            self.setWindowModality(QtCore.Qt.WindowModal)
-        if delete_on_close:
-            self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-
-        self.close_callback = None
-
-    def set_style(self, title=None, icon=None, size=None, minimum_size=None, resizable=True, background_image=None):
         if title:
             self.setWindowTitle(title)
         if icon:
             self.setWindowIcon(icon)
-        if size:
-            self.resize(size)
-        if minimum_size:
-            self.setMinimumSize(minimum_size)
-        if not resizable:
-            pass # todo
-        if background_image:
+        if delete_on_close:
+            self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        if modal:
+            self.setWindowModality(QtCore.Qt.WindowModal) # default is non-modal
+        if style:
             id = 'dialog'
             self.setObjectName(id)
-            self.setAttribute(QtCore.Qt.WA_StyledBackground)
-            style = '#{}{background-image: url({});}'.format(id, background_image)
+            self.setAttribute(QtCore.Qt.WA_StyledBackground) # in case
+            style = '#{}{{{}}}'.format(id, style) # escaping the {} by doubling {{}}
             self.setStyleSheet(style)
 
-    def set_close_callback(self, close_callback):
         self.close_callback = close_callback
 
     def set_content(self, widget, no_margins=True):
@@ -278,4 +268,4 @@ class Dialog(QtGui.QWidget):
 
     def closeEvent(self, event):
         if self.close_callback and not self.close_callback(self):
-            event.reject()
+            event.ignore()

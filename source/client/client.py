@@ -21,6 +21,7 @@ from PySide import QtCore, QtGui
 import constants as c, tools as t, lib.graphics as g
 import client.audio as audio
 from lib.browser import BrowserWidget
+from server.editor import  EditorScreen
 
 class StartScreen(QtGui.QGraphicsView):
     def __init__(self, size, client):
@@ -46,7 +47,7 @@ class StartScreen(QtGui.QGraphicsView):
             'exit': client.quit,
             'help': client.show_help_browser,
             'lobby': client.show_game_lobby,
-            'editor': client.quit,
+            'editor': client.show_editor_screen,
             'options': client.show_options
         }
 
@@ -133,12 +134,20 @@ class OptionsContentWidget(QtGui.QTabWidget):
         self.checkboxes.append((checkbox, option))
 
     def close_request(self, widget):
+        # check if something was changed
+        options_modified = any([box.isChecked() is not t.options.get(option) for (box, option) in self.checkboxes])
+        if options_modified:
+            answer = QtGui.QMessageBox.question(widget, 'Preferences', 'Save modified preferences', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.Yes)
+            if answer == QtGui.QMessageBox.Yes:
+                for (box, option) in self.checkboxes:
+                    t.options.set(option, box.isChecked())
         return True
 
 class MainWindow(QtGui.QWidget):
-    def __init__(self):
+    def __init__(self, full_screen_mode):
         super().__init__(f=QtCore.Qt.FramelessWindowHint)
-        self.showFullScreen()
+        if full_screen_mode:
+            self.showFullScreen()
         self.layout = QtGui.QHBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.content = None
@@ -152,19 +161,21 @@ class MainWindow(QtGui.QWidget):
 
 class Client():
     def __init__(self):
-        self.main_window = MainWindow()
-        # set icon
+        self.main_window = MainWindow(t.options.get('graphics.full_screen_mode'))
+        self.main_window.setWindowIcon(t.load_ui_icon('icon.ico'))
+        self.main_window.setWindowTitle('Imperialism Remake')
 
-        content_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
-        self.help_dialog = g.Dialog(self.main_window, title='Help', size=QtCore.QSize(800, 600), content_widget=content_widget)
+        self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
+        self.help_dialog = g.Dialog(self.main_window, title='Help')
+        self.help_dialog.set_content(self.help_browser_widget)
+        self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
 
     def show_notification(self, text):
         g.show_notification(self.main_window, 'Playing {}'.format(text), positioner=g.Relative_Positioner().centerH().south(50))
 
     def show_help_browser(self, url=None):
         if url:
-            pass
-            # c.help_browser.displayPage(url)
+            self.help_browser_widget.displayPage(url)
         self.help_dialog.show()
 
     def show_start_screen(self):
@@ -174,12 +185,17 @@ class Client():
     def show_game_lobby(self):
         pass
 
+    def show_editor_screen(self):
+        widget = EditorScreen(self)
+        self.main_window.change_content_widget(widget)
+
     def show_options(self):
-        content_widget = OptionsContentWidget()
-        dialog_window = g.Dialog(self.main_window, title='Preferences', size=QtCore.QSize(800, 600), content_widget=content_widget, close_callback=content_widget.close_request)
-        print(len(self.main_window.findChildren(QtGui.QWidget)))
-        print(dialog_window.testAttribute(QtCore.Qt.WA_DeleteOnClose))
-        dialog_window.show()
+        options_widget = OptionsContentWidget()
+        dialog = g.Dialog(self.main_window, title='Preferences', delete_on_close=True, modal=True, style='background-color: green;', close_callback=options_widget.close_request)
+        dialog.set_content(options_widget)
+        dialog.setStyleSheet('background-color:red;')
+        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.show()
 
     def quit(self):
         self.main_window.close()
@@ -199,3 +215,5 @@ def start():
 
     t.log_info('client initialized, start Qt app execution')
     app.exec_()
+
+    # TODO save options

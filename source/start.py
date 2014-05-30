@@ -85,5 +85,5 @@ if __name__ == '__main__':
 
     # now we can safely assume that the environment is good to us
     # and we simply start the client
-    from client import setup
-    setup.start()
+    from client import client
+    client.start()

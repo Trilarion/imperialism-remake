@@ -17,69 +17,67 @@
 from PySide import QtCore, QtGui
 import lib.graphics as g
 
-class MiniMap(QtCore.QObject):
+class MiniMap(QtGui.QGraphicsView):
 
     def __init__(self):
         super().__init__()
 
         self.scene = QtGui.QGraphicsScene()
-        self.widget = QtGui.QGraphicsView(self.scene)
-        self.widget.setObjectName('mini_map')
-        self.widget.setStyleSheet('#mini_map{background-color: black;border: 0px;}')
-        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setScene(self.scene)
+        self.setObjectName('mini_map')
+        self.setStyleSheet('#mini_map{background-color: gray;border: 0px;}')
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         size = QtCore.QSize(300, 300)
-        self.widget.setSceneRect(0, 0, size.width(), size.height())
-        self.widget.setMinimumSize(size)
+        self.setSceneRect(0, 0, size.width(), size.height())
+        self.setMinimumSize(size)
 
-class Map(QtCore.QObject):
+class Map(QtGui.QGraphicsView):
 
     def __init__(self):
         super().__init__()
 
         self.scene = QtGui.QGraphicsScene()
-        self.widget = QtGui.QGraphicsView(self.scene)
-        self.widget.setObjectName('map')
-        self.widget.setStyleSheet('#map{background-color: black;border: 0px;}')
-        self.widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setScene(self.scene)
+        self.setObjectName('map')
+        self.setStyleSheet('#map{background-color: gray;border: 0px;}')
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
-class InfoBox(QtCore.QObject):
+class InfoBox(QtGui.QLabel):
 
     def __init__(self):
         super().__init__()
 
-        self.widget = QtGui.QLabel()
-        self.widget.setObjectName('info_box')
-        self.widget.setStyleSheet('#info_box{background-color: black;}')
+        self.setText('Info box')
+        self.setObjectName('info_box')
+        self.setStyleSheet('#info_box{background-color: gray;}')
 
-class NewScenarioDialog(g.Dialog):
+class NewScenarioDialogWidget(QtGui.QWidget):
 
-    def __init__(self, parent):
-        super().__init__(parent, 'New Scenario Dialog')
+    def __init__(self):
+        super().__init__()
 
-        self.content = QtGui.QWidget()
-
-        layout = QtGui.QVBoxLayout()
+        layout = QtGui.QVBoxLayout(self)
 
         edit_title = QtGui.QLineEdit()
         edit_title.setFixedWidth(200)
         layout.addWidget(edit_title)
 
-        self.content.setLayout(layout)
-        self.set_content_widget(self.content)
+        layout.addStretch()
 
 
-class EditorScreen():
-    def __init__(self):
+class EditorScreen(QtGui.QWidget):
+    def __init__(self, client):
         super().__init__()
-        self.widget = QtGui.QWidget()
+
+        self.client = client
 
         self.toolbar = QtGui.QToolBar()
         self.toolbar.setFloatable(False)
         self.toolbar.setMovable(False)
 
-        action_new = QtGui.QAction(self.widget)
+        action_new = QtGui.QAction(self)
         action_new.triggered.connect(self.show_new_scenario_dialog)
         self.toolbar.addAction(action_new)
 
@@ -87,11 +85,12 @@ class EditorScreen():
         spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.toolbar.addWidget(spacer)
 
-        action_help = QtGui.QAction(self.widget)
+        action_help = QtGui.QAction(self)
+        action_help.triggered.connect(client.show_help_browser) # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
-        action_quit = QtGui.QAction(self.widget)
-        action_quit.triggered.connect(self.quit.emit)
+        action_quit = QtGui.QAction(self)
+        action_quit.triggered.connect(client.show_start_screen)
         self.toolbar.addAction(action_quit)
 
         self.mini_map = MiniMap()
@@ -100,18 +99,18 @@ class EditorScreen():
 
         self.map = Map()
 
-        layout = QtGui.QGridLayout()
+        layout = QtGui.QGridLayout(self)
         layout.addWidget(self.toolbar, 0, 0, 1, 2)
-        layout.addWidget(self.mini_map.widget, 1, 0)
-        layout.addWidget(self.info_box.widget, 2, 0)
-        layout.addWidget(self.map.widget, 1, 1, 2, 1)
+        layout.addWidget(self.mini_map, 1, 0)
+        layout.addWidget(self.info_box, 2, 0)
+        layout.addWidget(self.map, 1, 1, 2, 1)
         layout.setRowStretch(2, 1) # the info box will take all vertical space left
         layout.setColumnStretch(1, 1) # the map will take all horizontal space left
-        self.widget.setLayout(layout)
-
-    def screen_widget(self):
-        return self.widget
 
     def show_new_scenario_dialog(self):
-        dialog = NewScenarioDialog(self.widget)
+        new_scenario_widget = NewScenarioDialogWidget()
+        dialog = g.Dialog(self.client.main_window, title='New Scenario', delete_on_close=True, modal=True)
+        # TODO close callback
+        dialog.set_content(new_scenario_widget)
+        dialog.setFixedSize(QtCore.QSize(600, 400))
         dialog.show()
