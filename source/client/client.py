@@ -30,8 +30,7 @@ class StartScreen(QtGui.QGraphicsView):
         self.scene = QtGui.QGraphicsScene()
         self.setScene(self.scene)
 
-        self.setObjectName('start_screen')
-        self.setStyleSheet('#start_screen{background-color: black;border: 0px;}')
+        self.setProperty('background', 'wood')
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setSceneRect(0, 0, size.width(), size.height())
@@ -164,6 +163,7 @@ class Client():
         self.main_window = MainWindow(t.options.get('graphics.full_screen_mode'))
         self.main_window.setWindowIcon(t.load_ui_icon('icon.ico'))
         self.main_window.setWindowTitle('Imperialism Remake')
+        self.main_window.setStyleSheet('*[background="wood"] {background-image: url(data/artwork/graphics/ui/wood4.png)} *[background="glass"] {background-image: url(data/artwork/graphics/ui/background_glass.png)}')
 
         self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
         self.help_dialog = g.Dialog(self.main_window, title='Help')
@@ -191,9 +191,8 @@ class Client():
 
     def show_options(self):
         options_widget = OptionsContentWidget()
-        dialog = g.Dialog(self.main_window, title='Preferences', delete_on_close=True, modal=True, style='background-color: green;', close_callback=options_widget.close_request)
+        dialog = g.Dialog(self.main_window, title='Preferences', delete_on_close=True, modal=True, close_callback=options_widget.close_request)
         dialog.set_content(options_widget)
-        dialog.setStyleSheet('background-color:red;')
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 

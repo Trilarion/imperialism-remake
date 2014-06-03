@@ -41,6 +41,7 @@ class Map(QtGui.QGraphicsView):
         self.setScene(self.scene)
         self.setObjectName('map')
         self.setStyleSheet('#map{background-color: gray;border: 0px;}')
+        self.setProperty('background', 'glass')
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
