@@ -1,0 +1,35 @@
+{
+  "blocked": [],
+  "properties": {
+    "categories": [
+      "General",
+      "Artwork",
+      "Programming"
+    ],
+    "pageTitle": "Imperialism Remake Taskboard"
+  },
+  "available": [],
+  "completed": [],
+  "progress": [
+    {
+      "dependencies": [],
+      "creationDate": "2014-06-11",
+      "category": 1,
+      "id": 1,
+      "assignDate": "2014-06-11",
+      "title": "Finish first comprehensive version of game specification",
+      "assignee": "Trilarion",
+      "description": "The game specification is an extensive document describing all the various details of the game and how they interact. It needs public discussion and constant revising. But first it should be in a draft like state at least mentioning all the important parts as detailed as possible. In the next 2-3 months finish it and then publish it for public discussion."
+    },
+    {
+      "description": "The last Java version (0.1.4) had a functional start screen, a preliminary editor showing a map and a game center dialog allowing to choose a scenario. All these features will very likely be part of the final game design because they are so essential. In order to release a Python version a Python version with roughly the same features should be created. This will attract attention to the project and allows us to test the Python release pathways. Do not include more features for now but rather break them down to individual tasks later.",
+      "creationDate": "2014-06-11",
+      "category": 3,
+      "assignDate": "2014-06-11",
+      "dependencies": [],
+      "title": "Bring Python version of the game roughly to the state of the last Java version",
+      "assignee": "Trilarion",
+      "id": 2
+    }
+  ]
+}

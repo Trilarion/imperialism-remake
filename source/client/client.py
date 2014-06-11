@@ -30,7 +30,7 @@ class StartScreen(QtGui.QGraphicsView):
         self.scene = QtGui.QGraphicsScene()
         self.setScene(self.scene)
 
-        self.setProperty('background', 'wood')
+        self.setProperty('background', 'texture')
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setSceneRect(0, 0, size.width(), size.height())
@@ -163,7 +163,7 @@ class Client():
         self.main_window = MainWindow(t.options.get('graphics.full_screen_mode'))
         self.main_window.setWindowIcon(t.load_ui_icon('icon.ico'))
         self.main_window.setWindowTitle('Imperialism Remake')
-        self.main_window.setStyleSheet('*[background="wood"] {background-image: url(data/artwork/graphics/ui/wood4.png)} *[background="glass"] {background-image: url(data/artwork/graphics/ui/background_glass.png)}')
+        self.main_window.setStyleSheet('*[background="texture"] {background-image: url(data/artwork/graphics/ui/background_texture.png)}')
 
         self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
         self.help_dialog = g.Dialog(self.main_window, title='Help')
@@ -171,7 +171,7 @@ class Client():
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
 
     def show_notification(self, text):
-        g.show_notification(self.main_window, 'Playing {}'.format(text), positioner=g.Relative_Positioner().centerH().south(50))
+        g.show_notification(self.main_window, 'Playing {}'.format(text), positioner=g.Relative_Positioner().centerH().south(20))
 
     def show_help_browser(self, url=None):
         if url:

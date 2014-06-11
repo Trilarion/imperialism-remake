@@ -39,3 +39,4 @@ nosetests.xml
 /.idea/workspace.xml
 /data/manual
 /tools/imperialism_map_import.py
+/tools/board-content.json.backup
