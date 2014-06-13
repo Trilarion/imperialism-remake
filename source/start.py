@@ -87,3 +87,10 @@ if __name__ == '__main__':
     # and we simply start the client
     from client import client
     client.start()
+
+    # save options
+    t.options.save(Options_File)
+    t.log_info('options saved')
+
+    # finished
+    t.log_info('will exit soon - good bye')

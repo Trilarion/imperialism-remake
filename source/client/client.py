@@ -123,7 +123,12 @@ class OptionsContentWidget(QtGui.QTabWidget):
 
     def add_tab_music(self):
         tab = QtGui.QWidget()
-        layout = QtGui.QVBoxLayout(tab)
+        tab_layout = QtGui.QVBoxLayout(tab)
+
+        # mute checkbox
+        checkbox = QtGui.QCheckBox('Mute background music')
+        self.register_checkbox(checkbox, 'music.background.mute')
+        tab_layout.addWidget(checkbox)
 
         # add tab
         self.addTab(tab, 'Music')
@@ -140,6 +145,11 @@ class OptionsContentWidget(QtGui.QTabWidget):
             if answer == QtGui.QMessageBox.Yes:
                 for (box, option) in self.checkboxes:
                     t.options.set(option, box.isChecked())
+                # what else do we need to do?
+                if t.options.get('music.background.mute'):
+                    t.player.stop()
+                else:
+                    t.player.start()
         return True
 
 class MainWindow(QtGui.QWidget):
@@ -205,14 +215,11 @@ def start():
     client = Client()
     client.show_start_screen()
 
-    playlist = audio.load_soundtrack_playlist()
-
-    player = audio.Player()
-    player.song_title.connect(client.show_notification)
-    player.set_playlist(playlist)
-    player.start()
+    t.player = audio.Player()
+    t.player.song_title.connect(client.show_notification)
+    t.player.set_playlist(audio.load_soundtrack_playlist())
+    if not t.options.get('music.background.mute'):
+        t.player.start()
 
     t.log_info('client initialized, start Qt app execution')
     app.exec_()
-
-    # TODO save options

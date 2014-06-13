@@ -263,12 +263,11 @@ if __name__ == '__main__':
     # load the board
     board = load_board()
 
-    task = board.new_task(title='Bring Python version of the game roughly to the state of the last Java version', description='The last Java version (0.1.4) \
-had a functional start screen, a preliminary editor showing a map and a game center dialog allowing to choose a scenario. All these features will very likely \
-be part of the final game design because they are so essential. In order to release a Python version a Python version with roughly the same features should be \
-created. This will attract attention to the project and allows us to test the Python release pathways. Do not include more features for now but rather break them \
-down to individual tasks later.', category=3)
-    task.assign('Trilarion')
+    task = board.new_task(title='Music: Compose a few more pieces of background music', description='We could need a few more. Refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.', category=2)
+
+    task = board.new_task(title='UI: Compile a list of buttons that will most probably be needed in the game', description='Create a table giving each button a short but meaningful name and explain in one short sentence the function of each button. Indicate if the size is different from the standard size.', category=1)
+
+    task = board.new_task(title='UI: Develop a common design for buttons', description='We need a common style for button. Please refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.', category=2)
 
     # write to file
     save_board(board)

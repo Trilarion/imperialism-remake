@@ -27,7 +27,7 @@ options = {
 
     'graphics.full_screen_mode': True,
 
-    'music.soundtrack.mute': False
+    'music.background.mute': False
 }
 
 # save

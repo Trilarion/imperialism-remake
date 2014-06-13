@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PySide import QtCore, QtGui
-import lib.graphics as g
+import constants as c, tools as t, lib.graphics as g
 
 class MiniMap(QtGui.QGraphicsView):
 
@@ -78,7 +78,7 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.setFloatable(False)
         self.toolbar.setMovable(False)
 
-        action_new = QtGui.QAction(self)
+        action_new = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Create new scenario', self)
         action_new.triggered.connect(self.show_new_scenario_dialog)
         self.toolbar.addAction(action_new)
 
@@ -86,11 +86,11 @@ class EditorScreen(QtGui.QWidget):
         spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.toolbar.addWidget(spacer)
 
-        action_help = QtGui.QAction(self)
+        action_help = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Show help', self)
         action_help.triggered.connect(client.show_help_browser) # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
-        action_quit = QtGui.QAction(self)
+        action_quit = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Exit to main menu', self)
         action_quit.triggered.connect(client.show_start_screen)
         self.toolbar.addAction(action_quit)
 
