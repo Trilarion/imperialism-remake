@@ -41,8 +41,13 @@ def convert():
     with open(header_file, 'rt') as file:
         header = file.read()
 
-    # copy style file
-    shutil.copyfile(os.path.join(lookup_dir, 'style.css'), os.path.join(install_dir, 'style.css'))
+    # load footer
+    footer_file = os.path.join(lookup_dir, 'footer.tpl')
+    with open(footer_file, 'rt') as file:
+        footer = file.read()
+
+    # copy style files
+    shutil.copytree(os.path.join(lookup_dir, 'css'), os.path.join(install_dir, 'css'))
 
     # search for all markdown files
     md_files = [x for x in os.listdir(lookup_dir) if x.endswith('.md') and not x.startswith('README')]
@@ -60,8 +65,8 @@ def convert():
             text = file.read()
 
         # convert and add header and body tag (\n as newline)
-        html = md.convert(text)
-        html = header + u'<body>\n' + html + u'\n</body>\n</html>\n'
+        body = md.convert(text)
+        html = header + body + footer
 
         # output file name is with html extension instead of md
         out_file = os.path.join(install_dir, md_file.rsplit(".", 1)[0] + '.html')

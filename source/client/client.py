@@ -130,6 +130,9 @@ class OptionsContentWidget(QtGui.QTabWidget):
         self.register_checkbox(checkbox, 'music.background.mute')
         tab_layout.addWidget(checkbox)
 
+        # vertical stretch
+        tab_layout.addStretch()
+
         # add tab
         self.addTab(tab, 'Music')
 

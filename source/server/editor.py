@@ -82,6 +82,14 @@ class EditorScreen(QtGui.QWidget):
         action_new.triggered.connect(self.show_new_scenario_dialog)
         self.toolbar.addAction(action_new)
 
+        action_load = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Load scenario', self)
+        action_load.triggered.connect(self.load_scenario_dialog)
+        self.toolbar.addAction(action_load)
+
+        action_save = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Save scenario', self)
+        action_save.triggered.connect(self.save_scenario_dialog)
+        self.toolbar.addAction(action_save)
+
         spacer = QtGui.QWidget(self.toolbar)
         spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.toolbar.addWidget(spacer)
@@ -115,3 +123,10 @@ class EditorScreen(QtGui.QWidget):
         dialog.set_content(new_scenario_widget)
         dialog.setFixedSize(QtCore.QSize(600, 400))
         dialog.show()
+
+    def load_scenario_dialog(self):
+        fileName = QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', '', 'Scenario Files (*.scenario)')
+
+
+    def save_scenario_dialog(self):
+        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', '', 'Scenario Files (*.scenario)')
