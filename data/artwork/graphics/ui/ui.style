@@ -1,0 +1,4 @@
+*[background="texture"]
+{
+	background-image: url(data/artwork/graphics/ui/background_texture.png)
+}

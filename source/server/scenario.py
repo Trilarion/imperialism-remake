@@ -17,16 +17,25 @@
 from PySide import QtCore
 import tools as t
 
+# some constants
+key_map_size = 'map-size'
+
 class Scenario(QtCore.QObject):
+
+    Complete_Change = QtCore.Signal()
+
     def __init__(self):
         super().__init__()
+        self.clear()
+
+    def clear(self):
         self._properties = {}
         self._provinces = {}
         self._nations = {}
         self._map = []
 
     def create_map(self, size):
-        self._properties['map_size'] = size
+        self._properties[key_map_size] = size
         number_tiles = size[0] * size[1]
         self._map = [[0]*number_tiles]*2
 
@@ -44,13 +53,19 @@ class Scenario(QtCore.QObject):
 
     def map_index(self, position):
         print(position)
-        index = position[0] * self._properties['map_size'][0] + position[1]
+        index = position[0] * self._properties[key_map_size][0] + position[1]
         return index
 
-    def set_scenario_property(self, key, value):
+    def __setitem__(self, key, value):
+        """
+
+        :param key:
+        :param value:
+        :return:
+        """
         self._properties[key] = value
 
-    def get_scenario_property(self, key):
+    def __getitem__(self, key):
         """
             One can only obtain properties that have been set before.
         """
@@ -100,6 +115,7 @@ class Scenario(QtCore.QObject):
         self._nations[nation]['provinces'].append(province)
 
     def load(self, file_name):
+        self.clear()
         reader = t.ZipArchiveReader(file_name)
         self._properties = reader.read_as_json('properties')
         self._map = reader.read_as_json('map')
@@ -107,6 +123,7 @@ class Scenario(QtCore.QObject):
         # TODO check all ids are smaller then len()
         self._nations = reader.read_as_json('nations')
         # TODO check all ids are smaller then len()
+        self.Complete_Change.emit()
 
     def save(self, file_name):
         writer = t.ZipArchiveWriter(file_name)

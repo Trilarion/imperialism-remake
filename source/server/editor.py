@@ -14,8 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import os
 from PySide import QtCore, QtGui
 import constants as c, tools as t, lib.graphics as g
+from server.scenario import Scenario
 
 class MiniMap(QtGui.QGraphicsView):
 
@@ -40,10 +42,23 @@ class Map(QtGui.QGraphicsView):
         self.scene = QtGui.QGraphicsScene()
         self.setScene(self.scene)
         self.setObjectName('map')
-        self.setStyleSheet('#map{background-color: gray;border: 0px;}')
-        self.setProperty('background', 'texture')
+        self.setStyleSheet('#map{background-color: #191E69; border-style: solid ; border-width: 2px; border-radius: 6;border-color: beige;}')
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+    def complete_redraw(self, scenario):
+        self.scene.clear()
+
+        map_size = scenario['map-size']
+
+        S = 80
+
+        # draw the grid
+        for x in range(0, map_size[0]):
+            for y in range(0, map_size[1]):
+                item = self.scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
+                item.setZValue(1000)
+
 
 class InfoBox(QtGui.QLabel):
 
@@ -59,13 +74,48 @@ class NewScenarioDialogWidget(QtGui.QWidget):
     def __init__(self):
         super().__init__()
 
-        layout = QtGui.QVBoxLayout(self)
+        self.items = {}
 
-        edit_title = QtGui.QLineEdit()
-        edit_title.setFixedWidth(200)
-        layout.addWidget(edit_title)
+        widget_layout = QtGui.QVBoxLayout(self)
 
+        # title box
+        box = QtGui.QGroupBox('Title')
+        layout = QtGui.QVBoxLayout(box)
+        edit = QtGui.QLineEdit()
+        edit.setFixedWidth(300)
+        self.items['title'] = edit
+        layout.addWidget(edit)
+        widget_layout.addWidget(box)
+
+        # map size
+        box = QtGui.QGroupBox('Map size')
+        layout = QtGui.QHBoxLayout(box)
+
+        layout.addWidget(QtGui.QLabel('Width'))
+        edit = QtGui.QLineEdit()
+        edit.setFixedWidth(50)
+        self.items['width'] = edit
+        layout.addWidget(edit)
+
+        layout.addWidget(QtGui.QLabel('Height'))
+        edit = QtGui.QLineEdit()
+        edit.setFixedWidth(50)
+        self.items['heigh'] = edit
+        layout.addWidget(edit)
         layout.addStretch()
+
+        widget_layout.addWidget(box)
+
+        # vertical stretch
+        widget_layout.addStretch()
+
+        # add the button
+        layout = QtGui.QHBoxLayout()
+        button = QtGui.QPushButton()
+        button.setText('Create')
+        layout.addStretch()
+        layout.addWidget(button)
+        widget_layout.addLayout(layout)
 
 
 class EditorScreen(QtGui.QWidget):
@@ -73,6 +123,8 @@ class EditorScreen(QtGui.QWidget):
         super().__init__()
 
         self.client = client
+        self.scenario = Scenario()
+        self.scenario.Complete_Change.connect(self.scenario_change)
 
         self.toolbar = QtGui.QToolBar()
         self.toolbar.setFloatable(False)
@@ -100,6 +152,7 @@ class EditorScreen(QtGui.QWidget):
 
         action_quit = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Exit to main menu', self)
         action_quit.triggered.connect(client.show_start_screen)
+        # TODO ask if something is changed we should save.. (you might loose progress)
         self.toolbar.addAction(action_quit)
 
         self.mini_map = MiniMap()
@@ -121,12 +174,21 @@ class EditorScreen(QtGui.QWidget):
         dialog = g.Dialog(self.client.main_window, title='New Scenario', delete_on_close=True, modal=True)
         # TODO close callback
         dialog.set_content(new_scenario_widget)
-        dialog.setFixedSize(QtCore.QSize(600, 400))
+        dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
 
     def load_scenario_dialog(self):
-        fileName = QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', '', 'Scenario Files (*.scenario)')
-
+        file_name = QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
+        if file_name:
+            self.scenario.load(file_name)
+            self.client.show_notification('Loaded scenario {}'.format(self.scenario['title']))
 
     def save_scenario_dialog(self):
-        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', '', 'Scenario Files (*.scenario)')
+        file_name = QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
+        if file_name:
+            self.scenario.save(file_name)
+            path, name = os.path.split(file_name)
+            self.client.show_notification('Saved to {}'.format(name))
+
+    def scenario_change(self):
+        self.map.complete_redraw(self.scenario)

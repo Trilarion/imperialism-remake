@@ -184,7 +184,8 @@ class Client():
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
 
     def show_notification(self, text):
-        g.show_notification(self.main_window, 'Playing {}'.format(text), positioner=g.Relative_Positioner().centerH().south(20))
+        # TODO queue in case more than one comes
+        g.show_notification(self.main_window, text, positioner=g.Relative_Positioner().centerH().south(20))
 
     def show_help_browser(self, url=None):
         if url:
@@ -219,7 +220,7 @@ def start():
     client.show_start_screen()
 
     t.player = audio.Player()
-    t.player.song_title.connect(client.show_notification)
+    t.player.song_title.connect(lambda title: client.show_notification('Playing {}'.format(title)))
     t.player.set_playlist(audio.load_soundtrack_playlist())
     if not t.options.get('music.background.mute'):
         t.player.start()
