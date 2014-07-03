@@ -71,17 +71,28 @@ if __name__ == '__main__':
     if not os.path.exists(Options_File):
         shutil.copyfile(c.Options_Default_File, Options_File)
 
-    # create the single options object, load options and send the first log message
+    # create the single options object, load options and send a log message
     t.options = t.Options()
     t.options.load(Options_File)
     t.log_info('options loaded from user folder ({})'.format(User_Folder))
 
     # test for phonon availability
-    try:
-        from PySide.phonon import Phonon
-    except ImportError:
-        t.log_error('Phonon backend not available, no sound.')
-        # TODO set mute in options
+    if t.options[c.OM_PHONON_SUPPORTED]:
+        try:
+            from PySide.phonon import Phonon
+        except ImportError:
+            t.log_error('Phonon backend not available, no sound.')
+            t.options[c.OM_PHONON_SUPPORTED] = False
+
+    # special case of some desktop environments under Linux where full screen mode does not work well
+    if t.options[c.OG_FULLSCREEN_SUPPORTED]:
+        desktop_session = os.environ.get("DESKTOP_SESSION")
+        if desktop_session and (desktop_session.startswith('ubuntu') or 'xfce' in desktop_session \
+            or desktop_session.startswith('xubuntu') or 'gnome' in desktop_session):
+            t.options[c.OG_FULLSCREEN_SUPPORTED] = False
+            t.log_warning('Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
+    if not t.options[c.OG_FULLSCREEN_SUPPORTED]:
+        t.options[c.OG_FULLSCREEN] = False
 
     # now we can safely assume that the environment is good to us
     # and we simply start the client

@@ -37,15 +37,19 @@ def write_json(file_name, value):
     with open(file_name, 'w') as file:
         json.dump(value, file, indent=2, separators=(',', ': '))
 
-def log_info(text, exception=None):
-    log_write_entry(sys.stdout, "INFO", text, exception)
+def log_info(text):
+    log_write_entry(sys.stdout, "INFO", text)
 
+def log_warning(text):
+    log_write_entry(sys.stdout, "WARNING", text)
 
 def log_error(text, exception=None):
     log_write_entry(sys.stderr, "ERROR", text, exception)
+    # in case we send to somewhere else also send it to the standard error output (console)
+    if sys.stderr is not sys.__stderr__:
+        log_write_entry(sys.__stderr__, "ERROR", text, exception)
 
-
-def log_write_entry(writer, type, text, exception):
+def log_write_entry(writer, type, text, exception=None):
     now = datetime.datetime.now()
     header = now.isoformat(" ") + '\t' + type + '\t'
 
@@ -64,13 +68,13 @@ class Options():
     def save(self, file_name):
         write_json(file_name, self.options)
 
-    def get(self, key):
+    def __getitem__(self, key):
         """
             Will throw KeyError if the key is not existing (the dictionary does by default).
         """
         return self.options[key]
 
-    def set(self, key, value):
+    def __setitem__(self, key, value):
         self.options[key] = value
 
 class ZipArchiveReader():

@@ -118,7 +118,8 @@ def show_notification(parent, text, style=Notification_Default_Style, fade_durat
     widget.show()
     widget.fade_in.start()
 
-class Relative_Positioner():
+
+class RelativeLayoutConstraint():
 
     def __init__(self, x=(0, 0, 0), y=(0, 0, 0)):
         self.x = x
@@ -149,10 +150,56 @@ class Relative_Positioner():
         return self
 
 
-    def calculate(self, parent_size, own_size):
-        pos_x = self.x[0] * parent_size.width() + self.x[1] * own_size.width() + self.x[2]
-        pos_y = self.y[0] * parent_size.height() + self.y[1] * own_size.height() + self.y[2]
-        return QtCore.QPoint(pos_x, pos_y)
+class RelativeLayout(QtGui.QLayout):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.items = []
+
+    def addItem(self, item):
+        if not item.widget() or not hasattr(item.widget(), 'layout_constraint'):
+            raise RuntimeError('Only add widgets (with attribute position_constraint).')
+        self.items.append(item)
+
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def setGeometry(self, rect):
+        for item in self.items:
+            o_size = item.sizeHint()
+
+            c = item.widget().layout_constraint
+
+            x = rect.x() + c.x[0] * rect.width() + c.x[1] * o_size.width() + c.x[2]
+            y = rect.y() + c.y[0] * rect.height() + c.y[1] * o_size.height() + c.y[2]
+
+            item.setGeometry(QtCore.QRect(x, y, o_size.width(), o_size.height()))
+
+    def itemAt(self, index):
+        if index < len(self.items):
+            return self.items[index]
+        else:
+            return None
+
+    def takeAt(self, index):
+        return self.items.pop(index)
+
+    def minimumSize(self):
+        min_width = 0
+        min_height = 0
+
+        for item in self.items:
+            o_size = item.sizeHint()
+
+            c = item.widget().layout_constraint
+            gap_x = abs(c.x[2])
+            gap_y = abs(c.y[2])
+
+            min_width = max(min_width, o_size.width() + gap_x)
+            min_height = max(min_height, o_size.height() + gap_y)
+
+        return QtCore.QSize(min_width, min_height)
+
 
 class FadeAnimation():
 
@@ -269,3 +316,74 @@ class Dialog(QtGui.QWidget):
     def closeEvent(self, event):
         if self.close_callback and not self.close_callback(self):
             event.ignore()
+
+class ZoomableGraphicsView(QtGui.QGraphicsView):
+
+    ScaleFactor = 1.15
+    MinScaling = 0.5
+    MaxScaling = 2
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
+
+    def wheelEvent(self, event):
+        current_scale = self.transform().m11() # horizontal scaling factor = vertical scaling factor
+        if event.delta() > 0:
+            f = ZoomableGraphicsView.ScaleFactor
+            if current_scale * f > ZoomableGraphicsView.MaxScaling:
+                return
+        else:
+            f = 1 / ZoomableGraphicsView.ScaleFactor
+            if current_scale * f < ZoomableGraphicsView.MinScaling:
+                return
+        self.scale(f, f)
+
+class ExtendedWidget(QtGui.QWidget):
+    """
+
+    """
+
+    clicked = QtCore.Signal(QtGui.QMouseEvent)
+    dragged = QtCore.Signal(QtCore.QPoint)
+
+    def __init__(self, *args, **kwargs):
+        """
+
+        """
+        super().__init__(*args, **kwargs)
+
+    def mousePressEvent(self, event):
+        """
+
+        """
+        self.position_old = event.globalPos()
+        self.clicked.emit(event)
+
+    def mouseMoveEvent(self, event):
+        """
+        """
+        position_now = event.globalPos()
+        self.dragged.emit(position_now - self.position_old)
+        self.position_old = position_now
+
+class MyWidget(QtGui.QWidget):
+
+    def __init__(self, parent=None):
+        super().__init__(parent, f=QtCore.Qt.FramelessWindowHint)
+        # super().__init__(parent)
+
+        top_bar = ExtendedWidget()
+        top_bar.dragged.connect(lambda delta: self.move(self.pos() + delta))
+        top_bar.setAttribute(QtCore.Qt.WA_StyledBackground)
+        top_bar.setStyleSheet('background-color: blue')
+        top_bar.setMinimumHeight(20)
+        top_bar.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Fixed)
+
+        self.content = QtGui.QWidget()
+        self.content.setStyleSheet('background-color: red')
+        self.content.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
+
+        layout = QtGui.QVBoxLayout(self)
+        layout.addWidget(top_bar)
+        layout.addWidget(self.content)

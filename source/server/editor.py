@@ -34,7 +34,7 @@ class MiniMap(QtGui.QGraphicsView):
         self.setSceneRect(0, 0, size.width(), size.height())
         self.setMinimumSize(size)
 
-class Map(QtGui.QGraphicsView):
+class Map(g.ZoomableGraphicsView):
 
     def __init__(self):
         super().__init__()
@@ -71,6 +71,8 @@ class InfoBox(QtGui.QLabel):
 
 class NewScenarioDialogWidget(QtGui.QWidget):
 
+    create_scenario = QtCore.Signal(dict)
+
     def __init__(self):
         super().__init__()
 
@@ -94,12 +96,16 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         layout.addWidget(QtGui.QLabel('Width'))
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(50)
+        edit.setPlaceholderText('100')
+        edit.setValidator(QtGui.QIntValidator(0, 100))
         self.items['width'] = edit
         layout.addWidget(edit)
 
         layout.addWidget(QtGui.QLabel('Height'))
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(50)
+        edit.setPlaceholderText('100')
+        edit.setValidator(QtGui.QIntValidator(0, 100))
         self.items['heigh'] = edit
         layout.addWidget(edit)
         layout.addStretch()
@@ -111,11 +117,21 @@ class NewScenarioDialogWidget(QtGui.QWidget):
 
         # add the button
         layout = QtGui.QHBoxLayout()
-        button = QtGui.QPushButton()
-        button.setText('Create')
+        toolbar = QtGui.QToolBar()
+        action_create = QtGui.QAction(t.load_ui_icon('icon.empty.png'), 'Create new scenario', toolbar)
+        action_create.triggered.connect(self.create_scenario_clicked)
+        toolbar.addAction(action_create)
+        toolbar.addSeparator()
+        action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Help', toolbar)
+        toolbar.addAction(action_help)
         layout.addStretch()
-        layout.addWidget(button)
+        layout.addWidget(toolbar)
         widget_layout.addLayout(layout)
+
+    def create_scenario_clicked(self):
+        self.items['title'] = self.items['title'].text()
+        self.create_scenario.emit(self.items)
+        self.close()
 
 
 class EditorScreen(QtGui.QWidget):
@@ -130,27 +146,32 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.setFloatable(False)
         self.toolbar.setMovable(False)
 
-        action_new = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Create new scenario', self)
+        action_new = QtGui.QAction(t.load_ui_icon('icon.empty.png'), 'Create new scenario', self)
         action_new.triggered.connect(self.show_new_scenario_dialog)
         self.toolbar.addAction(action_new)
 
-        action_load = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Load scenario', self)
+        action_load = QtGui.QAction(t.load_ui_icon('icon.empty.png'), 'Load scenario', self)
         action_load.triggered.connect(self.load_scenario_dialog)
         self.toolbar.addAction(action_load)
 
-        action_save = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Save scenario', self)
+        action_save = QtGui.QAction(t.load_ui_icon('icon.empty.png'), 'Save scenario', self)
         action_save.triggered.connect(self.save_scenario_dialog)
         self.toolbar.addAction(action_save)
 
-        spacer = QtGui.QWidget(self.toolbar)
+        self.toolbar.addSeparator()
+        action_nations = QtGui.QAction(t.load_ui_icon('icon.empty.png'), 'Modify Nations', self)
+        action_nations.triggered.connect(self.show_nations_dialog)
+        self.toolbar.addAction(action_nations)
+
+        spacer = QtGui.QWidget()
         spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.toolbar.addWidget(spacer)
 
-        action_help = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Show help', self)
+        action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
         action_help.triggered.connect(client.show_help_browser) # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
-        action_quit = QtGui.QAction(t.load_ui_icon('button_empty.png'), 'Exit to main menu', self)
+        action_quit = QtGui.QAction(t.load_ui_icon('icon.empty.png'), 'Exit to main menu', self)
         action_quit.triggered.connect(client.show_start_screen)
         # TODO ask if something is changed we should save.. (you might loose progress)
         self.toolbar.addAction(action_quit)
@@ -192,3 +213,6 @@ class EditorScreen(QtGui.QWidget):
 
     def scenario_change(self):
         self.map.complete_redraw(self.scenario)
+
+    def show_nations_dialog(self):
+        pass

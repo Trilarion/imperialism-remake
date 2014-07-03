@@ -1,5 +1,7 @@
 {
-  "general.version": "v0.2.0 (2014-xx-xx)",
   "music.background.mute": false,
-  "graphics.full_screen_mode": true
+  "general.version": "v0.2.0 (2014-xx-xx)",
+  "graphics.configured": false,
+  "graphics.full_screen_supported": true,
+  "music.phonon_supported": true
 }

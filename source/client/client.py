@@ -83,13 +83,33 @@ class StartScreen(QtGui.QGraphicsView):
             frame_item.setZValue(4)
         self.map = map
 
-        version_item = QtGui.QGraphicsSimpleTextItem(t.options.get('general.version'))
+        version_item = QtGui.QGraphicsSimpleTextItem(t.options[c.O_VERSION])
         brush_white = QtGui.QBrush(QtCore.Qt.white)
         version_item.setBrush(brush_white)
         version_item.setZValue(5)
         pos = g.Relative_Positioner().east(20).south(20)
         version_item.setPos(pos.calculate(size, version_item.boundingRect()))
         self.scene.addItem(version_item)
+
+class GameLobbyWidget(QtGui.QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        layout = QtGui.QVBoxLayout(self)
+        toolbar = QtGui.QToolBar()
+        toolbar.setFloatable(False)
+        toolbar.setMovable(False)
+
+        spacer = QtGui.QWidget()
+        spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        toolbar.addWidget(spacer)
+
+        action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
+        toolbar.addAction(action_help)
+
+        layout.addWidget(toolbar)
+        layout.addStretch()
 
 class OptionsContentWidget(QtGui.QTabWidget):
 
@@ -137,19 +157,20 @@ class OptionsContentWidget(QtGui.QTabWidget):
         self.addTab(tab, 'Music')
 
     def register_checkbox(self, checkbox, option):
-        checkbox.setChecked(t.options.get(option))
+        checkbox.setChecked(t.options[option])
         self.checkboxes.append((checkbox, option))
 
     def close_request(self, widget):
         # check if something was changed
-        options_modified = any([box.isChecked() is not t.options.get(option) for (box, option) in self.checkboxes])
+        options_modified = any([box.isChecked() is not t.options[option] for (box, option) in self.checkboxes])
         if options_modified:
             answer = QtGui.QMessageBox.question(widget, 'Preferences', 'Save modified preferences', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.Yes)
             if answer == QtGui.QMessageBox.Yes:
+                # all checkboxes
                 for (box, option) in self.checkboxes:
-                    t.options.set(option, box.isChecked())
+                    t.options[option, box.isChecked()]
                 # what else do we need to do?
-                if t.options.get('music.background.mute'):
+                if t.options[c.OM_BG_MUTE]:
                     t.player.stop()
                 else:
                     t.player.start()
@@ -157,9 +178,13 @@ class OptionsContentWidget(QtGui.QTabWidget):
 
 class MainWindow(QtGui.QWidget):
     def __init__(self, full_screen_mode):
-        super().__init__(f=QtCore.Qt.FramelessWindowHint)
+        super().__init__()
         if full_screen_mode:
+            self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
             self.showFullScreen()
+        else:
+            self.resize(1024, 768)
+            self.show()
         self.layout = QtGui.QHBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.content = None
@@ -173,7 +198,7 @@ class MainWindow(QtGui.QWidget):
 
 class Client():
     def __init__(self):
-        self.main_window = MainWindow(t.options.get('graphics.full_screen_mode'))
+        self.main_window = MainWindow(t.options[c.OG_FULLSCREEN])
         self.main_window.setWindowIcon(t.load_ui_icon('icon.ico'))
         self.main_window.setWindowTitle('Imperialism Remake')
         self.main_window.setStyleSheet('*[background="texture"] {background-image: url(data/artwork/graphics/ui/background_texture.png)}')
@@ -197,7 +222,11 @@ class Client():
         self.main_window.change_content_widget(widget)
 
     def show_game_lobby(self):
-        pass
+        lobby_widget = GameLobbyWidget()
+        dialog = g.Dialog(self.main_window, title='Game Lobby', delete_on_close=True, modal=True)
+        dialog.set_content(lobby_widget)
+        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.show()
 
     def show_editor_screen(self):
         widget = EditorScreen(self)
@@ -214,16 +243,33 @@ class Client():
         self.main_window.close()
 
 def start():
+
     app = QtGui.QApplication([])
+
+
+    # TODO multiple screen support
+
+    # test for desktop availability
+    desktop = app.desktop()
+    rect = desktop.screenGeometry()
+    if rect.width() < c.Screen_Min_Size[0] or rect.height() < c.Screen_Min_Size[1]:
+        QtGui.QMessageBox.warning(None, 'Warning', 'Actual screen size below minimal screen size {}.'.format(c.Screen_Min_Size))
+        return
+
+    # configure if never configured before
+    if not t.option[c.OG_CONFIGURED]:
+        t.options[c.OG_MW_GEOMETRY] = desktop.availableGeometry()
+        t.options[c.OG_MAXIMIZED] = True
+
 
     client = Client()
     client.show_start_screen()
 
-    t.player = audio.Player()
-    t.player.song_title.connect(lambda title: client.show_notification('Playing {}'.format(title)))
-    t.player.set_playlist(audio.load_soundtrack_playlist())
-    if not t.options.get('music.background.mute'):
-        t.player.start()
+    # t.player = audio.Player()
+    # t.player.song_title.connect(lambda title: client.show_notification('Playing {}'.format(title)))
+    # t.player.set_playlist(audio.load_soundtrack_playlist())
+    # if not t.options['music.background.mute']:
+    #     t.player.start()
 
     t.log_info('client initialized, start Qt app execution')
     app.exec_()

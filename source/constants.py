@@ -49,5 +49,18 @@ Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 Options_Default_File = extend(Data_Folder, 'options.info.default')
 Manual_Index = extend(Data_Folder, 'manual', 'index.html')
 
-# network
+# other specific constants
+
+# port number for network communication
 Network_Port = 42932
+
+# minimal screen resolution
+Screen_Min_Size = (1024, 768)
+
+# option names
+O_VERSION = 'general.version'
+OG_CONFIGURED = 'graphics.configured'
+OG_FULLSCREEN = 'graphics.full_screen'
+OG_FULLSCREEN_SUPPORTED = 'graphics.full_screen_supported'
+OM_PHONON_SUPPORTED = 'music.phonon_supported'
+OM_BG_MUTE = 'music.background.mute'

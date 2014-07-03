@@ -21,16 +21,20 @@
 import os
 os.chdir('..')
 
+import constants as c
+
 # options are stored as a dictionary
 options = {
-    'general.version': 'v0.2.0 (2014-xx-xx)',
+    c.O_VERSION : 'v0.2.0 (2014-xx-xx)', # to be displayed on the start screen
 
-    'graphics.full_screen_mode': True,
+    c.OG_CONFIGURED: False, # has already been configured, is done on first start
+    c.OG_FULLSCREEN_SUPPORTED: True, # is full screen supported
 
-    'music.background.mute': False
+    c.OM_PHONON_SUPPORTED: True,
+    c.OM_BG_MUTE: False
 }
 
 # save
-import constants as c, tools as t
+import tools as t
 print('write to {}'.format(c.Options_Default_File))
 t.write_json(c.Options_Default_File, options)
