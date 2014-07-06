@@ -35,7 +35,7 @@ def read_json(file_name):
 
 def write_json(file_name, value):
     with open(file_name, 'w') as file:
-        json.dump(value, file, indent=2, separators=(',', ': '))
+        json.dump(value, file, indent=2, separators=(',', ': '), sort_keys=True)
 
 def log_info(text):
     log_write_entry(sys.stdout, "INFO", text)
@@ -58,24 +58,25 @@ def log_write_entry(writer, type, text, exception=None):
     if exception != None:
         print(header + exception, end='\r\n', file=writer)
 
-class Options():
-    def __init__(self):
-        self.options = {}
+options = {}
 
-    def load(self, file_name):
-        self.options = read_json(file_name)
+def load_options(file_name):
+    global options
+    options = read_json(file_name)
 
-    def save(self, file_name):
-        write_json(file_name, self.options)
+    # main window bounding rectangle from list to QRect
+    if c.OG_MW_BOUNDS in options:
+        rect = options[c.OG_MW_BOUNDS]
+        options[c.OG_MW_BOUNDS] = QtCore.QRect(*rect)
 
-    def __getitem__(self, key):
-        """
-            Will throw KeyError if the key is not existing (the dictionary does by default).
-        """
-        return self.options[key]
+def save_options(file_name):
+    data = options.copy()
 
-    def __setitem__(self, key, value):
-        self.options[key] = value
+    # main window bounding rectangle fromn QRect to list
+    rect = data[c.OG_MW_BOUNDS]
+    data[c.OG_MW_BOUNDS] = [rect.x(), rect.y(), rect.width(), rect.height()]
+
+    write_json(file_name, data)
 
 class ZipArchiveReader():
     def __init__(self, file):

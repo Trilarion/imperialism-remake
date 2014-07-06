@@ -48,6 +48,7 @@ Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 # special locations
 Options_Default_File = extend(Data_Folder, 'options.info.default')
 Manual_Index = extend(Data_Folder, 'manual', 'index.html')
+Global_Stylesheet = extend(Graphics_UI_Folder, 'style.css')
 
 # other specific constants
 
@@ -57,10 +58,15 @@ Network_Port = 42932
 # minimal screen resolution
 Screen_Min_Size = (1024, 768)
 
+# actual options version
+Options_Version = 1
+
 # option names
-O_VERSION = 'general.version'
-OG_CONFIGURED = 'graphics.configured'
-OG_FULLSCREEN = 'graphics.full_screen'
+O_VERSION = 'misc.version'
+O_OPTIONS_VERSION = 'misc.version.options'
+OG_MW_BOUNDS = 'graphics.mainwindow.bounds'
+OG_MW_MAXIMIZED = 'graphics.mainwindow.maximized'
+OG_MW_FULLSCREEN = 'graphics.full_screen'
 OG_FULLSCREEN_SUPPORTED = 'graphics.full_screen_supported'
 OM_PHONON_SUPPORTED = 'music.phonon_supported'
 OM_BG_MUTE = 'music.background.mute'

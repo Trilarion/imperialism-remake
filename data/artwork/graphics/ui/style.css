@@ -1,0 +1,14 @@
+/*
+	Imperialism Remake UI style definition used by the Qt framework (css)
+*/
+
+*[background="texture"]
+{
+	background-image: url(data/artwork/graphics/ui/background_texture.png);
+}
+
+
+.QWidget
+{
+	background-color: black;
+}

@@ -56,6 +56,42 @@ class ExtendedGraphicsPixmapItem(QtGui.QGraphicsPixmapItem, QtCore.QObject):
     def mousePressEvent(self, event):
         self.clicked.emit()
 
+class Relative_Positioner():
+
+    def __init__(self, x=(0, 0, 0), y=(0, 0, 0)):
+        self.x = x
+        self.y = y
+
+    def south(self, gap):
+        self.y = (1, -1, -gap)
+        return self
+
+    def north(self, gap):
+        self.y = (0, 0, gap)
+        return self
+
+    def west(self, gap):
+        self.x = (0, 0, gap)
+        return self
+
+    def east(self, gap):
+        self.x = (1, -1, -gap)
+        return self
+
+    def centerH(self):
+        self.x = (0.5, -0.5, 0)
+        return self
+
+    def centerV(self):
+        self.y = (0.5, -0.5, 0)
+        return self
+
+
+    def calculate(self, parent_size, own_size):
+        pos_x = self.x[0] * parent_size.width() + self.x[1] * own_size.width() + self.x[2]
+        pos_y = self.y[0] * parent_size.height() + self.y[1] * own_size.height() + self.y[2]
+        return QtCore.QPoint(pos_x, pos_y)
+
 Notification_Default_Style = 'border: 1px solid black; padding: 5px 10px 5px 10px; background-color: rgba(128, 128, 128, 128); color: white;'
 
 def show_notification(parent, text, style=Notification_Default_Style, fade_duration=2000, stay_duration=2000, positioner=None, callback=None):
@@ -154,6 +190,7 @@ class RelativeLayout(QtGui.QLayout):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.setContentsMargins(0, 0, 0, 0)
         self.items = []
 
     def addItem(self, item):

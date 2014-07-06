@@ -72,9 +72,14 @@ if __name__ == '__main__':
         shutil.copyfile(c.Options_Default_File, Options_File)
 
     # create the single options object, load options and send a log message
-    t.options = t.Options()
-    t.options.load(Options_File)
+    t.load_options(Options_File)
     t.log_info('options loaded from user folder ({})'.format(User_Folder))
+
+    # between versions the format of the options might change, then it's better to overwrite old options
+    if t.options[c.O_OPTIONS_VERSION] < c.Options_Version:
+        t.log_warning('outdated version of options, have been overwritten')
+        shutil.copyfile(c.Options_Default_File, Options_File)
+        t.load_options(Options_File)
 
     # test for phonon availability
     if t.options[c.OM_PHONON_SUPPORTED]:
@@ -92,7 +97,7 @@ if __name__ == '__main__':
             t.options[c.OG_FULLSCREEN_SUPPORTED] = False
             t.log_warning('Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
     if not t.options[c.OG_FULLSCREEN_SUPPORTED]:
-        t.options[c.OG_FULLSCREEN] = False
+        t.options[c.OG_MW_FULLSCREEN] = False
 
     # now we can safely assume that the environment is good to us
     # and we simply start the client
@@ -100,7 +105,7 @@ if __name__ == '__main__':
     client.start()
 
     # save options
-    t.options.save(Options_File)
+    t.save_options(Options_File)
     t.log_info('options saved')
 
     # finished

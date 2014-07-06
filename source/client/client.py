@@ -23,24 +23,29 @@ import client.audio as audio
 from lib.browser import BrowserWidget
 from server.editor import  EditorScreen
 
-class StartScreen(QtGui.QGraphicsView):
-    def __init__(self, size, client):
+class StartScreen(QtGui.QWidget):
+    def __init__(self, client):
         super().__init__()
 
-        self.scene = QtGui.QGraphicsScene()
-        self.setScene(self.scene)
-
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setProperty('background', 'texture')
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setSceneRect(0, 0, size.width(), size.height())
 
-        background = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, 'start.background.jpg'))
-        background_item = QtGui.QGraphicsPixmapItem(background)
-        pos = g.Relative_Positioner().centerH().centerV()
-        background_item.setOffset(pos.calculate(size, background.size()))
-        background_item.setZValue(1)
-        self.scene.addItem(background_item)
+        layout = g.RelativeLayout(self)
+
+        start_image = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, 'start.background.jpg'))
+        start_image_item = QtGui.QGraphicsPixmapItem(start_image)
+        start_image_item.setZValue(1)
+
+        scene = QtGui.QGraphicsScene(self)
+        scene.addItem(start_image_item)
+
+        view = QtGui.QGraphicsView(scene)
+        view.resize(start_image.size())
+        view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        view.setSceneRect(0, 0, start_image.width(), start_image.height())
+        view.layout_constraint = g.RelativeLayoutConstraint().centerH().centerV()
+        layout.addWidget(view)
 
         actions = {
             'exit': client.quit,
@@ -50,46 +55,40 @@ class StartScreen(QtGui.QGraphicsView):
             'options': client.show_options
         }
 
-        map_file = c.extend(c.Graphics_UI_Folder, 'start.overlay.info')
-        with open(map_file, 'r') as f:
-            map = json.load(f)
+        image_map_file = c.extend(c.Graphics_UI_Folder, 'start.overlay.info')
+        with open(image_map_file, 'r') as f:
+            image_map = json.load(f)
 
-        if actions.keys() != map.keys():
-            raise RuntimeError('Start screen hot map info file ({}) corrupt.'.format(map_file))
+        if actions.keys() != image_map.keys():
+            raise RuntimeError('Start screen hot map info file ({}) corrupt.'.format(image_map_file))
 
-        for k, v in map.items():
+        for k, v in image_map.items():
             # add action from our predefined action dictionary
             pixmap = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, v['overlay']))
             pixmap_item = g.ExtendedGraphicsPixmapItem(pixmap)
+
             pixmap_item.setZValue(3)
-            self.scene.addItem(pixmap_item)
-            v['item'] = pixmap_item
-
-            fade_animation = g.FadeAnimation(pixmap_item, 300)
-            pixmap_item.entered.connect(fade_animation.fade_in)
-            pixmap_item.left.connect(fade_animation.fade_out)
-            pixmap_item.clicked.connect(actions[k])
             offset = v['offset']
-            pixmap_item.setOffset(background_item.offset() + QtCore.QPointF(offset[0], offset[1]))
+            pixmap_item.setOffset(QtCore.QPointF(offset[0], offset[1]))
 
-            v['animation'] = fade_animation
+            pixmap_item.fade_animation = g.FadeAnimation(pixmap_item, 300)
+            pixmap_item.entered.connect(pixmap_item.fade_animation.fade_in)
+            pixmap_item.left.connect(pixmap_item.fade_animation.fade_out)
+            pixmap_item.clicked.connect(actions[k])
 
             frame_path = QtGui.QPainterPath()
             frame_path.addRect(pixmap_item.boundingRect())
             brush = QtGui.QBrush(QtGui.QColor(255,255,255, 64))
             # brush = QtGui.QBrush(QtGui.QColor(255,255,255, 128), bs=QtCore.Qt.Dense3Pattern)
             pen = QtGui.QPen(brush, 6, j=QtCore.Qt.BevelJoin)
-            frame_item = self.scene.addPath(frame_path, pen)
+            frame_item = scene.addPath(frame_path, pen)
             frame_item.setZValue(4)
-        self.map = map
 
-        version_item = QtGui.QGraphicsSimpleTextItem(t.options[c.O_VERSION])
-        brush_white = QtGui.QBrush(QtCore.Qt.white)
-        version_item.setBrush(brush_white)
-        version_item.setZValue(5)
-        pos = g.Relative_Positioner().east(20).south(20)
-        version_item.setPos(pos.calculate(size, version_item.boundingRect()))
-        self.scene.addItem(version_item)
+            scene.addItem(pixmap_item)
+
+        version_label = QtGui.QLabel('<font color=#ffffff>{}</font>'.format(t.options[c.O_VERSION]))
+        version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
+        layout.addWidget(version_label)
 
 class GameLobbyWidget(QtGui.QWidget):
 
@@ -130,7 +129,7 @@ class OptionsContentWidget(QtGui.QTabWidget):
         # Graphics box
         box = QtGui.QGroupBox('Graphics')
         checkbox = QtGui.QCheckBox('Full screen mode')
-        self.register_checkbox(checkbox, 'graphics.full_screen_mode')
+        self.register_checkbox(checkbox, c.OG_MW_FULLSCREEN)
         layout = QtGui.QVBoxLayout(box)
         layout.addWidget(checkbox)
         tab_layout.addWidget(box)
@@ -147,7 +146,7 @@ class OptionsContentWidget(QtGui.QTabWidget):
 
         # mute checkbox
         checkbox = QtGui.QCheckBox('Mute background music')
-        self.register_checkbox(checkbox, 'music.background.mute')
+        self.register_checkbox(checkbox, c.OM_BG_MUTE)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -168,26 +167,43 @@ class OptionsContentWidget(QtGui.QTabWidget):
             if answer == QtGui.QMessageBox.Yes:
                 # all checkboxes
                 for (box, option) in self.checkboxes:
-                    t.options[option, box.isChecked()]
+                    t.options[option] = box.isChecked()
                 # what else do we need to do?
                 if t.options[c.OM_BG_MUTE]:
-                    t.player.stop()
+                    pass
+                    # t.player.stop()
                 else:
-                    t.player.start()
+                    pass
+                    # t.player.start()
         return True
 
 class MainWindow(QtGui.QWidget):
-    def __init__(self, full_screen_mode):
+    def __init__(self):
         super().__init__()
-        if full_screen_mode:
-            self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
-            self.showFullScreen()
-        else:
-            self.resize(1024, 768)
-            self.show()
+        # set geometry
+        self.setGeometry(t.options[c.OG_MW_BOUNDS])
+        # set icon
+        self.setWindowIcon(t.load_ui_icon('icon.ico'))
+        # set title
+        self.setWindowTitle('Imperialism Remake')
+        # load global stylesheet and apply it
+        with open(c.Global_Stylesheet, 'r', encoding='utf-8') as file:
+            style = file.read()
+        self.setStyleSheet(style)
+        #'')
+
         self.layout = QtGui.QHBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.content = None
+
+        # show in full screen, maximized or normal
+        if t.options[c.OG_MW_FULLSCREEN]:
+            self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
+            self.showFullScreen()
+        elif t.options[c.OG_MW_MAXIMIZED]:
+            self.showMaximized()
+        else:
+            self.show()
 
     def change_content_widget(self, widget):
         if self.content:
@@ -198,10 +214,7 @@ class MainWindow(QtGui.QWidget):
 
 class Client():
     def __init__(self):
-        self.main_window = MainWindow(t.options[c.OG_FULLSCREEN])
-        self.main_window.setWindowIcon(t.load_ui_icon('icon.ico'))
-        self.main_window.setWindowTitle('Imperialism Remake')
-        self.main_window.setStyleSheet('*[background="texture"] {background-image: url(data/artwork/graphics/ui/background_texture.png)}')
+        self.main_window = MainWindow()
 
         self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
         self.help_dialog = g.Dialog(self.main_window, title='Help')
@@ -218,7 +231,7 @@ class Client():
         self.help_dialog.show()
 
     def show_start_screen(self):
-        widget = StartScreen(self.main_window.size(), self)
+        widget = StartScreen(self)
         self.main_window.change_content_widget(widget)
 
     def show_game_lobby(self):
@@ -256,10 +269,11 @@ def start():
         QtGui.QMessageBox.warning(None, 'Warning', 'Actual screen size below minimal screen size {}.'.format(c.Screen_Min_Size))
         return
 
-    # configure if never configured before
-    if not t.option[c.OG_CONFIGURED]:
-        t.options[c.OG_MW_GEOMETRY] = desktop.availableGeometry()
-        t.options[c.OG_MAXIMIZED] = True
+    # if no bounds are set, set bounds
+    if not c.OG_MW_BOUNDS in t.options:
+        t.options[c.OG_MW_BOUNDS] = desktop.availableGeometry()
+        t.options[c.OG_MW_MAXIMIZED] = True
+        t.log_info('No bounds of the main window stored, start maximized')
 
 
     client = Client()

@@ -1,42 +1,42 @@
 {
-  "options": {
-    "label": "Preferences",
-    "overlay": "start.overlay.fireplace.png",
-    "offset": [
-      832,
-      505
-    ]
-  },
-  "lobby": {
-    "label": "Game Lobby",
-    "overlay": "start.overlay.throne.png",
-    "offset": [
-      421,
-      459
-    ]
-  },
-  "help": {
-    "label": "Help",
-    "overlay": "start.overlay.window.left.png",
-    "offset": [
-      127,
-      397
-    ]
-  },
   "editor": {
     "label": "Scenario Editor",
-    "overlay": "start.overlay.map.png",
     "offset": [
       821,
       60
-    ]
+    ],
+    "overlay": "start.overlay.map.png"
   },
   "exit": {
     "label": "Exit",
-    "overlay": "start.overlay.door.right.png",
     "offset": [
       575,
       412
-    ]
+    ],
+    "overlay": "start.overlay.door.right.png"
+  },
+  "help": {
+    "label": "Help",
+    "offset": [
+      127,
+      397
+    ],
+    "overlay": "start.overlay.window.left.png"
+  },
+  "lobby": {
+    "label": "Game Lobby",
+    "offset": [
+      421,
+      459
+    ],
+    "overlay": "start.overlay.throne.png"
+  },
+  "options": {
+    "label": "Preferences",
+    "offset": [
+      832,
+      505
+    ],
+    "overlay": "start.overlay.fireplace.png"
   }
 }
