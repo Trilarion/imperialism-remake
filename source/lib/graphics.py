@@ -87,14 +87,12 @@ class Relative_Positioner():
         return self
 
 
-    def calculate(self, parent_size, own_size):
-        pos_x = self.x[0] * parent_size.width() + self.x[1] * own_size.width() + self.x[2]
-        pos_y = self.y[0] * parent_size.height() + self.y[1] * own_size.height() + self.y[2]
+    def calculate(self, parent_rect, own_size):
+        pos_x = parent_rect.x() + self.x[0] * parent_rect.width() + self.x[1] * own_size.width() + self.x[2]
+        pos_y = parent_rect.y() + self.y[0] * parent_rect.height() + self.y[1] * own_size.height() + self.y[2]
         return QtCore.QPoint(pos_x, pos_y)
 
-Notification_Default_Style = 'border: 1px solid black; padding: 5px 10px 5px 10px; background-color: rgba(128, 128, 128, 128); color: white;'
-
-def show_notification(parent, text, style=Notification_Default_Style, fade_duration=2000, stay_duration=2000, positioner=None, callback=None):
+def show_notification(parent, text, style=None, fade_duration=2000, stay_duration=2000, positioner=None, callback=None):
     """
         border_style example: "border: 1px solid black"
         Please only use a color that is fully opaque (alpha = 255) for bg_color, otherwise a black background will appear.
@@ -111,10 +109,12 @@ def show_notification(parent, text, style=Notification_Default_Style, fade_durat
 
     # create a label and set the text
     label = QtGui.QLabel(widget)
+    label.setObjectName('notification')
     label.setText(text)
 
-    # set style (border, padding, background color, text color
-    label.setStyleSheet(style)
+    # set style (border, padding, background color
+    if style:
+        label.setStyleSheet(style)
 
     # we need to manually tell the widget that it should be exactly as big as the label it contains
     widget.resize(label.sizeHint())
@@ -146,7 +146,7 @@ def show_notification(parent, text, style=Notification_Default_Style, fade_durat
 
     # if given, position
     if parent and positioner:
-        position = positioner.calculate(parent.size(), widget.size())
+        position = positioner.calculate(parent.geometry(), widget.size())
         widget.move(position)
 
     # to avoid short blinking show transparent and start animation
@@ -376,51 +376,24 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
                 return
         self.scale(f, f)
 
-class ExtendedWidget(QtGui.QWidget):
-    """
+def createExtendedWidgetClasses(parent):
+    class ExtendedWidgetSubclass(parent):
+        clicked = QtCore.Signal(QtGui.QMouseEvent)
+        dragged = QtCore.Signal(QtCore.QPoint)
 
-    """
+        def __init__(self, *args, **kwargs):
+            super(ExtendedWidgetSubclass, self).__init__(*args, **kwargs)
 
-    clicked = QtCore.Signal(QtGui.QMouseEvent)
-    dragged = QtCore.Signal(QtCore.QPoint)
+        def mousePressEvent(self, event):
+            self.position_old = event.globalPos()
+            self.clicked.emit(event)
 
-    def __init__(self, *args, **kwargs):
-        """
+        def mouseMoveEvent(self, event):
+            position_now = event.globalPos()
+            self.dragged.emit(position_now - self.position_old)
+            self.position_old = position_now
 
-        """
-        super().__init__(*args, **kwargs)
+    return ExtendedWidgetSubclass
 
-    def mousePressEvent(self, event):
-        """
+ExtendedToolBar = createExtendedWidgetClasses(QtGui.QToolBar)
 
-        """
-        self.position_old = event.globalPos()
-        self.clicked.emit(event)
-
-    def mouseMoveEvent(self, event):
-        """
-        """
-        position_now = event.globalPos()
-        self.dragged.emit(position_now - self.position_old)
-        self.position_old = position_now
-
-class MyWidget(QtGui.QWidget):
-
-    def __init__(self, parent=None):
-        super().__init__(parent, f=QtCore.Qt.FramelessWindowHint)
-        # super().__init__(parent)
-
-        top_bar = ExtendedWidget()
-        top_bar.dragged.connect(lambda delta: self.move(self.pos() + delta))
-        top_bar.setAttribute(QtCore.Qt.WA_StyledBackground)
-        top_bar.setStyleSheet('background-color: blue')
-        top_bar.setMinimumHeight(20)
-        top_bar.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Fixed)
-
-        self.content = QtGui.QWidget()
-        self.content.setStyleSheet('background-color: red')
-        self.content.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
-
-        layout = QtGui.QVBoxLayout(self)
-        layout.addWidget(top_bar)
-        layout.addWidget(self.content)

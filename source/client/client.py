@@ -17,8 +17,9 @@
 # TODO queue notifications
 
 import json
+from functools import partial
 from PySide import QtCore, QtGui
-import constants as c, tools as t, lib.graphics as g
+import constants as c, tools as t, lib.graphics as g, client.graphics as cg
 import client.audio as audio
 from lib.browser import BrowserWidget
 from server.editor import  EditorScreen
@@ -47,6 +48,10 @@ class StartScreen(QtGui.QWidget):
         view.layout_constraint = g.RelativeLayoutConstraint().centerH().centerV()
         layout.addWidget(view)
 
+        subtitle = QtGui.QLabel('')
+        subtitle.layout_constraint = g.RelativeLayoutConstraint((0.5, -0.5, 0), (0.5, -0.5, start_image.height() / 2 + 20))
+        layout.addWidget(subtitle)
+
         actions = {
             'exit': client.quit,
             'help': client.show_help_browser,
@@ -63,6 +68,7 @@ class StartScreen(QtGui.QWidget):
             raise RuntimeError('Start screen hot map info file ({}) corrupt.'.format(image_map_file))
 
         for k, v in image_map.items():
+
             # add action from our predefined action dictionary
             pixmap = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, v['overlay']))
             pixmap_item = g.ExtendedGraphicsPixmapItem(pixmap)
@@ -75,6 +81,8 @@ class StartScreen(QtGui.QWidget):
             pixmap_item.entered.connect(pixmap_item.fade_animation.fade_in)
             pixmap_item.left.connect(pixmap_item.fade_animation.fade_out)
             pixmap_item.clicked.connect(actions[k])
+            pixmap_item.entered.connect(partial(subtitle.setText, '<font color=#ffffff size=6>{}</font>'.format(v['label'])))
+            pixmap_item.left.connect(lambda: subtitle.setText(''))
 
             frame_path = QtGui.QPainterPath()
             frame_path.addRect(pixmap_item.boundingRect())
@@ -97,15 +105,6 @@ class GameLobbyWidget(QtGui.QWidget):
 
         layout = QtGui.QVBoxLayout(self)
         toolbar = QtGui.QToolBar()
-        toolbar.setFloatable(False)
-        toolbar.setMovable(False)
-
-        spacer = QtGui.QWidget()
-        spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        toolbar.addWidget(spacer)
-
-        action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
-        toolbar.addAction(action_help)
 
         layout.addWidget(toolbar)
         layout.addStretch()
@@ -170,11 +169,9 @@ class OptionsContentWidget(QtGui.QTabWidget):
                     t.options[option] = box.isChecked()
                 # what else do we need to do?
                 if t.options[c.OM_BG_MUTE]:
-                    pass
-                    # t.player.stop()
+                    t.player.stop()
                 else:
-                    pass
-                    # t.player.start()
+                    t.player.start()
         return True
 
 class MainWindow(QtGui.QWidget):
@@ -190,7 +187,6 @@ class MainWindow(QtGui.QWidget):
         with open(c.Global_Stylesheet, 'r', encoding='utf-8') as file:
             style = file.read()
         self.setStyleSheet(style)
-        #'')
 
         self.layout = QtGui.QHBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -217,8 +213,7 @@ class Client():
         self.main_window = MainWindow()
 
         self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
-        self.help_dialog = g.Dialog(self.main_window, title='Help')
-        self.help_dialog.set_content(self.help_browser_widget)
+        self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
 
     def show_notification(self, text):
@@ -236,8 +231,7 @@ class Client():
 
     def show_game_lobby(self):
         lobby_widget = GameLobbyWidget()
-        dialog = g.Dialog(self.main_window, title='Game Lobby', delete_on_close=True, modal=True)
-        dialog.set_content(lobby_widget)
+        dialog = cg.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby', help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
@@ -247,12 +241,14 @@ class Client():
 
     def show_options(self):
         options_widget = OptionsContentWidget()
-        dialog = g.Dialog(self.main_window, title='Preferences', delete_on_close=True, modal=True, close_callback=options_widget.close_request)
-        dialog.set_content(options_widget)
+        dialog = cg.GameDialog(self.main_window, options_widget, delete_on_close=True, title='Preferences', help_callback=self.show_help_browser, close_callback=options_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
     def quit(self):
+        # store state in options
+        t.options[c.OG_MW_BOUNDS] = self.main_window.normalGeometry()
+        t.options[c.OG_MW_MAXIMIZED] = self.main_window.isMaximized()
         self.main_window.close()
 
 def start():
@@ -271,7 +267,7 @@ def start():
 
     # if no bounds are set, set bounds
     if not c.OG_MW_BOUNDS in t.options:
-        t.options[c.OG_MW_BOUNDS] = desktop.availableGeometry()
+        t.options[c.OG_MW_BOUNDS] = desktop.availableGeometry().adjusted(50, 50, -100, -100)
         t.options[c.OG_MW_MAXIMIZED] = True
         t.log_info('No bounds of the main window stored, start maximized')
 
@@ -279,11 +275,12 @@ def start():
     client = Client()
     client.show_start_screen()
 
-    # t.player = audio.Player()
-    # t.player.song_title.connect(lambda title: client.show_notification('Playing {}'.format(title)))
-    # t.player.set_playlist(audio.load_soundtrack_playlist())
-    # if not t.options['music.background.mute']:
-    #     t.player.start()
+    # audio
+    t.player = audio.Player()
+    t.player.song_title.connect(lambda title: client.show_notification('Playing {}'.format(title)))
+    t.player.set_playlist(audio.load_soundtrack_playlist())
+    if not t.options['music.background.mute']:
+        t.player.start()
 
     t.log_info('client initialized, start Qt app execution')
     app.exec_()

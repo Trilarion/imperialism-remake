@@ -25,8 +25,6 @@ class BrowserWidget(QtGui.QWidget):
 
         # create and add tool bar on top (non floatable or movable)
         tool_bar = QtGui.QToolBar(self)
-        tool_bar.setMovable(False)
-        tool_bar.setFloatable(False)
 
         # create actions, connect to methods, add to tool bar
         action_home = QtGui.QAction(self)
@@ -58,6 +56,7 @@ class BrowserWidget(QtGui.QWidget):
 
         # set Layout
         layout = QtGui.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(tool_bar)
         layout.addWidget(web_view)
 
