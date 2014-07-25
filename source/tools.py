@@ -18,9 +18,26 @@
     Non-specific independent helper functions.
 """
 
-import zipfile, json, sys, datetime
+import zipfile
+import json
+import sys
+import datetime
+
 from PySide import QtGui, QtCore
+
 import constants as c
+
+
+names = ['Alice', 'Bob', 'Suzy', 'Norman', 'Uma', 'Joe']
+threads = {}
+
+def thread_status(text):
+    global threads
+    thread = QtCore.QThread.currentThread()
+    if thread not in threads:
+        threads[thread] = names[len(threads)]
+    thread = threads[thread]
+    print('{}: {}'.format(thread, text))
 
 def load_ui_icon(name):
     """
@@ -55,7 +72,7 @@ def log_write_entry(writer, type, text, exception=None):
 
     print(header + text, end='\r\n', file=writer)
 
-    if exception != None:
+    if exception is not None:
         print(header + exception, end='\r\n', file=writer)
 
 options = {}

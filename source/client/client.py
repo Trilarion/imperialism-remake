@@ -18,11 +18,16 @@
 
 import json
 from functools import partial
+
 from PySide import QtCore, QtGui
-import constants as c, tools as t, lib.graphics as g, client.graphics as cg
-import client.audio as audio
+
+import constants as c
+import tools as t
+import lib.graphics as g
+import client.graphics as cg
 from lib.browser import BrowserWidget
 from server.editor import  EditorScreen
+
 
 class StartScreen(QtGui.QWidget):
     def __init__(self, client):
@@ -169,9 +174,11 @@ class OptionsContentWidget(QtGui.QTabWidget):
                     t.options[option] = box.isChecked()
                 # what else do we need to do?
                 if t.options[c.OM_BG_MUTE]:
-                    t.player.stop()
+                    #t.player.stop()
+                    pass
                 else:
-                    t.player.start()
+                    #t.player.start()
+                    pass
         return True
 
 class MainWindow(QtGui.QWidget):
@@ -204,7 +211,7 @@ class MainWindow(QtGui.QWidget):
     def change_content_widget(self, widget):
         if self.content:
             self.layout.removeWidget(self.content)
-            del(self.content)
+            self.content.deleteLater()
         self.content = widget
         self.layout.addWidget(widget)
 
@@ -216,9 +223,16 @@ class Client():
         self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
 
+        # audio
+        #self.player = audio.Player()
+        #self.player.next.connect(lambda title: self.show_notification('Playing {}'.format(title)))
+        #self.player.set_playlist(audio.load_soundtrack_playlist())
+        #if not t.options[c.OM_BG_MUTE]:
+            #self.player.start()
+
     def show_notification(self, text):
         # TODO queue in case more than one comes
-        g.show_notification(self.main_window, text, positioner=g.Relative_Positioner().centerH().south(20))
+        g.Notification(self.main_window, text, positioner=g.Relative_Positioner().centerH().south(20))
 
     def show_help_browser(self, url=None):
         if url:
@@ -228,6 +242,8 @@ class Client():
     def show_start_screen(self):
         widget = StartScreen(self)
         self.main_window.change_content_widget(widget)
+        g.Notification(self.main_window, 'Startscreen', positioner=g.Relative_Positioner().centerH().south(20))
+        pass
 
     def show_game_lobby(self):
         lobby_widget = GameLobbyWidget()
@@ -249,6 +265,9 @@ class Client():
         # store state in options
         t.options[c.OG_MW_BOUNDS] = self.main_window.normalGeometry()
         t.options[c.OG_MW_MAXIMIZED] = self.main_window.isMaximized()
+        # audio
+        #self.player.stop()
+        # close the main window
         self.main_window.close()
 
 def start():
@@ -271,16 +290,9 @@ def start():
         t.options[c.OG_MW_MAXIMIZED] = True
         t.log_info('No bounds of the main window stored, start maximized')
 
-
+    t.thread_status('main')
     client = Client()
     client.show_start_screen()
-
-    # audio
-    t.player = audio.Player()
-    t.player.song_title.connect(lambda title: client.show_notification('Playing {}'.format(title)))
-    t.player.set_playlist(audio.load_soundtrack_playlist())
-    if not t.options['music.background.mute']:
-        t.player.start()
 
     t.log_info('client initialized, start Qt app execution')
     app.exec_()

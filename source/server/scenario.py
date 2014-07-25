@@ -15,13 +15,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PySide import QtCore
+
 import tools as t
+
 
 # some constants
 key_map_size = 'map-size'
 
-class Scenario(QtCore.QObject):
 
+class Scenario(QtCore.QObject):
     Complete_Change = QtCore.Signal()
 
     def __init__(self):
@@ -37,7 +39,7 @@ class Scenario(QtCore.QObject):
     def create_map(self, size):
         self._properties[key_map_size] = size
         number_tiles = size[0] * size[1]
-        self._map = [[0]*number_tiles]*2
+        self._map = [[0] * number_tiles] * 2
 
     def set_terrain_at(self, position, terrain):
         self._map[0][self.map_index(position)] = terrain
@@ -75,7 +77,7 @@ class Scenario(QtCore.QObject):
             raise RuntimeError('Unknown property {}.'.format(key))
 
     def new_province(self):
-        province = len(self._provinces) # this always works because we check after loading
+        province = len(self._provinces)  # this always works because we check after loading
         self._provinces[province] = {}
         return province
 
@@ -92,7 +94,7 @@ class Scenario(QtCore.QObject):
             raise RuntimeError('Unknown province {} or property {}.'.format(province, key))
 
     def new_nation(self):
-        nation = len(self._nations) # this always gives a new unique number because we check after loading
+        nation = len(self._nations)  # this always gives a new unique number because we check after loading
         self._nations[nation] = {}
         self._nations[nation]['properties'] = {}
         self._nations[nation]['provinces'] = []

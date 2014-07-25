@@ -16,6 +16,7 @@
 
 from PySide import QtCore, QtGui
 
+
 class ClickableWidget(QtGui.QWidget):
     """
 
@@ -35,8 +36,8 @@ class ClickableWidget(QtGui.QWidget):
         """
         self.clicked.emit(event)
 
-class ExtendedGraphicsPixmapItem(QtGui.QGraphicsPixmapItem, QtCore.QObject):
 
+class ExtendedGraphicsPixmapItem(QtGui.QGraphicsPixmapItem, QtCore.QObject):
     entered = QtCore.Signal()
     left = QtCore.Signal()
     clicked = QtCore.Signal()
@@ -56,8 +57,8 @@ class ExtendedGraphicsPixmapItem(QtGui.QGraphicsPixmapItem, QtCore.QObject):
     def mousePressEvent(self, event):
         self.clicked.emit()
 
-class Relative_Positioner():
 
+class Relative_Positioner():
     def __init__(self, x=(0, 0, 0), y=(0, 0, 0)):
         self.x = x
         self.y = y
@@ -86,77 +87,75 @@ class Relative_Positioner():
         self.y = (0.5, -0.5, 0)
         return self
 
-
     def calculate(self, parent_rect, own_size):
         pos_x = parent_rect.x() + self.x[0] * parent_rect.width() + self.x[1] * own_size.width() + self.x[2]
         pos_y = parent_rect.y() + self.y[0] * parent_rect.height() + self.y[1] * own_size.height() + self.y[2]
         return QtCore.QPoint(pos_x, pos_y)
 
-def show_notification(parent, text, style=None, fade_duration=2000, stay_duration=2000, positioner=None, callback=None):
-    """
-        border_style example: "border: 1px solid black"
-        Please only use a color that is fully opaque (alpha = 255) for bg_color, otherwise a black background will appear.
-    """
-    # create a clickable widget as standalone window and without a frame
-    widget = ClickableWidget(parent, QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
-    # connect the click event with closing of the widget and optional the callback action
-    widget.clicked.connect(widget.close)
-    if callback:
-        widget.clicked.connect(callback)
 
-    # widget must be translucent, otherwise when setting semi-transparent background colors
-    widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+class Notification(QtCore.QObject):
+    clicked = QtCore.Signal(QtGui.QMouseEvent)
 
-    # create a label and set the text
-    label = QtGui.QLabel(widget)
-    label.setObjectName('notification')
-    label.setText(text)
+    def __init__(self, parent, content, fade_duration=2000, stay_duration=2000, positioner=None):
+        super().__init__(parent)
 
-    # set style (border, padding, background color
-    if style:
-        label.setStyleSheet(style)
+        # create a clickable widget as standalone window and without a frame
+        self.widget = ClickableWidget(parent, QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
 
-    # we need to manually tell the widget that it should be exactly as big as the label it contains
-    widget.resize(label.sizeHint())
+        # widget must be translucent, otherwise when setting semi-transparent background colors
+        self.widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 
-    # fade in animation
-    widget.fade_in = QtCore.QPropertyAnimation(widget, 'windowOpacity')
-    widget.fade_in.setDuration(fade_duration)
-    widget.fade_in.setStartValue(0)
-    widget.fade_in.setEndValue(1)
+        # connect click with deletion and emit clicked signal
+        self.widget.clicked.connect(self.clicked.emit)
 
-    # fading out and waiting for fading out makes only sense if a positive stay_duration has been given
-    if stay_duration:
+        # replace content by QLabel if content is a string
+        if isinstance(content, str):
+            content = QtGui.QLabel(content)
+            content.setObjectName('notification')
 
-        # fade out animation
-        widget.fade_out = QtCore.QPropertyAnimation(widget, 'windowOpacity')
-        widget.fade_out.setDuration(fade_duration)
-        widget.fade_out.setStartValue(1)
-        widget.fade_out.setEndValue(0)
-        widget.fade_out.finished.connect(widget.close)
+        # set background
+        layout = QtGui.QVBoxLayout(self.widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(content)
 
-        # timer for fading out animation
-        widget.timer = QtCore.QTimer()
-        widget.timer.setSingleShot(True)
-        widget.timer.setInterval(stay_duration)
-        widget.timer.timeout.connect(widget.fade_out.start)
+        # fade in animation
+        self.fade_in = QtCore.QPropertyAnimation(self.widget, 'windowOpacity')
+        self.fade_in.setDuration(fade_duration)
+        self.fade_in.setStartValue(0)
+        self.fade_in.setEndValue(1)
 
-        # start the timer as soon as the fading in animation has finished
-        widget.fade_in.finished.connect(widget.timer.start)
+        # fading out and waiting for fading out makes only sense if a positive stay_duration has been given
+        if stay_duration > 0:
+            # fade out animation
+            self.fade_out = QtCore.QPropertyAnimation(self.widget, 'windowOpacity')
+            self.fade_out.setDuration(fade_duration)
+            self.fade_out.setStartValue(1)
+            self.fade_out.setEndValue(0)
+            self.fade_out.finished.connect(self.deleteLater)
 
-    # if given, position
-    if parent and positioner:
-        position = positioner.calculate(parent.geometry(), widget.size())
-        widget.move(position)
+            # timer for fading out animation
+            self.timer = QtCore.QTimer()
+            self.timer.setSingleShot(True)
+            self.timer.setInterval(stay_duration)
+            self.timer.timeout.connect(self.fade_out.start)
 
-    # to avoid short blinking show transparent and start animation
-    widget.setWindowOpacity(0)
-    widget.show()
-    widget.fade_in.start()
+            # start the timer as soon as the fading in animation has finished
+            self.fade_in.finished.connect(self.timer.start)
+
+        # to avoid short blinking show transparent and start animation
+        self.widget.setWindowOpacity(0)
+
+        # if given, set a position
+        if parent and positioner:
+            position = positioner.calculate(parent.geometry(), content.sizeHint())
+            self.widget.move(position)
+
+        # finally show and start fade in
+        self.widget.show()
+        self.fade_in.start()
 
 
 class RelativeLayoutConstraint():
-
     def __init__(self, x=(0, 0, 0), y=(0, 0, 0)):
         self.x = x
         self.y = y
@@ -187,14 +186,13 @@ class RelativeLayoutConstraint():
 
 
 class RelativeLayout(QtGui.QLayout):
-
     def __init__(self, *args):
         super().__init__(*args)
         self.setContentsMargins(0, 0, 0, 0)
         self.items = []
 
     def addItem(self, item):
-        if not item.widget() or not hasattr(item.widget(), 'layout_constraint'):
+        if item.widget() is None or not hasattr(item.widget(), 'layout_constraint'):
             raise RuntimeError('Only add widgets (with attribute position_constraint).')
         self.items.append(item)
 
@@ -239,9 +237,7 @@ class RelativeLayout(QtGui.QLayout):
 
 
 class FadeAnimation():
-
     def __init__(self, graphics_item, duration):
-
         # create opacity effect
         self.effect = QtGui.QGraphicsOpacityEffect()
         self.effect.setOpacity(0)
@@ -260,6 +256,7 @@ class FadeAnimation():
     def fade_out(self):
         self.animation.setDirection(QtCore.QAbstractAnimation.Backward)
         self.animation.start()
+
 
 class GraphicsItemSet():
     """
@@ -284,6 +281,7 @@ class GraphicsItemSet():
         """
         for item in self.content:
             item.setZValue(level)
+
 
 class ZStackingManager():
     """
@@ -311,7 +309,6 @@ class ZStackingManager():
         self.floors.insert(insert_position, new_floor)
         return new_floor
 
-
     def stack(self):
         """
 
@@ -321,8 +318,8 @@ class ZStackingManager():
 
 
 class Dialog(QtGui.QWidget):
-
-    def __init__(self, parent, title=None, icon=None, delete_on_close=False, modal=False, style=None, close_callback=None):
+    def __init__(self, parent, title=None, icon=None, delete_on_close=False, modal=False, style=None,
+                 close_callback=None):
         super().__init__(parent, QtCore.Qt.Dialog)
         # no context help button in the title bar (Qt.Dialog has it by default)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
@@ -334,12 +331,12 @@ class Dialog(QtGui.QWidget):
         if delete_on_close:
             self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         if modal:
-            self.setWindowModality(QtCore.Qt.WindowModal) # default is non-modal
+            self.setWindowModality(QtCore.Qt.WindowModal)  # default is non-modal
         if style:
             id = 'dialog'
             self.setObjectName(id)
-            self.setAttribute(QtCore.Qt.WA_StyledBackground) # in case
-            style = '#{}{{{}}}'.format(id, style) # escaping the {} by doubling {{}}
+            self.setAttribute(QtCore.Qt.WA_StyledBackground)  # in case
+            style = '#{}{{{}}}'.format(id, style)  # escaping the {} by doubling {{}}
             self.setStyleSheet(style)
 
         self.close_callback = close_callback
@@ -354,8 +351,8 @@ class Dialog(QtGui.QWidget):
         if self.close_callback and not self.close_callback(self):
             event.ignore()
 
-class ZoomableGraphicsView(QtGui.QGraphicsView):
 
+class ZoomableGraphicsView(QtGui.QGraphicsView):
     ScaleFactor = 1.15
     MinScaling = 0.5
     MaxScaling = 2
@@ -365,7 +362,7 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
         self.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
 
     def wheelEvent(self, event):
-        current_scale = self.transform().m11() # horizontal scaling factor = vertical scaling factor
+        current_scale = self.transform().m11()  # horizontal scaling factor = vertical scaling factor
         if event.delta() > 0:
             f = ZoomableGraphicsView.ScaleFactor
             if current_scale * f > ZoomableGraphicsView.MaxScaling:
@@ -375,6 +372,7 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
             if current_scale * f < ZoomableGraphicsView.MinScaling:
                 return
         self.scale(f, f)
+
 
 def createExtendedWidgetClasses(parent):
     class ExtendedWidgetSubclass(parent):
@@ -394,6 +392,7 @@ def createExtendedWidgetClasses(parent):
             self.position_old = position_now
 
     return ExtendedWidgetSubclass
+
 
 ExtendedToolBar = createExtendedWidgetClasses(QtGui.QToolBar)
 

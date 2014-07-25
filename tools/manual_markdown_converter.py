@@ -76,7 +76,7 @@ def convert():
             file.write(html)
 
         # reset state of converter
-        md.reset
+        md.reset()
 
 if __name__ == '__main__':
     # change to project root

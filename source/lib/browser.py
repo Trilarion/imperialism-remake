@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtCore, QtGui, QtWebKit
+from PySide import QtGui, QtWebKit
+
 
 class BrowserWidget(QtGui.QWidget):
     def __init__(self, home_url, icon_provider):
@@ -133,7 +134,7 @@ class BrowserWidget(QtGui.QWidget):
 
         # update title of window, only show extended version if the page has a title
         # TODO title?
-        #page_title = self.web_view.title()
+        # page_title = self.web_view.title()
         #if not page_title:
         #    self.widget.setWindowTitle(self.title)
         #else:

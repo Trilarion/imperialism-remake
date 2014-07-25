@@ -16,10 +16,11 @@
 
 import random
 from functools import partial
+
 from PySide import QtCore, QtNetwork
 
-class Server(QtCore.QObject):
 
+class Server(QtCore.QObject):
     def __init__(self, address):
         super().__init__()
         self.address = address
@@ -51,7 +52,6 @@ class Server(QtCore.QObject):
             socket.disconnected.connect(partial(self.disconnected, id))
             socket.readyRead.connect(partial(self.receive, id))
             socket.error.connect(partial(self.error, id))
-
 
     def disconnected(self, socket):
         pass

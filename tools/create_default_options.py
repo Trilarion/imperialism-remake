@@ -28,7 +28,7 @@ options = {
     c.O_VERSION: 'v0.2.0 (2014-xx-xx)', # to be displayed on the start screen
     c.O_OPTIONS_VERSION: 1, # version of options
 
-    c.OG_MW_FULLSCREEN: True, # we start full screen (can be unset by the programm for some linux dekstop environments
+    c.OG_MW_FULLSCREEN: True, # we start full screen (can be unset by the program for some linux desktop environments
     c.OG_FULLSCREEN_SUPPORTED: True, # is full screen supported
 
     c.OM_PHONON_SUPPORTED: True,

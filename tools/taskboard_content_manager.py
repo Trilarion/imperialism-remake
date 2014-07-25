@@ -30,15 +30,16 @@ import json, shutil, os, itertools
 from datetime import date
 
 # minimal set of keys that have to be set in the boards properties
-min_board_keys = set(['pageTitle', 'categories'])
+min_board_keys = {'pageTitle', 'categories'}
 # maximal set of keys that can be set in the boards properties
 max_board_keys = min_board_keys | set([])
 # minimal set of keys that have to be set in a task
-min_task_keys = set(['id', 'creationDate', 'dependencies', 'title', 'description', 'category'])
+min_task_keys = {'id', 'creationDate', 'dependencies', 'title', 'description', 'category'}
 # maximal set of keys that can be set in a task
-max_task_keys = min_task_keys | set(['assignee', 'assignDate', 'completionDate', 'result', 'dependencies'])
+max_task_keys = min_task_keys | {'assignee', 'assignDate', 'completionDate', 'result', 'dependencies'}
 # standard file name
-default_file_name = 'board-content.json';
+default_file_name = 'board-content.json'
+
 
 class Task():
     """
@@ -112,10 +113,10 @@ def save_board(board, file_name=default_file_name):
     """
 
     # safety check
-    if not (board.properties.keys() >= min_board_keys and board.properties.keys() <= max_board_keys):
+    if not (min_board_keys <= board.properties.keys() <= max_board_keys):
         raise RuntimeError('board either contains not enough properties or too many')
     for task in board:
-        if not (task.properties.keys() >= min_task_keys and task.properties.keys() <= max_task_keys):
+        if not (min_task_keys <= task.properties.keys() <= max_task_keys):
             raise RuntimeError('a task either contains not enough properties or too many')
     for (k, task) in enumerate(board.tasks):
         if task['id'] != k + 1: # id starts at 1
@@ -124,8 +125,7 @@ def save_board(board, file_name=default_file_name):
     # collect all internal data
 
     # properties goes to properties
-    data = {}
-    data['properties'] = board.properties.copy()
+    data = {'properties': board.properties.copy()}
 
     # sort into available, blocked, in progress, completed
     unworked = []

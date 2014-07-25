@@ -19,7 +19,9 @@ from PySide import QtCore, QtNetwork
 
 class Client(QtCore.QObject):
 
-    def __init__(self, name):
+    received = QtCore.Signal(str)
+
+    def __init__(self):
         super().__init__()
         self.socket = QtNetwork.QTcpSocket(self)
 
@@ -34,6 +36,7 @@ class Client(QtCore.QObject):
     def receive(self):
         reader = QtCore.QDataStream(self.socket)
         message = reader.readString()
+        self.received.emit(message)
 
     def send(self, message):
         writer = QtCore.QDataStream(self.socket)

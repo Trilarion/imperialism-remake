@@ -92,16 +92,18 @@ if __name__ == '__main__':
     # special case of some desktop environments under Linux where full screen mode does not work well
     if t.options[c.OG_FULLSCREEN_SUPPORTED]:
         desktop_session = os.environ.get("DESKTOP_SESSION")
-        if desktop_session and (desktop_session.startswith('ubuntu') or 'xfce' in desktop_session \
-            or desktop_session.startswith('xubuntu') or 'gnome' in desktop_session):
+        if desktop_session and (desktop_session.startswith('ubuntu') or 'xfce' in desktop_session
+                                or desktop_session.startswith('xubuntu') or 'gnome' in desktop_session):
             t.options[c.OG_FULLSCREEN_SUPPORTED] = False
-            t.log_warning('Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
+            t.log_warning(
+                'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
     if not t.options[c.OG_FULLSCREEN_SUPPORTED]:
         t.options[c.OG_MW_FULLSCREEN] = False
 
     # now we can safely assume that the environment is good to us
     # and we simply start the client
     from client import client
+
     client.start()
 
     # save options

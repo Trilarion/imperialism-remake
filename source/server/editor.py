@@ -15,12 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os
+
 from PySide import QtCore, QtGui
-import constants as c, tools as t, lib.graphics as g, client.graphics as cg
+
+import constants as c
+import tools as t
+import lib.graphics as g
+import client.graphics as cg
 from server.scenario import Scenario
 
-class MiniMap(QtGui.QGraphicsView):
 
+class MiniMap(QtGui.QGraphicsView):
     def __init__(self):
         super().__init__()
 
@@ -33,8 +38,8 @@ class MiniMap(QtGui.QGraphicsView):
         self.setSceneRect(0, 0, size.width(), size.height())
         self.setMinimumSize(size)
 
-class Map(g.ZoomableGraphicsView):
 
+class Map(g.ZoomableGraphicsView):
     def __init__(self):
         super().__init__()
 
@@ -59,14 +64,13 @@ class Map(g.ZoomableGraphicsView):
 
 
 class InfoBox(QtGui.QLabel):
-
     def __init__(self):
         super().__init__()
         self.setObjectName('infobox')
         self.setText('Info box')
 
-class NewScenarioDialogWidget(QtGui.QWidget):
 
+class NewScenarioDialogWidget(QtGui.QWidget):
     create_scenario = QtCore.Signal(dict)
 
     def __init__(self):
@@ -161,7 +165,7 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.addWidget(spacer)
 
         action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
-        action_help.triggered.connect(client.show_help_browser) # TODO with partial make reference to specific page
+        action_help.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
         action_quit = QtGui.QAction(t.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
@@ -180,24 +184,27 @@ class EditorScreen(QtGui.QWidget):
         layout.addWidget(self.mini_map, 1, 0)
         layout.addWidget(self.info_box, 2, 0)
         layout.addWidget(self.map, 1, 1, 2, 1)
-        layout.setRowStretch(2, 1) # the info box will take all vertical space left
-        layout.setColumnStretch(1, 1) # the map will take all horizontal space left
+        layout.setRowStretch(2, 1)  # the info box will take all vertical space left
+        layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
 
     def show_new_scenario_dialog(self):
         new_scenario_widget = NewScenarioDialogWidget()
-        dialog = cg.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario', delete_on_close=True, help_callback=self.client.show_help_browser)
+        dialog = cg.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario', delete_on_close=True,
+                               help_callback=self.client.show_help_browser)
         # TODO close callback
         dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
 
     def load_scenario_dialog(self):
-        file_name = QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
+        file_name = \
+            QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
         if file_name:
             self.scenario.load(file_name)
             self.client.show_notification('Loaded scenario {}'.format(self.scenario['title']))
 
     def save_scenario_dialog(self):
-        file_name = QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
+        file_name = \
+            QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
         if file_name:
             self.scenario.save(file_name)
             path, name = os.path.split(file_name)

@@ -18,6 +18,7 @@ import json
 
 from PySide import QtCore
 from PySide.phonon import Phonon
+
 import constants as c
 
 def is_mime_type_ogg_available():
@@ -44,7 +45,7 @@ class Player(QtCore.QObject):
         some hooks for updating the display or seeking and playing only a part of a file.
     """
 
-    song_title = QtCore.Signal(str)
+    next = QtCore.Signal(str)
 
     def __init__(self):
         """
@@ -64,7 +65,7 @@ class Player(QtCore.QObject):
         self.media_object.aboutToFinish.connect(self.before_finish)
 
         # default values
-        self.playlist = None
+        self.playlist = []
         self.auto_rewind = True
 
     def set_playlist(self, playlist):
@@ -86,8 +87,7 @@ class Player(QtCore.QObject):
             # schedule next
             self.schedule_next()
 
-            # self.media_object.play()
-            QtCore.QMetaObject.invokeMethod(self.media_object, 'play')
+            self.media_object.play()
 
     def stop(self):
         self.media_object.stop()
@@ -101,7 +101,7 @@ class Player(QtCore.QObject):
         self.media_object.enqueue(Phonon.MediaSource(next_source))
 
         next_title = self.playlist[self.song_index][1]
-        self.song_title.emit(next_title)
+        self.next.emit(next_title)
 
     def before_finish(self):
         if self.auto_rewind:

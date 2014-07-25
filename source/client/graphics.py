@@ -15,11 +15,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PySide import QtGui, QtCore
-import tools as t, lib.graphics as g
+
+import tools as t
+import lib.graphics as g
+
 
 class GameDialog(QtGui.QWidget):
-
-    def __init__(self, parent, content, title=None, modal=False, delete_on_close=False, help_callback=None, close_callback=None):
+    def __init__(self, parent, content, title=None, modal=False, delete_on_close=False, help_callback=None,
+                 close_callback=None):
         super().__init__(parent, f=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
 
         self.setAttribute(QtCore.Qt.WA_StyledBackground)

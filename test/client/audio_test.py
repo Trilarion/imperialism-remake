@@ -14,20 +14,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtCore, QtGui
+from PySide import QtGui, QtCore
 from client import audio
+import lib.graphics as g, tools as t
 
-if __name__ == '__main__':
-    app = QtGui.QApplication([])
+def show_notification(text):
+    t.thread_status('notification')
+    text = 'Playing {}'.format(text)
+    g.Notification(window, text, positioner=g.Relative_Positioner().centerH().south(20))
 
-    window = QtGui.QWidget()
-    window.show()
+t.thread_status('main')
 
-    playlist = audio.load_soundtrack_playlist()
+app = QtGui.QApplication([])
 
-    player = audio.Player()
-    player.song_title.connect(print)
-    player.set_playlist(playlist)
-    player.start()
+window = QtGui.QWidget()
+window.show()
 
-    app.exec_()
+playlist = audio.load_soundtrack_playlist()
+
+player = audio.Player()
+player.next.connect(show_notification)
+player.set_playlist(playlist)
+player.start()
+QtCore.QTimer.singleShot(0, lambda: t.thread_status('qt'))
+app.exec_()
