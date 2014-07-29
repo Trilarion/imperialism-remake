@@ -16,47 +16,11 @@
 
 from PySide import QtCore, QtGui
 
+"""
+    Graphics (Qt) based objects and algorithms that do not depend specifically on the project but only on Qt.
 
-class ClickableWidget(QtGui.QWidget):
-    """
-
-    """
-
-    clicked = QtCore.Signal(QtGui.QMouseEvent)
-
-    def __init__(self, *args, **kwargs):
-        """
-
-        """
-        super().__init__(*args, **kwargs)
-
-    def mousePressEvent(self, event):
-        """
-
-        """
-        self.clicked.emit(event)
-
-
-class ExtendedGraphicsPixmapItem(QtGui.QGraphicsPixmapItem, QtCore.QObject):
-    entered = QtCore.Signal()
-    left = QtCore.Signal()
-    clicked = QtCore.Signal()
-
-    def __init__(self, pixmap):
-        QtGui.QGraphicsPixmapItem.__init__(self, pixmap)
-        QtCore.QObject.__init__(self)
-        self.setAcceptHoverEvents(True)
-        self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
-
-    def hoverEnterEvent(self, event):
-        self.entered.emit()
-
-    def hoverLeaveEvent(self, event):
-        self.left.emit()
-
-    def mousePressEvent(self, event):
-        self.clicked.emit()
-
+    Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
+"""
 
 class Relative_Positioner():
     def __init__(self, x=(0, 0, 0), y=(0, 0, 0)):
@@ -94,19 +58,16 @@ class Relative_Positioner():
 
 
 class Notification(QtCore.QObject):
-    clicked = QtCore.Signal(QtGui.QMouseEvent)
+    finished = QtCore.Signal()
 
     def __init__(self, parent, content, fade_duration=2000, stay_duration=2000, positioner=None):
-        super().__init__(parent)
+        super().__init__()
 
         # create a clickable widget as standalone window and without a frame
-        self.widget = ClickableWidget(parent, QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
+        self.widget = QtGui.QWidget(parent, QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
 
         # widget must be translucent, otherwise when setting semi-transparent background colors
         self.widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-        # connect click with deletion and emit clicked signal
-        self.widget.clicked.connect(self.clicked.emit)
 
         # replace content by QLabel if content is a string
         if isinstance(content, str):
@@ -131,7 +92,8 @@ class Notification(QtCore.QObject):
             self.fade_out.setDuration(fade_duration)
             self.fade_out.setStartValue(1)
             self.fade_out.setEndValue(0)
-            self.fade_out.finished.connect(self.deleteLater)
+            # when fade out has finished, emit finished
+            self.fade_out.finished.connect(self.finished.emit)
 
             # timer for fading out animation
             self.timer = QtCore.QTimer()
@@ -143,14 +105,15 @@ class Notification(QtCore.QObject):
             self.fade_in.finished.connect(self.timer.start)
 
         # to avoid short blinking show transparent and start animation
-        self.widget.setWindowOpacity(0)
+        # self.widget.setWindowOpacity(0)
 
         # if given, set a position
         if parent and positioner:
             position = positioner.calculate(parent.geometry(), content.sizeHint())
             self.widget.move(position)
 
-        # finally show and start fade in
+    def show(self):
+        # show and start fade in
         self.widget.show()
         self.fade_in.start()
 
@@ -317,41 +280,6 @@ class ZStackingManager():
             self.floors[z].set_level(z)
 
 
-class Dialog(QtGui.QWidget):
-    def __init__(self, parent, title=None, icon=None, delete_on_close=False, modal=False, style=None,
-                 close_callback=None):
-        super().__init__(parent, QtCore.Qt.Dialog)
-        # no context help button in the title bar (Qt.Dialog has it by default)
-        self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowContextHelpButtonHint)
-
-        if title:
-            self.setWindowTitle(title)
-        if icon:
-            self.setWindowIcon(icon)
-        if delete_on_close:
-            self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        if modal:
-            self.setWindowModality(QtCore.Qt.WindowModal)  # default is non-modal
-        if style:
-            id = 'dialog'
-            self.setObjectName(id)
-            self.setAttribute(QtCore.Qt.WA_StyledBackground)  # in case
-            style = '#{}{{{}}}'.format(id, style)  # escaping the {} by doubling {{}}
-            self.setStyleSheet(style)
-
-        self.close_callback = close_callback
-
-    def set_content(self, widget, no_margins=True):
-        layout = QtGui.QVBoxLayout(self)
-        layout.addWidget(widget)
-        if no_margins:
-            layout.setContentsMargins(0, 0, 0, 0)
-
-    def closeEvent(self, event):
-        if self.close_callback and not self.close_callback(self):
-            event.ignore()
-
-
 class ZoomableGraphicsView(QtGui.QGraphicsView):
     ScaleFactor = 1.15
     MinScaling = 0.5
@@ -373,26 +301,75 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
                 return
         self.scale(f, f)
 
-
-def createExtendedWidgetClasses(parent):
-    class ExtendedWidgetSubclass(parent):
+def makeWidgetClickable(parent):
+    """
+        Takes any QtGui.QWidget derived class and emits a signal emitting on mousePressEvent.
+    """
+    class ClickableWidgetSubclass(parent):
         clicked = QtCore.Signal(QtGui.QMouseEvent)
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+        def mousePressEvent(self, event):
+            super().mousePressEvent(event)
+            self.clicked.emit(event)
+
+    return ClickableWidgetSubclass
+
+def makeDraggableWidget(parent):
+    """
+        Takes any QtGui.QWidget derived class and emits a signal on mouseMoveEvent emitting the position change since
+        the last mousePressEvent. By default mouseMoveEvents are only invoked while the mouse is pressed. Therefore
+        we can use it to listen to dragging or implement dragging.
+    """
+    class DraggableWidgetSubclass(parent):
         dragged = QtCore.Signal(QtCore.QPoint)
 
         def __init__(self, *args, **kwargs):
-            super(ExtendedWidgetSubclass, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def mousePressEvent(self, event):
-            self.position_old = event.globalPos()
-            self.clicked.emit(event)
+            super().mousePressEvent(event)
+            self.position_on_click = event.globalPos()
 
         def mouseMoveEvent(self, event):
+            super().mouseMoveEvent(event)
             position_now = event.globalPos()
-            self.dragged.emit(position_now - self.position_old)
-            self.position_old = position_now
+            self.dragged.emit(position_now - self.position_on_click)
+            self.position_on_click = position_now
 
-    return ExtendedWidgetSubclass
+    return DraggableWidgetSubclass
 
+def makeClickableGraphicsItem(parent):
+    """
+        Takes a QtGui.QGraphicsItem and adds signals for entering, leaving and clicking on the item. For this the item
+        must have setAcceptHoverEvents and it must also inherit from QObject to have signals. Only use it when really
+        needed because there is some performance hit attached.
+    """
+    class ClickableGraphicsItem(parent, QtCore.QObject):
+        entered = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
+        left = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
+        clicked = QtCore.Signal(QtGui.QGraphicsSceneMouseEvent)
 
-ExtendedToolBar = createExtendedWidgetClasses(QtGui.QToolBar)
+        def __init__(self, *args, **kwargs):
+            parent.__init__(self, *args, **kwargs)
+            QtCore.QObject.__init__(self)
+            self.setAcceptHoverEvents(True)
+            self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
 
+        def hoverEnterEvent(self, event):
+            self.entered.emit(event)
+
+        def hoverLeaveEvent(self, event):
+            self.left.emit(event)
+
+        def mousePressEvent(self, event):
+            self.clicked.emit(event)
+
+    return ClickableGraphicsItem
+
+# Some classes we need (just to make the naming clear), Name will be used in Stylesheet selectors
+DraggableToolBar = makeDraggableWidget(QtGui.QToolBar)
+ClickableWidget = makeWidgetClickable(QtGui.QWidget)
+ClickablePixmapItem = makeClickableGraphicsItem(QtGui.QGraphicsPixmapItem)

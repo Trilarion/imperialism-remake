@@ -21,12 +21,14 @@ from PySide.phonon import Phonon
 
 import constants as c
 
+
 def is_mime_type_ogg_available():
     """
         Checks if the ogg mime type 'audio/ogg' is contained in the list of available mime types
     """
     available_types = Phonon.BackendCapabilities.availableMimeTypes()
     return 'audio/ogg' in available_types
+
 
 def load_soundtrack_playlist():
     """
@@ -38,6 +40,7 @@ def load_soundtrack_playlist():
     for entry in playlist:
         entry[0] = c.extend(c.Soundtrack_Folder, entry[0])
     return playlist
+
 
 class Player(QtCore.QObject):
     """

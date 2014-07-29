@@ -44,7 +44,7 @@ class Window(QtGui.QWidget):
         self.setLayout(layout_main)
 
     def show_notification(self):
-        gui.show_notification(self, 'Notification')
+        gui.schedule_notification(self, 'Notification')
 
 if __name__ == '__main__':
     app = QtGui.QApplication([])

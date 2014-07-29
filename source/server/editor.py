@@ -165,11 +165,11 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.addWidget(spacer)
 
         action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
-        action_help.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
+        action_help.triggered.connect(client.display_help_browser)  # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
         action_quit = QtGui.QAction(t.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
-        action_quit.triggered.connect(client.show_start_screen)
+        action_quit.triggered.connect(client.switch_to_start_screen)
         # TODO ask if something is changed we should save.. (you might loose progress)
         self.toolbar.addAction(action_quit)
 
@@ -190,25 +190,27 @@ class EditorScreen(QtGui.QWidget):
     def show_new_scenario_dialog(self):
         new_scenario_widget = NewScenarioDialogWidget()
         dialog = cg.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario', delete_on_close=True,
-                               help_callback=self.client.show_help_browser)
+                               help_callback=self.client.display_help_browser)
         # TODO close callback
         dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
 
     def load_scenario_dialog(self):
         file_name = \
-            QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
+            QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
+                0]
         if file_name:
             self.scenario.load(file_name)
-            self.client.show_notification('Loaded scenario {}'.format(self.scenario['title']))
+            self.client.schedule_notification('Loaded scenario {}'.format(self.scenario['title']))
 
     def save_scenario_dialog(self):
         file_name = \
-            QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
+            QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
+                0]
         if file_name:
             self.scenario.save(file_name)
             path, name = os.path.split(file_name)
-            self.client.show_notification('Saved to {}'.format(name))
+            self.client.schedule_notification('Saved to {}'.format(name))
 
     def scenario_change(self):
         self.map.complete_redraw(self.scenario)

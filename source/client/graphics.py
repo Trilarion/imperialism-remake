@@ -37,7 +37,7 @@ class GameDialog(QtGui.QWidget):
             self.setWindowModality(QtCore.Qt.WindowModal)
 
         # title bar
-        title_bar = g.ExtendedToolBar()
+        title_bar = g.DraggableToolBar()
         title_bar.setIconSize(QtCore.QSize(20, 20))
         title_bar.setObjectName('titlebar')
         title_bar.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Fixed)

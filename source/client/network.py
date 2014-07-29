@@ -18,7 +18,6 @@ from PySide import QtCore, QtNetwork
 
 
 class Client(QtCore.QObject):
-
     received = QtCore.Signal(str)
 
     def __init__(self):

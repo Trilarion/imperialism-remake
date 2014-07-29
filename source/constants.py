@@ -16,32 +16,38 @@
 
 """
     Game specific path locations for artwork, music, ...
-    Only real constant constants.
+
+    Only real static values go here.
 """
 
 import os
 
+
 def extend(path, *parts):
+    """
+        Uses os.path.join to join parts of a path. Also checks for existence and raises an error
+        if the path is not existing.
+    """
     extended = os.path.join(path, *parts)
     if not os.path.exists(extended):
         raise RuntimeError('constructed path {} does not exist'.format(extended))
     return extended
 
-# general folder (do not directly contain data)
+# general folders (do not directly contain data)
 Data_Folder = extend('.', 'data')
 Artwork_Folder = extend(Data_Folder, 'artwork')
 
-# scenario
+# scenarios (save games)
 Scenario_Folder = extend(Data_Folder, 'scenarios')
 Core_Scenario_Folder = extend(Scenario_Folder, 'core')
 Saved_Scenario_Folder = extend(Scenario_Folder, 'saved')
 
-# music related folder
+# music related folders
 Music_Folder = extend(Artwork_Folder, 'music')
 Soundtrack_Folder = extend(Music_Folder, 'soundtrack')
 Soundtrack_Playlist = extend(Soundtrack_Folder, 'playlist.info')
 
-# graphics related folder
+# graphics related folders
 Graphics_Folder = extend(Artwork_Folder, 'graphics')
 Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 

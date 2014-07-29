@@ -16,6 +16,11 @@
 
 from PySide import QtGui, QtWebKit
 
+"""
+    Browser based on QtWebKit.QtWebView. Provides Home, Forward, Backward (in history) functionality.
+"""
+
+# TODO base instead on QtWebPage?
 
 class BrowserWidget(QtGui.QWidget):
     def __init__(self, home_url, icon_provider):
@@ -135,7 +140,7 @@ class BrowserWidget(QtGui.QWidget):
         # update title of window, only show extended version if the page has a title
         # TODO title?
         # page_title = self.web_view.title()
-        #if not page_title:
+        # if not page_title:
         #    self.widget.setWindowTitle(self.title)
         #else:
         #    self.widget.setWindowTitle('{} - {}'.format(self.title, self.web_view.title()))

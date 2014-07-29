@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Start the application.
+    Starts the application.
 
-    Start in project root folder and with 'debug' as script parameter is wished.
+    Start in project root folder and with 'debug' as parameter if wished.
 """
 
 if __name__ == '__main__':
