@@ -19,11 +19,8 @@ from client import audio
 import lib.graphics as g, tools as t
 
 def show_notification(text):
-    t.thread_status('notification')
     text = 'Playing {}'.format(text)
     g.Notification(window, text, positioner=g.Relative_Positioner().centerH().south(20))
-
-t.thread_status('main')
 
 app = QtGui.QApplication([])
 
@@ -36,5 +33,4 @@ player = audio.Player()
 player.next.connect(show_notification)
 player.set_playlist(playlist)
 player.start()
-QtCore.QTimer.singleShot(0, lambda: t.thread_status('qt'))
 app.exec_()

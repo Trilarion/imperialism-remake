@@ -27,24 +27,6 @@ from PySide import QtGui, QtCore
 
 import constants as c
 
-
-# for debugging purposes of thread computations
-names = ['Alice', 'Bob', 'Suzy', 'Norman', 'Uma', 'Joe']
-threads = {}
-
-
-def thread_status(text):
-    """
-        For debug purposes: keeps track of current running thread.
-    """
-
-    global threads
-    thread = QtCore.QThread.currentThread()
-    if thread not in threads:
-        threads[thread] = names[len(threads)]
-    thread = threads[thread]
-    print('{}: {}'.format(thread, text))
-
 def load_ui_icon(name):
     """
         Load an icon from a base icon path.

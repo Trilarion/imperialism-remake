@@ -17,7 +17,6 @@
 # TODO queue notifications
 
 import json
-from queue import Queue
 from functools import partial
 
 from PySide import QtCore, QtGui
@@ -30,8 +29,36 @@ import client.audio as audio
 from lib.browser import BrowserWidget
 from server.editor import EditorScreen
 
+class MapItem(QtCore.QObject):
+    def __init__(self, parent, pixmap, label, description):
+        super().__init__(parent)
+        # store label and description
+        self.label = label
+        self.description = description
+
+        # create clickable pixmap item and create fade animation
+        self.item = g.ClickablePixmapItem(pixmap)
+        self.fade = g.FadeAnimation(self.item)
+        self.fade.set_duration(300)
+
+        # wire to fade in/out
+        self.item.entered.connect(self.fade.fadein)
+        self.item.left.connect(self.fade.fadeout)
+
+        # wire to show/hide connection
+        self.item.entered.connect(self.show_description)
+        self.item.left.connect(self.hide_description)
+
+    def show_description(self):
+        self.label.setText('<font color=#ffffff size=6>{}</font>'.format(self.description))
+
+    def hide_description(self):
+        self.label.setText('')
 
 class StartScreen(QtGui.QWidget):
+
+    frame_pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 255, 255, 64)), 6, j=QtCore.Qt.BevelJoin)
+
     def __init__(self, client):
         super().__init__()
 
@@ -78,29 +105,18 @@ class StartScreen(QtGui.QWidget):
         for k, v in image_map.items():
             # add action from our predefined action dictionary
             pixmap = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, v['overlay']))
-            pixmap_item = g.ClickablePixmapItem(pixmap)
-
-            pixmap_item.setZValue(3)
+            mapitem = MapItem(view, pixmap, label=subtitle, description=v['label'])
+            mapitem.item.setZValue(3)
             offset = v['offset']
-            pixmap_item.setOffset(QtCore.QPointF(offset[0], offset[1]))
-
-            pixmap_item.fade_animation = g.FadeAnimation(pixmap_item, 300)
-            pixmap_item.entered.connect(pixmap_item.fade_animation.fade_in)
-            pixmap_item.left.connect(pixmap_item.fade_animation.fade_out)
-            pixmap_item.clicked.connect(actions[k])
-            pixmap_item.entered.connect(
-                partial(subtitle.setText, '<font color=#ffffff size=6>{}</font>'.format(v['label'])))
-            pixmap_item.left.connect(lambda: subtitle.setText(''))
+            mapitem.item.setOffset(QtCore.QPointF(offset[0], offset[1]))
+            mapitem.item.clicked.connect(actions[k])
 
             frame_path = QtGui.QPainterPath()
-            frame_path.addRect(pixmap_item.boundingRect())
-            brush = QtGui.QBrush(QtGui.QColor(255, 255, 255, 64))
-            # brush = QtGui.QBrush(QtGui.QColor(255,255,255, 128), bs=QtCore.Qt.Dense3Pattern)
-            pen = QtGui.QPen(brush, 6, j=QtCore.Qt.BevelJoin)
-            frame_item = scene.addPath(frame_path, pen)
+            frame_path.addRect(mapitem.item.boundingRect())
+            frame_item = scene.addPath(frame_path, StartScreen.frame_pen)
             frame_item.setZValue(4)
+            scene.addItem(mapitem.item)
 
-            scene.addItem(pixmap_item)
 
         version_label = QtGui.QLabel('<font color=#ffffff>{}</font>'.format(t.options[c.O_VERSION]))
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
@@ -227,7 +243,7 @@ class Client():
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
 
         self.pending_notifications = []
-        self.notification_positioner = g.Relative_Positioner().centerH().south(20)
+        self.notification_position_constraint = g.RelativeLayoutConstraint().centerH().south(20)
         self.notification = None
 
         # audio
@@ -249,7 +265,7 @@ class Client():
     def show_next_notification(self):
         if len(self.pending_notifications) > 0:
             message = self.pending_notifications.pop(0)
-            self.notification = g.Notification(self.main_window, message, positioner=self.notification_positioner)
+            self.notification = g.Notification(self.main_window, message, position_constraint=self.notification_position_constraint)
             self.notification.finished.connect(self.show_next_notification)
             self.notification.show()
         else:
