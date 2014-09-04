@@ -203,7 +203,14 @@ class OptionsContentWidget(QtGui.QTabWidget):
 
 
 class MainWindow(QtGui.QWidget):
+    """
+        The main window (widget) which is the top level window of the application. It can be full screen or not and hold
+        a single widget in a margin-less layout.
+    """
     def __init__(self):
+        """
+            All the necessary initializations. Is shown at the end.
+        """
         super().__init__()
         # set geometry
         self.setGeometry(t.options[c.OG_MW_BOUNDS])
@@ -235,34 +242,55 @@ class MainWindow(QtGui.QWidget):
 
 
 class Client():
+    """
+        Main class of the client, holds the help browser, the main window (full screen or not), the content of the main
+        window, the audio player
+    """
     def __init__(self):
+        """
+            Create the main window, the help browser dialog, the audio player, ...
+        """
+        # main window
         self.main_window = MainWindow()
 
+        # help browser
         self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
         self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
 
+        # for the notifications
         self.pending_notifications = []
         self.notification_position_constraint = g.RelativeLayoutConstraint().centerH().south(20)
         self.notification = None
 
-        # audio
+        # audio player
         self.player = audio.Player()
         self.player.next.connect(self.audio_notification)
         self.player.set_playlist(audio.load_soundtrack_playlist())
+        # start audio player if wished
         if not t.options[c.OM_BG_MUTE]:
             self.player.start()
 
     def audio_notification(self, title):
+        """
+            Special kind of notification from the audio system.
+        """
         text = 'Playing {}'.format(title)
         self.schedule_notification(text)
 
     def schedule_notification(self, text):
+        """
+            Generic scheduling of a notification. Will be shown immediately if no other notification is shown, otherwise
+            it will be shown as soon at the of the current list of notifications to be shown.
+        """
         self.pending_notifications.append(text)
         if self.notification is None:
             self.show_next_notification()
 
     def show_next_notification(self):
+        """
+            Will be called whenever a notification is shown and was cleared. Tries to show the next one if there is one.
+        """
         if len(self.pending_notifications) > 0:
             message = self.pending_notifications.pop(0)
             self.notification = g.Notification(self.main_window, message, position_constraint=self.notification_position_constraint)
@@ -271,17 +299,25 @@ class Client():
         else:
             self.notification = None
 
-
     def display_help_browser(self, url=None):
+        """
+            Displays the help browser somewhere on screen. Can set a special page if needed.
+        """
         if url:
             self.help_browser_widget.displayPage(url)
         self.help_dialog.show()
 
     def switch_to_start_screen(self):
+        """
+            Switches the content of the main window to the start screen.
+        """
         widget = StartScreen(self)
         self.main_window.change_content_widget(widget)
 
     def display_game_lobby_dialog(self):
+        """
+            Shows the game lobby dialog.
+        """
         lobby_widget = GameLobbyWidget()
         dialog = cg.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby',
                                help_callback=self.display_help_browser)
@@ -289,10 +325,16 @@ class Client():
         dialog.show()
 
     def switch_to_editor_screen(self):
+        """
+            Switches the content of the main window to the editor screen.
+        """
         widget = EditorScreen(self)
         self.main_window.change_content_widget(widget)
 
     def display_options_dialog(self):
+        """
+            Shows the preferences dialog.
+        """
         options_widget = OptionsContentWidget()
         dialog = cg.GameDialog(self.main_window, options_widget, delete_on_close=True, title='Preferences',
                                help_callback=self.display_help_browser, close_callback=options_widget.close_request)
@@ -300,6 +342,9 @@ class Client():
         dialog.show()
 
     def quit(self):
+        """
+            Cleans up and closes the main window which causes app.exec_() to finish.
+        """
         # store state in options
         t.options[c.OG_MW_BOUNDS] = self.main_window.normalGeometry()
         t.options[c.OG_MW_MAXIMIZED] = self.main_window.isMaximized()
