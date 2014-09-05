@@ -16,15 +16,30 @@
 
 from PySide import QtGui, QtCore
 
+"""
+    Graphics elements that are dependent on the tools and lib.graphics library, but not on any game specific (constants,
+    scenario or otherwise) logic. Therefore kind of a intermediate abstraction between the fully independent lib.graphics
+    module and the client game specific logic under folder client.
+"""
+
 import tools as t
 import lib.graphics as g
 
 
 class GameDialog(QtGui.QWidget):
+    """
+        Create a dialog (widget) with many preconfigured properties (modality, title, parent, content, help callback, ...
+
+        Main property is the custom window frame that allows dragging around (on the titlebar).
+
+        Reference in stylesheets with 'gamedialog'.
+    """
     def __init__(self, parent, content, title=None, modal=False, delete_on_close=False, help_callback=None,
                  close_callback=None):
+        # no frame but a standalong window
         super().__init__(parent, f=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
 
+        # we need this
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setObjectName('gamedialog')
 
@@ -71,8 +86,6 @@ class GameDialog(QtGui.QWidget):
     def closeEvent(self, event):
         """
             To prevent Alt+F4 or other automatic closes.
-        :param event:
-        :return:
         """
         if self.close_callback and not self.close_callback(self):
             event.ignore()

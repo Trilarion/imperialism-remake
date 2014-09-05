@@ -14,30 +14,57 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Client network code
+"""
+
 from PySide import QtCore, QtNetwork
 
 
 class Client(QtCore.QObject):
+    """
+        Mostly a wrapper around QtNetwork.QTcpSocket and QDataStream to allow reading and writing of strings (messages).
+    """
     received = QtCore.Signal(str)
 
     def __init__(self):
+        """
+            Create a socket.
+        """
         super().__init__()
         self.socket = QtNetwork.QTcpSocket(self)
-
-    def login(self, address):
-        self.socket.connectToHost(address[0], address[1])
+        # some connections
         self.socket.readyRead.connect(self.receive)
         self.error.connect(self.error)
 
+    def login(self, address):
+        """
+            Given an address (list of two parts: hostname (str), port (int)) tries to connect the socket.
+        """
+        self.socket.connectToHost(address[0], address[1])
+
     def error(self):
+        """
+            Something went wrong. We should disconnect immediately.
+        """
         self.socket.disconnectFromHost()
 
     def receive(self):
+        """
+            A new mesage came, read the message as string.
+
+            TODO will the whole message arrive in one piece?
+        """
         reader = QtCore.QDataStream(self.socket)
         message = reader.readString()
         self.received.emit(message)
 
     def send(self, message):
+        """
+            Sends a message (a astring) over the socket.
+
+            TODO check if connected before, error if not
+        """
         writer = QtCore.QDataStream(self.socket)
         writer.setVersion(QtCore.QDataStream.Qt_4_8)
         writer.writeString(message)

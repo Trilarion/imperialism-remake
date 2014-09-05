@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-# TODO queue notifications
+"""
+    Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
+"""
 
 import json
-from functools import partial
-
 from PySide import QtCore, QtGui
 
 import constants as c
@@ -30,6 +30,13 @@ from lib.browser import BrowserWidget
 from server.editor import EditorScreen
 
 class MapItem(QtCore.QObject):
+    """
+        Holds together a clickable QPixmapItem, a description text and a reference to a label that shows the text
+
+        TODO use signals to show the text instead
+    """
+    description_change = QtCore.Signal(str)
+
     def __init__(self, parent, pixmap, label, description):
         super().__init__(parent)
         # store label and description
@@ -56,6 +63,11 @@ class MapItem(QtCore.QObject):
         self.label.setText('')
 
 class StartScreen(QtGui.QWidget):
+    """
+        Creates the start screen
+
+        TODO convert to simple method which does it, no need to be a class
+    """
 
     frame_pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 255, 255, 64)), 6, j=QtCore.Qt.BevelJoin)
 
@@ -99,6 +111,7 @@ class StartScreen(QtGui.QWidget):
         with open(image_map_file, 'r') as f:
             image_map = json.load(f)
 
+        # security check, they have to be the same
         if actions.keys() != image_map.keys():
             raise RuntimeError('Start screen hot map info file ({}) corrupt.'.format(image_map_file))
 
@@ -124,7 +137,13 @@ class StartScreen(QtGui.QWidget):
 
 
 class GameLobbyWidget(QtGui.QWidget):
+    """
+        Content widget for the game lobby.
+    """
     def __init__(self):
+        """
+            Create toolbar and invoke pressing of first tab.
+        """
         super().__init__()
 
         layout = QtGui.QVBoxLayout(self)
@@ -135,7 +154,15 @@ class GameLobbyWidget(QtGui.QWidget):
 
 
 class OptionsContentWidget(QtGui.QTabWidget):
+    """
+        Content widget for the options/preferences dialog window, based on QTabWidget.
+
+        TODO change to toolbar style since we use toolbars everywhere else in the application.
+    """
     def __init__(self):
+        """
+            Create and add all tabs
+        """
         super().__init__()
 
         # empty lists
@@ -146,6 +173,9 @@ class OptionsContentWidget(QtGui.QTabWidget):
         self.add_tab_music()
 
     def add_tab_general(self):
+        """
+            General options tab
+        """
         tab = QtGui.QWidget()
         tab_layout = QtGui.QVBoxLayout(tab)
 
@@ -164,6 +194,9 @@ class OptionsContentWidget(QtGui.QTabWidget):
         self.addTab(tab, 'General')
 
     def add_tab_music(self):
+        """
+            Music options tab
+        """
         tab = QtGui.QWidget()
         tab_layout = QtGui.QVBoxLayout(tab)
 
@@ -179,14 +212,25 @@ class OptionsContentWidget(QtGui.QTabWidget):
         self.addTab(tab, 'Music')
 
     def register_checkbox(self, checkbox, option):
+        """
+            Takes an option identifier (str) where the option value must be True/False and sets a checkbox according
+            to the current value. Stores the checkbox, option pair in a list.
+        """
         checkbox.setChecked(t.options[option])
         self.checkboxes.append((checkbox, option))
 
-    def close_request(self, widget):
+    def close_request(self, parent_widget):
+        """
+            User wants to close the dialog, check if an option has been changed. If an option has been changed, ask for
+            okay from user and update the options.
+
+            Also react on some updated options (others might only take affect after a restart of the application).
+            We immediately : start/stop music (mute option)
+        """
         # check if something was changed
         options_modified = any([box.isChecked() is not t.options[option] for (box, option) in self.checkboxes])
         if options_modified:
-            answer = QtGui.QMessageBox.question(widget, 'Preferences', 'Save modified preferences',
+            answer = QtGui.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences',
                                                 QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.Yes)
             if answer == QtGui.QMessageBox.Yes:
                 # all checkboxes
@@ -206,6 +250,8 @@ class MainWindow(QtGui.QWidget):
     """
         The main window (widget) which is the top level window of the application. It can be full screen or not and hold
         a single widget in a margin-less layout.
+
+        TODO should we make this as small as possible, used only once put in Client
     """
     def __init__(self):
         """
@@ -303,7 +349,8 @@ class Client():
         """
             Displays the help browser somewhere on screen. Can set a special page if needed.
         """
-        if url:
+        # we sometimes wire signals that send parameters for url (mouseevents for example) which we do not like
+        if isinstance(url, QtCore.QUrl):
             self.help_browser_widget.displayPage(url)
         self.help_dialog.show()
 

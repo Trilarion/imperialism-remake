@@ -18,11 +18,7 @@
     Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.
 """
 
-import zipfile
-import json
-import sys
-import datetime
-
+import zipfile, json, sys, datetime
 from PySide import QtGui, QtCore
 
 import constants as c

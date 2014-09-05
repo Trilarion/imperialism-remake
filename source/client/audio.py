@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import json
+"""
+    Plays soundtrack music.
+"""
 
+import json
 from PySide import QtCore
 from PySide.phonon import Phonon
 
 import constants as c
-
 
 def is_mime_type_ogg_available():
     """
@@ -32,7 +34,9 @@ def is_mime_type_ogg_available():
 
 def load_soundtrack_playlist():
     """
+        Loads the play list of the soundtracks and replaces the file name with the full path, then returns the list.
 
+        A playlist is a list where each entry is a list of two strings: filepath, title
     """
     file = open(c.Soundtrack_Playlist, 'r')
     playlist = json.load(file)
@@ -46,15 +50,18 @@ class Player(QtCore.QObject):
     """
         Mostly a wrapper around Phonon.MediaObject this class can play a song or a list of songs while also giving
         some hooks for updating the display or seeking and playing only a part of a file.
+
+        Public attribute: auto_rewind (True means that after the playlist has finished starts again´)
     """
 
     next = QtCore.Signal(str)
 
     def __init__(self):
         """
-
+            Setups the sound system.
             Ticks are not implemented because we don't need them but in case we do it is fairly simple.
 
+            TODO what if there are no sound capabilities, is this sure at this point that we have them?
         """
         super().__init__()
 
@@ -73,40 +80,43 @@ class Player(QtCore.QObject):
 
     def set_playlist(self, playlist):
         """
-            Stops the playback in any case
+            Sets a new playlist. Stops the playback in any case.
         """
         self.stop()
         self.playlist = playlist
         self.song_index = 0
 
-    def set_auto_rewind(self, auto_rewind):
-        """
-         auto_rewind (bool)
-        """
-        self.auto_rewind = auto_rewind
-
     def start(self):
+        """
+            If a playlist has been set, start playing with the next song.
+        """
         if self.playlist:
-            # schedule next
+            # schedule next and start playing
             self.schedule_next()
-
             self.media_object.play()
 
     def stop(self):
+        """
+            Stop playing. Should not do anything if we already stopped before.
+        """
         self.media_object.stop()
 
     def schedule_next(self):
         """
-
+            Take the next song from the playlist, send it to the media object, emit the next signal.
         """
-        next_source = self.playlist[self.song_index][0]
-        # print(next_source)
-        self.media_object.enqueue(Phonon.MediaSource(next_source))
+        if self.playlist:
+            next_source = self.playlist[self.song_index][0]
+            self.media_object.enqueue(Phonon.MediaSource(next_source))
 
-        next_title = self.playlist[self.song_index][1]
-        self.next.emit(next_title)
+            next_title = self.playlist[self.song_index][1]
+            self.next.emit(next_title)
 
     def before_finish(self):
+        """
+            If we are not yet at the end of the playlist or if auto_rewind is True, schedule the next song.
+            Otherwise do nothing.
+        """
         if self.auto_rewind:
             self.song_index = (self.song_index + 1) % len(self.playlist)
             self.schedule_next()
