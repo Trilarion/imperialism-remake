@@ -34,6 +34,7 @@ class EditorMiniMap(QtGui.QGraphicsView):
     """
         Small overview map
     """
+
     def __init__(self):
         super().__init__()
 
@@ -51,6 +52,7 @@ class EditorMainMap(g.ZoomableGraphicsView):
     """
         The big map holding the game map and everything.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -68,6 +70,7 @@ class EditorMainMap(g.ZoomableGraphicsView):
 
         map_size = scenario['map-size']
 
+        # todo here should be the real drawing code
         S = 80
 
         # draw the grid
@@ -81,6 +84,7 @@ class InfoBox(QtGui.QLabel):
     """
         Info box on the right side of the editor.
     """
+
     def __init__(self):
         super().__init__()
         self.setObjectName('infobox')
@@ -151,6 +155,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         """
         self.items['title'] = self.items['title'].text()
         self.create_scenario.emit(self.items)
+        # TODO this does not kill the window, close callback
         self.close()
 
 
@@ -159,6 +164,7 @@ class EditorScreen(QtGui.QWidget):
         The screen the contains the whole scenario editor. Is copied into the application main window if the user
         clicks on the editor pixmap in the client main screen.
     """
+
     def __init__(self, client):
         """
             Create and setup all the elements.

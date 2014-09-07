@@ -18,7 +18,10 @@
     Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
 """
 
+# TODO lock the client start screen if a dialog is running (modal)
+
 import json
+
 from PySide import QtCore, QtGui
 
 import constants as c
@@ -28,6 +31,7 @@ import client.graphics as cg
 import client.audio as audio
 from lib.browser import BrowserWidget
 from server.editor import EditorScreen
+
 
 class MapItem(QtCore.QObject):
     """
@@ -61,6 +65,7 @@ class MapItem(QtCore.QObject):
 
     def hide_description(self):
         self.label.setText('')
+
 
 class StartScreen(QtGui.QWidget):
     """
@@ -130,7 +135,6 @@ class StartScreen(QtGui.QWidget):
             frame_item.setZValue(4)
             scene.addItem(mapitem.item)
 
-
         version_label = QtGui.QLabel('<font color=#ffffff>{}</font>'.format(t.options[c.O_VERSION]))
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
@@ -140,6 +144,7 @@ class GameLobbyWidget(QtGui.QWidget):
     """
         Content widget for the game lobby.
     """
+
     def __init__(self):
         """
             Create toolbar and invoke pressing of first tab.
@@ -159,6 +164,7 @@ class OptionsContentWidget(QtGui.QTabWidget):
 
         TODO change to toolbar style since we use toolbars everywhere else in the application.
     """
+
     def __init__(self):
         """
             Create and add all tabs
@@ -253,6 +259,7 @@ class MainWindow(QtGui.QWidget):
 
         TODO should we make this as small as possible, used only once put in Client
     """
+
     def __init__(self):
         """
             All the necessary initializations. Is shown at the end.
@@ -292,6 +299,7 @@ class Client():
         Main class of the client, holds the help browser, the main window (full screen or not), the content of the main
         window, the audio player
     """
+
     def __init__(self):
         """
             Create the main window, the help browser dialog, the audio player, ...
@@ -303,6 +311,9 @@ class Client():
         self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
         self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
+        # move to lower right border, so that overlap with other windows is not that strong
+        self.help_dialog.move(self.main_window.x() + self.main_window.width() - 800,
+                              self.main_window.y() + self.main_window.height() - 600)
 
         # for the notifications
         self.pending_notifications = []
@@ -339,7 +350,8 @@ class Client():
         """
         if len(self.pending_notifications) > 0:
             message = self.pending_notifications.pop(0)
-            self.notification = g.Notification(self.main_window, message, position_constraint=self.notification_position_constraint)
+            self.notification = g.Notification(self.main_window, message,
+                                               position_constraint=self.notification_position_constraint)
             self.notification.finished.connect(self.show_next_notification)
             self.notification.show()
         else:

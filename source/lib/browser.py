@@ -141,7 +141,7 @@ class BrowserWidget(QtGui.QWidget):
         # TODO title?
         # page_title = self.web_view.title()
         # if not page_title:
-        #    self.widget.setWindowTitle(self.title)
+        # self.widget.setWindowTitle(self.title)
         #else:
         #    self.widget.setWindowTitle('{} - {}'.format(self.title, self.web_view.title()))
 

@@ -26,6 +26,7 @@ import tools as t
 # some constants
 key_map_size = 'map-size'
 
+
 class Scenario(QtCore.QObject):
     """
         Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.

@@ -22,10 +22,12 @@ from PySide import QtCore, QtGui
     Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
 """
 
+
 class RelativeLayoutConstraint():
     """
         Defines a relative position. The position depends on our own size, the parent rectangle and a constant offset.
     """
+
     def __init__(self, x=(0, 0, 0), y=(0, 0, 0)):
         """
             Initialize so that the new object would be placed with the left-top corner exactly at the left-top-corner
@@ -79,6 +81,7 @@ class RelativeLayoutConstraint():
         self.y = (0.5, -0.5, 0)
         return self
 
+
 def calculate_relative_position(parent_rect, own_size, constraint):
     """
         Returns the left, upper corner of an object if the parent_rectangle is given and our own size and a relative
@@ -86,7 +89,8 @@ def calculate_relative_position(parent_rect, own_size, constraint):
     """
     x = parent_rect.x() + constraint.x[0] * parent_rect.width() + constraint.x[1] * own_size.width() + constraint.x[2]
     y = parent_rect.y() + constraint.y[0] * parent_rect.height() + constraint.y[1] * own_size.height() + constraint.y[2]
-    return (x, y)
+    return x, y
+
 
 class Notification(QtCore.QObject):
     """
@@ -153,6 +157,7 @@ class Notification(QtCore.QObject):
         """
         self.widget.show()
         self.fade.fadein()
+
 
 class RelativeLayout(QtGui.QLayout):
     """
@@ -229,6 +234,7 @@ class RelativeLayout(QtGui.QLayout):
             min_height = max(min_height, o_size.height() + gap_y)
 
         return QtCore.QSize(min_width, min_height)
+
 
 # TODO make this more flexible to work with widget and graphicsitem as well as override duration
 class FadeAnimation(QtCore.QObject):
@@ -396,10 +402,12 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
         # scale
         self.scale(f, f)
 
+
 def makeWidgetClickable(parent):
     """
         Takes any QtGui.QWidget derived class and emits a signal emitting on mousePressEvent.
     """
+
     class ClickableWidgetSubclass(parent):
         clicked = QtCore.Signal(QtGui.QMouseEvent)
 
@@ -412,12 +420,14 @@ def makeWidgetClickable(parent):
 
     return ClickableWidgetSubclass
 
+
 def makeDraggableWidget(parent):
     """
         Takes any QtGui.QWidget derived class and emits a signal on mouseMoveEvent emitting the position change since
         the last mousePressEvent. By default mouseMoveEvents are only invoked while the mouse is pressed. Therefore
         we can use it to listen to dragging or implement dragging.
     """
+
     class DraggableWidgetSubclass(parent):
         dragged = QtCore.Signal(QtCore.QPoint)
 
@@ -436,12 +446,14 @@ def makeDraggableWidget(parent):
 
     return DraggableWidgetSubclass
 
+
 def makeClickableGraphicsItem(parent):
     """
         Takes a QtGui.QGraphicsItem and adds signals for entering, leaving and clicking on the item. For this the item
         must have setAcceptHoverEvents and it must also inherit from QObject to have signals. Only use it when really
         needed because there is some performance hit attached.
     """
+
     class ClickableGraphicsItem(parent, QtCore.QObject):
         entered = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
         left = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)

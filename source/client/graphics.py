@@ -34,6 +34,7 @@ class GameDialog(QtGui.QWidget):
 
         Reference in stylesheets with 'gamedialog'.
     """
+
     def __init__(self, parent, content, title=None, modal=False, delete_on_close=False, help_callback=None,
                  close_callback=None):
         # no frame but a standalong window
@@ -63,21 +64,24 @@ class GameDialog(QtGui.QWidget):
         title.setObjectName('gamedialog-title')
         title_bar.addWidget(title)
 
+        # spacer between titlebar and help/close icons
         spacer = QtGui.QWidget()
         spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         title_bar.addWidget(spacer)
 
+        # if help call back is given, add help icon
         if help_callback:
             help_action = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Help', title_bar)
             help_action.triggered.connect(help_callback)
             title_bar.addAction(help_action)
 
         self.close_callback = close_callback
-
+        # the close button always calls self.close (but in closeEvent we call the close callback if existing)
         close_action = QtGui.QAction(t.load_ui_icon('icon.close.png'), 'Close', title_bar)
         close_action.triggered.connect(self.close)
         title_bar.addAction(close_action)
 
+        # layout is 2 pixel contents margin (border), title bar and content widget
         self.layout = QtGui.QVBoxLayout(self)
         self.layout.setContentsMargins(2, 2, 2, 2)
         self.layout.addWidget(title_bar)

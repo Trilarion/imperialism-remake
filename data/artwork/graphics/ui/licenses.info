@@ -1,0 +1,25 @@
+files: start.background.jpg, start.overlay.*.png
+source: http://www.loc.gov/pictures/item/2002710942/
+  http://remake.twelvepm.de/forum/memberlist.php?mode=viewprofile&u=99
+creator: Creator
+license: CC BY-SA 3.0
+comment: start.background.jpg based on photograph (PD), start.overlay.*.png are based on start.background.jpg
+
+file: icon.ico
+source: http://openclipart.org/detail/171267/flag-of-ducal-prussia-by-hofnaar-171267
+creator: Trilarion
+license: CC BY-SA 3.0
+comment: based on openclipart by hofnaar (PD)
+
+file: loading.gif
+source: http://ajaxload.info/
+license: WTFPL (http://www.wtfpl.net/)
+
+files: icon.(add|backward|close|delete|edit|forward|help|home).png
+source: http://www.famfamfam.com/lab/icons/silk/
+creator: Mark James
+license: CC BY 3.0
+
+files: icon.(back.startscreen|confirm).png
+source: Oxygen icon set
+license: GPL or something equivalent, need to investigate (TODO)

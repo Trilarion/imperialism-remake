@@ -18,10 +18,15 @@
     Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.
 """
 
-import zipfile, json, sys, datetime
+import zipfile
+import json
+import sys
+import datetime
+
 from PySide import QtGui, QtCore
 
 import constants as c
+
 
 def load_ui_icon(name):
     """
@@ -30,12 +35,14 @@ def load_ui_icon(name):
     file_name = c.extend(c.Graphics_UI_Folder, name)
     return QtGui.QIcon(file_name)
 
+
 def read_json(file_name):
     """
         Read JSON struct from file
     """
     with open(file_name, 'r') as file:
         return json.load(file)
+
 
 def write_json(file_name, value):
     """
@@ -44,11 +51,13 @@ def write_json(file_name, value):
     with open(file_name, 'w') as file:
         json.dump(value, file, indent=2, separators=(',', ': '), sort_keys=True)
 
+
 def log_info(text):
     """
         Prints a INFO message to stdout.
     """
     log_write_entry(sys.stdout, "INFO", text)
+
 
 def log_warning(text):
     """
@@ -82,6 +91,7 @@ def log_write_entry(writer, prefix, text, exception=None):
 # singleton options dictionary (we only need one throughout the application)
 options = {}
 
+
 def load_options(file_name):
     """
         Load options from a JSON file and apply some conversions like changing the main window bounding rectangle
@@ -94,6 +104,7 @@ def load_options(file_name):
     if c.OG_MW_BOUNDS in options:
         rect = options[c.OG_MW_BOUNDS]
         options[c.OG_MW_BOUNDS] = QtCore.QRect(*rect)
+
 
 def save_options(file_name):
     """
@@ -116,6 +127,7 @@ class ZipArchiveReader():
 
         See also: https://docs.python.org/3.4/library/zipfile.html
     """
+
     def __init__(self, file):
         """
             Open the zip file in read-only mode.
@@ -147,6 +159,7 @@ class ZipArchiveWriter():
     """
         Ecapsulates a zip file to write files into it or even whole Python objects via JSON.
     """
+
     def __init__(self, file):
         """
             Open the zip file in write mode with standard zlib compression mode.
@@ -177,6 +190,7 @@ class List2D():
     """
         Implements an 2D array with getter and setter for two indices (x,y). Based on list.
     """
+
     def __init__(self, dimension):
         """
             Creates an empty array with a given dimensions (tuple).
@@ -206,19 +220,9 @@ class Worker(QtCore.QObject):
     """
         Not yet in workable state. Skeleton of a worker doing jobs on a specific thread.
     """
+
     def __init__(self):
         super().__init__()
         self.thread = QtCore.QThread()
         self.moveToThread(self.thread)
         self.thread.start()
-
-    def check_thread(self):
-        current_thread = QtCore.QThread.currentThread()
-        if current_thread is not self.thread:
-            raise RuntimeError('Not running in internal Thread!')
-
-    def kill(self):
-        current_thread = QtCore.QThread.currentThread()
-        self.thread.quit()
-        while self.thread.isRunning():
-            current_thread.msleep(10)

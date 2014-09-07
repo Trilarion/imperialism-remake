@@ -19,10 +19,12 @@
 """
 
 import json
+
 from PySide import QtCore
 from PySide.phonon import Phonon
 
 import constants as c
+
 
 def is_mime_type_ogg_available():
     """
@@ -124,7 +126,7 @@ class Player(QtCore.QObject):
             self.song_index += 1
             self.schedule_next()
 
-    def state_changed(self, newState, oldState):
+    def state_changed(self, new_state, old_state):
         """
             The state (Phonon.State) changed.
 
@@ -134,7 +136,7 @@ class Player(QtCore.QObject):
             See Phonon.MediaObject.stateChanged
         """
         # print('time {} state {} to {}'.format(time.clock(), oldState, newState))
-        if newState == Phonon.ErrorState:
+        if new_state == Phonon.ErrorState:
             print(self.media_object.errorType())
             print(self.media_object.errorString())
             # TODO turn off music and tell the user about the error

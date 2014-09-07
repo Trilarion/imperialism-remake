@@ -6,5 +6,10 @@
 
 3. Execute "start.py" in this folder with Python 3.
    e.g. python3 start.py
+   
+On the first start a sub folder "Imperialism Remake User Data"
+in the current user home folder is created. It contains
+preferences and logs.
 
-Contact: http://remake.twelvepm.de/
+Website: http://remake.twelvepm.de/
+Troubleshooting: http://remake.twelvepm.de/home/contact/

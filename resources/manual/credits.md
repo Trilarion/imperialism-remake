@@ -2,9 +2,14 @@
 
 ## Release 0.2.0
 
-Date: 2014-
+Date: 2014-09-07
 
 Changes:
+
+- Conversion from Java to Python (using PySide Qt bindings)
+- Rework of start screen, preferences screen, help screen
+- Skeleton of Scenario Editor
+- Music and logging
 
 Contribution
  

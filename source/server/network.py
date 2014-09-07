@@ -28,6 +28,7 @@ class Server(QtCore.QObject):
     """
         Wrapper around QtNetwork.QTcpServer and a management of several connections (each a QtNetwork.QTcpSocket).
     """
+
     def __init__(self):
         """
         """
@@ -50,7 +51,7 @@ class Server(QtCore.QObject):
         """
             Given an address (hostname, port) tries to start listening.
         """
-        if not self.server.listen(self.address[0], self.address[1]):
+        if not self.server.listen(address[0], address[1]):
             raise RuntimeError('Network error: cannot listen')
 
     def stop(self):
@@ -93,7 +94,6 @@ class Server(QtCore.QObject):
         socket = self.connections[id]
         reader = QtCore.QDataStream(socket)
         message = reader.readString()
-
 
     def send(self, id, message):
         """
