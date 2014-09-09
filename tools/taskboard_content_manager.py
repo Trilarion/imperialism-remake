@@ -174,6 +174,11 @@ def save_board(board, file_name=default_file_name):
     with open(file_name, 'w') as file:
         json.dump(data, file, indent=2, separators=(',', ': '))
 
+    # write number of available tasks in separate file
+    with open('tasks_available.json', 'w') as file:
+        json.dump(len(available), file, indent=2, separators=(',', ': '))
+
+
 def load_board(file_name=default_file_name):
     """
         Deserialize the JSON file and create a board from it. No real checks are performed (these are done before saving).
@@ -263,11 +268,21 @@ if __name__ == '__main__':
     # load the board
     board = load_board()
 
-    task = board.new_task(title='Music: Compose a few more pieces of background music', description='We could need a few more. Refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.', category=2)
+    #task = board.new_task(title='Trade Prototype: Create a GUI for allowing to set up trade preferences with different trade partners and resources', description='For specifications have a look at the Game Definition Manual. No fancy graphics. Just a QWidget that has all the necessary fields.', category=3)
 
-    task = board.new_task(title='UI: Compile a list of buttons that will most probably be needed in the game', description='Create a table giving each button a short but meaningful name and explain in one short sentence the function of each button. Indicate if the size is different from the standard size.', category=1)
+    #task = board.new_task(title='Tests: Write more tests', description='The project definitely needs more tests to run automatically. While there is currently only audio and some GUI in PySide there are possibilities to write more tests. Do it.', category=3)
 
-    task = board.new_task(title='UI: Develop a common design for buttons', description='We need a common style for button. Please refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.', category=2)
+    #task = board.tasks[1]
+    #task.complete('A new version (0.2.0) using Python and the PySide Qt bindings has been released. It is roughly feature equivalent to the last Java version.')
+
+    #task = board.new_task(title='Programming: Improve the Editor screen, implement map view and edit nations dialog.', description='The map is a central piece of the UI. Many layers (terrain, ressources, rivers, grid, borders, units, cities) need to be painted. Also the nations must be made customizable (color, name, ...).', category=3)
+    #task.assign('Trilarion')
+
+    #task = board.new_task(title='Music: Compose a few more pieces of background music', description='We could need a few more. Refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.', category=2)
+
+    #task = board.new_task(title='UI: Compile a list of buttons that will most probably be needed in the game', description='Create a table giving each button a short but meaningful name and explain in one short sentence the function of each button. Indicate if the size is different from the standard size.', category=1)
+
+    #task = board.new_task(title='UI: Develop a common design for buttons', description='We need a common style for button. Please refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.', category=2)
 
     # write to file
     save_board(board)

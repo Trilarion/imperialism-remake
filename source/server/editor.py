@@ -154,10 +154,9 @@ class NewScenarioDialogWidget(QtGui.QWidget):
             Callback if indeed yes is clicked.
         """
         self.items['title'] = self.items['title'].text()
+        # we close the parent window and emit the appropriate signal
+        self.parent().close()
         self.create_scenario.emit(self.items)
-        # TODO this does not kill the window, close callback
-        self.close()
-
 
 class EditorScreen(QtGui.QWidget):
     """

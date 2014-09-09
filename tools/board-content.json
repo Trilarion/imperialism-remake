@@ -1,47 +1,40 @@
 {
-  "available": [
+  "progress": [
     {
-      "description": "Create a table giving each button a short but meaningful name and explain in one short sentence the function of each button. Indicate if the size is different from the standard size.",
-      "title": "UI: Compile a list of buttons that will most probably be needed in the game",
-      "dependencies": [],
-      "creationDate": "2014-06-12",
       "category": 1,
-      "id": 12
+      "title": "Finish first comprehensive version of game specification",
+      "dependencies": [],
+      "description": "Rules: The game specification is an extensive document describing all the various details of the game and how they interact. It needs public discussion and constant revising. But first it should be in a draft like state at least mentioning all the important parts as detailed as possible. In the next 2-3 months finish it and then publish it for public discussion.",
+      "id": 1,
+      "assignDate": "2014-06-11",
+      "assignee": "Trilarion",
+      "creationDate": "2014-06-11"
     },
     {
-      "description": "Create a list of all sound effects likely to be needed. See <a href=\"http://remake.twelvepm.de/forum/viewtopic.php?f=8&t=1067\">here</a> for more information.",
-      "title": "Music: Compile a list of all sound effects likely to be used",
-      "dependencies": [],
-      "creationDate": "2014-06-12",
-      "category": 1,
-      "id": 3
-    },
-    {
-      "description": "We could need a few more. Refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.",
-      "title": "Music: Compose a few more pieces of background music",
-      "dependencies": [],
-      "creationDate": "2014-06-12",
-      "category": 2,
-      "id": 11
-    },
-    {
-      "description": "We need a common style for button. Please refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.",
-      "title": "UI: Develop a common design for buttons",
-      "dependencies": [],
-      "creationDate": "2014-06-12",
-      "category": 2,
-      "id": 13
-    },
-    {
-      "description": "For specifications have a look at the Game Definition Manual. No fancy graphics. Just a QGraphicsView for the battlefield, a toolbar above and a logging message QTextEdit below.",
-      "title": "Battle Prototype: Create a GUI drawing a battle field and allowing to move place some units on it",
-      "dependencies": [],
-      "creationDate": "2014-06-12",
       "category": 3,
-      "id": 5
+      "title": "Programming: Improve the Editor screen, implement map view and edit nations dialog.",
+      "dependencies": [],
+      "description": "The map is a central piece of the UI. Many layers (terrain, ressources, rivers, grid, borders, units, cities) need to be painted. Also the nations must be made customizable (color, name, ...).",
+      "assignDate": "2014-09-08",
+      "assignee": "Trilarion",
+      "id": 14,
+      "creationDate": "2014-09-08"
     }
   ],
-  "completed": [],
+  "completed": [
+    {
+      "category": 3,
+      "title": "Release: Bring Python version of the game roughly to the state of the last Java version",
+      "dependencies": [],
+      "description": "The last Java version (0.1.4) had a functional start screen, a preliminary editor showing a map and a game center dialog allowing to choose a scenario. All these features will very likely be part of the final game design because they are so essential. In order to release a Python version a Python version with roughly the same features should be created. This will attract attention to the project and allows us to test the Python release pathways. Do not include more features for now but rather break them down to individual tasks later.",
+      "result": "A new version (0.2.0) using Python and the PySide Qt bindings has been released. It is roughly feature equivalent to the last Java version.",
+      "assignee": "Trilarion",
+      "id": 2,
+      "completionDate": "2014-09-08",
+      "assignDate": "2014-06-11",
+      "creationDate": "2014-06-11"
+    }
+  ],
   "properties": {
     "categories": [
       "General",
@@ -50,88 +43,124 @@
     ],
     "pageTitle": "Imperialism Remake Taskboard"
   },
+  "available": [
+    {
+      "category": 1,
+      "title": "Music: Compile a list of all sound effects likely to be used",
+      "id": 3,
+      "dependencies": [],
+      "description": "Create a list of all sound effects likely to be needed. See <a href=\"http://remake.twelvepm.de/forum/viewtopic.php?f=8&t=1067\">here</a> for more information.",
+      "creationDate": "2014-06-12"
+    },
+    {
+      "category": 1,
+      "title": "UI: Compile a list of buttons that will most probably be needed in the game",
+      "id": 12,
+      "dependencies": [],
+      "description": "Create a table giving each button a short but meaningful name and explain in one short sentence the function of each button. Indicate if the size is different from the standard size.",
+      "creationDate": "2014-06-12"
+    },
+    {
+      "category": 2,
+      "title": "Music: Compose a few more pieces of background music",
+      "id": 11,
+      "dependencies": [],
+      "description": "We could need a few more. Refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.",
+      "creationDate": "2014-06-12"
+    },
+    {
+      "category": 2,
+      "title": "UI: Develop a common design for buttons",
+      "id": 13,
+      "dependencies": [],
+      "description": "We need a common style for button. Please refer to the forum for discussions about the style. Please do not forget to provide a license agreement and as much raw (notation) data as possible.",
+      "creationDate": "2014-06-12"
+    },
+    {
+      "category": 3,
+      "title": "Battle Prototype: Create a GUI drawing a battle field and allowing to move place some units on it",
+      "id": 5,
+      "dependencies": [],
+      "description": "For specifications have a look at the Game Definition Manual. No fancy graphics. Just a QGraphicsView for the battlefield, a toolbar above and a logging message QTextEdit below.",
+      "creationDate": "2014-06-12"
+    },
+    {
+      "category": 3,
+      "title": "Trade Prototype: Create a GUI for allowing to set up trade preferences with different trade partners and resources",
+      "id": 15,
+      "dependencies": [],
+      "description": "For specifications have a look at the Game Definition Manual. No fancy graphics. Just a QWidget that has all the necessary fields.",
+      "creationDate": "2014-09-09"
+    },
+    {
+      "category": 3,
+      "title": "Tests: Write more tests",
+      "id": 16,
+      "dependencies": [],
+      "description": "The project definitely needs more tests to run automatically. While there is currently only audio and some GUI in PySide there are possibilities to write more tests. Do it.",
+      "creationDate": "2014-09-09"
+    }
+  ],
   "blocked": [
     {
-      "description": "Search and find sound effect samples that can be used for the sound effects listed in the dependent task. Indicate time ranges within the files if reasonable. See <a href=\"http://remake.twelvepm.de/forum/viewtopic.php?f=8&t=1067\">here</a> for more information.",
+      "category": 2,
       "title": "Music: Compile a repository of sound effect files under compatible licenses",
+      "id": 4,
       "dependencies": [
         3
       ],
-      "creationDate": "2014-06-12",
-      "category": 2,
-      "id": 4
+      "description": "Search and find sound effect samples that can be used for the sound effects listed in the dependent task. Indicate time ranges within the files if reasonable. See <a href=\"http://remake.twelvepm.de/forum/viewtopic.php?f=8&t=1067\">here</a> for more information.",
+      "creationDate": "2014-06-12"
     },
     {
-      "description": "For specifications have a loot at the Game Definition Manual. An army is a list of units each with their respective stats and position on the battlefield. Load/save army to file.",
+      "category": 3,
       "title": "Battle Prototype: Create internal data structures to hold armies",
+      "id": 6,
       "dependencies": [
         5
       ],
-      "creationDate": "2014-06-12",
-      "category": 3,
-      "id": 6
+      "description": "For specifications have a loot at the Game Definition Manual. An army is a list of units each with their respective stats and position on the battlefield. Load/save army to file.",
+      "creationDate": "2014-06-12"
     },
     {
-      "description": "Again nothing fancy, just the bare minimum so that it works.",
+      "category": 3,
       "title": "Battle Prototype: Create GUI to load/save/create new army",
+      "id": 7,
       "dependencies": [
         6
       ],
-      "creationDate": "2014-06-12",
-      "category": 3,
-      "id": 7
+      "description": "Again nothing fancy, just the bare minimum so that it works.",
+      "creationDate": "2014-06-12"
     },
     {
-      "description": "We also need a small info panel showing the units stats.",
+      "category": 3,
       "title": "Battle Prototype: Implement turns, selection and move of units",
+      "id": 8,
       "dependencies": [
         7
       ],
-      "creationDate": "2014-06-12",
-      "category": 3,
-      "id": 8
+      "description": "We also need a small info panel showing the units stats.",
+      "creationDate": "2014-06-12"
     },
     {
-      "description": "For specifications have a loot at the Game Definition Manual.",
+      "category": 3,
       "title": "Battle Prototype: Implement attacking of units",
+      "id": 9,
       "dependencies": [
         8
       ],
-      "creationDate": "2014-06-12",
-      "category": 3,
-      "id": 9
+      "description": "For specifications have a loot at the Game Definition Manual.",
+      "creationDate": "2014-06-12"
     },
     {
-      "description": "Try to develop a simple one. Let it run against each other and against humans.",
+      "category": 3,
       "title": "Battle Prototype: Experiment with combat AI",
+      "id": 10,
       "dependencies": [
         9
       ],
-      "creationDate": "2014-06-12",
-      "category": 3,
-      "id": 10
-    }
-  ],
-  "progress": [
-    {
-      "assignDate": "2014-06-11",
-      "creationDate": "2014-06-11",
-      "assignee": "Trilarion",
-      "dependencies": [],
-      "title": "Finish first comprehensive version of game specification",
-      "description": "Rules: The game specification is an extensive document describing all the various details of the game and how they interact. It needs public discussion and constant revising. But first it should be in a draft like state at least mentioning all the important parts as detailed as possible. In the next 2-3 months finish it and then publish it for public discussion.",
-      "category": 1,
-      "id": 1
-    },
-    {
-      "assignDate": "2014-06-11",
-      "creationDate": "2014-06-11",
-      "assignee": "Trilarion",
-      "dependencies": [],
-      "title": "Release: Bring Python version of the game roughly to the state of the last Java version",
-      "description": "The last Java version (0.1.4) had a functional start screen, a preliminary editor showing a map and a game center dialog allowing to choose a scenario. All these features will very likely be part of the final game design because they are so essential. In order to release a Python version a Python version with roughly the same features should be created. This will attract attention to the project and allows us to test the Python release pathways. Do not include more features for now but rather break them down to individual tasks later.",
-      "category": 3,
-      "id": 2
+      "description": "Try to develop a simple one. Let it run against each other and against humans.",
+      "creationDate": "2014-06-12"
     }
   ]
 }
