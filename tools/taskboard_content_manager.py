@@ -96,6 +96,8 @@ class Board():
             task. All the parameters are necessary.
 
             :return: The new task which is also appended to the taswk list.
+
+            TODO prevent task creation if task with the same title already exists (avoid duplicates)
         """
         id = len(self.tasks) + 1
         task = Task(id)
@@ -175,8 +177,8 @@ def save_board(board, file_name=default_file_name):
         json.dump(data, file, indent=2, separators=(',', ': '))
 
     # write number of available tasks in separate file
-    with open('tasks_available.json', 'w') as file:
-        json.dump(len(available), file, indent=2, separators=(',', ': '))
+    with open('board-summary.json', 'w') as file:
+        json.dump([len(available), len(progress)], file, indent=2, separators=(',', ': '))
 
 
 def load_board(file_name=default_file_name):
@@ -267,6 +269,12 @@ if __name__ == '__main__':
 
     # load the board
     board = load_board()
+
+    #task = board.new_task(title='Music: Combining sound effects in one file and playing from this one file.', description='Sound effects will very probably be available in the wav format but may need cutting. Furthermore they must be compiled into a single ogg file (using an external encode on Windows). Automatize this. Then this file must be read and chunks from it must be played upon request and with minimal delay.', category=3)
+
+    #task = board.new_task(title='UI: Develop a common design for backgrounds of windows, button, elements, ...', description='There are many backgrounds that need to be filled. We need a common design for them. This probably needs some discussion. Woodlike/metal or a blurred map are ideas that might be of interest.', category=2)
+
+    #task = board.new_task(title='UI: Implement a specific font.', description='The designers will choose a font. Modify the GUI so that this font is used throughout the game.', category=3)
 
     #task = board.new_task(title='Trade Prototype: Create a GUI for allowing to set up trade preferences with different trade partners and resources', description='For specifications have a look at the Game Definition Manual. No fancy graphics. Just a QWidget that has all the necessary fields.', category=3)
 
