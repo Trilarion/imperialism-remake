@@ -30,22 +30,38 @@ import client.graphics as cg
 from server.scenario import Scenario
 
 
-class EditorMiniMap(QtGui.QGraphicsView):
+class EditorMiniMap(QtGui.QWidget):
     """
         Small overview map
     """
 
     def __init__(self):
         super().__init__()
+        self.setObjectName('minimap')
+
+        layout = QtGui.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
 
         self.scene = QtGui.QGraphicsScene()
-        self.setScene(self.scene)
-        self.setObjectName('minimap')
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+        tracker = g.DraggableRectItem()
+        tracker.setRect(0,0,100,100)
+        tracker.setCursor(QtCore.Qt.PointingHandCursor)
+        self.scene.addItem(tracker)
+
+        self.view = QtGui.QGraphicsView(self.scene)
+        self.view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        layout.addWidget(self.view)
+
         size = QtCore.QSize(300, 300)
-        self.setSceneRect(0, 0, size.width(), size.height())
-        self.setMinimumSize(size)
+        self.view.setSceneRect(0, 0, size.width(), size.height())
+        self.view.setMinimumSize(size)
+
+        self.toolbar = QtGui.QToolBar()
+        self.toolbar.setFloatable(False)
+        self.toolbar.setMovable(False)
+        layout.addWidget(self.toolbar)
 
 
 class EditorMainMap(g.ZoomableGraphicsView):
@@ -61,8 +77,9 @@ class EditorMainMap(g.ZoomableGraphicsView):
         self.setObjectName('map')
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setMouseTracking(True)
 
-    def draw(self, scenario):
+    def draw_map(self, scenario):
         """
             When a scenario is loaded anew we need to draw the whole map new.
         """
@@ -73,11 +90,27 @@ class EditorMainMap(g.ZoomableGraphicsView):
         # todo here should be the real drawing code
         S = 80
 
+        width = (map_size[0] + 0.5) * S
+        height = map_size[1] * S
+        self.scene.setSceneRect(0, 0, width, height)
+
+        pixmap = QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_ocean.jpg'))
+        texture_ocean = QtGui.QBrush(pixmap)
+
+        item = self.scene.addRect(0, 0, width, height)
+        item.setBrush(texture_ocean)
+        item.setZValue(0)
+
+
         # draw the grid
         for x in range(0, map_size[0]):
             for y in range(0, map_size[1]):
-                item = self.scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
-                item.setZValue(1000)
+                pass
+                #item = self.scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
+                #item.setZValue(1000)
+
+    def mouseMoveEvent(self, event):
+        print(event)
 
 
 class InfoBox(QtGui.QLabel):
@@ -261,7 +294,7 @@ class EditorScreen(QtGui.QWidget):
         """
             Whenever the scenario changes completely (new scenario, scenario loaded, ...)
         """
-        self.map.draw(self.scenario)
+        self.map.draw_map(self.scenario)
 
     def show_nations_dialog(self):
         """

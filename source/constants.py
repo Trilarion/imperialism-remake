@@ -50,6 +50,7 @@ Soundtrack_Playlist = extend(Soundtrack_Folder, 'playlist.info')
 # graphics related folders
 Graphics_Folder = extend(Artwork_Folder, 'graphics')
 Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
+Graphics_Map_Folder = extend(Graphics_Folder, 'map')
 
 # special locations
 Options_Default_File = extend(Data_Folder, 'options.info.default')

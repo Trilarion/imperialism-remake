@@ -476,7 +476,32 @@ def makeClickableGraphicsItem(parent):
 
     return ClickableGraphicsItem
 
+def makeDraggableGraphicsItem(parent):
+    """
+
+    """
+
+    class DraggableGraphicsRectItem(parent, QtCore.QObject):
+
+        changed = QtCore.Signal(object)
+
+        def __init__(self, *args, **kwargs):
+            parent.__init__(self, *args, **kwargs)
+            self.parent = parent
+            QtCore.QObject.__init__(self)
+
+            self.setFlags(QtGui.QGraphicsItem.ItemIsMovable | QtGui.QGraphicsItem.ItemSendsScenePositionChanges)
+
+        def itemChange(self, change, value):
+            if change == QtGui.QGraphicsItem.ItemPositionChange:
+                self.changed(value)
+
+            return parent.itemChange(self, change, value)
+
+    return DraggableGraphicsRectItem
+
 # Some classes we need (just to make the naming clear), Name will be used in Stylesheet selectors
 DraggableToolBar = makeDraggableWidget(QtGui.QToolBar)
 ClickableWidget = makeWidgetClickable(QtGui.QWidget)
 ClickablePixmapItem = makeClickableGraphicsItem(QtGui.QGraphicsPixmapItem)
+DraggableRectItem = makeDraggableGraphicsItem(QtGui.QGraphicsRectItem)
