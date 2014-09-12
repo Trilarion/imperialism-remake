@@ -383,6 +383,7 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
         """
         super().__init__(*args, **kwargs)
         self.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
+        self.standard_scale = 1
 
     def wheelEvent(self, event):
         """
@@ -392,15 +393,17 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
         if event.delta() > 0:
             # we are zooming in
             f = ZoomableGraphicsView.ScaleFactor
-            if current_scale * f > ZoomableGraphicsView.MaxScaling:
+            if current_scale * f > ZoomableGraphicsView.MaxScaling * self.standard_scale:
                 return
         else:
             # we are zooming out
             f = 1 / ZoomableGraphicsView.ScaleFactor
-            if current_scale * f < ZoomableGraphicsView.MinScaling:
+            if current_scale * f < ZoomableGraphicsView.MinScaling * self.standard_scale:
                 return
         # scale
         self.scale(f, f)
+
+        super().wheelEvent(event)
 
 
 def makeWidgetClickable(parent):
@@ -434,9 +437,10 @@ def makeDraggableWidget(parent):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
+
         def mousePressEvent(self, event):
-            super().mousePressEvent(event)
             self.position_on_click = event.globalPos()
+            super().mousePressEvent(event)
 
         def mouseMoveEvent(self, event):
             super().mouseMoveEvent(event)
@@ -462,17 +466,21 @@ def makeClickableGraphicsItem(parent):
         def __init__(self, *args, **kwargs):
             parent.__init__(self, *args, **kwargs)
             QtCore.QObject.__init__(self)
+            self.parent = parent
             self.setAcceptHoverEvents(True)
             self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
 
         def hoverEnterEvent(self, event):
             self.entered.emit(event)
+            self.parent.hoverEnterEvent(self, event)
 
         def hoverLeaveEvent(self, event):
             self.left.emit(event)
+            self.parent.hoverLeaveEvent(self, event)
 
         def mousePressEvent(self, event):
             self.clicked.emit(event)
+            self.parent.mousePressEvent(self, event)
 
     return ClickableGraphicsItem
 
@@ -494,7 +502,7 @@ def makeDraggableGraphicsItem(parent):
 
         def itemChange(self, change, value):
             if change == QtGui.QGraphicsItem.ItemPositionChange:
-                self.changed(value)
+                self.changed.emit(value)
 
             return parent.itemChange(self, change, value)
 

@@ -19,13 +19,13 @@
     thin client).
 """
 
+import math
 from PySide import QtCore
 
 import tools as t
 
 # some constants
 key_map_size = 'map-size'
-
 
 class Scenario(QtCore.QObject):
     """
@@ -81,6 +81,22 @@ class Scenario(QtCore.QObject):
             Returns the resource value at a given position from the map.
         """
         return self._map[1][self.map_index(position)]
+
+    def map_position(self, x, y):
+        """
+            Converts a scene position to a map position (or return (-1,-1) if
+        """
+        column = math.floor(x - (y % 2) / 2)
+        row = math.floor(y)
+        if row < 0 or row >= self._properties[key_map_size][0] or column < 0 or column >= self._properties[key_map_size][1]:
+            return -1, -1
+        return column, row
+
+    def scene_position(self, column, row):
+        """
+            Converts a map position to a scene position
+        """
+        return column + (row % 2) / 2, row
 
     def map_index(self, position):
         """

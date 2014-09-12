@@ -41,6 +41,7 @@ class EditorMiniMap(QtGui.QWidget):
 
         layout = QtGui.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
         self.scene = QtGui.QGraphicsScene()
 
@@ -61,13 +62,25 @@ class EditorMiniMap(QtGui.QWidget):
         self.toolbar = QtGui.QToolBar()
         self.toolbar.setFloatable(False)
         self.toolbar.setMovable(False)
+
+        action_political = QtGui.QAction(t.load_ui_icon('icon.mini.political.png'), 'Show political view', self)
+        self.toolbar.addAction(action_political)
+
+        action_geographical = QtGui.QAction(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', self)
+        self.toolbar.addAction(action_geographical)
+
         layout.addWidget(self.toolbar)
+
+    def new_scenario(self, new_scenario):
+        pass
 
 
 class EditorMainMap(g.ZoomableGraphicsView):
     """
         The big map holding the game map and everything.
     """
+
+    map_position_changed = QtCore.Signal(object)
 
     def __init__(self):
         super().__init__()
@@ -78,39 +91,50 @@ class EditorMainMap(g.ZoomableGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setMouseTracking(True)
+        self.current_map_position = (-1, -1)
+        self.tile_size = 80
+        self.scenario = None
 
-    def draw_map(self, scenario):
+    def draw_map(self, new_scenario):
         """
             When a scenario is loaded anew we need to draw the whole map new.
         """
+        self.scenario = new_scenario
+
         self.scene.clear()
 
-        map_size = scenario['map-size']
+        map_size = self.scenario['map-size']
 
         # todo here should be the real drawing code
-        S = 80
 
-        width = (map_size[0] + 0.5) * S
-        height = map_size[1] * S
+        width = (map_size[0] + 0.5) * self.tile_size
+        height = map_size[1] * self.tile_size
         self.scene.setSceneRect(0, 0, width, height)
 
         pixmap = QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_ocean.jpg'))
         texture_ocean = QtGui.QBrush(pixmap)
 
+        # fill the ground layer with ocean
         item = self.scene.addRect(0, 0, width, height)
         item.setBrush(texture_ocean)
         item.setZValue(0)
 
-
         # draw the grid
-        for x in range(0, map_size[0]):
-            for y in range(0, map_size[1]):
-                pass
-                #item = self.scene.addRect(x * S + y % 2 * S / 2, y * S, S, S)
-                #item.setZValue(1000)
+        for column in range(0, map_size[0]):
+            for row in range(0, map_size[1]):
+                x, y = self.scenario.scene_position(column, row)
+                item = self.scene.addRect(x * self.tile_size, y * self.tile_size,  self.tile_size,  self.tile_size)
+                item.setZValue(1000)
 
     def mouseMoveEvent(self, event):
-        print(event)
+        if self.scenario:
+            # get mouse position in scene coordinates
+            scene_position = self.mapToScene(event.pos()) / self.tile_size
+            map_position = self.scenario.map_position(scene_position.x(), scene_position.y())
+            if map_position != self.current_map_position:
+                self.current_map_position = map_position
+                self.map_position_changed.emit(self.current_map_position)
+        super().mouseMoveEvent(event)
 
 
 class InfoBox(QtGui.QLabel):
@@ -122,6 +146,9 @@ class InfoBox(QtGui.QLabel):
         super().__init__()
         self.setObjectName('infobox')
         self.setText('Info box')
+
+    def new_map_position(self, map_position):
+        self.setText('New position {}'.format(map_position))
 
 
 class NewScenarioDialogWidget(QtGui.QWidget):
@@ -246,6 +273,7 @@ class EditorScreen(QtGui.QWidget):
         self.info_box = InfoBox()
 
         self.map = EditorMainMap()
+        self.map.map_position_changed.connect(self.info_box.new_map_position)
 
         layout = QtGui.QGridLayout(self)
         layout.addWidget(self.toolbar, 0, 0, 1, 2)
