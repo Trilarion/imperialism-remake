@@ -19,7 +19,7 @@
     know anything about the scenario, we put it in the server module.
 """
 
-import os
+import os, math
 
 from PySide import QtCore, QtGui
 
@@ -29,13 +29,22 @@ import lib.graphics as g
 import client.graphics as cg
 from server.scenario import Scenario
 
+class EditorScenario(Scenario):
+
+    everything_changed = QtCore.Signal()
+
+    def load(self, file_name):
+        super().load(file_name)
+        self.everything_changed.emit()
 
 class EditorMiniMap(QtGui.QWidget):
     """
         Small overview map
     """
 
-    def __init__(self):
+    Fixed_Width = 300
+
+    def __init__(self, scenario):
         super().__init__()
         self.setObjectName('minimap')
 
@@ -55,24 +64,81 @@ class EditorMiniMap(QtGui.QWidget):
         self.view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         layout.addWidget(self.view)
 
-        size = QtCore.QSize(300, 300)
-        self.view.setSceneRect(0, 0, size.width(), size.height())
-        self.view.setMinimumSize(size)
+        self.view.setFixedWidth(self.Fixed_Width)
+        self.view.setFixedHeight(math.floor(0.6 * self.Fixed_Width))
 
         self.toolbar = QtGui.QToolBar()
         self.toolbar.setFloatable(False)
         self.toolbar.setMovable(False)
+        self.toolbar.setIconSize(QtCore.QSize(20, 20))
 
         action_political = QtGui.QAction(t.load_ui_icon('icon.mini.political.png'), 'Show political view', self)
+        action_political.triggered.connect(self.switch_to_political)
         self.toolbar.addAction(action_political)
 
         action_geographical = QtGui.QAction(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', self)
+        action_geographical.triggered.connect(self.switch_to_geographical)
         self.toolbar.addAction(action_geographical)
 
-        layout.addWidget(self.toolbar)
+        l = QtGui.QHBoxLayout()
+        l.setContentsMargins(0, 0, 0, 0)
+        l.addWidget(self.toolbar)
+        l.addStretch()
 
-    def new_scenario(self, new_scenario):
-        pass
+        # layout.addWidget(self.toolbar)
+        layout.addLayout(l)
+
+        self.scenario = scenario
+        self.map_mode = 'political'
+
+    def redraw_map(self):
+        # we do not draw anything if the scenario is not valid
+        if not self.scenario.valid:
+            return
+        # adjust view height
+        map_size = self.scenario['map-size']
+        scale = self.Fixed_Width / map_size[0]
+        height = math.floor(self.Fixed_Width / map_size[0] * map_size[1])
+        self.view.setFixedHeight(height)
+        self.view.setSceneRect(0, 0, self.Fixed_Width, height)
+
+        # draw rectangle
+        self.scene.clear()
+
+        # fill the ground layer with ocean
+        item = self.scene.addRect(0, 0, self.Fixed_Width, height)
+        item.setBrush(QtCore.Qt.blue)
+        transparent_pen = pen = QtGui.QPen(QtCore.Qt.transparent)
+        item.setPen(transparent_pen)
+        item.setZValue(0)
+
+        # draw the nations
+        for nation in self.scenario.all_nations():
+            provinces = self.scenario.get_provinces_of_nation(nation)
+            color = self.scenario.get_nation_property(nation, 'color')
+            c = QtGui.QColor()
+            c.setNamedColor(color)
+            tiles = []
+            for province in provinces:
+                tiles.extend(self.scenario.get_province_property(province, 'tiles'))
+            path = QtGui.QPainterPath()
+            for p in tiles:
+                path.addRect(p[0] * scale, p[1] * scale, scale, scale)
+            path = path.simplified()
+            brush = QtGui.QBrush(c)
+            item = self.scene.addPath(path, brush=brush)
+            item.setZValue(1)
+
+
+    def switch_to_political(self):
+        if self.map_mode is not 'political':
+            self.map_mode = 'political'
+            self.redraw_map()
+
+    def switch_to_geographical(self):
+        if self.map_mode is not 'geographical':
+            self.map_mode = 'geographical'
+            self.redraw_map()
 
 
 class EditorMainMap(g.ZoomableGraphicsView):
@@ -82,7 +148,7 @@ class EditorMainMap(g.ZoomableGraphicsView):
 
     map_position_changed = QtCore.Signal(object)
 
-    def __init__(self):
+    def __init__(self, scenario):
         super().__init__()
 
         self.scene = QtGui.QGraphicsScene()
@@ -93,14 +159,12 @@ class EditorMainMap(g.ZoomableGraphicsView):
         self.setMouseTracking(True)
         self.current_map_position = (-1, -1)
         self.tile_size = 80
-        self.scenario = None
+        self.scenario = scenario
 
-    def draw_map(self, new_scenario):
+    def redraw_map(self):
         """
             When a scenario is loaded anew we need to draw the whole map new.
         """
-        self.scenario = new_scenario
-
         self.scene.clear()
 
         map_size = self.scenario['map-size']
@@ -231,8 +295,8 @@ class EditorScreen(QtGui.QWidget):
         super().__init__()
 
         self.client = client
-        self.scenario = Scenario()
-        self.scenario.Complete_Change.connect(self.scenario_change)
+        self.scenario = EditorScenario()
+        self.scenario.everything_changed.connect(self.scenario_change)
 
         self.toolbar = QtGui.QToolBar()
         self.toolbar.setFloatable(False)
@@ -268,11 +332,12 @@ class EditorScreen(QtGui.QWidget):
         # TODO ask if something is changed we should save.. (you might loose progress)
         self.toolbar.addAction(action_quit)
 
-        self.mini_map = EditorMiniMap()
+        self.mini_map = EditorMiniMap(self.scenario)
 
         self.info_box = InfoBox()
 
-        self.map = EditorMainMap()
+        # the main map
+        self.map = EditorMainMap(self.scenario)
         self.map.map_position_changed.connect(self.info_box.new_map_position)
 
         layout = QtGui.QGridLayout(self)
@@ -322,7 +387,8 @@ class EditorScreen(QtGui.QWidget):
         """
             Whenever the scenario changes completely (new scenario, scenario loaded, ...)
         """
-        self.map.draw_map(self.scenario)
+        self.map.redraw_map()
+        self.mini_map.redraw_map()
 
     def show_nations_dialog(self):
         """

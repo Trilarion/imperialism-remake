@@ -31,21 +31,20 @@ class Scenario(QtCore.QObject):
     """
         Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
     """
-    Complete_Change = QtCore.Signal()
 
     def __init__(self):
         """
             Start with a clean state.
         """
         super().__init__()
-        self.clear()
+        self.reset()
 
-    def clear(self):
+    def reset(self):
         """
-            We just set all internal variables to empty dictionaries and lists. This is a rather undefined state then
-            and needs to be populated by meaningful data later on.
+            Just empty
         """
         self._properties = {}
+        self.valid = False
         self._provinces = {}
         self._nations = {}
         self._map = []
@@ -126,7 +125,9 @@ class Scenario(QtCore.QObject):
             Creates a new (nation-less) province and returns it.
         """
         province = len(self._provinces)  # this always works because we check after loading
+        province = str(province) # while already when saving in JSON keys are converted to string we simply give strings from the beginning
         self._provinces[province] = {}
+        self._provinces[province]['tiles'] = []
         return province
 
     def set_province_property(self, province, key, value):
@@ -147,11 +148,19 @@ class Scenario(QtCore.QObject):
         else:
             raise RuntimeError('Unknown province {} or property {}.'.format(province, key))
 
+    def add_province_map_tile(self, province, position):
+        if province in self._provinces and self.is_valid_position(position):
+            self._provinces[province]['tiles'].append(position)
+
+    def all_nations(self):
+        return self._nations.keys()
+
     def new_nation(self):
         """
             Add a new nation and returns it.
         """
         nation = len(self._nations)  # this always gives a new unique number because we check after loading
+        nation = str(nation) # because while saving keys in JSON get converted to string anyway we already here work with strings
         self._nations[nation] = {}
         self._nations[nation]['properties'] = {}
         self._nations[nation]['provinces'] = []
@@ -175,6 +184,12 @@ class Scenario(QtCore.QObject):
         else:
             raise RuntimeError('Unknown nation {} or property {}.'.format(nation, key))
 
+    def get_provinces_of_nation(self, nation):
+        if nation in self._nations:
+            return self._nations[nation]['provinces']
+        else:
+            raise RuntimeError('Unknown nation {}.'.format(nation))
+
     def transfer_province_to_nation(self, province, nation):
         """
             Moves a province to a nation.
@@ -186,7 +201,7 @@ class Scenario(QtCore.QObject):
         """
             Loads/deserializes all internal variables from a zipped archive via JSON.
         """
-        self.clear()
+        self.reset()
         reader = t.ZipArchiveReader(file_name)
         self._properties = reader.read_as_json('properties')
         self._map = reader.read_as_json('map')
@@ -194,7 +209,7 @@ class Scenario(QtCore.QObject):
         # TODO check all ids are smaller then len()
         self._nations = reader.read_as_json('nations')
         # TODO check all ids are smaller then len()
-        self.Complete_Change.emit()
+        self.valid = True
 
     def save(self, file_name):
         """
