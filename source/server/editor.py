@@ -112,21 +112,30 @@ class EditorMiniMap(QtGui.QWidget):
         item.setPen(transparent_pen)
         item.setZValue(0)
 
-        # draw the nations
+        # draw the nation borders and content (non-smooth)
+
+        # for all nations
         for nation in self.scenario.all_nations():
-            provinces = self.scenario.get_provinces_of_nation(nation)
+            # get nation color
             color = self.scenario.get_nation_property(nation, 'color')
             c = QtGui.QColor()
             c.setNamedColor(color)
+            # get all provinces
+            provinces = self.scenario.get_provinces_of_nation(nation)
             tiles = []
+            # get all tiles
             for province in provinces:
                 tiles.extend(self.scenario.get_province_property(province, 'tiles'))
+            # get rectangular path for each tile
             path = QtGui.QPainterPath()
-            for p in tiles:
-                path.addRect(p[0] * scale, p[1] * scale, scale, scale)
+            for map_position in tiles:
+                scene_position = self.scenario.scene_position(map_position[0], map_position[1])
+                path.addRect(scene_position[0] * scale, scene_position[1] * scale, scale, scale)
+            # simply (creates outline)
             path = path.simplified()
+            # create a brush from the color
             brush = QtGui.QBrush(c)
-            item = self.scene.addPath(path, brush=brush)
+            item = self.scene.addPath(path, brush=brush) # will use the default pen for outline
             item.setZValue(1)
 
 
@@ -322,6 +331,9 @@ class EditorScreen(QtGui.QWidget):
         spacer = QtGui.QWidget()
         spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.toolbar.addWidget(spacer)
+
+        clock = g.ClockLabel()
+        self.toolbar.addWidget(clock)
 
         action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
         action_help.triggered.connect(client.display_help_browser)  # TODO with partial make reference to specific page

@@ -270,6 +270,16 @@ if __name__ == '__main__':
     # load the board
     board = load_board()
 
+    # no dot at the end of the title!
+
+    #task = board.new_task(title='Milestone: 0.3', description='This is not a task but a milestone. I will be marked completed automatically if the following state is reached: workable first version of editor, selection of a scenario and simple play (making turns, inspecting various screens, doing some stuff with it).', category=1)
+    #task.assign('')
+
+    #task = board.new_task(title='Video: Create an introductory video.', description='Create a short video (1-2 minutes) which can be used as a trailer, intro, advertisment video. Use music and graphics from the artwork of the project.', category=2)
+
+    #task = board.new_task(title='UI: Smooth areas, country borders, province borders.', description='Currently they go square like according to the tile boundaries. Make them a bit random and smooth, rounding any hard corners.', category=3)
+    #task['dependencies'].extend([14])
+
     #task = board.new_task(title='Music: Combining sound effects in one file and playing from this one file.', description='Sound effects will very probably be available in the wav format but may need cutting. Furthermore they must be compiled into a single ogg file (using an external encode on Windows). Automatize this. Then this file must be read and chunks from it must be played upon request and with minimal delay.', category=3)
 
     #task = board.new_task(title='UI: Develop a common design for backgrounds of windows, button, elements, ...', description='There are many backgrounds that need to be filled. We need a common design for them. This probably needs some discussion. Woodlike/metal or a blurred map are ideas that might be of interest.', category=2)

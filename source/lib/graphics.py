@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from datetime import datetime
 from PySide import QtCore, QtGui
 
 """
@@ -513,3 +514,17 @@ DraggableToolBar = makeDraggableWidget(QtGui.QToolBar)
 ClickableWidget = makeWidgetClickable(QtGui.QWidget)
 ClickablePixmapItem = makeClickableGraphicsItem(QtGui.QGraphicsPixmapItem)
 DraggableRectItem = makeDraggableGraphicsItem(QtGui.QGraphicsRectItem)
+
+class ClockLabel(QtGui.QLabel):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update_clock)
+        self.timer.setInterval(1000)
+        self.timer.start()
+        self.update_clock()
+
+    def update_clock(self):
+        text = datetime.now().strftime('%H:%M')
+        self.setText(text)
