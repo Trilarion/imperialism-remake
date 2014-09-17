@@ -516,15 +516,21 @@ ClickablePixmapItem = makeClickableGraphicsItem(QtGui.QGraphicsPixmapItem)
 DraggableRectItem = makeDraggableGraphicsItem(QtGui.QGraphicsRectItem)
 
 class ClockLabel(QtGui.QLabel):
+    """
+        Just a clock label that shows hour : minute and updates itself every minute for as long as it lives.
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_clock)
-        self.timer.setInterval(1000)
+        self.timer.setInterval(60000)
         self.timer.start()
         self.update_clock()
 
     def update_clock(self):
         text = datetime.now().strftime('%H:%M')
         self.setText(text)
+
+# some constant expressions
+TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
