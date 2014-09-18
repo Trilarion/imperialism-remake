@@ -2,3 +2,12 @@ file: texture_ocean.jpg
 source: http://opengameart.org/node/10593 (brushwalker437.jpg)
 creator: qubodup
 license: CC0 (=PD)
+
+files: texture_desert/plain/swamp/tundra.png
+source: http://imperialism-remake.googlecode.com/files/VensTerrainSet-1.0.zip
+creator: Veneteaou
+license: CC BY SA 3.0
+
+file: city.png
+source: Amplio tileset (http://download.gna.org/freeciv/contrib/tilesets/amplio/)
+license: GPL v2+

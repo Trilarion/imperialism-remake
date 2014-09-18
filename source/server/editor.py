@@ -81,12 +81,16 @@ class EditorMiniMap(QtGui.QWidget):
         self.toolbar.setMovable(False)
         self.toolbar.setIconSize(QtCore.QSize(20, 20))
 
-        action_political = QtGui.QAction(t.load_ui_icon('icon.mini.political.png'), 'Show political view', self)
+        action_group = QtGui.QActionGroup(self.toolbar)
+
+        action_political = QtGui.QAction(t.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group)
         action_political.triggered.connect(self.switch_to_political)
+        action_political.setCheckable(True)
         self.toolbar.addAction(action_political)
 
-        action_geographical = QtGui.QAction(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', self)
+        action_geographical = QtGui.QAction(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group)
         action_geographical.triggered.connect(self.switch_to_geographical)
+        action_geographical.setCheckable(True)
         self.toolbar.addAction(action_geographical)
 
         l = QtGui.QHBoxLayout()
@@ -265,23 +269,110 @@ class EditorMainMap(QtGui.QGraphicsView):
         height = map_size[1] * self.tile_size
         self.scene.setSceneRect(0, 0, width, height)
 
-        pixmap = QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_ocean.jpg'))
-        texture_ocean = QtGui.QBrush(pixmap)
+        # TODO should load only once and cache (universal cache)
+        # load all textures
+        textures = {}
+        textures[0] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_ocean.jpg')))
+        textures[1] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_plain.png')))
+        textures[2] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_plain.png')))
+        textures[3] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_plain.png')))
+        textures[4] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_tundra.png')))
+        textures[5] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_swamp.png')))
+        textures[6] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_desert.png')))
 
         # fill the ground layer with ocean
-        item = self.scene.addRect(0, 0, width, height, brush=texture_ocean, pen=g.TRANSPARENT_PEN)
+        item = self.scene.addRect(0, 0, width, height, brush=textures[0], pen=g.TRANSPARENT_PEN)
         item.setZValue(0)
+
+        # fill plains, hills, mountains, tundra, swamp, desert with texture
+
+        # go through each position
+        paths = {}
+        for t in range(1, 7):
+            paths[t] = QtGui.QPainterPath()
+        for column in range(0, map_size[0]):
+            for row in range(0, map_size[1]):
+                t = self.scenario.terrain_at(column, row)
+                if t != 0:
+                    # not for sea
+                    sx, sy = self.scenario.scene_position(column, row)
+                    paths[t].addRect(sx * self.tile_size, sy * self.tile_size, self.tile_size, self.tile_size)
+        for t in paths:
+            path = paths[t]
+            path = path.simplified()
+            item = self.scene.addPath(path, brush=textures[t], pen=g.TRANSPARENT_PEN)
+            item.setZValue(1)
+
+        # fill the half tiles which are not part of the map
+        brush = QtGui.QBrush(QtCore.Qt.darkGray)
+        for row in range(0, map_size[1]):
+            if row % 2 == 0:
+                item = self.scene.addRect(map_size[0] * self.tile_size, row * self.tile_size, self.tile_size / 2, self.tile_size, pen=g.TRANSPARENT_PEN)
+            else:
+                item = self.scene.addRect(0, row * self.tile_size, self.tile_size / 2, self.tile_size, pen=g.TRANSPARENT_PEN)
+            item.setBrush(brush)
+            item.setZValue(1)
+
+        # draw province and nation borders
+        province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
+        province_border_pen.setWidth(2)
+        for nation in self.scenario.all_nations():
+            # get nation color
+            color = self.scenario.get_nation_property(nation, 'color')
+            nation_color = QtGui.QColor()
+            nation_color.setNamedColor(color)
+            # get all provinces
+            provinces = self.scenario.get_provinces_of_nation(nation)
+            nation_path = QtGui.QPainterPath()
+            # get all tiles
+            for province in provinces:
+                province_path = QtGui.QPainterPath()
+                tiles = self.scenario.get_province_property(province, 'tiles')
+                for column, row in tiles:
+                    sx, sy = self.scenario.scene_position(column, row)
+                    province_path.addRect(sx * self.tile_size, sy * self.tile_size, self.tile_size, self.tile_size)
+                province_path = province_path.simplified()
+                item = self.scene.addPath(province_path, pen=province_border_pen)
+                item.setZValue(4)
+
+        # draw towns and names
+        city_pixmap = QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'city.png'))
+        for nation in self.scenario.all_nations():
+            # get all provinces of this nation
+            provinces = self.scenario.get_provinces_of_nation(nation)
+            for province in provinces:
+                column, row = self.scenario.get_province_property(province, 'town_location')
+                sx, sy = self.scenario.scene_position(column, row)
+                # center pixmap on center of tile
+                x = (sx + 0.5) * self.tile_size - city_pixmap.width() / 2
+                y = (sy + 0.5) * self.tile_size - city_pixmap.height() / 2
+                item = self.scene.addPixmap(city_pixmap)
+                item.setOffset(x, y)
+                item.setZValue(6)
+                province_name = self.scenario.get_province_property(province, 'name')
+                item = self.scene.addSimpleText(province_name)
+                item.setPen(g.TRANSPARENT_PEN)
+                item.setBrush(QtGui.QBrush(QtCore.Qt.darkRed))
+                x = (sx + 0.5) * self.tile_size - item.boundingRect().width() / 2
+                y = (sy + 1) * self.tile_size - item.boundingRect().height()
+                item.setPos(x, y)
+                item.setZValue(6)
+                bx = 5
+                by = 2
+                background = QtCore.QRectF(x - bx, y - by, item.boundingRect().width() + 2 * bx, item.boundingRect().height() + 2 * by)
+                item = self.scene.addRect(background, pen=g.TRANSPARENT_PEN, brush=QtGui.QBrush(QtGui.QColor(128, 128, 196, 128)))
+                item.setZValue(5)
 
         # draw the grid and the coordinates
         for column in range(0, map_size[0]):
             for row in range(0, map_size[1]):
-                x, y = self.scenario.scene_position(column, row)
-                item = self.scene.addRect(x * self.tile_size, y * self.tile_size,  self.tile_size,  self.tile_size)
-                item.setZValue(1000)
+                sx, sy = self.scenario.scene_position(column, row)
+                #item = self.scene.addRect(sx * self.tile_size, sy * self.tile_size,  self.tile_size,  self.tile_size)
+                #item.setZValue(1000)
                 text = '({},{})'.format(column, row)
                 item = QtGui.QGraphicsSimpleTextItem(text)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.black))
-                item.setPos((x + 0.5) * self.tile_size - item.boundingRect().width() / 2, y * self.tile_size)
+                item.setPos((sx + 0.5) * self.tile_size - item.boundingRect().width() / 2, sy * self.tile_size)
                 item.setZValue(1001)
                 self.scene.addItem(item)
 

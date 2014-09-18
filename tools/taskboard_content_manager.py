@@ -270,6 +270,9 @@ if __name__ == '__main__':
     # load the board
     board = load_board()
 
+    task = board.new_task(title='Definition: Detailed proposal for a tech tree', description='Starting from the discussion in the forum about the tech tree, create a workable proposal for the techtree. In the end it will be discussed and inserted in the Game Definition document.', category=1)
+    task.assign('Earymgn')
+
     # no dot at the end of the title!
 
     #task = board.new_task(title='Milestone: 0.3', description='This is not a task but a milestone. I will be marked completed automatically if the following state is reached: workable first version of editor, selection of a scenario and simple play (making turns, inspecting various screens, doing some stuff with it).', category=1)
