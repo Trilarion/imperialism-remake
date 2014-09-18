@@ -143,8 +143,8 @@ class EditorMiniMap(QtGui.QWidget):
                 # get rectangular path for each tile
                 path = QtGui.QPainterPath()
                 for map_position in tiles:
-                    scene_position = self.scenario.scene_position(map_position[0], map_position[1])
-                    path.addRect(scene_position[0] * scale, scene_position[1] * scale, scale, scale)
+                    sx, sy = self.scenario.scene_position(map_position[0], map_position[1])
+                    path.addRect(sx * scale, sy * scale, scale, scale)
                 # simply (creates outline)
                 path = path.simplified()
                 # create a brush from the color
@@ -155,12 +155,41 @@ class EditorMiniMap(QtGui.QWidget):
 
         elif self.map_mode is 'geographical':
 
-            # fill the ground layer with a neutral color
+            # fill the background with sea (blue)
             item = self.scene.addRect(0, 0, self.Fixed_Width, height)
             item.setBrush(QtCore.Qt.blue)
             item.setPen(g.TRANSPARENT_PEN)
             item.setZValue(0)
             self.removable_items.extend([item])
+
+            # six terrains left, plains, hills, mountains, tundra, swamp, desert
+
+            # go through each position
+            paths = {}
+            for t in range(1, 7):
+                paths[t] = QtGui.QPainterPath()
+            for column in range(0, map_size[0]):
+                for row in range(0, map_size[1]):
+                    t = self.scenario.terrain_at(column, row)
+                    if t != 0:
+                        # not for sea
+                        sx, sy = self.scenario.scene_position(column, row)
+                        paths[t].addRect(sx * scale, sy * scale, scale, scale)
+            colors = {
+                1: QtCore.Qt.green,
+                2: QtCore.Qt.darkGreen,
+                3: QtCore.Qt.darkGray,
+                4: QtCore.Qt.white,
+                5: QtCore.Qt.darkYellow,
+                6: QtCore.Qt.yellow
+            }
+            for t in paths:
+                path = paths[t]
+                path = path.simplified()
+                brush = QtGui.QBrush(colors[t])
+                item = self.scene.addPath(path, brush=brush, pen=g.TRANSPARENT_PEN)
+                item.setZValue(1)
+                self.removable_items.extend([item])
 
     def switch_to_political(self):
         if self.map_mode is not 'political':
@@ -240,8 +269,7 @@ class EditorMainMap(QtGui.QGraphicsView):
         texture_ocean = QtGui.QBrush(pixmap)
 
         # fill the ground layer with ocean
-        item = self.scene.addRect(0, 0, width, height)
-        item.setBrush(texture_ocean)
+        item = self.scene.addRect(0, 0, width, height, brush=texture_ocean, pen=g.TRANSPARENT_PEN)
         item.setZValue(0)
 
         # draw the grid and the coordinates

@@ -47,7 +47,7 @@ class Scenario(QtCore.QObject):
         self.valid = False
         self._provinces = {}
         self._nations = {}
-        self._map = []
+        self._map = {}
 
     def create_map(self, size):
         """
@@ -55,31 +55,32 @@ class Scenario(QtCore.QObject):
         """
         self._properties[key_map_size] = size
         number_tiles = size[0] * size[1]
-        self._map = [[0] * number_tiles] * 2
+        self._map['terrain'] = [0] * number_tiles
+        self._map['resource'] = [0] * number_tiles
 
-    def set_terrain_at(self, position, terrain):
+    def set_terrain_at(self, column, row, terrain):
         """
             Sets the terrain at a given position.
         """
-        self._map[0][self.map_index(position)] = terrain
+        self._map['terrain'][self.map_index(column, row)] = terrain
 
-    def terrain_at(self, position):
+    def terrain_at(self, column, row):
         """
             Returns the terrain at a given position.
         """
-        return self._map[0][self.map_index(position)]
+        return self._map['terrain'][self.map_index(column, row)]
 
-    def set_resource_at(self, position, resource):
+    def set_resource_at(self, column, row, resource):
         """
             Sets the resource value at a given position.
         """
-        self._map[1][self.map_index(position)] = resource
+        self._map['resource'][self.map_index(column, row)] = resource
 
-    def resource_at(self, position):
+    def resource_at(self, column, row):
         """
             Returns the resource value at a given position from the map.
         """
-        return self._map[1][self.map_index(position)]
+        return self._map['resource'][self.map_index(column, row)]
 
     def map_position(self, x, y):
         """
@@ -97,12 +98,11 @@ class Scenario(QtCore.QObject):
         """
         return column + (row % 2) / 2, row
 
-    def map_index(self, position):
+    def map_index(self, column, row):
         """
             Calculates the index in the linear map for a given 2D position (first row, then column)?
         """
-        print(position)
-        index = position[0] * self._properties[key_map_size][0] + position[1]
+        index = row * self._properties[key_map_size][0] + column
         return index
 
     def __setitem__(self, key, value):
