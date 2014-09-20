@@ -31,6 +31,7 @@ import client.graphics as cg
 import client.audio as audio
 from lib.browser import BrowserWidget
 from server.editor import EditorScreen
+from server.monitor import ServerMonitorWidget
 
 
 class MapItem(QtCore.QObject):
@@ -106,10 +107,10 @@ class StartScreen(QtGui.QWidget):
 
         actions = {
             'exit': client.quit,
-            'help': client.display_help_browser,
-            'lobby': client.display_game_lobby_dialog,
+            'help': client.show_help_browser,
+            'lobby': client.show_game_lobby_dialog,
             'editor': client.switch_to_editor_screen,
-            'options': client.display_options_dialog
+            'options': client.show_options_dialog
         }
 
         image_map_file = c.extend(c.Graphics_UI_Folder, 'start.overlay.info')
@@ -307,6 +308,12 @@ class Client():
         # main window
         self.main_window = MainWindow()
 
+        # add server monitor
+        action = QtGui.QAction(self.main_window)
+        action.setShortcut(QtGui.QKeySequence('F1'))
+        action.triggered.connect(self.show_server_monitor)
+        self.main_window.addAction(action)
+
         # help browser
         self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
         self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
@@ -357,7 +364,7 @@ class Client():
         else:
             self.notification = None
 
-    def display_help_browser(self, url=None):
+    def show_help_browser(self, url=None):
         """
             Displays the help browser somewhere on screen. Can set a special page if needed.
         """
@@ -366,6 +373,11 @@ class Client():
             self.help_browser_widget.displayPage(url)
         self.help_dialog.show()
 
+    def show_server_monitor(self):
+        monitor_widget = ServerMonitorWidget()
+        dialog = cg.GameDialog(self.main_window, monitor_widget, delete_on_close=True, title='Server Monitor')
+        dialog.show()
+
     def switch_to_start_screen(self):
         """
             Switches the content of the main window to the start screen.
@@ -373,13 +385,13 @@ class Client():
         widget = StartScreen(self)
         self.main_window.change_content_widget(widget)
 
-    def display_game_lobby_dialog(self):
+    def show_game_lobby_dialog(self):
         """
             Shows the game lobby dialog.
         """
         lobby_widget = GameLobbyWidget()
         dialog = cg.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby',
-                               help_callback=self.display_help_browser)
+                               help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
@@ -390,13 +402,13 @@ class Client():
         widget = EditorScreen(self)
         self.main_window.change_content_widget(widget)
 
-    def display_options_dialog(self):
+    def show_options_dialog(self):
         """
             Shows the preferences dialog.
         """
         options_widget = OptionsContentWidget()
         dialog = cg.GameDialog(self.main_window, options_widget, delete_on_close=True, title='Preferences',
-                               help_callback=self.display_help_browser, close_callback=options_widget.close_request)
+                               help_callback=self.show_help_browser, close_callback=options_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 

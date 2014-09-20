@@ -314,8 +314,11 @@ class EditorMainMap(QtGui.QGraphicsView):
             item.setZValue(1)
 
         # draw province and nation borders
+        # TODO the whole border drawing is a crude approximiation, implement it the right way
         province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
         province_border_pen.setWidth(2)
+        nation_border_pen = QtGui.QPen()
+        nation_border_pen.setWidth(4)
         for nation in self.scenario.all_nations():
             # get nation color
             color = self.scenario.get_nation_property(nation, 'color')
@@ -334,6 +337,11 @@ class EditorMainMap(QtGui.QGraphicsView):
                 province_path = province_path.simplified()
                 item = self.scene.addPath(province_path, pen=province_border_pen)
                 item.setZValue(4)
+                nation_path.addPath(province_path)
+            nation_path = nation_path.simplified()
+            nation_border_pen.setColor(nation_color)
+            item = self.scene.addPath(nation_path, pen=nation_border_pen)
+            item.setZValue(5)
 
         # draw towns and names
         city_pixmap = QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'city.png'))
@@ -343,12 +351,13 @@ class EditorMainMap(QtGui.QGraphicsView):
             for province in provinces:
                 column, row = self.scenario.get_province_property(province, 'town_location')
                 sx, sy = self.scenario.scene_position(column, row)
-                # center pixmap on center of tile
+                # center city image on center of tile
                 x = (sx + 0.5) * self.tile_size - city_pixmap.width() / 2
                 y = (sy + 0.5) * self.tile_size - city_pixmap.height() / 2
                 item = self.scene.addPixmap(city_pixmap)
                 item.setOffset(x, y)
                 item.setZValue(6)
+                # display province name below
                 province_name = self.scenario.get_province_property(province, 'name')
                 item = self.scene.addSimpleText(province_name)
                 item.setPen(g.TRANSPARENT_PEN)
@@ -357,10 +366,13 @@ class EditorMainMap(QtGui.QGraphicsView):
                 y = (sy + 1) * self.tile_size - item.boundingRect().height()
                 item.setPos(x, y)
                 item.setZValue(6)
-                bx = 5
-                by = 2
+                # display rounded rectangle below province name
+                bx = 8
+                by = 4
                 background = QtCore.QRectF(x - bx, y - by, item.boundingRect().width() + 2 * bx, item.boundingRect().height() + 2 * by)
-                item = self.scene.addRect(background, pen=g.TRANSPARENT_PEN, brush=QtGui.QBrush(QtGui.QColor(128, 128, 196, 128)))
+                path = QtGui.QPainterPath()
+                path.addRoundRect(background, 50, 50)
+                item = self.scene.addPath(path, pen=g.TRANSPARENT_PEN, brush=QtGui.QBrush(QtGui.QColor(128, 128, 255, 64)))
                 item.setZValue(5)
 
         # draw the grid and the coordinates
@@ -531,7 +543,7 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.addWidget(clock)
 
         action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
-        action_help.triggered.connect(client.display_help_browser)  # TODO with partial make reference to specific page
+        action_help.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
         action_quit = QtGui.QAction(t.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
@@ -564,7 +576,7 @@ class EditorScreen(QtGui.QWidget):
         """
         new_scenario_widget = NewScenarioDialogWidget()
         dialog = cg.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario', delete_on_close=True,
-                               help_callback=self.client.display_help_browser)
+                               help_callback=self.client.show_help_browser)
         # TODO close callback
         dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
@@ -574,8 +586,7 @@ class EditorScreen(QtGui.QWidget):
             Show the load a scenario dialog. Then loads it if the user has selected one.
         """
         file_name = \
-            QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
-                0]
+            QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
             self.scenario.load(file_name)
