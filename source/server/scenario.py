@@ -26,6 +26,8 @@ import tools as t
 
 # some constants
 key_map_size = 'map-size'
+key_rivers = 'rivers'
+
 
 class Scenario(QtCore.QObject):
     """
@@ -44,6 +46,7 @@ class Scenario(QtCore.QObject):
             Just empty
         """
         self._properties = {}
+        self._properties[key_rivers] = []
         self.valid = False
         self._provinces = {}
         self._nations = {}
@@ -57,6 +60,13 @@ class Scenario(QtCore.QObject):
         number_tiles = size[0] * size[1]
         self._map['terrain'] = [0] * number_tiles
         self._map['resource'] = [0] * number_tiles
+
+    def add_river(self, name, tiles):
+        river = {
+            'name': name,
+            'tiles': tiles
+        }
+        self._properties[key_rivers].extend([river])
 
     def set_terrain_at(self, column, row, terrain):
         """
@@ -88,7 +98,8 @@ class Scenario(QtCore.QObject):
         """
         column = math.floor(x - (y % 2) / 2)
         row = math.floor(y)
-        if row < 0 or row >= self._properties[key_map_size][0] or column < 0 or column >= self._properties[key_map_size][1]:
+        if row < 0 or row >= self._properties[key_map_size][0] or column < 0 or column >= \
+                self._properties[key_map_size][1]:
             return -1, -1
         return column, row
 
@@ -104,6 +115,48 @@ class Scenario(QtCore.QObject):
         """
         index = row * self._properties[key_map_size][0] + column
         return index
+
+    def get_neighbored_tiles(self, column, row):
+        tiles = []
+        # west
+        if column > 0:
+            tiles.append((column - 1, row))
+        # east
+        if column < self._properties[key_map_size][0] - 1:
+            tiles.append((column + 1, row))
+        if row % 2 == 0:
+            # even row (0, 2, 4, ..)
+            # north
+            if row > 0:
+                # north-west
+                if column > 0:
+                    tiles.append((column - 1, row - 1))
+                # north-east always exists
+                tiles.append((column, row - 1))
+            # south
+            if row < self._properties[key_map_size][1] - 1:
+                # south-west
+                if column > 0:
+                    tiles.append((column - 1, row + 1))
+                # south-east always exists
+                tiles.append((column, row + 1))
+        else:
+            # odd row (1, 3, 5, ..)
+            # north
+            if row > 0:
+                # north-west always exists
+                tiles.append((column, row - 1))
+                # north-east
+                if column < self._properties[key_map_size][0] - 1:
+                    tiles.append((column + 1, row - 1))
+            # south
+            if row < self._properties[key_map_size][1] - 1:
+                # south-west always exists
+                tiles.append((column, row + 1))
+                # south-east
+                if column < self._properties[key_map_size][0] - 1:
+                    tiles.append((column + 1, row + 1))
+        return tiles
 
     def __setitem__(self, key, value):
         """
@@ -125,7 +178,8 @@ class Scenario(QtCore.QObject):
             Creates a new (nation-less) province and returns it.
         """
         province = len(self._provinces)  # this always works because we check after loading
-        province = str(province) # while already when saving in JSON keys are converted to string we simply give strings from the beginning
+        province = str(
+            province)  # while already when saving in JSON keys are converted to string we simply give strings from the beginning
         self._provinces[province] = {}
         self._provinces[province]['tiles'] = []
         return province
@@ -160,7 +214,8 @@ class Scenario(QtCore.QObject):
             Add a new nation and returns it.
         """
         nation = len(self._nations)  # this always gives a new unique number because we check after loading
-        nation = str(nation) # because while saving keys in JSON get converted to string anyway we already here work with strings
+        nation = str(
+            nation)  # because while saving keys in JSON get converted to string anyway we already here work with strings
         self._nations[nation] = {}
         self._nations[nation]['properties'] = {}
         self._nations[nation]['provinces'] = []

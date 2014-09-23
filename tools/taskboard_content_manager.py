@@ -270,8 +270,21 @@ if __name__ == '__main__':
     # load the board
     board = load_board()
 
-    task = board.new_task(title='Definition: Detailed proposal for a tech tree', description='Starting from the discussion in the forum about the tech tree, create a workable proposal for the techtree. In the end it will be discussed and inserted in the Game Definition document.', category=1)
-    task.assign('Earymgn')
+    #task = board.new_task(title='UI: Smooth display of rivers', description='Rivers are currently a list of neighbored tile positions and only crudely painted. Display them nicely as smooth line with random turns (use correlated random displacement on a finer length scale) and increasing width from the source. Use a texture or a multi-color brush for painting.', category=3)
+    #task['dependencies'].extend([14])
+
+    #task = board.new_task(title='UI: Smooth display of borders and landscapes', description='This is a difficult task. Produce a smooth display of borders (provinces, nations), shores, areas of equal terrain. The difficulty is that neighbored regions etc. must still share the same border after smoothing.', category=3)
+    #task['dependencies'].extend([14])
+
+    #task = board.new_task(title='UI: Visualization of the tech tree', description='Create a nicely looking visualization that displays the dependencies and all important information of the techs. Displayable properties might be: name of tech, year of introduction, costs of research, dependencies, icons for what is gained. Use placeholders for any real needed graphics.', category=3)
+    #task.assign('Earymgn')
+
+    #task = board.new_task(title='Linux: Create package or installer', description='Explore possibilities for automatized installation via shell script, python egg(?), debian package, .... The packaging process itself should be automatized too and the compatible Linux distros be named.', category=3)
+
+    #task = board.new_task(title='MacOS: Create package or installer', description='Explore possibilities for automatized installation on a computer running MacOS. The packaging process itself should be automatized too.', category=3)
+
+    #task = board.new_task(title='Definition: Detailed proposal for a tech tree', description='Starting from the discussion in the forum about the tech tree, create a workable proposal for the techtree. In the end it will be discussed and inserted in the Game Definition document.', category=1)
+    #task.assign('Earymgn')
 
     # no dot at the end of the title!
 

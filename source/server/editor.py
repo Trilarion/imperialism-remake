@@ -313,6 +313,24 @@ class EditorMainMap(QtGui.QGraphicsView):
             item.setBrush(brush)
             item.setZValue(1)
 
+        # draw rivers
+        # TODO get rivers via a method (generator)
+        river_pen = QtGui.QPen(QtGui.QColor(64, 64, 255))
+        river_pen.setWidth(5)
+        for river in self.scenario._properties['rivers']:
+            tiles = river['tiles']
+            path = QtGui.QPainterPath()
+            for tile in tiles:
+                sx, sy = self.scenario.scene_position(tile[0], tile[1])
+                x = (sx + 0.5) * self.tile_size
+                y = (sy + 0.5) * self.tile_size
+                if tile == tiles[0]:
+                    path.moveTo(x, y)
+                else:
+                    path.lineTo(x, y)
+            item = self.scene.addPath(path, pen=river_pen)
+            item.setZValue(2)
+
         # draw province and nation borders
         # TODO the whole border drawing is a crude approximiation, implement it the right way
         province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
