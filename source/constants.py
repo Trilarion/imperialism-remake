@@ -40,6 +40,8 @@ Artwork_Folder = extend(Data_Folder, 'artwork')
 # scenarios (save games)
 Scenario_Folder = extend(Data_Folder, 'scenarios')
 Core_Scenario_Folder = extend(Scenario_Folder, 'core')
+Scenario_Ruleset_Folder = extend(Scenario_Folder, 'rules')
+Scenario_Ruleset_Standard_File = extend(Scenario_Ruleset_Folder, 'standard.rules')
 #Saved_Scenario_Folder = extend(Scenario_Folder, 'saved')
 
 # music related folders

@@ -105,6 +105,9 @@ class EditorMiniMap(QtGui.QWidget):
         self.map_mode = 'political'
         self.removable_items = []
 
+        # we start in political mode
+        action_political.trigger()
+
     def redraw_map(self):
         # we do not draw anything if the scenario is not valid
         if not self.scenario.valid:
@@ -240,7 +243,7 @@ class EditorMainMap(QtGui.QGraphicsView):
         The big map holding the game map and everything.
     """
 
-    tile_at_focus_changed = QtCore.Signal(object)
+    tile_at_focus_changed = QtCore.Signal(int, int)
 
     def __init__(self, scenario):
         super().__init__()
@@ -253,7 +256,8 @@ class EditorMainMap(QtGui.QGraphicsView):
         self.setTransformationAnchor(QtGui.QGraphicsView.NoAnchor)
         self.setResizeAnchor(QtGui.QGraphicsView.NoAnchor)
         self.setMouseTracking(True)
-        self.current_map_position = (-1, -1)
+        self.current_column = -1
+        self.current_row = -1
         self.tile_size = 80
         self.scenario = scenario
 
@@ -425,28 +429,51 @@ class EditorMainMap(QtGui.QGraphicsView):
         self.centerOn(x, y)
 
     def mouseMoveEvent(self, event):
-        if self.scenario:
+        if self.scenario.valid:
             # get mouse position in scene coordinates
             scene_position = self.mapToScene(event.pos()) / self.tile_size
-            map_position = self.scenario.map_position(scene_position.x(), scene_position.y())
-            if map_position != self.current_map_position:
-                self.current_map_position = map_position
-                self.tile_at_focus_changed.emit(self.current_map_position)
+            column, row = self.scenario.map_position(scene_position.x(), scene_position.y())
+            if column != self.current_column or row != self.current_row:
+                self.current_column = column
+                self.current_row = row
+                self.tile_at_focus_changed.emit(column, row)
         super().mouseMoveEvent(event)
 
 
-class InfoBox(QtGui.QLabel):
+class InfoBox(QtGui.QWidget):
     """
         Info box on the right side of the editor.
     """
 
-    def __init__(self):
+    def __init__(self, scenario):
         super().__init__()
         self.setObjectName('infobox')
-        self.setText('Info box')
+        layout = QtGui.QVBoxLayout(self)
 
-    def new_map_position(self, map_position):
-        self.setText('New position {}'.format(map_position))
+        self.text_label = QtGui.QLabel()
+        self.text_label.setTextFormat(QtCore.Qt.RichText)
+        layout.addWidget(self.text_label)
+
+        self.province_label = QtGui.QLabel()
+        layout.addWidget(self.province_label)
+
+        self.nation_label = QtGui.QLabel()
+        layout.addWidget(self.nation_label)
+
+        layout.addStretch()
+        self.scenario = scenario
+
+    def new_map_position(self, column, row):
+        text = 'Position ({}, {})'.format(column, row)
+        terrain = self.scenario.terrain_at(column, row)
+        terrain_name = self.scenario.get_terrain_name(terrain)
+        text += '<br>Terrain: {}'.format(terrain_name)
+        province = self.scenario.get_province_at(column, row)
+        if province is not None:
+            name = self.scenario.get_province_property(province, 'name')
+            text += '<br>Province: {}'.format(name)
+
+        self.text_label.setText(text)
 
 
 class NewScenarioDialogWidget(QtGui.QWidget):
@@ -570,7 +597,7 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.addAction(action_quit)
 
         # info box
-        self.info_box = InfoBox()
+        self.info_box = InfoBox(self.scenario)
 
         # the main map
         self.map = EditorMainMap(self.scenario)

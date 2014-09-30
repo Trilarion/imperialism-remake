@@ -22,11 +22,14 @@
 import math
 from PySide import QtCore
 
-import tools as t
+import tools as t, constants as c
 
 # some constants
 key_map_size = 'map-size'
 key_rivers = 'rivers'
+
+def convert_keys_to_int(dict):
+    return {int(k): v for k, v in dict.items()}
 
 
 class Scenario(QtCore.QObject):
@@ -178,8 +181,6 @@ class Scenario(QtCore.QObject):
             Creates a new (nation-less) province and returns it.
         """
         province = len(self._provinces)  # this always works because we check after loading
-        province = str(
-            province)  # while already when saving in JSON keys are converted to string we simply give strings from the beginning
         self._provinces[province] = {}
         self._provinces[province]['tiles'] = []
         return province
@@ -214,8 +215,6 @@ class Scenario(QtCore.QObject):
             Add a new nation and returns it.
         """
         nation = len(self._nations)  # this always gives a new unique number because we check after loading
-        nation = str(
-            nation)  # because while saving keys in JSON get converted to string anyway we already here work with strings
         self._nations[nation] = {}
         self._nations[nation]['properties'] = {}
         self._nations[nation]['provinces'] = []
@@ -245,12 +244,22 @@ class Scenario(QtCore.QObject):
         else:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
+    def get_province_at(self, column, row):
+        position = [column, row] # internally because of JSON saving we only have []
+        for province in self._provinces:
+            if position in self._provinces[province]['tiles']:
+                return province
+        return None
+
     def transfer_province_to_nation(self, province, nation):
         """
             Moves a province to a nation.
         """
         # TODO this is not right yet
         self._nations[nation]['provinces'].append(province)
+
+    def get_terrain_name(self, terrain):
+        return self._properties['rules']['terrain.names'][terrain]
 
     def load(self, file_name):
         """
@@ -261,9 +270,19 @@ class Scenario(QtCore.QObject):
         self._properties = reader.read_as_json('properties')
         self._map = reader.read_as_json('map')
         self._provinces = reader.read_as_json('provinces')
+        # convert keys from str to int
+        self._provinces = convert_keys_to_int(self._provinces)
         # TODO check all ids are smaller then len()
         self._nations = reader.read_as_json('nations')
+        # convert keys from str to int
+        self._nations = convert_keys_to_int(self._nations)
         # TODO check all ids are smaller then len()
+        # read rules
+        rule_file = c.extend(c.Scenario_Ruleset_Folder, self._properties['rules'])
+        self._properties['rules'] = t.read_json(rule_file)
+        # replace terrain_names
+        self._properties['rules']['terrain.names'] = convert_keys_to_int(self._properties['rules']['terrain.names'])
+
         self.valid = True
 
     def save(self, file_name):

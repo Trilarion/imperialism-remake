@@ -159,7 +159,7 @@ class GameLobbyWidget(QtGui.QWidget):
         layout.addStretch()
 
 
-class OptionsContentWidget(QtGui.QTabWidget):
+class OptionsContentWidget(QtGui.QWidget):
     """
         Content widget for the options/preferences dialog window, based on QTabWidget.
 
@@ -172,14 +172,44 @@ class OptionsContentWidget(QtGui.QTabWidget):
         """
         super().__init__()
 
+        toolbar = QtGui.QToolBar()
+        toolbar.setFloatable(False)
+        toolbar.setMovable(False)
+        toolbar.setIconSize(QtCore.QSize(40, 20))
+
+        action_group = QtGui.QActionGroup(toolbar)
+
+        action_general = QtGui.QAction(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group)
+        action_general.triggered.connect(self.show_tab_general)
+        action_general.setCheckable(True)
+        toolbar.addAction(action_general)
+
+        action_music = QtGui.QAction(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group)
+        action_music.triggered.connect(self.show_tab_music)
+        action_music.setCheckable(True)
+        toolbar.addAction(action_music)
+
+        self.stacked_layout = QtGui.QStackedLayout()
+
+        layout = QtGui.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(toolbar)
+        layout.addLayout(self.stacked_layout)
+
         # empty lists
         self.checkboxes = []
 
         # add tabs
-        self.add_tab_general()
-        self.add_tab_music()
+        self.create_tab_general()
+        self.create_tab_music()
 
-    def add_tab_general(self):
+        # trigger action_general programmatically
+        action_general.trigger()
+
+    def show_tab_general(self):
+        self.stacked_layout.setCurrentWidget(self.tab_general)
+
+    def create_tab_general(self):
         """
             General options tab
         """
@@ -198,9 +228,13 @@ class OptionsContentWidget(QtGui.QTabWidget):
         tab_layout.addStretch()
 
         # add tab
-        self.addTab(tab, 'General')
+        self.tab_general = tab
+        self.stacked_layout.addWidget(tab)
 
-    def add_tab_music(self):
+    def show_tab_music(self):
+        self.stacked_layout.setCurrentWidget(self.tab_music)
+
+    def create_tab_music(self):
         """
             Music options tab
         """
@@ -216,7 +250,8 @@ class OptionsContentWidget(QtGui.QTabWidget):
         tab_layout.addStretch()
 
         # add tab
-        self.addTab(tab, 'Music')
+        self.tab_music = tab
+        self.stacked_layout.addWidget(tab)
 
     def register_checkbox(self, checkbox, option):
         """
@@ -287,13 +322,21 @@ class MainWindow(QtGui.QWidget):
         else:
             self.show()
 
+        # loading animation
+        # TODO animation right and start, stop in client
+        self.animation = QtGui.QMovie(c.extend(c.Graphics_UI_Folder, 'loading.gif'))
+        #self.animation.start()
+        self.loading_label = QtGui.QLabel(self, f=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
+        self.loading_label.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.loading_label.setMovie(self.animation)
+        #self.loading_label.show()
+
     def change_content_widget(self, widget):
         if self.content:
             self.layout.removeWidget(self.content)
             self.content.deleteLater()
         self.content = widget
         self.layout.addWidget(widget)
-
 
 class Client():
     """

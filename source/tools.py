@@ -49,7 +49,7 @@ def write_json(file_name, value):
         Writes JSON struct with a bit custom formatting to a file.
     """
     with open(file_name, 'w') as file:
-        json.dump(value, file, indent=2, separators=(',', ': '), sort_keys=True)
+        json.dump(value, file, indent=1, separators=(',', ':'), sort_keys=True)
 
 
 def log_info(text):
@@ -176,7 +176,7 @@ class ZipArchiveWriter():
         """
             Write a Python object via JSON into an entry in the zip file.
         """
-        bytes = json.dumps(obj, indent=2, separators=(',', ': '), sort_keys=True).encode()
+        bytes = json.dumps(obj, indent=1, separators=(',', ':'), sort_keys=True).encode()
         self.write(name, bytes)
 
     def __del__(self):
