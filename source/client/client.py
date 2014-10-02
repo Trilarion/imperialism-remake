@@ -18,7 +18,8 @@
     Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
 """
 
-# TODO lock the client start screen if a dialog is running (modal)
+# TODO automatic placement of help dialog depending on if another dialog is open
+# TODO help dialog has close button in focus initially (why?) remove this
 
 import json
 
@@ -155,8 +156,33 @@ class GameLobbyWidget(QtGui.QWidget):
         layout = QtGui.QVBoxLayout(self)
         toolbar = QtGui.QToolBar()
 
+        action_group = QtGui.QActionGroup(toolbar)
+
+        action_initial = g.create_action(t.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario', action_group, True, self.single_new)
+        toolbar.addAction(action_initial)
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario', action_group, True, self.single_load))
+
+        toolbar.addSeparator()
+
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.network.png'), 'Show network center', action_group, True, self.network_center))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario', action_group, True, self.multiplayer_lobby))
+
         layout.addWidget(toolbar)
         layout.addStretch()
+
+        action_initial.trigger()
+
+    def single_new(self):
+        pass
+
+    def single_load(self):
+        pass
+
+    def network_center(self):
+        pass
+
+    def multiplayer_lobby(self):
+        pass
 
 
 class OptionsContentWidget(QtGui.QWidget):
@@ -179,15 +205,9 @@ class OptionsContentWidget(QtGui.QWidget):
 
         action_group = QtGui.QActionGroup(toolbar)
 
-        action_general = QtGui.QAction(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group)
-        action_general.triggered.connect(self.show_tab_general)
-        action_general.setCheckable(True)
-        toolbar.addAction(action_general)
-
-        action_music = QtGui.QAction(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group)
-        action_music.triggered.connect(self.show_tab_music)
-        action_music.setCheckable(True)
-        toolbar.addAction(action_music)
+        action_initial = g.create_action(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, True, self.show_tab_general)
+        toolbar.addAction(action_initial)
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, True, self.show_tab_music))
 
         self.stacked_layout = QtGui.QStackedLayout()
 
@@ -204,7 +224,7 @@ class OptionsContentWidget(QtGui.QWidget):
         self.create_tab_music()
 
         # trigger action_general programmatically
-        action_general.trigger()
+        action_initial.trigger()
 
     def show_tab_general(self):
         self.stacked_layout.setCurrentWidget(self.tab_general)

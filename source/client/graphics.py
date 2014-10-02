@@ -35,7 +35,7 @@ class GameDialog(QtGui.QWidget):
         Reference in stylesheets with 'gamedialog'.
     """
 
-    def __init__(self, parent, content, title=None, modal=False, delete_on_close=False, help_callback=None,
+    def __init__(self, parent, content, title=None, modal=True, delete_on_close=False, help_callback=None,
                  close_callback=None):
         # no frame but a standalong window
         super().__init__(parent, f=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)

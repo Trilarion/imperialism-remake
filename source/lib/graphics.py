@@ -534,3 +534,10 @@ class ClockLabel(QtGui.QLabel):
 
 # some constant expressions
 TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
+
+def create_action(icon, text, parent, checkable, triggered_action=None):
+    action = QtGui.QAction(icon, text, parent)
+    action.setCheckable(checkable)
+    if triggered_action is not None:
+        action.triggered.connect(triggered_action)
+    return action

@@ -29,6 +29,8 @@ import lib.graphics as g
 import client.graphics as cg
 from server.scenario import Scenario
 
+# TODO in the beginning of the editor just automatically create a new scenario with the default values, to show at least something
+
 class EditorScenario(Scenario):
     """
 
@@ -461,6 +463,17 @@ class InfoBox(QtGui.QWidget):
         layout.addWidget(self.nation_label)
 
         layout.addStretch()
+
+        toolbar = QtGui.QToolBar()
+        toolbar.setFloatable(False)
+        toolbar.setMovable(False)
+        toolbar.setIconSize(QtCore.QSize(20, 20))
+
+        action_terrain = QtGui.QAction(t.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self)
+        action_terrain.triggered.connect(self.change_terrain)
+        toolbar.addAction(action_terrain)
+
+        layout.addWidget(toolbar)
         self.scenario = scenario
 
     def new_map_position(self, column, row):
@@ -474,6 +487,9 @@ class InfoBox(QtGui.QWidget):
             text += '<br>Province: {}'.format(name)
 
         self.text_label.setText(text)
+
+    def change_terrain(self):
+        pass
 
 
 class NewScenarioDialogWidget(QtGui.QWidget):
@@ -563,22 +579,13 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.setFloatable(False)
         self.toolbar.setMovable(False)
 
-        action_new = QtGui.QAction(t.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self)
-        action_new.triggered.connect(self.show_new_scenario_dialog)
-        self.toolbar.addAction(action_new)
-
-        action_load = QtGui.QAction(t.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self)
-        action_load.triggered.connect(self.load_scenario_dialog)
-        self.toolbar.addAction(action_load)
-
-        action_save = QtGui.QAction(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self)
-        action_save.triggered.connect(self.save_scenario_dialog)
-        self.toolbar.addAction(action_save)
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self, False, self.show_new_scenario_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, False, self.load_scenario_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, False, self.save_scenario_dialog))
 
         self.toolbar.addSeparator()
-        action_nations = QtGui.QAction(t.load_ui_icon('icon.editor.nations.png'), 'Modify Nations', self)
-        action_nations.triggered.connect(self.show_nations_dialog)
-        self.toolbar.addAction(action_nations)
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.nations.png'), 'Edit Nations', self, False, self.show_nations_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.provinces.png'), 'Edit Provinces', self, False, self.show_provinces_dialog))
 
         spacer = QtGui.QWidget()
         spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
@@ -641,6 +648,8 @@ class EditorScreen(QtGui.QWidget):
         """
             Show the save a scenario dialog. Then saves it.
         """
+        if not self.scenario.valid:
+            return
         file_name = \
             QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
                 0]
@@ -661,4 +670,7 @@ class EditorScreen(QtGui.QWidget):
         """
             Show the modify nations dialog.
         """
+        pass
+
+    def show_provinces_dialog(self):
         pass
