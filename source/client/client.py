@@ -153,30 +153,42 @@ class GameLobbyWidget(QtGui.QWidget):
         """
         super().__init__()
 
-        layout = QtGui.QVBoxLayout(self)
-        toolbar = QtGui.QToolBar()
+        self.layout = QtGui.QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.addWidget(self.create_toolbar())
+        self.content = QtGui.QWidget()
+        self.layout.addWidget(self.content)
 
+    def create_toolbar(self):
+        toolbar = QtGui.QToolBar()
         action_group = QtGui.QActionGroup(toolbar)
 
-        action_initial = g.create_action(t.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario', action_group, True, self.single_new)
+        action_initial = g.create_action(t.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario', action_group, self.single_new, True)
         toolbar.addAction(action_initial)
-        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario', action_group, True, self.single_load))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario', action_group, self.single_load, True))
 
         toolbar.addSeparator()
 
-        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.network.png'), 'Show network center', action_group, True, self.network_center))
-        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario', action_group, True, self.multiplayer_lobby))
-
-        layout.addWidget(toolbar)
-        layout.addStretch()
-
-        action_initial.trigger()
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.network.png'), 'Show network center', action_group, self.network_center, True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario', action_group, self.multiplayer_lobby, True))
+        return toolbar
 
     def single_new(self):
-        pass
+        content = QtGui.QWidget()
+        layout = QtGui.QGridLayout(content)
+        scenario_selection = QtGui.QListWidget()
+        layout.addWidget(scenario_selection, 0, 0)
+
+        # TODO switching of the widgets should be easier
+        self.layout.removeWidget(self.content)
+        self.content = content
+        self.layout.addWidget(self.content)
 
     def single_load(self):
-        pass
+        file_name = QtGui.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[0]
+        if file_name:
+            # TODO check that it is a valid single player scenario in play
+            pass
 
     def network_center(self):
         pass
@@ -199,15 +211,14 @@ class OptionsContentWidget(QtGui.QWidget):
         super().__init__()
 
         toolbar = QtGui.QToolBar()
-        toolbar.setFloatable(False)
-        toolbar.setMovable(False)
-        toolbar.setIconSize(QtCore.QSize(40, 20))
+        toolbar.setIconSize(QtCore.QSize(32, 32))
 
         action_group = QtGui.QActionGroup(toolbar)
 
-        action_initial = g.create_action(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, True, self.show_tab_general)
+        action_initial = g.create_action(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, self.show_tab_general, True)
         toolbar.addAction(action_initial)
-        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, True, self.show_tab_music))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group, self.show_tab_graphics, True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, self.show_tab_music, True))
 
         self.stacked_layout = QtGui.QStackedLayout()
 
@@ -221,6 +232,7 @@ class OptionsContentWidget(QtGui.QWidget):
 
         # add tabs
         self.create_tab_general()
+        self.create_tab_graphics()
         self.create_tab_music()
 
         # trigger action_general programmatically
@@ -236,19 +248,31 @@ class OptionsContentWidget(QtGui.QWidget):
         tab = QtGui.QWidget()
         tab_layout = QtGui.QVBoxLayout(tab)
 
-        # Graphics box
-        box = QtGui.QGroupBox('Graphics')
-        checkbox = QtGui.QCheckBox('Full screen mode')
-        self.register_checkbox(checkbox, c.OG_MW_FULLSCREEN)
-        layout = QtGui.QVBoxLayout(box)
-        layout.addWidget(checkbox)
-        tab_layout.addWidget(box)
-
         # vertical stretch
         tab_layout.addStretch()
 
         # add tab
         self.tab_general = tab
+        self.stacked_layout.addWidget(tab)
+
+    def show_tab_graphics(self):
+        self.stacked_layout.setCurrentWidget(self.tab_graphics)
+
+    def create_tab_graphics(self):
+
+        tab = QtGui.QWidget()
+        tab_layout = QtGui.QVBoxLayout(tab)
+
+        # full screen mode
+        checkbox = QtGui.QCheckBox('Full screen mode')
+        self.register_checkbox(checkbox, c.OG_MW_FULLSCREEN)
+        tab_layout.addWidget(checkbox)
+
+        # vertical stretch
+        tab_layout.addStretch()
+
+        # add tab
+        self.tab_graphics = tab
         self.stacked_layout.addWidget(tab)
 
     def show_tab_music(self):

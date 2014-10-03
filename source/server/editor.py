@@ -79,21 +79,12 @@ class EditorMiniMap(QtGui.QWidget):
         self.view.setFixedHeight(math.floor(0.6 * self.Fixed_Width))
 
         self.toolbar = QtGui.QToolBar()
-        self.toolbar.setFloatable(False)
-        self.toolbar.setMovable(False)
         self.toolbar.setIconSize(QtCore.QSize(20, 20))
 
         action_group = QtGui.QActionGroup(self.toolbar)
-
-        action_political = QtGui.QAction(t.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group)
-        action_political.triggered.connect(self.switch_to_political)
-        action_political.setCheckable(True)
-        self.toolbar.addAction(action_political)
-
-        action_geographical = QtGui.QAction(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group)
-        action_geographical.triggered.connect(self.switch_to_geographical)
-        action_geographical.setCheckable(True)
-        self.toolbar.addAction(action_geographical)
+        action_initial = g.create_action(t.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group, self.switch_to_political, True)
+        self.toolbar.addAction(action_initial)
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group, self.switch_to_geographical, True))
 
         l = QtGui.QHBoxLayout()
         l.setContentsMargins(0, 0, 0, 0)
@@ -108,12 +99,9 @@ class EditorMiniMap(QtGui.QWidget):
         self.removable_items = []
 
         # we start in political mode
-        action_political.trigger()
+        action_initial.trigger()
 
     def redraw_map(self):
-        # we do not draw anything if the scenario is not valid
-        if not self.scenario.valid:
-            return
         # adjust view height
         map_size = self.scenario['map-size']
         scale = self.Fixed_Width / map_size[0]
@@ -431,14 +419,13 @@ class EditorMainMap(QtGui.QGraphicsView):
         self.centerOn(x, y)
 
     def mouseMoveEvent(self, event):
-        if self.scenario.valid:
-            # get mouse position in scene coordinates
-            scene_position = self.mapToScene(event.pos()) / self.tile_size
-            column, row = self.scenario.map_position(scene_position.x(), scene_position.y())
-            if column != self.current_column or row != self.current_row:
-                self.current_column = column
-                self.current_row = row
-                self.tile_at_focus_changed.emit(column, row)
+        # get mouse position in scene coordinates
+        scene_position = self.mapToScene(event.pos()) / self.tile_size
+        column, row = self.scenario.map_position(scene_position.x(), scene_position.y())
+        if column != self.current_column or row != self.current_row:
+            self.current_column = column
+            self.current_row = row
+            self.tile_at_focus_changed.emit(column, row)
         super().mouseMoveEvent(event)
 
 
@@ -463,18 +450,20 @@ class InfoBox(QtGui.QWidget):
         layout.addWidget(self.nation_label)
 
         layout.addStretch()
+        layout.addLayout(self.create_toolbar())
+        self.scenario = scenario
+
+    def create_toolbar(self):
+        layout = QtGui.QHBoxLayout()
 
         toolbar = QtGui.QToolBar()
-        toolbar.setFloatable(False)
-        toolbar.setMovable(False)
         toolbar.setIconSize(QtCore.QSize(20, 20))
-
-        action_terrain = QtGui.QAction(t.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self)
-        action_terrain.triggered.connect(self.change_terrain)
-        toolbar.addAction(action_terrain)
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self, self.change_terrain))
 
         layout.addWidget(toolbar)
-        self.scenario = scenario
+        layout.addStretch()
+
+        return layout
 
     def new_map_position(self, column, row):
         text = 'Position ({}, {})'.format(column, row)
@@ -492,6 +481,7 @@ class InfoBox(QtGui.QWidget):
         pass
 
 
+# TODO replace key strings by constants (variables)
 class NewScenarioDialogWidget(QtGui.QWidget):
     """
         New scenario dialog.
@@ -501,7 +491,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
     def __init__(self):
         super().__init__()
 
-        self.items = {}
+        self.properties = {}
 
         widget_layout = QtGui.QVBoxLayout(self)
 
@@ -510,7 +500,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         layout = QtGui.QVBoxLayout(box)
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(300)
-        self.items['title'] = edit
+        self.properties['title'] = edit
         layout.addWidget(edit)
         widget_layout.addWidget(box)
 
@@ -523,7 +513,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         edit.setFixedWidth(50)
         edit.setPlaceholderText('100')
         edit.setValidator(QtGui.QIntValidator(0, 100))
-        self.items['width'] = edit
+        self.properties['width'] = edit
         layout.addWidget(edit)
 
         layout.addWidget(QtGui.QLabel('Height'))
@@ -531,7 +521,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         edit.setFixedWidth(50)
         edit.setPlaceholderText('100')
         edit.setValidator(QtGui.QIntValidator(0, 100))
-        self.items['heigh'] = edit
+        self.properties['height'] = edit
         layout.addWidget(edit)
         layout.addStretch()
 
@@ -543,21 +533,36 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         # add the button
         layout = QtGui.QHBoxLayout()
         toolbar = QtGui.QToolBar()
-        action_create = QtGui.QAction(t.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar)
-        action_create.triggered.connect(self.create_scenario_clicked)
-        toolbar.addAction(action_create)
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar, self.create_scenario_clicked))
         layout.addStretch()
         layout.addWidget(toolbar)
         widget_layout.addLayout(layout)
 
     def create_scenario_clicked(self):
         """
-            Callback if indeed yes is clicked.
+            "Create scenario" is clicked.
         """
-        self.items['title'] = self.items['title'].text()
+        self.properties['title'] = self.properties['title'].text()
+        self.properties['width'] = int(self.properties['width'].text())
+        self.properties['height'] = int(self.properties['height'].text())
         # we close the parent window and emit the appropriate signal
         self.parent().close()
-        self.create_scenario.emit(self.items)
+        self.create_scenario.emit(self.properties)
+
+class GeneralPropertiesWidget(QtGui.QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+class NationPropertiesWidget(QtGui.QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+class ProvincePropertiesWidget(QtGui.QWidget):
+
+    def __init__(self):
+        super().__init__()
 
 class EditorScreen(QtGui.QWidget):
     """
@@ -576,16 +581,14 @@ class EditorScreen(QtGui.QWidget):
         self.scenario.everything_changed.connect(self.scenario_change)
 
         self.toolbar = QtGui.QToolBar()
-        self.toolbar.setFloatable(False)
-        self.toolbar.setMovable(False)
-
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self, False, self.show_new_scenario_dialog))
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, False, self.load_scenario_dialog))
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, False, self.save_scenario_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self, self.show_new_scenario_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, self.load_scenario_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog))
 
         self.toolbar.addSeparator()
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.nations.png'), 'Edit Nations', self, False, self.show_nations_dialog))
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.provinces.png'), 'Edit Provinces', self, False, self.show_provinces_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self, self.show_general_properties_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self, self.show_provinces_dialog))
 
         spacer = QtGui.QWidget()
         spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
@@ -622,14 +625,34 @@ class EditorScreen(QtGui.QWidget):
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
 
+        # create a new scenario (to have something displayed at the beginning)
+        properties = {
+            'title': 'Unnamed',
+            'width': 100,
+            'height': 60
+        }
+        self.create_new_scenario(properties)
+
+    def create_new_scenario(self, properties):
+        self.scenario.reset()
+        self.scenario['title'] = properties['title']
+        self.scenario.create_map(properties['width'], properties['height'])
+
+        # standard rules
+        self.scenario['rules'] = 'standard.rules'
+        self.scenario.load_rules()
+
+        # emit that everything has changed
+        self.scenario.everything_changed.emit()
+
     def show_new_scenario_dialog(self):
         """
             Show the dialog for creation of a new scenario dialog.
         """
         new_scenario_widget = NewScenarioDialogWidget()
+        new_scenario_widget.create_scenario.connect(self.create_new_scenario)
         dialog = cg.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario', delete_on_close=True,
                                help_callback=self.client.show_help_browser)
-        # TODO close callback
         dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
 
@@ -666,11 +689,26 @@ class EditorScreen(QtGui.QWidget):
         self.mini_map.redraw_map()
         self.mini_map.reset_tracker(self.map.get_bounds())
 
+    def show_general_properties_dialog(self):
+        content_widget = GeneralPropertiesWidget()
+        dialog = cg.GameDialog(self.client.main_window, content_widget, title='General Properties', delete_on_close=True,
+                               help_callback=self.client.show_help_browser)
+        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.show()
+
     def show_nations_dialog(self):
         """
             Show the modify nations dialog.
         """
-        pass
+        content_widget = NationPropertiesWidget()
+        dialog = cg.GameDialog(self.client.main_window, content_widget, title='Nations', delete_on_close=True,
+                               help_callback=self.client.show_help_browser)
+        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.show()
 
     def show_provinces_dialog(self):
-        pass
+        content_widget = ProvincePropertiesWidget()
+        dialog = cg.GameDialog(self.client.main_window, content_widget, title='Provinces', delete_on_close=True,
+                               help_callback=self.client.show_help_browser)
+        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.show()

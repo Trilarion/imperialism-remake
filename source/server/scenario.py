@@ -50,17 +50,16 @@ class Scenario(QtCore.QObject):
         """
         self._properties = {}
         self._properties[key_rivers] = []
-        self.valid = False
         self._provinces = {}
         self._nations = {}
         self._map = {}
 
-    def create_map(self, size):
+    def create_map(self, columns, rows):
         """
             Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
         """
-        self._properties[key_map_size] = size
-        number_tiles = size[0] * size[1]
+        self._properties[key_map_size] = (columns, rows)
+        number_tiles = columns * rows
         self._map['terrain'] = [0] * number_tiles
         self._map['resource'] = [0] * number_tiles
 
@@ -277,13 +276,14 @@ class Scenario(QtCore.QObject):
         # convert keys from str to int
         self._nations = convert_keys_to_int(self._nations)
         # TODO check all ids are smaller then len()
+        self.load_rules()
+
+    def load_rules(self):
         # read rules
         rule_file = c.extend(c.Scenario_Ruleset_Folder, self._properties['rules'])
         self._properties['rules'] = t.read_json(rule_file)
         # replace terrain_names
         self._properties['rules']['terrain.names'] = convert_keys_to_int(self._properties['rules']['terrain.names'])
-
-        self.valid = True
 
     def save(self, file_name):
         """
