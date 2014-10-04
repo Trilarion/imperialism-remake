@@ -25,8 +25,11 @@ from PySide import QtCore
 import tools as t, constants as c
 
 # some constants
-key_map_size = 'map-size'
-key_rivers = 'rivers'
+TITLE = 'title'
+MAP_COLUMNS = 'map.columns'
+MAP_ROWS = 'map.rows'
+RIVERS = 'rivers'
+
 
 def convert_keys_to_int(dict):
     return {int(k): v for k, v in dict.items()}
@@ -49,7 +52,7 @@ class Scenario(QtCore.QObject):
             Just empty
         """
         self._properties = {}
-        self._properties[key_rivers] = []
+        self._properties[RIVERS] = []
         self._provinces = {}
         self._nations = {}
         self._map = {}
@@ -58,7 +61,8 @@ class Scenario(QtCore.QObject):
         """
             Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
         """
-        self._properties[key_map_size] = (columns, rows)
+        self._properties[MAP_COLUMNS] = columns
+        self._properties[MAP_ROWS] = rows
         number_tiles = columns * rows
         self._map['terrain'] = [0] * number_tiles
         self._map['resource'] = [0] * number_tiles
@@ -68,7 +72,7 @@ class Scenario(QtCore.QObject):
             'name': name,
             'tiles': tiles
         }
-        self._properties[key_rivers].extend([river])
+        self._properties[RIVERS].extend([river])
 
     def set_terrain_at(self, column, row, terrain):
         """
@@ -100,8 +104,7 @@ class Scenario(QtCore.QObject):
         """
         column = math.floor(x - (y % 2) / 2)
         row = math.floor(y)
-        if row < 0 or row >= self._properties[key_map_size][0] or column < 0 or column >= \
-                self._properties[key_map_size][1]:
+        if row < 0 or row >= self._properties[MAP_ROWS] or column < 0 or column >= self._properties[MAP_COLUMNS]:
             return -1, -1
         return column, row
 
@@ -115,7 +118,7 @@ class Scenario(QtCore.QObject):
         """
             Calculates the index in the linear map for a given 2D position (first row, then column)?
         """
-        index = row * self._properties[key_map_size][0] + column
+        index = row * self._properties[MAP_COLUMNS] + column
         return index
 
     def get_neighbored_tiles(self, column, row):
@@ -124,7 +127,7 @@ class Scenario(QtCore.QObject):
         if column > 0:
             tiles.append((column - 1, row))
         # east
-        if column < self._properties[key_map_size][0] - 1:
+        if column < self._properties[MAP_COLUMNS] - 1:
             tiles.append((column + 1, row))
         if row % 2 == 0:
             # even row (0, 2, 4, ..)
@@ -136,7 +139,7 @@ class Scenario(QtCore.QObject):
                 # north-east always exists
                 tiles.append((column, row - 1))
             # south
-            if row < self._properties[key_map_size][1] - 1:
+            if row < self._properties[MAP_ROWS] - 1:
                 # south-west
                 if column > 0:
                     tiles.append((column - 1, row + 1))
@@ -149,14 +152,14 @@ class Scenario(QtCore.QObject):
                 # north-west always exists
                 tiles.append((column, row - 1))
                 # north-east
-                if column < self._properties[key_map_size][0] - 1:
+                if column < self._properties[MAP_COLUMNS] - 1:
                     tiles.append((column + 1, row - 1))
             # south
-            if row < self._properties[key_map_size][1] - 1:
+            if row < self._properties[MAP_ROWS] - 1:
                 # south-west always exists
                 tiles.append((column, row + 1))
                 # south-east
-                if column < self._properties[key_map_size][0] - 1:
+                if column < self._properties[MAP_COLUMNS] - 1:
                     tiles.append((column + 1, row + 1))
         return tiles
 

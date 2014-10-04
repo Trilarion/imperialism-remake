@@ -21,7 +21,7 @@
 # TODO automatic placement of help dialog depending on if another dialog is open
 # TODO help dialog has close button in focus initially (why?) remove this
 
-import json
+import json, os
 
 from PySide import QtCore, QtGui
 
@@ -33,6 +33,7 @@ import client.audio as audio
 from lib.browser import BrowserWidget
 from server.editor import EditorScreen
 from server.monitor import ServerMonitorWidget
+from server.scenario import * # TODO only temporary until we move everything back to the server
 
 
 class MapItem(QtCore.QObject):
@@ -141,6 +142,57 @@ class StartScreen(QtGui.QWidget):
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
+def scenario_read_title(file_name):
+    reader = t.ZipArchiveReader(file_name)
+    properties = reader.read_as_json('properties')
+    return properties['title']
+
+def scenario_read_as_preview(file_name):
+    scenario = Scenario()
+    scenario.load(file_name)
+    preview = {}
+
+    return preview
+
+class SinglePlayerScenarioSelection(QtGui.QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        layout = QtGui.QGridLayout(self)
+
+        self.list_selection = QtGui.QListWidget()
+        self.list_selection.setFixedWidth(150)
+        self.list_selection.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+
+
+        # populate list
+        self.scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
+        self.scenario_files = [os.path.join(c.Core_Scenario_Folder, x) for x in self.scenario_files]
+        scenario_titles = [scenario_read_title(x) for x in self.scenario_files]
+        # TODO sort lists by title before adding to QListWidget
+        self.list_selection.addItems(scenario_titles)
+        self.list_selection.itemSelectionChanged.connect(self.list_selection_changed)
+
+
+        layout.addWidget(self.list_selection, 0, 0)
+        map = QtGui.QWidget()
+        layout.addWidget(map, 0, 1, 2)
+        scenario_alternative_button = QtGui.QPushButton('Select another')
+        layout.addWidget(scenario_alternative_button, 1, 0)
+        info = QtGui.QWidget()
+        layout.addWidget(info, 2, 0, 1, 2)
+        layout.setRowStretch(2, 1) # infobox gets all the height
+        layout.setColumnStretch(1, 1) # map gets all the width
+
+    def list_selection_changed(self):
+        row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself
+        file_name = self.scenario_files[row]
+        self.new_selected_scenario(file_name)
+
+    def new_selected_scenario(self, file_name):
+        preview = scenario_read_as_preview(file_name)
+
 
 class GameLobbyWidget(QtGui.QWidget):
     """
@@ -174,10 +226,7 @@ class GameLobbyWidget(QtGui.QWidget):
         return toolbar
 
     def single_new(self):
-        content = QtGui.QWidget()
-        layout = QtGui.QGridLayout(content)
-        scenario_selection = QtGui.QListWidget()
-        layout.addWidget(scenario_selection, 0, 0)
+        content = SinglePlayerScenarioSelection()
 
         # TODO switching of the widgets should be easier
         self.layout.removeWidget(self.content)

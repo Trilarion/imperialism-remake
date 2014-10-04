@@ -27,9 +27,17 @@ import constants as c
 import tools as t
 import lib.graphics as g
 import client.graphics as cg
-from server.scenario import Scenario
+from server.scenario import *
 
 # TODO in the beginning of the editor just automatically create a new scenario with the default values, to show at least something
+
+NEW_SCENARIO_DEFAULT_PROPERTIES = {
+    TITLE: 'Unnamed',
+    MAP_COLUMNS: 100,
+    MAP_ROWS: 60
+}
+
+
 
 class EditorScenario(Scenario):
     """
@@ -103,9 +111,10 @@ class EditorMiniMap(QtGui.QWidget):
 
     def redraw_map(self):
         # adjust view height
-        map_size = self.scenario['map-size']
-        scale = self.Fixed_Width / map_size[0]
-        height = math.floor(self.Fixed_Width / map_size[0] * map_size[1])
+        columns = self.scenario[MAP_COLUMNS]
+        rows = self.scenario[MAP_ROWS]
+        scale = self.Fixed_Width / columns
+        height = math.floor(scale * rows)
         self.view.setFixedHeight(height)
         self.view.setSceneRect(0, 0, self.Fixed_Width, height)
 
@@ -165,8 +174,8 @@ class EditorMiniMap(QtGui.QWidget):
             paths = {}
             for t in range(1, 7):
                 paths[t] = QtGui.QPainterPath()
-            for column in range(0, map_size[0]):
-                for row in range(0, map_size[1]):
+            for column in range(0, columns):
+                for row in range(0, rows):
                     t = self.scenario.terrain_at(column, row)
                     if t != 0:
                         # not for sea
@@ -257,10 +266,11 @@ class EditorMainMap(QtGui.QGraphicsView):
         """
         self.scene.clear()
 
-        map_size = self.scenario['map-size']
+        columns = self.scenario[MAP_COLUMNS]
+        rows = self.scenario[MAP_ROWS]
 
-        width = (map_size[0] + 0.5) * self.tile_size
-        height = map_size[1] * self.tile_size
+        width = (columns + 0.5) * self.tile_size
+        height = rows * self.tile_size
         self.scene.setSceneRect(0, 0, width, height)
 
         # TODO should load only once and cache (universal cache)
@@ -284,8 +294,8 @@ class EditorMainMap(QtGui.QGraphicsView):
         paths = {}
         for t in range(1, 7):
             paths[t] = QtGui.QPainterPath()
-        for column in range(0, map_size[0]):
-            for row in range(0, map_size[1]):
+        for column in range(0, columns):
+            for row in range(0, rows):
                 t = self.scenario.terrain_at(column, row)
                 if t != 0:
                     # not for sea
@@ -299,9 +309,9 @@ class EditorMainMap(QtGui.QGraphicsView):
 
         # fill the half tiles which are not part of the map
         brush = QtGui.QBrush(QtCore.Qt.darkGray)
-        for row in range(0, map_size[1]):
+        for row in range(0, rows):
             if row % 2 == 0:
-                item = self.scene.addRect(map_size[0] * self.tile_size, row * self.tile_size, self.tile_size / 2, self.tile_size, pen=g.TRANSPARENT_PEN)
+                item = self.scene.addRect(columns * self.tile_size, row * self.tile_size, self.tile_size / 2, self.tile_size, pen=g.TRANSPARENT_PEN)
             else:
                 item = self.scene.addRect(0, row * self.tile_size, self.tile_size / 2, self.tile_size, pen=g.TRANSPARENT_PEN)
             item.setBrush(brush)
@@ -388,8 +398,8 @@ class EditorMainMap(QtGui.QGraphicsView):
                 item.setZValue(5)
 
         # draw the grid and the coordinates
-        for column in range(0, map_size[0]):
-            for row in range(0, map_size[1]):
+        for column in range(0, columns):
+            for row in range(0, rows):
                 sx, sy = self.scenario.scene_position(column, row)
                 #item = self.scene.addRect(sx * self.tile_size, sy * self.tile_size,  self.tile_size,  self.tile_size)
                 #item.setZValue(1000)
@@ -481,17 +491,16 @@ class InfoBox(QtGui.QWidget):
         pass
 
 
-# TODO replace key strings by constants (variables)
+# TODO widget without any focus, otherwise the placeholder texts are overwritten
 class NewScenarioDialogWidget(QtGui.QWidget):
     """
         New scenario dialog.
     """
     create_scenario = QtCore.Signal(dict)
 
-    def __init__(self):
+    def __init__(self, properties):
         super().__init__()
-
-        self.properties = {}
+        self.properties = properties
 
         widget_layout = QtGui.QVBoxLayout(self)
 
@@ -500,7 +509,8 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         layout = QtGui.QVBoxLayout(box)
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(300)
-        self.properties['title'] = edit
+        edit.setPlaceholderText(self.properties[TITLE])
+        self.properties[TITLE] = edit
         layout.addWidget(edit)
         widget_layout.addWidget(box)
 
@@ -511,17 +521,17 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         layout.addWidget(QtGui.QLabel('Width'))
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(50)
-        edit.setPlaceholderText('100')
-        edit.setValidator(QtGui.QIntValidator(0, 100))
-        self.properties['width'] = edit
+        edit.setValidator(QtGui.QIntValidator(0, 1000))
+        edit.setPlaceholderText(str(self.properties[MAP_COLUMNS]))
+        self.properties[MAP_COLUMNS] = edit
         layout.addWidget(edit)
 
         layout.addWidget(QtGui.QLabel('Height'))
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(50)
-        edit.setPlaceholderText('100')
-        edit.setValidator(QtGui.QIntValidator(0, 100))
-        self.properties['height'] = edit
+        edit.setValidator(QtGui.QIntValidator(0, 1000))
+        edit.setPlaceholderText(str(self.properties[MAP_ROWS]))
+        self.properties[MAP_ROWS] = edit
         layout.addWidget(edit)
         layout.addStretch()
 
@@ -542,17 +552,39 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         """
             "Create scenario" is clicked.
         """
-        self.properties['title'] = self.properties['title'].text()
-        self.properties['width'] = int(self.properties['width'].text())
-        self.properties['height'] = int(self.properties['height'].text())
+        self.properties[TITLE] = self.properties[TITLE].text()
+        self.properties[MAP_COLUMNS] = int(self.properties[MAP_COLUMNS].text())
+        self.properties[MAP_ROWS] = int(self.properties[MAP_ROWS].text())
         # we close the parent window and emit the appropriate signal
         self.parent().close()
         self.create_scenario.emit(self.properties)
 
 class GeneralPropertiesWidget(QtGui.QWidget):
 
-    def __init__(self):
+    def __init__(self, scenario):
         super().__init__()
+        self.scenario = scenario
+
+        widget_layout = QtGui.QVBoxLayout(self)
+
+        # title box
+        # TODO validator for title, no empty string
+        box = QtGui.QGroupBox('Title')
+        layout = QtGui.QVBoxLayout(box)
+        self.edit = QtGui.QLineEdit()
+        self.edit.setFixedWidth(300)
+        self.edit.setText(self.scenario[TITLE])
+        layout.addWidget(self.edit)
+
+        widget_layout.addWidget(box)
+
+        widget_layout.addStretch()
+
+    def close_request(self, parent_widget):
+        self.scenario[TITLE] = self.edit.text()
+        return True
+
+
 
 class NationPropertiesWidget(QtGui.QWidget):
 
@@ -626,17 +658,12 @@ class EditorScreen(QtGui.QWidget):
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
 
         # create a new scenario (to have something displayed at the beginning)
-        properties = {
-            'title': 'Unnamed',
-            'width': 100,
-            'height': 60
-        }
-        self.create_new_scenario(properties)
+        self.create_new_scenario(NEW_SCENARIO_DEFAULT_PROPERTIES)
 
     def create_new_scenario(self, properties):
         self.scenario.reset()
-        self.scenario['title'] = properties['title']
-        self.scenario.create_map(properties['width'], properties['height'])
+        self.scenario[TITLE] = properties[TITLE]
+        self.scenario.create_map(properties[MAP_COLUMNS], properties[MAP_ROWS])
 
         # standard rules
         self.scenario['rules'] = 'standard.rules'
@@ -649,7 +676,7 @@ class EditorScreen(QtGui.QWidget):
         """
             Show the dialog for creation of a new scenario dialog.
         """
-        new_scenario_widget = NewScenarioDialogWidget()
+        new_scenario_widget = NewScenarioDialogWidget(NEW_SCENARIO_DEFAULT_PROPERTIES.copy())
         new_scenario_widget.create_scenario.connect(self.create_new_scenario)
         dialog = cg.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario', delete_on_close=True,
                                help_callback=self.client.show_help_browser)
@@ -690,9 +717,9 @@ class EditorScreen(QtGui.QWidget):
         self.mini_map.reset_tracker(self.map.get_bounds())
 
     def show_general_properties_dialog(self):
-        content_widget = GeneralPropertiesWidget()
+        content_widget = GeneralPropertiesWidget(self.scenario)
         dialog = cg.GameDialog(self.client.main_window, content_widget, title='General Properties', delete_on_close=True,
-                               help_callback=self.client.show_help_browser)
+                               help_callback=self.client.show_help_browser, close_callback=content_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
