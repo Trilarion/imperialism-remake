@@ -613,6 +613,7 @@ class EditorScreen(QtGui.QWidget):
         self.scenario.everything_changed.connect(self.scenario_change)
 
         self.toolbar = QtGui.QToolBar()
+        self.toolbar.setIconSize(QtCore.QSize(32, 32))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self, self.show_new_scenario_dialog))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, self.load_scenario_dialog))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog))

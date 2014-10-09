@@ -20,6 +20,7 @@
 
 from PySide import QtCore, QtNetwork
 
+from lib.network import *
 
 class Client(QtCore.QObject):
     """
@@ -35,13 +36,13 @@ class Client(QtCore.QObject):
         self.socket = QtNetwork.QTcpSocket(self)
         # some connections
         self.socket.readyRead.connect(self.receive)
-        self.error.connect(self.error)
+        self.socket.error.connect(self.error)
 
-    def login(self, address):
+    def login(self, host, port):
         """
             Given an address (list of two parts: hostname (str), port (int)) tries to connect the socket.
         """
-        self.socket.connectToHost(address[0], address[1])
+        self.socket.connectToHost(host, port)
 
     def error(self):
         """
@@ -55,16 +56,14 @@ class Client(QtCore.QObject):
 
             TODO will the whole message arrive in one piece?
         """
-        reader = QtCore.QDataStream(self.socket)
-        message = reader.readString()
-        self.received.emit(message)
+        value = read_from_socket_uncompress_and_deserialize(self.socket)
+        print('client received {}'.format(json.dumps(value)))
+        self.received.emit(value)
 
-    def send(self, message):
+    def send(self, value):
         """
             Sends a message (a astring) over the socket.
 
             TODO check if connected before, error if not
         """
-        writer = QtCore.QDataStream(self.socket)
-        writer.setVersion(QtCore.QDataStream.Qt_4_8)
-        writer.writeString(message)
+        serialize_compress_and_write_to_socket(self.socket, value)

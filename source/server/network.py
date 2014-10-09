@@ -23,6 +23,7 @@ from functools import partial
 
 from PySide import QtCore, QtNetwork
 
+from lib.network import *
 
 class Server(QtCore.QObject):
     """
@@ -47,11 +48,11 @@ class Server(QtCore.QObject):
             if id not in self.connections:
                 return id
 
-    def start(self, address):
+    def start(self, host, port):
         """
             Given an address (hostname, port) tries to start listening.
         """
-        if not self.server.listen(address[0], address[1]):
+        if not self.server.listen(host, port):
             raise RuntimeError('Network error: cannot listen')
 
     def stop(self):
@@ -66,10 +67,11 @@ class Server(QtCore.QObject):
             Zero or more new connections might be available, give them an id and wire them.
         """
         while self.server.hasPendingConnections():
-            socket = self.server.nextPendingConnection()
+            socket = self.server.nextPendingConnection() # returns a QTcpSocket
             # get id
             id = self.create_id()
             self.connections[id] = socket
+            print('new connection id {}, address {}, port {}'.format(id, socket.peerAddress().toString(), socket.peerPort()))
             # connect
             socket.disconnected.connect(partial(self.disconnected, id))
             socket.readyRead.connect(partial(self.receive, id))
@@ -92,14 +94,15 @@ class Server(QtCore.QObject):
             A certain connection (identified by its id) wants to send us something.
         """
         socket = self.connections[id]
-        reader = QtCore.QDataStream(socket)
-        message = reader.readString()
+        value = read_from_socket_uncompress_and_deserialize(socket)
+        print('connection id {} received {}'.format(id, json.dumps(value)))
 
-    def send(self, id, message):
+    def send(self, id, value):
         """
             We send a message to a certain connection (identified by its id).
         """
         socket = self.connections[id]
-        writer = QtCore.QDataStream(socket)
-        writer.setVersion(QtCore.QDataStream.Qt_4_8)
-        writer.writeString(message)
+        serialize_compress_and_write_to_socket(socket, value)
+
+# create a local server
+local_server = Server()

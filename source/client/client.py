@@ -21,7 +21,7 @@
 # TODO automatic placement of help dialog depending on if another dialog is open
 # TODO help dialog has close button in focus initially (why?) remove this
 
-import json, os
+import json, os, zlib, codecs
 
 from PySide import QtCore, QtGui
 
@@ -151,8 +151,43 @@ def scenario_read_as_preview(file_name):
     scenario = Scenario()
     scenario.load(file_name)
     preview = {}
+    preview['message.id'] = 'preview'
+    preview['message.file'] = file_name
 
-    return preview
+    # scenario copy keys
+    scenario_copy_keys = [TITLE, MAP_COLUMNS, MAP_ROWS]
+    for key in scenario_copy_keys:
+        preview[key] = scenario[key]
+
+    # copy a bit of nations
+    nations = {}
+    nation_copy_keys = ['color', 'name']
+    for nation in scenario.all_nations():
+        nations[nation] = {}
+        for key in nation_copy_keys:
+            nations[key] = scenario.get_nation_property(nation, key)
+    preview['nations'] = nations
+
+    # assemble map
+    columns = scenario[MAP_COLUMNS]
+    rows = scenario[MAP_ROWS]
+    map = [0] * (columns * rows)
+    for nation in scenario.all_nations():
+        provinces = scenario.get_provinces_of_nation(nation)
+        for province in provinces:
+            tiles = scenario.get_province_property(province, 'tiles')
+            for column, row in tiles:
+                map[row * columns + column] = nation
+    preview['map'] = map
+
+    # convert to json
+    message = json.dumps(preview, separators=(',',':'))
+
+    # zip it
+    compressed = zlib.compress(message.encode())
+
+    return compressed
+
 
 class SinglePlayerScenarioSelection(QtGui.QWidget):
 
@@ -180,8 +215,8 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         layout.addWidget(map, 0, 1, 2)
         scenario_alternative_button = QtGui.QPushButton('Select another')
         layout.addWidget(scenario_alternative_button, 1, 0)
-        info = QtGui.QWidget()
-        layout.addWidget(info, 2, 0, 1, 2)
+        self.info = QtGui.QLabel()
+        layout.addWidget(self.info, 2, 0, 1, 2)
         layout.setRowStretch(2, 1) # infobox gets all the height
         layout.setColumnStretch(1, 1) # map gets all the width
 
@@ -191,7 +226,12 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         self.new_selected_scenario(file_name)
 
     def new_selected_scenario(self, file_name):
-        preview = scenario_read_as_preview(file_name)
+        compressed = scenario_read_as_preview(file_name)
+        message = zlib.decompress(compressed).decode()
+        preview = json.loads(message)
+        text = 'Title: {}'.format(preview[TITLE])
+        text += '<br>Number nations: {}'.format(len(preview['nations']))
+        self.info.setText(text)
 
 
 class GameLobbyWidget(QtGui.QWidget):
@@ -261,7 +301,6 @@ class OptionsContentWidget(QtGui.QWidget):
 
         toolbar = QtGui.QToolBar()
         toolbar.setIconSize(QtCore.QSize(32, 32))
-
         action_group = QtGui.QActionGroup(toolbar)
 
         action_initial = g.create_action(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, self.show_tab_general, True)
@@ -444,12 +483,6 @@ class Client():
         # main window
         self.main_window = MainWindow()
 
-        # add server monitor
-        action = QtGui.QAction(self.main_window)
-        action.setShortcut(QtGui.QKeySequence('F1'))
-        action.triggered.connect(self.show_server_monitor)
-        self.main_window.addAction(action)
-
         # help browser
         self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
         self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
@@ -457,6 +490,18 @@ class Client():
         # move to lower right border, so that overlap with other windows is not that strong
         self.help_dialog.move(self.main_window.x() + self.main_window.width() - 800,
                               self.main_window.y() + self.main_window.height() - 600)
+
+        # add help browser keyboard shortcut
+        action = QtGui.QAction(self.main_window)
+        action.setShortcut(QtGui.QKeySequence('F1'))
+        action.triggered.connect(self.show_help_browser)
+        self.main_window.addAction(action)
+
+        # add server monitor keyboard shortcut
+        action = QtGui.QAction(self.main_window)
+        action.setShortcut(QtGui.QKeySequence('F2'))
+        action.triggered.connect(self.show_server_monitor)
+        self.main_window.addAction(action)
 
         # for the notifications
         self.pending_notifications = []
@@ -470,6 +515,10 @@ class Client():
         # start audio player if wished
         if not t.options[c.OM_BG_MUTE]:
             self.player.start()
+
+        # after the player starts, the main window is not active anymore
+        # set it active again or it doesn't get keyboard focus
+        self.main_window.activateWindow()
 
     def audio_notification(self, title):
         """
@@ -512,6 +561,7 @@ class Client():
     def show_server_monitor(self):
         monitor_widget = ServerMonitorWidget()
         dialog = cg.GameDialog(self.main_window, monitor_widget, delete_on_close=True, title='Server Monitor')
+        dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
     def switch_to_start_screen(self):

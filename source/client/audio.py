@@ -58,14 +58,14 @@ class Player(QtCore.QObject):
 
     next = QtCore.Signal(str)
 
-    def __init__(self):
+    def __init__(self, parent=None):
         """
             Setups the sound system.
             Ticks are not implemented because we don't need them but in case we do it is fairly simple.
 
             TODO what if there are no sound capabilities, is this sure at this point that we have them?
         """
-        super().__init__()
+        super().__init__(parent=parent)
 
         # set up audio output and media object and connect both
         self.audio_output = Phonon.AudioOutput(Phonon.MusicCategory, self)

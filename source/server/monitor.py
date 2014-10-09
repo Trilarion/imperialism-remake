@@ -15,8 +15,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PySide import QtCore, QtGui
+from server.network import local_server
 
 class ServerMonitorWidget(QtGui.QWidget):
 
     def __init__(self):
         super().__init__()
+
+        layout = QtGui.QGridLayout(self)
+
+        self.status_label = QtGui.QLabel()
+        layout.addWidget(self.status_label, 0, 0)
+
+        # set timer for update
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update_monitor)
+        self.timer.setInterval(60000) # every second
+        self.timer.start()
+        self.update_monitor()
+
+    def update_monitor(self):
+        text = '{} connections'.format(len(local_server.connections))
+        self.status_label.setText(text)

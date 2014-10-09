@@ -101,9 +101,13 @@ if __name__ == '__main__':
         t.options[c.OG_MW_FULLSCREEN] = False
 
     # now we can safely assume that the environment is good to us
-    # and we simply start the client
-    from client import client
 
+    # start local server
+    from server.network import local_server
+    local_server.start(c.LOCALHOST, c.NETWORK_PORT)
+
+    # start client
+    from client import client
     client.start()
 
     # save options
