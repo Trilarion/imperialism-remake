@@ -14,26 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtCore, QtGui
-from server.network import server
+from PySide import QtCore
 
-class ServerMonitorWidget(QtGui.QWidget):
+class ServerClientManager():
+
+    def __init__(self):
+        self.clients_chat = []
+
+    def chat_register(self, client):
+
+    def chat_unregister(self, client):
+
+    def chat_broadcast(self, client, text):
+
+manager = ServerClientManager()
+
+class ServerClient(QtCore.QObject):
+
+    send = QtCore.Signal(dict)
 
     def __init__(self):
         super().__init__()
 
-        layout = QtGui.QGridLayout(self)
-
-        self.status_label = QtGui.QLabel()
-        layout.addWidget(self.status_label, 0, 0)
-
-        # set timer for update
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.update_monitor)
-        self.timer.setInterval(60000) # every second
-        self.timer.start()
-        self.update_monitor()
-
-    def update_monitor(self):
-        text = '{} clients'.format(len(server.clients))
-        self.status_label.setText(text)
+    def receive(self, message):
+        if message['type'] is 'chat.register':
+            manager.chat_register(self)
+        if message['type'] is 'chat.message':
+            manager.chat_broadcast(self, message['text'])

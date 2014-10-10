@@ -81,6 +81,12 @@ class GameDialog(QtGui.QWidget):
         close_action.triggered.connect(self.close)
         title_bar.addAction(close_action)
 
+        # escape key for close
+        action = QtGui.QAction(self)
+        action.setShortcut(QtGui.QKeySequence('Escape'))
+        action.triggered.connect(self.close)
+        self.addAction(action)
+
         # layout is 2 pixel contents margin (border), title bar and content widget
         self.layout = QtGui.QVBoxLayout(self)
         self.layout.setContentsMargins(2, 2, 2, 2)

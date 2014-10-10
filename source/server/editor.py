@@ -699,8 +699,6 @@ class EditorScreen(QtGui.QWidget):
         """
             Show the save a scenario dialog. Then saves it.
         """
-        if not self.scenario.valid:
-            return
         file_name = \
             QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
                 0]

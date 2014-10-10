@@ -26,7 +26,7 @@ class Client(QtCore.QObject):
     """
         Mostly a wrapper around QtNetwork.QTcpSocket and QDataStream to allow reading and writing of strings (messages).
     """
-    received = QtCore.Signal(str)
+    received = QtCore.Signal(dict)
 
     def __init__(self):
         """
@@ -34,8 +34,9 @@ class Client(QtCore.QObject):
         """
         super().__init__()
         self.socket = QtNetwork.QTcpSocket(self)
-        # some connections
+        # some clients
         self.socket.readyRead.connect(self.receive)
+        self.socket.disconnected.connect(self.disconnected)
         self.socket.error.connect(self.error)
 
     def login(self, host, port):
@@ -44,10 +45,14 @@ class Client(QtCore.QObject):
         """
         self.socket.connectToHost(host, port)
 
+    def disconnected(self):
+        print('client disconnected')
+
     def error(self):
         """
             Something went wrong. We should disconnect immediately.
         """
+        print('error will disconnect')
         self.socket.disconnectFromHost()
 
     def receive(self):
@@ -56,9 +61,10 @@ class Client(QtCore.QObject):
 
             TODO will the whole message arrive in one piece?
         """
-        value = read_from_socket_uncompress_and_deserialize(self.socket)
-        print('client received {}'.format(json.dumps(value)))
-        self.received.emit(value)
+        while self.socket.bytesAvailable() > 0:
+            value = read_from_socket_uncompress_and_deserialize(self.socket)
+            print('client received {}'.format(json.dumps(value)))
+            self.received.emit(value)
 
     def send(self, value):
         """
@@ -67,3 +73,5 @@ class Client(QtCore.QObject):
             TODO check if connected before, error if not
         """
         serialize_compress_and_write_to_socket(self.socket, value)
+
+client = Client()

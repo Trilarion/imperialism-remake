@@ -103,8 +103,8 @@ if __name__ == '__main__':
     # now we can safely assume that the environment is good to us
 
     # start local server
-    from server.network import local_server
-    local_server.start(c.LOCALHOST, c.NETWORK_PORT)
+    from server.network import server
+    server.start(c.NETWORK_PORT)
 
     # start client
     from client import client

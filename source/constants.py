@@ -21,7 +21,6 @@
 """
 
 import os
-from PySide import QtNetwork
 
 def extend(path, *parts):
     """
@@ -62,7 +61,6 @@ Global_Stylesheet = extend(Graphics_UI_Folder, 'style.css')
 # other specific constants
 
 # network communication
-LOCALHOST = QtNetwork.QHostAddress.LocalHost
 NETWORK_PORT = 42932
 
 # minimal screen resolution
