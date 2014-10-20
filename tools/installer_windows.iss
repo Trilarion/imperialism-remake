@@ -24,6 +24,8 @@ OutputBaseFilename=ImperialismRemake-{#MyAppVersion}-win
 SetupIconFile=..\data\artwork\graphics\ui\icon.ico
 Compression=lzma2/ultra
 SolidCompression=yes
+ArchitecturesAllowed=x64
+ArchitecturesInstallIn64BitMode=x64
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -33,7 +35,50 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\build\exe.win-amd64-3.4\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; download VC 2010 redistributable x64 from http://www.microsoft.com/en-us/download/details.aspx?id=13523
+Source: "..\build\vcredist_x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+
+[Run]
+; add the Parameters, WorkingDir and StatusMsg as you wish, just keep here
+; the conditional installation Check
+Filename: "{tmp}\vcredist_x64.exe"; Check: VCRedistNeedsInstall
+
+[Code]
+// see http://stackoverflow.com/questions/11137424/how-to-make-vcredist-x86-reinstall-only-if-not-yet-installed
+#IFDEF UNICODE
+  #DEFINE AW "W"
+#ELSE
+  #DEFINE AW "A"
+#ENDIF
+type
+  INSTALLSTATE = Longint;
+const
+  INSTALLSTATE_DEFAULT = 5;      // The product is installed for the current user.
+
+  VC_2010_SP1_REDIST_X64 = '{1D8E6291-B0D5-35EC-8441-6616F567A0F7}';
+
+function MsiQueryProductState(szProduct: string): INSTALLSTATE; 
+  external 'MsiQueryProductState{#AW}@msi.dll stdcall';
+
+function VCVersionInstalled(const ProductID: string): Boolean;
+begin
+  Result := MsiQueryProductState(ProductID) = INSTALLSTATE_DEFAULT;
+end;
+
+function VCRedistNeedsInstall: Boolean;
+var IsNotInstalled : boolean;
+begin
+  // here the Result must be True when you need to install your VCRedist
+  // or False when you don't need to, the following won't install your VC redist
+  // only when the Visual C++ 2010 SP1 Redist (x64) is installed
+  IsNotInstalled := not VCVersionInstalled(VC_2010_SP1_REDIST_X64);
+  if (IsNotInstalled) then
+  begin
+    MsgBox('Microsoft VC 2010 SP1 Runtime (x64) is required but not yet installed. Will start installer.', mbInformation, MB_OK);
+  end;
+  Result := IsNotInstalled;
+end;
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

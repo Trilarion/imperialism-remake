@@ -25,7 +25,7 @@ from cx_Freeze import setup, Executable
 import  manual_markdown_converter
 
 # version string
-version = '0.2.0'
+version = '0.2.1'
 
 # change to project root
 os.chdir('..')
@@ -39,7 +39,7 @@ options = {'build_exe': {
     'icon': os.path.join('data', 'artwork', 'graphics', 'ui', 'icon.ico'),
     'compressed': True,
     'include_in_shared_zip': True,
-    'include_msvcr': True,
+    'include_msvcr': False,
     'include_files': [('data', 'data')],
     'excludes': ['Tkinter']
 }}

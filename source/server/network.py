@@ -23,55 +23,20 @@ from functools import partial
 
 from PySide import QtNetwork
 
-from lib.network import *
+import lib.network as net
 
-SCOPE = {
-    'local': QtNetwork.QHostAddress.LocalHost,
-    'any': QtNetwork.QHostAddress.Any
-}
+class ServerClient(net.EnhancedSocket):
 
-class ServerNetworkClient(QtCore.QObject):
-
-    received = QtCore.Signal(dict)
-
-    def __init__(self, id, socket):
-        super().__init__()
-        self.id = id
-        self.socket = socket
-        self.socket.readyRead.connect(self.receive)
-        self.socket.error.connect(self.error)
-        print('new connection id {}, address {}, port {}'.format(id, socket.peerAddress().toString(), socket.peerPort()))
-
-    def receive(self):
-        while self.socket.bytesAvailable() > 0:
-            value = read_from_socket_uncompress_and_deserialize(self.socket)
-            print('connection id {} received {}'.format(self.id, json.dumps(value)))
-            self.received.emit(value)
-
-    def error(self):
-        self.socket.disconnectFromHost()
-
-    def send(self, value):
-        """
-            We send a message back to the client.
-        """
-        serialize_compress_and_write_to_socket(self.socket, value)
+    def __init__(self, socket):
+        super().__init__(socket)
 
 
-class Server(QtCore.QObject):
-    """
-        Wrapper around QtNetwork.QTcpServer and a management of several clients (each a QtNetwork.QTcpSocket).
-    """
 
-    new_client = QtCore.Signal(ServerNetworkClient)
+class Server(net.Server):
 
     def __init__(self):
-        """
-        """
-        super().__init__()
-        self.server = QtNetwork.QTcpServer(self)
-        self.server.newConnection.connect(self.new_connection)
-        self.clients = []
+        super().__init__(ServerClient)
+        self.new_client.connect(self.initialize_new_client)
 
     def new_id(self):
         """
@@ -83,49 +48,9 @@ class Server(QtCore.QObject):
             if id not in self.clients:
                 return id
 
-    def start(self, port, scope='local'):
-        """
-            Given an address (hostname, port) tries to start listening.
-            QtNetwork.QHostAddress.Any
-        """
-        host = SCOPE[scope]
-        if not self.server.listen(host, port):
-            raise RuntimeError('Network error: cannot listen')
+    def initialize_new_client(self, client):
+        pass
 
-    def isListening(self):
-        return self.server.isListening()
-
-    def scope(self):
-        if self.isListening():
-            return SCOPE.keys()[SCOPE.values().index(self.server.serverAddress())]
-        else:
-            return None
-
-    def stop(self):
-        """
-            Stopps listening.
-        """
-        if self.isListening():
-            self.server.close()
-
-    def new_connection(self):
-        """
-            Zero or more new clients might be available, give them an id and wire them.
-        """
-        while self.server.hasPendingConnections():
-            socket = self.server.nextPendingConnection() # returns a QTcpSocket
-            # create new client
-            client = ServerNetworkClient(self.new_id(), socket)
-            # add to client list
-            self.clients.extend([client])
-            # add disconnected signal to remove client
-            socket.disconnected.connect(partial(self.disconnected, client))
-
-    def disconnected(self, client):
-        """
-            One connection disconnected. Remove from list
-        """
-        self.clients.remove(client)
 
 # create a local server
 server = Server()
