@@ -18,60 +18,12 @@
     Client network code
 """
 
-from PySide import QtCore, QtNetwork
+import lib.network as net
 
-from lib.network import *
-
-class Client(QtCore.QObject):
-    """
-        Mostly a wrapper around QtNetwork.QTcpSocket and QDataStream to allow reading and writing of strings (messages).
-    """
-    received = QtCore.Signal(dict)
+class Client(net.Client):
 
     def __init__(self):
-        """
-            Create a socket.
-        """
         super().__init__()
-        self.socket = QtNetwork.QTcpSocket(self)
-        # some clients
-        self.socket.readyRead.connect(self.receive)
-        self.socket.disconnected.connect(self.disconnected)
-        self.socket.error.connect(self.error)
+        self.set_socket()
 
-    def login(self, host, port):
-        """
-            Given an address (list of two parts: hostname (str), port (int)) tries to connect the socket.
-        """
-        self.socket.connectToHost(host, port)
-
-    def disconnected(self):
-        print('client disconnected')
-
-    def error(self):
-        """
-            Something went wrong. We should disconnect immediately.
-        """
-        print('error will disconnect')
-        self.socket.disconnectFromHost()
-
-    def receive(self):
-        """
-            A new mesage came, read the message as string.
-
-            TODO will the whole message arrive in one piece?
-        """
-        while self.socket.bytesAvailable() > 0:
-            value = read_from_socket_uncompress_and_deserialize(self.socket)
-            print('client received {}'.format(json.dumps(value)))
-            self.received.emit(value)
-
-    def send(self, value):
-        """
-            Sends a message (a astring) over the socket.
-
-            TODO check if connected before, error if not
-        """
-        serialize_compress_and_write_to_socket(self.socket, value)
-
-client = Client()
+#client = Client()

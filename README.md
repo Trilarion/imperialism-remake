@@ -1,7 +1,6 @@
 # Imperialism Remake
 
-**[Home](http://remake.twelvepm.de/) - [Community](http://remake.twelvepm.de/forum/) - [Sources](https://github.com/Trilarion/Imperialism-Remake)
-- [Download](http://remake.twelvepm.de/home/download/) - [Tasks](http://remake.twelvepm.de/tasks/) - [Contact](http://remake.twelvepm.de/home/contact/)**
+**[Home](http://remake.twelvepm.de/) - [Community](http://remake.twelvepm.de/forum/) - [Sources](https://github.com/Trilarion/Imperialism-Remake) - [Download](http://remake.twelvepm.de/home/download/) - [Tasks](http://remake.twelvepm.de/tasks/) - [Contact](http://remake.twelvepm.de/home/contact/)**
 
 ## Getting Started
 

@@ -59,25 +59,53 @@ SCOPE = {
     'any': QtNetwork.QHostAddress.Any
 }
 
-class EnhancedSocket(QtCore.QObject):
+class Client(QtCore.QObject):
+    """
 
-    received = QtCore.Signal(dict)
+    """
+    connected = QtCore.Signal()
+    disconnected = QtCore.Signal()
+    error = QtCore.Signal(QtNetwork.QAbstractSocket.SocketError)
+    received = QtCore.Signal(object)
 
-    def __init__(self, socket):
+    def __init__(self):
+        """
+
+        """
         super().__init__()
+        self.socket = None
+        self.bytes_written = 0
+        #print('new connection id {}, address {}, port {}'.format(id, socket.peerAddress().toString(), socket.peerPort()))
+
+    def set_socket(self, socket=None):
+        if self.socket is not None:
+            raise RuntimeError('Socket already set!')
+        if socket is None:
+            socket = QtNetwork.QTcpSocket()
         self.socket = socket
+        self.socket.setParent(self.socket)
         self.socket.readyRead.connect(self.receive)
         self.socket.error.connect(self.error)
-        print('new connection id {}, address {}, port {}'.format(id, socket.peerAddress().toString(), socket.peerPort()))
+        self.socket.connected.connect(self.connected)
+        self.socket.disconnected.connect(self.disconnected)
+        self.socket.bytesWritten.connect(self.count_bytes_written)
+
+    def disconnectFromHost(self):
+        self.socket.disconnectFromHost()
+
+    def connectToHost(self, port, host='local'):
+        if host is 'local':
+            host = SCOPE['local']
+        self.socket.connectToHost(host, port)
 
     def receive(self):
+        """
+
+        """
         while self.socket.bytesAvailable() > 0:
             value = read_from_socket_uncompress_and_deserialize(self.socket)
             print('connection id {} received {}'.format(self.id, json.dumps(value)))
             self.received.emit(value)
-
-    def error(self):
-        self.socket.disconnectFromHost()
 
     def send(self, value):
         """
@@ -85,22 +113,23 @@ class EnhancedSocket(QtCore.QObject):
         """
         serialize_compress_and_write_to_socket(self.socket, value)
 
+    def count_bytes_written(self, bytes):
+        self.bytes_written += bytes
+
 
 class Server(QtCore.QObject):
     """
         Wrapper around QtNetwork.QTcpServer and a management of several clients (each a QtNetwork.QTcpSocket).
     """
 
-    new_client = QtCore.Signal(EnhancedSocket)
+    new_client = QtCore.Signal(QtNetwork.QTcpSocket)
 
-    def __init__(self, EnhancedSocketClass):
+    def __init__(self):
         """
         """
         super().__init__()
         self.server = QtNetwork.QTcpServer(self)
         self.server.newConnection.connect(self.new_connection)
-        self.clients = []
-        self.EnhancedSocketClass = EnhancedSocketClass
 
     def start(self, port, scope='local'):
         """
@@ -129,20 +158,12 @@ class Server(QtCore.QObject):
 
     def new_connection(self):
         """
-            Zero or more new clients might be available, give them an id and wire them.
+            Zero or more new clients might be available, emit new_client signal for each of them.
         """
         while self.server.hasPendingConnections():
-            socket = self.server.nextPendingConnection() # returns a QTcpSocket
-            # create new client
-            client = self.EnhancedSocketClass(socket)
-            # add to client list
-            self.clients.extend([client])
-            # add disconnected signal to remove client
-            socket.disconnected.connect(partial(self.disconnected, client))
+            # returns a new QTcpSocket
+            socket = self.server.nextPendingConnection()
+            # emit signal
+            self.new_client.emit(socket)
 
-    def disconnected(self, client):
-        """
-            One connection disconnected. Remove from list
-        """
-        self.clients.remove(client)
 

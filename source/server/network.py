@@ -19,38 +19,41 @@
 """
 
 import random
-from functools import partial
-
-from PySide import QtNetwork
+from PySide import QtCore
 
 import lib.network as net
 
-class ServerClient(net.EnhancedSocket):
-
-    def __init__(self, socket):
-        super().__init__(socket)
-
-
-
-class Server(net.Server):
+class ServerClient(net.Client):
 
     def __init__(self):
-        super().__init__(ServerClient)
-        self.new_client.connect(self.initialize_new_client)
+        super().__init__()
 
-    def new_id(self):
+class ServerManager(QtCore.QObject):
+
+    def __init__(self):
+        super().__init__()
+        self.server = net.Server()
+        self.server.new_client.connect(self.new_client)
+        self.server_clients = []
+
+    def new_client(self, socket):
+        client = ServerClient()
+        client.set_socket(socket)
+        client.id = self.create_new_id()
+
+        # finally add to list of clients
+        self.server_clients.append(client)
+
+    def create_new_id(self):
         """
             Creates a new random id in the range of 0 to 1e6.
         """
         while True:
             # theoretically this could take forever, practically only if we have 1e6 clients already
             id = random.randint(0, 1e6)
-            if id not in self.clients:
+            if not any([id == client.id for client in self.server_clients]):
+                # not any == none
                 return id
 
-    def initialize_new_client(self, client):
-        pass
-
-
 # create a local server
-server = Server()
+#manager = ServerManager()
