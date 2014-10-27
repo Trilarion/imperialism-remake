@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PySide import QtCore, QtGui
-#from server.network import manager
+from server.network import server_manager
 
 class ServerMonitorWidget(QtGui.QWidget):
 
@@ -35,6 +35,5 @@ class ServerMonitorWidget(QtGui.QWidget):
         self.update_monitor()
 
     def update_monitor(self):
-        pass
-        #text = '{} clients'.format(len(manager.server_clients))
-        #self.status_label.setText(text)
+        text = '{} clients'.format(len(server_manager.server_clients))
+        self.status_label.setText(text)

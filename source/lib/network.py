@@ -83,7 +83,7 @@ class Client(QtCore.QObject):
         if socket is None:
             socket = QtNetwork.QTcpSocket()
         self.socket = socket
-        self.socket.setParent(self.socket)
+        # self.socket.setParent(self)
         self.socket.readyRead.connect(self.receive)
         self.socket.error.connect(self.error)
         self.socket.connected.connect(self.connected)

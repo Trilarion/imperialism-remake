@@ -78,3 +78,15 @@ OG_MW_FULLSCREEN = 'graphics.full_screen'
 OG_FULLSCREEN_SUPPORTED = 'graphics.full_screen_supported'
 OM_PHONON_SUPPORTED = 'music.phonon_supported'
 OM_BG_MUTE = 'music.background.mute'
+
+# network communication messages
+from enum import Enum
+class AutoNumber(Enum):
+    def __new__(cls):
+        value = len(cls.__members__) + 1
+        obj = object.__new__(cls)
+        obj._value_ = value
+        return obj
+
+class MessageType(AutoNumber):
+    scenario_preview = ()

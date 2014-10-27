@@ -56,4 +56,4 @@ class ServerManager(QtCore.QObject):
                 return id
 
 # create a local server
-#manager = ServerManager()
+server_manager = ServerManager()

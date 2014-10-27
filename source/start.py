@@ -102,25 +102,9 @@ if __name__ == '__main__':
 
     # now we can safely assume that the environment is good to us
 
-    # start local server
-    #from server.network import manager
-    #manager.server.start(c.NETWORK_PORT)
-
-    # connect network client of client
-    #from client.network import client
-    #client.connectToHost(c.NETWORK_PORT)
-
     # start client
     from client import client
     client.start()
-
-    # disconnect client
-    #from client.network import client
-    #client.disconnectFromHost()
-
-    # stop server
-    #from server.network import manager
-    #manager.server.stop()
 
     # save options
     t.save_options(Options_File)

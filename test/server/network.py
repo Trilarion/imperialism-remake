@@ -1,23 +1,24 @@
 from PySide import QtCore, QtNetwork
 import constants as c
-from server.network import server
-from client.network import client
+from server.network import server_manager
+from client.network import network_client
 
 def setup():
-    server.start(c.NETWORK_PORT)
-    client.login(QtNetwork.QHostAddress.LocalHost, c.NETWORK_PORT)
+    server_manager.server.start(c.NETWORK_PORT)
+    network_client.connectToHost(c.NETWORK_PORT)
 
 def send():
     message = {
         'type': 'chat.register',
+        'message': c.MessageType.scenario_preview.value
     }
-    client.send(message)
+    network_client.send(message)
 
     message = {
         'type' : 'chat.message',
         'text' : 'Hi guys'
     }
-    client.send(message)
+    network_client.send(message)
 
 
 app = QtCore.QCoreApplication([])

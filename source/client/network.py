@@ -20,10 +20,10 @@
 
 import lib.network as net
 
-class Client(net.Client):
+class NetworkClient(net.Client):
 
     def __init__(self):
         super().__init__()
-        self.set_socket()
 
-#client = Client()
+network_client = NetworkClient()
+network_client.set_socket()

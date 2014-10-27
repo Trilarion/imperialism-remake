@@ -612,6 +612,23 @@ class Client():
         # close the main window
         self.main_window.close()
 
+def network_start():
+
+    # start local server
+    from server.network import server_manager
+    server_manager.server.start(c.NETWORK_PORT)
+
+    # connect network client of client
+    from client.network import network_client
+    network_client.connectToHost(c.NETWORK_PORT)
+
+
+    # TODO must be run at the end before app finishes
+    # disconnect client
+    #network_client.disconnectFromHost()
+
+    # stop server
+    #server_manager.server.stop()
 
 def start():
     # create app
@@ -643,4 +660,5 @@ def start():
     client.switch_to_start_screen()
 
     t.log_info('client initialized, start Qt app execution')
+    QtCore.QTimer.singleShot(0, network_start)
     app.exec_()
