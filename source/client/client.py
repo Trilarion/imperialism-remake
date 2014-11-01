@@ -34,7 +34,7 @@ from lib.browser import BrowserWidget
 from server.editor import EditorScreen
 from server.monitor import ServerMonitorWidget
 from server.scenario import * # TODO only temporary until we move everything back to the server
-
+from client.network import network_client
 
 class MapItem(QtCore.QObject):
     """
@@ -142,11 +142,6 @@ class StartScreen(QtGui.QWidget):
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
-def scenario_read_title(file_name):
-    reader = t.ZipArchiveReader(file_name)
-    properties = reader.read_as_json('properties')
-    return properties['title']
-
 def scenario_read_as_preview(file_name):
     scenario = Scenario()
     scenario.load(file_name)
@@ -200,13 +195,9 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         self.list_selection.setFixedWidth(150)
         self.list_selection.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
+        network_client.send((c.MsgID.cat_general, c.MsgID.scenario_titles))
 
-        # populate list
-        self.scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
-        self.scenario_files = [os.path.join(c.Core_Scenario_Folder, x) for x in self.scenario_files]
-        scenario_titles = [scenario_read_title(x) for x in self.scenario_files]
-        # TODO sort lists by title before adding to QListWidget
-        self.list_selection.addItems(scenario_titles)
+        # self.list_selection.addItems(scenario_titles)
         self.list_selection.itemSelectionChanged.connect(self.list_selection_changed)
 
 
@@ -303,7 +294,7 @@ class OptionsContentWidget(QtGui.QWidget):
         toolbar.setIconSize(QtCore.QSize(32, 32))
         action_group = QtGui.QActionGroup(toolbar)
 
-        action_initial = g.create_action(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, self.show_tab_general, True)
+        action_initial = g.create_action(t.load_ui_icon('icon.preferences.base.png'), 'Show base preferences', action_group, self.show_tab_general, True)
         toolbar.addAction(action_initial)
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group, self.show_tab_graphics, True))
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, self.show_tab_music, True))
@@ -619,7 +610,6 @@ def network_start():
     server_manager.server.start(c.NETWORK_PORT)
 
     # connect network client of client
-    from client.network import network_client
     network_client.connectToHost(c.NETWORK_PORT)
 
 

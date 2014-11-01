@@ -18,42 +18,80 @@
     Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
-import random
+import random, os
 from PySide import QtCore
 
-import lib.network as net
+from lib.network import Server
+from base.network import NetworkClient
+import constants as c, tools as t
 
-class ServerClient(net.Client):
+class GeneralActionsListener:
 
     def __init__(self):
-        super().__init__()
+        self.services = {
+            c.MsgID.scenario_titles.value : self.scenario_titles
+        }
+
+    def process(self, client, message):
+        # get subtype
+        subtype = message['type'][1]
+        if subtype in self.services:
+            self.services[subtype](client, message)
+
+    def scenario_titles(self, client, message):
+        # get all core scenario files
+        scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
+
+        # joing the path
+        scenario_files = [os.path.join(c.Core_Scenario_Folder, x) for x in scenario_files]
+
+        # read scenario titles
+        scenario_titles = []
+        for scenario_file in scenario_files:
+            reader = t.ZipArchiveReader(scenario_file)
+            properties = reader.read_as_json('properties')
+            scenario_titles.append(properties['title'])
+
+        # zip files and titles together
+        scenarios = zip(scenario_titles, scenario_files)
+
+        # sort them
+        scenarios = sorted(scenarios) # default sort order is by first element anyway
+
+        # return message
+        answer = {
+            'scenarios' : scenarios
+        }
+        client.send((c.MsgID.cat_general, c.MsgID.scenario_titles), answer)
+
 
 class ServerManager(QtCore.QObject):
 
     def __init__(self):
         super().__init__()
-        self.server = net.Server()
+        self.server = Server()
         self.server.new_client.connect(self.new_client)
         self.server_clients = []
 
     def new_client(self, socket):
-        client = ServerClient()
+        client = NetworkClient()
         client.set_socket(socket)
-        client.id = self.create_new_id()
 
-        # finally add to list of clients
-        self.server_clients.append(client)
-
-    def create_new_id(self):
-        """
-            Creates a new random id in the range of 0 to 1e6.
-        """
-        while True:
+        # give a new id
+        found_id = False
+        while not found_id:
             # theoretically this could take forever, practically only if we have 1e6 clients already
             id = random.randint(0, 1e6)
             if not any([id == client.id for client in self.server_clients]):
                 # not any == none
-                return id
+                found_id = True
+        client.id = id
+
+        # add a GeneralActionListener
+        client.register_listener(c.MsgID.cat_general, GeneralActionsListener())
+
+        # finally add to list of clients
+        self.server_clients.append(client)
 
 # create a local server
 server_manager = ServerManager()

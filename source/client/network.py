@@ -18,12 +18,8 @@
     Client network code
 """
 
-import lib.network as net
+import base.network as net
 
-class NetworkClient(net.Client):
-
-    def __init__(self):
-        super().__init__()
-
-network_client = NetworkClient()
+network_client = net.NetworkClient()
+network_client.id = -1
 network_client.set_socket()

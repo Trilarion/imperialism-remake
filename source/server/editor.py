@@ -619,7 +619,7 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog))
 
         self.toolbar.addSeparator()
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self, self.show_general_properties_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.base.png'), 'Edit base properties', self, self.show_general_properties_dialog))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self, self.show_provinces_dialog))
 

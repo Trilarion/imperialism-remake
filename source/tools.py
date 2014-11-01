@@ -27,7 +27,6 @@ from PySide import QtGui, QtCore
 
 import constants as c
 
-
 def load_ui_icon(name):
     """
         Load an icon from a base icon path.

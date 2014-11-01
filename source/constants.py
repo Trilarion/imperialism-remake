@@ -32,7 +32,7 @@ def extend(path, *parts):
         raise RuntimeError('constructed path {} does not exist'.format(extended))
     return extended
 
-# general folders (do not directly contain data)
+# base folders (do not directly contain data)
 Data_Folder = extend('.', 'data')
 Artwork_Folder = extend(Data_Folder, 'artwork')
 
@@ -88,5 +88,9 @@ class AutoNumber(Enum):
         obj._value_ = value
         return obj
 
-class MessageType(AutoNumber):
+class MsgID(AutoNumber):
+    # categories
+    cat_general = ()
+    # subtypes
     scenario_preview = ()
+    scenario_titles = ()
