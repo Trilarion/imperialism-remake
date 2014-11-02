@@ -195,9 +195,9 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         self.list_selection.setFixedWidth(150)
         self.list_selection.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
+        network_client.register_receiver(c.MsgID.cat_general, self.scenario_titles)
         network_client.send((c.MsgID.cat_general, c.MsgID.scenario_titles))
 
-        # self.list_selection.addItems(scenario_titles)
         self.list_selection.itemSelectionChanged.connect(self.list_selection_changed)
 
 
@@ -210,6 +210,10 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         layout.addWidget(self.info, 2, 0, 1, 2)
         layout.setRowStretch(2, 1) # infobox gets all the height
         layout.setColumnStretch(1, 1) # map gets all the width
+
+    def scenario_titles(self, client, message):
+        self.list_selection.addItems(message['scenarios'])
+        client.unregister_receiver(c.MsgID.cat_general, self.scenario_titles)
 
     def list_selection_changed(self):
         row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself

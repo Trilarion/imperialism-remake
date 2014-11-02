@@ -25,18 +25,43 @@ from lib.network import Server
 from base.network import NetworkClient
 import constants as c, tools as t
 
-class GeneralActionsListener:
+class ServerManager(QtCore.QObject):
 
     def __init__(self):
-        self.services = {
-            c.MsgID.scenario_titles.value : self.scenario_titles
+        super().__init__()
+        self.server = Server()
+        self.server.new_client.connect(self.new_client)
+        self.server_clients = []
+        self.general_actions = {
+            c.MsgID.scenario_titles : self.scenario_titles
         }
 
-    def process(self, client, message):
+    def new_client(self, socket):
+        client = NetworkClient()
+        client.set_socket(socket)
+
+        # give a new id
+        found_id = False
+        while not found_id:
+            # theoretically this could take forever, practically only if we have 1e6 clients already
+            id = random.randint(0, 1e6)
+            if not any([id == client.id for client in self.server_clients]):
+                # not any == none
+                found_id = True
+        client.id = id
+
+        # add a GeneralActionListener
+        client.register_receiver(c.MsgID.cat_general, self.general_actions_receiver)
+
+        # finally add to list of clients
+        self.server_clients.append(client)
+
+    def general_actions_receiver(self, client, message):
         # get subtype
-        subtype = message['type'][1]
-        if subtype in self.services:
-            self.services[subtype](client, message)
+        subtype = message['signature'][1]
+        if subtype in self.general_actions:
+            return self.general_actions[subtype](client, message)
+        return False
 
     def scenario_titles(self, client, message):
         # get all core scenario files
@@ -64,34 +89,7 @@ class GeneralActionsListener:
         }
         client.send((c.MsgID.cat_general, c.MsgID.scenario_titles), answer)
 
-
-class ServerManager(QtCore.QObject):
-
-    def __init__(self):
-        super().__init__()
-        self.server = Server()
-        self.server.new_client.connect(self.new_client)
-        self.server_clients = []
-
-    def new_client(self, socket):
-        client = NetworkClient()
-        client.set_socket(socket)
-
-        # give a new id
-        found_id = False
-        while not found_id:
-            # theoretically this could take forever, practically only if we have 1e6 clients already
-            id = random.randint(0, 1e6)
-            if not any([id == client.id for client in self.server_clients]):
-                # not any == none
-                found_id = True
-        client.id = id
-
-        # add a GeneralActionListener
-        client.register_listener(c.MsgID.cat_general, GeneralActionsListener())
-
-        # finally add to list of clients
-        self.server_clients.append(client)
+        return True
 
 # create a local server
 server_manager = ServerManager()

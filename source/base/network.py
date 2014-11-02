@@ -15,34 +15,44 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from lib.network import Client
+import constants as c
 
 class NetworkClient(Client):
 
     def __init__(self):
         super().__init__()
         self.received.connect(self.process)
-        self.listeners = {}
+        self.receivers = {}
+        self.id = -1
 
-    def register_listener(self, category, listener):
-        category = category.value
-        if category not in self.listeners:
-            self.listeners[category] = []
-        self.listeners[category].append(listener)
+    def register_receiver(self, category, listener):
+        if category not in self.receivers:
+            self.receivers[category] = []
+        self.receivers[category].append(listener)
 
-    def unregister_listener(self, listener):
-        for category in self.listeners:
-            if listener in self.listeners[category]:
-                self.listeners[category].remove(listener)
+    def unregister_receiver(self, category, listener):
+        if listener in self.receivers[category]:
+            self.receivers[category].remove(listener)
+        else:
+            raise RuntimeError('Receiver unknown.')
 
     def process(self, message):
-        # get category
-        category = message['type'][0]
-        if category in self.listeners:
-            for listener in self.listeners[category]:
-                listener.process(self, message)
+        # convert signature
+        message['signature'] = [c.MsgID(x) for x in message['signature']]
 
-    def send(self, type, message=None):
+        # get category
+        category = message['signature'][0]
+
+        # call all receivers until one returns True or there are None left
+        if category in self.receivers:
+            for receiver in self.receivers[category]:
+                if receiver(self, message) is True:
+                    return
+        # either there was no listener in this category or no listener returned true
+
+
+    def send(self, signature, message=None):
         if message is None:
             message = {}
-        message['type'] = [x.value for x in type]
+        message['signature'] = [x.value for x in signature]
         super().send(message)

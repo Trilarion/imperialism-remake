@@ -21,5 +21,4 @@
 import base.network as net
 
 network_client = net.NetworkClient()
-network_client.id = -1
 network_client.set_socket()
