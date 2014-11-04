@@ -195,11 +195,12 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         self.list_selection.setFixedWidth(150)
         self.list_selection.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
-        network_client.register_receiver(c.MsgID.cat_general, self.scenario_titles)
-        network_client.send((c.MsgID.cat_general, c.MsgID.scenario_titles))
+        # register us as recipient of server answer
+        network_client.add_service(c.MsgIDs.core_scenario_titles, self.scenario_titles)
+        # send message and ask for scenario titles
+        network_client.send(c.MsgIDs.core_scenario_titles)
 
         self.list_selection.itemSelectionChanged.connect(self.list_selection_changed)
-
 
         layout.addWidget(self.list_selection, 0, 0)
         map = QtGui.QWidget()
@@ -212,8 +213,9 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         layout.setColumnStretch(1, 1) # map gets all the width
 
     def scenario_titles(self, client, message):
-        self.list_selection.addItems(message['scenarios'])
-        client.unregister_receiver(c.MsgID.cat_general, self.scenario_titles)
+        scenario_titles, self.scenario_files = zip(*message['scenarios'])
+        self.list_selection.addItems(scenario_titles)
+        return True # will only be used once as receiver
 
     def list_selection_changed(self):
         row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself

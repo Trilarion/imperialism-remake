@@ -32,9 +32,6 @@ class ServerManager(QtCore.QObject):
         self.server = Server()
         self.server.new_client.connect(self.new_client)
         self.server_clients = []
-        self.general_actions = {
-            c.MsgID.scenario_titles : self.scenario_titles
-        }
 
     def new_client(self, socket):
         client = NetworkClient()
@@ -51,19 +48,12 @@ class ServerManager(QtCore.QObject):
         client.id = id
 
         # add a GeneralActionListener
-        client.register_receiver(c.MsgID.cat_general, self.general_actions_receiver)
+        client.add_service(c.MsgIDs.core_scenario_titles, self.core_scenario_titles)
 
         # finally add to list of clients
         self.server_clients.append(client)
 
-    def general_actions_receiver(self, client, message):
-        # get subtype
-        subtype = message['signature'][1]
-        if subtype in self.general_actions:
-            return self.general_actions[subtype](client, message)
-        return False
-
-    def scenario_titles(self, client, message):
+    def core_scenario_titles(self, client, message):
         # get all core scenario files
         scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
 
@@ -87,9 +77,7 @@ class ServerManager(QtCore.QObject):
         answer = {
             'scenarios' : scenarios
         }
-        client.send((c.MsgID.cat_general, c.MsgID.scenario_titles), answer)
-
-        return True
+        client.send(c.MsgIDs.core_scenario_titles, answer)
 
 # create a local server
 server_manager = ServerManager()

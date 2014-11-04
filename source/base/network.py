@@ -22,37 +22,36 @@ class NetworkClient(Client):
     def __init__(self):
         super().__init__()
         self.received.connect(self.process)
-        self.receivers = {}
+        self.services = {}
         self.id = -1
 
-    def register_receiver(self, category, listener):
-        if category not in self.receivers:
-            self.receivers[category] = []
-        self.receivers[category].append(listener)
+    def add_service(self, id, service):
+        if id in self.services:
+            raise RuntimeError('Already a service with this id registered.')
+        self.services[id] = service
 
-    def unregister_receiver(self, category, listener):
-        if listener in self.receivers[category]:
-            self.receivers[category].remove(listener)
-        else:
-            raise RuntimeError('Receiver unknown.')
+    def remove_service(self, id):
+        self.services.pop(id)
 
     def process(self, message):
         # convert signature
-        message['signature'] = [c.MsgID(x) for x in message['signature']]
+        message['id'] = c.MsgIDs(message['id'])
+        id = message['id']
 
-        # get category
-        category = message['signature'][0]
+        # do we have receivers in this category
+        if id not in self.services:
+            raise RuntimeError('No suitable service for this id.')
 
-        # call all receivers until one returns True or there are None left
-        if category in self.receivers:
-            for receiver in self.receivers[category]:
-                if receiver(self, message) is True:
-                    return
-        # either there was no listener in this category or no listener returned true
+        # execute service with message
+        response = self.services[id](self, message)
 
+        # if return value is true, remove service from services list
+        if response is True:
+            self.services.pop(id)
 
-    def send(self, signature, message=None):
+    def send(self, id, message=None):
         if message is None:
             message = {}
-        message['signature'] = [x.value for x in signature]
+        # need to convert enum to int (cannot be serialized)
+        message['id'] = id.value
         super().send(message)
