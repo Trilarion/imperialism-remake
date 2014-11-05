@@ -22,7 +22,7 @@
 
 import os
 
-import lib.utils as utils
+import lib.utils as u
 
 def extend(path, *parts):
     """
@@ -81,6 +81,6 @@ OG_FULLSCREEN_SUPPORTED = 'graphics.full_screen_supported'
 OM_PHONON_SUPPORTED = 'music.phonon_supported'
 OM_BG_MUTE = 'music.background.mute'
 
-class MsgIDs(utils.AutoNumber):
+class MsgIDs(u.AutoNumber):
     scenario_preview = ()
     core_scenario_titles = ()

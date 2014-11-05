@@ -19,9 +19,10 @@
 """
 
 import os
-os.chdir('..')
 
-import constants as c
+from base import constants as c
+
+os.chdir('..')
 
 rules = {}
 
@@ -37,7 +38,6 @@ terrain_names = {
 rules['terrain.names'] = terrain_names
 
 # save
-import tools as t
 file = c.Scenario_Ruleset_Standard_File
 print('write to {}'.format(file))
 t.write_json(file, rules)

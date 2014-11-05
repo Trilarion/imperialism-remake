@@ -18,12 +18,13 @@
     Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
-import random, os
-from PySide import QtCore
+import random
+import os
 
+import lib.utils as u
 from lib.network import Server
 from base.network import NetworkClient
-import constants as c, tools as t
+from server.scenario import *
 
 class ServerManager(QtCore.QObject):
 
@@ -49,6 +50,7 @@ class ServerManager(QtCore.QObject):
 
         # add a GeneralActionListener
         client.add_service(c.MsgIDs.core_scenario_titles, self.core_scenario_titles)
+        client.add_service(c.MsgIDs.scenario_preview, self.scenario_preview)
 
         # finally add to list of clients
         self.server_clients.append(client)
@@ -63,7 +65,7 @@ class ServerManager(QtCore.QObject):
         # read scenario titles
         scenario_titles = []
         for scenario_file in scenario_files:
-            reader = t.ZipArchiveReader(scenario_file)
+            reader = u.ZipArchiveReader(scenario_file)
             properties = reader.read_as_json('properties')
             scenario_titles.append(properties['title'])
 
@@ -78,6 +80,43 @@ class ServerManager(QtCore.QObject):
             'scenarios' : scenarios
         }
         client.send(c.MsgIDs.core_scenario_titles, answer)
+
+    def scenario_preview(self, client, message):
+        scenario = Scenario()
+        file_name = message['scenario'] # should be the file name
+        scenario.load(file_name)
+
+        preview = {}
+        preview['scenario'] = file_name
+
+        # scenario copy keys
+        scenario_copy_keys = [TITLE, MAP_COLUMNS, MAP_ROWS]
+        for key in scenario_copy_keys:
+            preview[key] = scenario[key]
+
+        # copy a bit of nations
+        nations = {}
+        nation_copy_keys = ['color', 'name']
+        for nation in scenario.all_nations():
+            nations[nation] = {}
+            for key in nation_copy_keys:
+                nations[key] = scenario.get_nation_property(nation, key)
+        preview['nations'] = nations
+
+        # assemble map
+        columns = scenario[MAP_COLUMNS]
+        rows = scenario[MAP_ROWS]
+        map = [0] * (columns * rows)
+        for nation in scenario.all_nations():
+            provinces = scenario.get_provinces_of_nation(nation)
+            for province in provinces:
+                tiles = scenario.get_province_property(province, 'tiles')
+                for column, row in tiles:
+                    map[row * columns + column] = nation
+        preview['map'] = map
+
+        # send return message
+        client.send(c.MsgIDs.scenario_preview, preview)
 
 # create a local server
 server_manager = ServerManager()

@@ -19,9 +19,10 @@
 """
 
 import os
-os.chdir('..')
 
-import constants as c
+from base import constants as c
+
+os.chdir('..')
 
 # options are stored as a dictionary
 options = {
@@ -36,6 +37,5 @@ options = {
 }
 
 # save
-import tools as t
 print('write to {}'.format(c.Options_Default_File))
 t.write_json(c.Options_Default_File, options)

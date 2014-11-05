@@ -19,6 +19,9 @@
 """
 
 import os
+
+from base import constants as c
+
 os.chdir('..')
 
 # hot areas map
@@ -60,7 +63,6 @@ map['options'] = {
 }
 
 # write
-import constants as c, tools as t
 file_name = os.path.join(c.Graphics_UI_Folder, 'start.overlay.info')
 print('write to {}'.format(file_name))
 t.write_json(file_name, map)

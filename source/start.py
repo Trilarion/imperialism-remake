@@ -35,7 +35,6 @@ if __name__ == '__main__':
         raise RuntimeError('PySide must be installed.')
 
     import os, codecs, shutil
-    import constants as c, tools as t
 
     # determine Debug_Mode from runtime arguments
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
@@ -65,6 +64,10 @@ if __name__ == '__main__':
     if not Debug_Mode:
         sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
         sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
+
+    # import some base libraries
+    from base import constants as c
+    from base import tools as t
 
     # search for existing options file, load it
     Options_File = os.path.join(User_Folder, 'options.info')

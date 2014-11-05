@@ -19,12 +19,13 @@
     know anything about the scenario, we put it in the server module.
 """
 
-import os, math
+import os
 
-from PySide import QtCore, QtGui
+from PySide import QtGui
 
-import constants as c
-import tools as t
+import math
+
+import base.tools as t
 import lib.graphics as g
 import client.graphics as cg
 from server.scenario import *
@@ -552,12 +553,14 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         """
             "Create scenario" is clicked.
         """
-        self.properties[TITLE] = self.properties[TITLE].text()
-        self.properties[MAP_COLUMNS] = int(self.properties[MAP_COLUMNS].text())
-        self.properties[MAP_ROWS] = int(self.properties[MAP_ROWS].text())
+        p = {}
+        p[TITLE] = self.properties[TITLE].text()
+        # TODO conversion can fail, placeholder values are not transferred here, only ''!
+        p[MAP_COLUMNS] = int(self.properties[MAP_COLUMNS].text())
+        p[MAP_ROWS] = int(self.properties[MAP_ROWS].text())
         # we close the parent window and emit the appropriate signal
         self.parent().close()
-        self.create_scenario.emit(self.properties)
+        self.create_scenario.emit(p)
 
 class GeneralPropertiesWidget(QtGui.QWidget):
 
@@ -619,7 +622,7 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog))
 
         self.toolbar.addSeparator()
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.base.png'), 'Edit base properties', self, self.show_general_properties_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.general.png'), 'Edit base properties', self, self.show_general_properties_dialog))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self, self.show_provinces_dialog))
 

@@ -13,9 +13,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+from base import constants as c
 
 from lib.network import Client
-import constants as c
+
 
 class NetworkClient(Client):
 

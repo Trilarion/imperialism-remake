@@ -21,15 +21,15 @@
 # TODO automatic placement of help dialog depending on if another dialog is open
 # TODO help dialog has close button in focus initially (why?) remove this
 
-import json, os, zlib, codecs
+import json
 
-from PySide import QtCore, QtGui
+from PySide import QtGui
 
-import constants as c
-import tools as t
+import base.tools as t
 import lib.graphics as g
 import client.graphics as cg
 import client.audio as audio
+
 from lib.browser import BrowserWidget
 from server.editor import EditorScreen
 from server.monitor import ServerMonitorWidget
@@ -142,48 +142,6 @@ class StartScreen(QtGui.QWidget):
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
-def scenario_read_as_preview(file_name):
-    scenario = Scenario()
-    scenario.load(file_name)
-    preview = {}
-    preview['message.id'] = 'preview'
-    preview['message.file'] = file_name
-
-    # scenario copy keys
-    scenario_copy_keys = [TITLE, MAP_COLUMNS, MAP_ROWS]
-    for key in scenario_copy_keys:
-        preview[key] = scenario[key]
-
-    # copy a bit of nations
-    nations = {}
-    nation_copy_keys = ['color', 'name']
-    for nation in scenario.all_nations():
-        nations[nation] = {}
-        for key in nation_copy_keys:
-            nations[key] = scenario.get_nation_property(nation, key)
-    preview['nations'] = nations
-
-    # assemble map
-    columns = scenario[MAP_COLUMNS]
-    rows = scenario[MAP_ROWS]
-    map = [0] * (columns * rows)
-    for nation in scenario.all_nations():
-        provinces = scenario.get_provinces_of_nation(nation)
-        for province in provinces:
-            tiles = scenario.get_province_property(province, 'tiles')
-            for column, row in tiles:
-                map[row * columns + column] = nation
-    preview['map'] = map
-
-    # convert to json
-    message = json.dumps(preview, separators=(',',':'))
-
-    # zip it
-    compressed = zlib.compress(message.encode())
-
-    return compressed
-
-
 class SinglePlayerScenarioSelection(QtGui.QWidget):
 
     def __init__(self):
@@ -197,6 +155,7 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
 
         # register us as recipient of server answer
         network_client.add_service(c.MsgIDs.core_scenario_titles, self.scenario_titles)
+        # TODO unregister if destroyed?
         # send message and ask for scenario titles
         network_client.send(c.MsgIDs.core_scenario_titles)
 
@@ -218,18 +177,19 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         return True # will only be used once as receiver
 
     def list_selection_changed(self):
+        # get selected file
         row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself
         file_name = self.scenario_files[row]
-        self.new_selected_scenario(file_name)
+        # regist5er us
+        network_client.add_service(c.MsgIDs.scenario_preview, self.scenario_preview)
+        # send a message
+        network_client.send(c.MsgIDs.scenario_preview, {'scenario': file_name})
 
-    def new_selected_scenario(self, file_name):
-        compressed = scenario_read_as_preview(file_name)
-        message = zlib.decompress(compressed).decode()
-        preview = json.loads(message)
-        text = 'Title: {}'.format(preview[TITLE])
-        text += '<br>Number nations: {}'.format(len(preview['nations']))
+    def scenario_preview(self, client, message):
+        text = 'Title: {}'.format(message[TITLE])
+        text += '<br>Number nations: {}'.format(len(message['nations']))
         self.info.setText(text)
-
+        return True # will only be used once
 
 class GameLobbyWidget(QtGui.QWidget):
     """

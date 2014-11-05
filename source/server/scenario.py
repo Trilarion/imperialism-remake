@@ -20,9 +20,11 @@
 """
 
 import math
+
 from PySide import QtCore
 
-import tools as t, constants as c
+from base import constants as c
+import lib.utils as u
 
 # some constants
 TITLE = 'title'
@@ -268,7 +270,7 @@ class Scenario(QtCore.QObject):
             Loads/deserializes all internal variables from a zipped archive via JSON.
         """
         self.reset()
-        reader = t.ZipArchiveReader(file_name)
+        reader = u.ZipArchiveReader(file_name)
         self._properties = reader.read_as_json('properties')
         self._map = reader.read_as_json('map')
         self._provinces = reader.read_as_json('provinces')
@@ -284,7 +286,7 @@ class Scenario(QtCore.QObject):
     def load_rules(self):
         # read rules
         rule_file = c.extend(c.Scenario_Ruleset_Folder, self._properties['rules'])
-        self._properties['rules'] = t.read_json(rule_file)
+        self._properties['rules'] = u.read_json(rule_file)
         # replace terrain_names
         self._properties['rules']['terrain.names'] = convert_keys_to_int(self._properties['rules']['terrain.names'])
 
@@ -292,7 +294,7 @@ class Scenario(QtCore.QObject):
         """
             Saves/serializes all internal variables via JSON into a zipped archive.
         """
-        writer = t.ZipArchiveWriter(file_name)
+        writer = u.ZipArchiveWriter(file_name)
         writer.write_json('properties', self._properties)
         writer.write_json('map', self._map)
         writer.write_json('provinces', self._provinces)

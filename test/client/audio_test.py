@@ -14,9 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtGui, QtCore
+from PySide import QtGui
+
 from client import audio
-import lib.graphics as g, tools as t
+import lib.graphics as g
+
 
 def show_notification(text):
     text = 'Playing {}'.format(text)

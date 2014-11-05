@@ -1,7 +1,9 @@
-from PySide import QtCore, QtNetwork
-import constants as c
+from PySide import QtCore
+
+from base import constants as c
 from server.network import server_manager
 from client.network import network_client
+
 
 def setup():
     server_manager.server.start(c.NETWORK_PORT)

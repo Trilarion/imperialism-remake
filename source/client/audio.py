@@ -23,7 +23,7 @@ import json
 from PySide import QtCore
 from PySide.phonon import Phonon
 
-import constants as c
+from base import constants as c
 
 
 def is_mime_type_ogg_available():

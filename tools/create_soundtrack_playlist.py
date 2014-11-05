@@ -21,6 +21,9 @@
 """
 
 import os
+
+from base import constants as c
+
 os.chdir('..')
 
 # create the playlist, a list of (filename, title)
@@ -28,6 +31,5 @@ playlist = [('01 Imperialism Theme.ogg', 'Imperialism Theme'),
             ('02 Silent Ashes.ogg', 'Silent Ashes')]
 
 # write
-import constants as c, tools as t
 print('write to {}'.format(c.Soundtrack_Playlist))
 t.write_json(c.Soundtrack_Playlist, playlist)

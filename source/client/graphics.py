@@ -16,13 +16,15 @@
 
 from PySide import QtGui, QtCore
 
+from base import tools as t
+
+
 """
     Graphics elements that are dependent on the tools and lib.graphics library, but not on any game specific (constants,
     scenario or otherwise) logic. Therefore kind of a intermediate abstraction between the fully independent lib.graphics
     module and the client game specific logic under folder client.
 """
 
-import tools as t
 import lib.graphics as g
 
 
