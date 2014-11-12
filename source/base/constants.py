@@ -32,7 +32,13 @@ def extend(path, *parts):
     extended = os.path.join(path, *parts)
     if not os.path.exists(extended):
         raise RuntimeError('constructed path {} does not exist'.format(extended))
+    if Debug_Mode:
+        Used_Resources.add(extended)
     return extended
+
+# debug mode and helpers
+Debug_Mode = False
+Used_Resources = set()
 
 # base folders (do not directly contain data)
 Data_Folder = extend('.', 'data')
@@ -63,7 +69,7 @@ Global_Stylesheet = extend(Graphics_UI_Folder, 'style.css')
 # other specific constants
 
 # network communication
-NETWORK_PORT = 42932
+Network_Port = 42932
 
 # minimal screen resolution
 Screen_Min_Size = (1024, 768)
@@ -72,15 +78,16 @@ Screen_Min_Size = (1024, 768)
 Options_Version = 1
 
 # option names
-O_VERSION = 'misc.version'
-O_OPTIONS_VERSION = 'misc.version.options'
-OG_MW_BOUNDS = 'graphics.mainwindow.bounds'
-OG_MW_MAXIMIZED = 'graphics.mainwindow.maximized'
-OG_MW_FULLSCREEN = 'graphics.full_screen'
-OG_FULLSCREEN_SUPPORTED = 'graphics.full_screen_supported'
-OM_PHONON_SUPPORTED = 'music.phonon_supported'
-OM_BG_MUTE = 'music.background.mute'
+O_Version = 'misc.version'
+O_Options_Version = 'misc.version.options'
+OG_MW_Bounds = 'graphics.mainwindow.bounds'
+OG_MW_Maximized = 'graphics.mainwindow.maximized'
+OG_MW_Fullscreen = 'graphics.full_screen'
+OG_Fullscreen_Supported = 'graphics.full_screen_supported'
+OM_Phonon_Supported = 'music.phonon_supported'
+OM_BG_Mute = 'music.background.mute'
 
 class MsgIDs(u.AutoNumber):
-    scenario_preview = ()
-    core_scenario_titles = ()
+    Scenario_Preview = ()
+    Core_Scenario_Titles = ()
+    Single_Player_Selection = ()

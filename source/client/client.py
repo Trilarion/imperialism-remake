@@ -138,7 +138,7 @@ class StartScreen(QtGui.QWidget):
             frame_item.setZValue(4)
             scene.addItem(mapitem.item)
 
-        version_label = QtGui.QLabel('<font color=#ffffff>{}</font>'.format(t.options[c.O_VERSION]))
+        version_label = QtGui.QLabel('<font color=#ffffff>{}</font>'.format(t.options[c.O_Version]))
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
@@ -154,10 +154,10 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         self.list_selection.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
         # register us as recipient of server answer
-        network_client.add_service(c.MsgIDs.core_scenario_titles, self.scenario_titles)
+        network_client.add_service(c.MsgIDs.Core_Scenario_Titles, self.scenario_titles)
         # TODO unregister if destroyed?
         # send message and ask for scenario titles
-        network_client.send(c.MsgIDs.core_scenario_titles)
+        network_client.send(c.MsgIDs.Core_Scenario_Titles)
 
         self.list_selection.itemSelectionChanged.connect(self.list_selection_changed)
 
@@ -181,9 +181,9 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself
         file_name = self.scenario_files[row]
         # regist5er us
-        network_client.add_service(c.MsgIDs.scenario_preview, self.scenario_preview)
+        network_client.add_service(c.MsgIDs.Scenario_Preview, self.scenario_preview)
         # send a message
-        network_client.send(c.MsgIDs.scenario_preview, {'scenario': file_name})
+        network_client.send(c.MsgIDs.Scenario_Preview, {'scenario': file_name})
 
     def scenario_preview(self, client, message):
         text = 'Title: {}'.format(message[TITLE])
@@ -260,7 +260,7 @@ class OptionsContentWidget(QtGui.QWidget):
         toolbar.setIconSize(QtCore.QSize(32, 32))
         action_group = QtGui.QActionGroup(toolbar)
 
-        action_initial = g.create_action(t.load_ui_icon('icon.preferences.base.png'), 'Show base preferences', action_group, self.show_tab_general, True)
+        action_initial = g.create_action(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, self.show_tab_general, True)
         toolbar.addAction(action_initial)
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group, self.show_tab_graphics, True))
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, self.show_tab_music, True))
@@ -310,7 +310,7 @@ class OptionsContentWidget(QtGui.QWidget):
 
         # full screen mode
         checkbox = QtGui.QCheckBox('Full screen mode')
-        self.register_checkbox(checkbox, c.OG_MW_FULLSCREEN)
+        self.register_checkbox(checkbox, c.OG_MW_Fullscreen)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -332,7 +332,7 @@ class OptionsContentWidget(QtGui.QWidget):
 
         # mute checkbox
         checkbox = QtGui.QCheckBox('Mute background music')
-        self.register_checkbox(checkbox, c.OM_BG_MUTE)
+        self.register_checkbox(checkbox, c.OM_BG_Mute)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -368,7 +368,7 @@ class OptionsContentWidget(QtGui.QWidget):
                 for (box, option) in self.checkboxes:
                     t.options[option] = box.isChecked()
                 # what else do we need to do?
-                if t.options[c.OM_BG_MUTE]:
+                if t.options[c.OM_BG_Mute]:
                     # t.player.stop()
                     pass
                 else:
@@ -391,7 +391,7 @@ class MainWindow(QtGui.QWidget):
         """
         super().__init__()
         # set geometry
-        self.setGeometry(t.options[c.OG_MW_BOUNDS])
+        self.setGeometry(t.options[c.OG_MW_Bounds])
         # set icon
         self.setWindowIcon(t.load_ui_icon('icon.ico'))
         # set title
@@ -403,10 +403,10 @@ class MainWindow(QtGui.QWidget):
         self.content = None
 
         # show in full screen, maximized or normal
-        if t.options[c.OG_MW_FULLSCREEN]:
+        if t.options[c.OG_MW_Fullscreen]:
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
             self.showFullScreen()
-        elif t.options[c.OG_MW_MAXIMIZED]:
+        elif t.options[c.OG_MW_Maximized]:
             self.showMaximized()
         else:
             self.show()
@@ -470,7 +470,7 @@ class Client():
         self.player.next.connect(self.audio_notification)
         self.player.set_playlist(audio.load_soundtrack_playlist())
         # start audio player if wished
-        if not t.options[c.OM_BG_MUTE]:
+        if not t.options[c.OM_BG_Mute]:
             self.player.start()
 
         # after the player starts, the main window is not active anymore
@@ -560,8 +560,8 @@ class Client():
             Cleans up and closes the main window which causes app.exec_() to finish.
         """
         # store state in options
-        t.options[c.OG_MW_BOUNDS] = self.main_window.normalGeometry()
-        t.options[c.OG_MW_MAXIMIZED] = self.main_window.isMaximized()
+        t.options[c.OG_MW_Bounds] = self.main_window.normalGeometry()
+        t.options[c.OG_MW_Maximized] = self.main_window.isMaximized()
 
         # audio
         # self.player.stop()
@@ -573,10 +573,10 @@ def network_start():
 
     # start local server
     from server.network import server_manager
-    server_manager.server.start(c.NETWORK_PORT)
+    server_manager.server.start(c.Network_Port)
 
     # connect network client of client
-    network_client.connectToHost(c.NETWORK_PORT)
+    network_client.connectToHost(c.Network_Port)
 
 
     # TODO must be run at the end before app finishes
@@ -601,9 +601,9 @@ def start():
         return
 
     # if no bounds are set, set resonable bounds
-    if not c.OG_MW_BOUNDS in t.options:
-        t.options[c.OG_MW_BOUNDS] = desktop.availableGeometry().adjusted(50, 50, -100, -100)
-        t.options[c.OG_MW_MAXIMIZED] = True
+    if not c.OG_MW_Bounds in t.options:
+        t.options[c.OG_MW_Bounds] = desktop.availableGeometry().adjusted(50, 50, -100, -100)
+        t.options[c.OG_MW_Maximized] = True
         t.log_info('No bounds of the main window stored, start maximized')
 
     # load global stylesheet to app

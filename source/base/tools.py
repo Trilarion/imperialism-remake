@@ -70,6 +70,9 @@ def log_write_entry(writer, prefix, text, exception=None):
     if exception is not None:
         print(header + exception, end='\r\n', file=writer)
 
+def find_unused_resources():
+    pass
+
 # singleton options dictionary (we only need one throughout the application)
 options = {}
 
@@ -82,9 +85,9 @@ def load_options(file_name):
     options = read_json(file_name)
 
     # main window bounding rectangle from list to QRect
-    if c.OG_MW_BOUNDS in options:
-        rect = options[c.OG_MW_BOUNDS]
-        options[c.OG_MW_BOUNDS] = QtCore.QRect(*rect)
+    if c.OG_MW_Bounds in options:
+        rect = options[c.OG_MW_Bounds]
+        options[c.OG_MW_Bounds] = QtCore.QRect(*rect)
 
 
 def save_options(file_name):
@@ -95,8 +98,8 @@ def save_options(file_name):
     data = options.copy()
 
     # main window bounding rectangle fromn QRect to list
-    rect = data[c.OG_MW_BOUNDS]
-    data[c.OG_MW_BOUNDS] = [rect.x(), rect.y(), rect.width(), rect.height()]
+    rect = data[c.OG_MW_Bounds]
+    data[c.OG_MW_Bounds] = [rect.x(), rect.y(), rect.width(), rect.height()]
 
     # write to file
     write_json(file_name, data)

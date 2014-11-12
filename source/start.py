@@ -36,13 +36,6 @@ if __name__ == '__main__':
 
     import os, codecs, shutil
 
-    # determine Debug_Mode from runtime arguments
-    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        Debug_Mode = True
-        print('debug mode on')
-    else:
-        Debug_Mode = False
-
     # determine home dir
     if os.name == 'posix':
         # Linux / Unix
@@ -58,10 +51,16 @@ if __name__ == '__main__':
     if not os.path.isdir(User_Folder):
         os.mkdir(User_Folder)
 
+    # determine Debug_Mode from runtime arguments
+    from base import constants as c
+    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
+        c.Debug_Mode = True
+        print('debug mode on')
+
     # redirect output to log files (will be overwritten each time)
     Log_File = os.path.join(User_Folder, 'remake.log')
     Error_File = os.path.join(User_Folder, 'remake.error.log')
-    if not Debug_Mode:
+    if not c.Debug_Mode:
         sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
         sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
 
@@ -79,29 +78,29 @@ if __name__ == '__main__':
     t.log_info('options loaded from user folder ({})'.format(User_Folder))
 
     # between versions the format of the options might change, then it's better to overwrite old options
-    if t.options[c.O_OPTIONS_VERSION] < c.Options_Version:
+    if t.options[c.O_Options_Version] < c.Options_Version:
         t.log_warning('outdated version of options, have been overwritten')
         shutil.copyfile(c.Options_Default_File, Options_File)
         t.load_options(Options_File)
 
     # test for phonon availability
-    if t.options[c.OM_PHONON_SUPPORTED]:
+    if t.options[c.OM_Phonon_Supported]:
         try:
             from PySide.phonon import Phonon
         except ImportError:
             t.log_error('Phonon backend not available, no sound.')
-            t.options[c.OM_PHONON_SUPPORTED] = False
+            t.options[c.OM_Phonon_Supported] = False
 
     # special case of some desktop environments under Linux where full screen mode does not work well
-    if t.options[c.OG_FULLSCREEN_SUPPORTED]:
+    if t.options[c.OG_Fullscreen_Supported]:
         desktop_session = os.environ.get("DESKTOP_SESSION")
         if desktop_session and (desktop_session.startswith('ubuntu') or 'xfce' in desktop_session
                                 or desktop_session.startswith('xubuntu') or 'gnome' in desktop_session):
-            t.options[c.OG_FULLSCREEN_SUPPORTED] = False
+            t.options[c.OG_Fullscreen_Supported] = False
             t.log_warning(
                 'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
-    if not t.options[c.OG_FULLSCREEN_SUPPORTED]:
-        t.options[c.OG_MW_FULLSCREEN] = False
+    if not t.options[c.OG_Fullscreen_Supported]:
+        t.options[c.OG_MW_Fullscreen] = False
 
     # now we can safely assume that the environment is good to us
 
@@ -112,6 +111,10 @@ if __name__ == '__main__':
     # save options
     t.save_options(Options_File)
     t.log_info('options saved')
+
+    # unused resources
+    if c.Debug_Mode:
+        t.find_unused_resources()
 
     # finished
     t.log_info('will exit soon - good bye')

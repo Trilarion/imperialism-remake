@@ -49,8 +49,8 @@ class ServerManager(QtCore.QObject):
         client.id = id
 
         # add a GeneralActionListener
-        client.add_service(c.MsgIDs.core_scenario_titles, self.core_scenario_titles)
-        client.add_service(c.MsgIDs.scenario_preview, self.scenario_preview)
+        client.add_service(c.MsgIDs.Core_Scenario_Titles, self.core_scenario_titles)
+        client.add_service(c.MsgIDs.Scenario_Preview, self.scenario_preview)
 
         # finally add to list of clients
         self.server_clients.append(client)
@@ -79,7 +79,7 @@ class ServerManager(QtCore.QObject):
         answer = {
             'scenarios' : scenarios
         }
-        client.send(c.MsgIDs.core_scenario_titles, answer)
+        client.send(c.MsgIDs.Core_Scenario_Titles, answer)
 
     def scenario_preview(self, client, message):
         scenario = Scenario()
@@ -116,7 +116,7 @@ class ServerManager(QtCore.QObject):
         preview['map'] = map
 
         # send return message
-        client.send(c.MsgIDs.scenario_preview, preview)
+        client.send(c.MsgIDs.Scenario_Preview, preview)
 
 # create a local server
 server_manager = ServerManager()

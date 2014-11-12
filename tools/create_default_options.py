@@ -26,14 +26,14 @@ os.chdir('..')
 
 # options are stored as a dictionary
 options = {
-    c.O_VERSION: 'v0.2.0 (2014-09-07)', # to be displayed on the start screen
-    c.O_OPTIONS_VERSION: 1, # version of options
+    c.O_Version: 'v0.2.0 (2014-09-07)', # to be displayed on the start screen
+    c.O_Options_Version: 1, # version of options
 
-    c.OG_MW_FULLSCREEN: True, # we start full screen (can be unset by the program for some linux desktop environments
-    c.OG_FULLSCREEN_SUPPORTED: True, # is full screen supported
+    c.OG_MW_Fullscreen: True, # we start full screen (can be unset by the program for some linux desktop environments
+    c.OG_Fullscreen_Supported: True, # is full screen supported
 
-    c.OM_PHONON_SUPPORTED: True,
-    c.OM_BG_MUTE: False
+    c.OM_Phonon_Supported: True,
+    c.OM_BG_Mute: False
 }
 
 # save
