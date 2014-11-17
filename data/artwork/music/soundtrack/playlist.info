@@ -1,10 +1,2 @@
-[
-  [
-    "01 Imperialism Theme.ogg",
-    "Imperialism Theme"
-  ],
-  [
-    "02 Silent Ashes.ogg",
-    "Silent Ashes"
-  ]
-]
+- !!python/tuple [01 Imperialism Theme.ogg, Imperialism Theme]
+- !!python/tuple [02 Silent Ashes.ogg, Silent Ashes]

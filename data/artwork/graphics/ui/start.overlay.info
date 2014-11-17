@@ -1,42 +1,20 @@
-{
-  "editor": {
-    "label": "Scenario Editor",
-    "offset": [
-      821,
-      60
-    ],
-    "overlay": "start.overlay.map.png"
-  },
-  "exit": {
-    "label": "Exit",
-    "offset": [
-      575,
-      412
-    ],
-    "overlay": "start.overlay.door.right.png"
-  },
-  "help": {
-    "label": "Help",
-    "offset": [
-      127,
-      397
-    ],
-    "overlay": "start.overlay.window.left.png"
-  },
-  "lobby": {
-    "label": "Game Lobby",
-    "offset": [
-      421,
-      459
-    ],
-    "overlay": "start.overlay.throne.png"
-  },
-  "options": {
-    "label": "Preferences",
-    "offset": [
-      832,
-      505
-    ],
-    "overlay": "start.overlay.fireplace.png"
-  }
-}
+editor:
+  label: Scenario Editor
+  offset: !!python/tuple [821, 60]
+  overlay: start.overlay.map.png
+exit:
+  label: Exit
+  offset: !!python/tuple [575, 412]
+  overlay: start.overlay.door.right.png
+help:
+  label: Help
+  offset: !!python/tuple [127, 397]
+  overlay: start.overlay.window.left.png
+lobby:
+  label: Game Lobby
+  offset: !!python/tuple [421, 459]
+  overlay: start.overlay.throne.png
+options:
+  label: Preferences
+  offset: !!python/tuple [832, 505]
+  overlay: start.overlay.fireplace.png

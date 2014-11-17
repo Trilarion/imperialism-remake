@@ -20,9 +20,10 @@
 
 import os
 
-from base import constants as c
-
 os.chdir('..')
+
+from base import constants as c
+from lib import utils as u
 
 rules = {}
 
@@ -40,4 +41,4 @@ rules['terrain.names'] = terrain_names
 # save
 file = c.Scenario_Ruleset_Standard_File
 print('write to {}'.format(file))
-t.write_json(file, rules)
+u.write_as_yaml(file, rules)

@@ -24,7 +24,7 @@ import datetime
 from PySide import QtGui, QtCore
 
 from base import constants as c
-from lib.utils import read_json, write_json
+from lib.utils import read_as_yaml, write_as_yaml
 
 
 def load_ui_icon(name):
@@ -82,7 +82,7 @@ def load_options(file_name):
         from list to QtCore.QRect.
     """
     global options
-    options = read_json(file_name)
+    options = read_as_yaml(file_name)
 
     # main window bounding rectangle from list to QRect
     if c.OG_MW_Bounds in options:
@@ -102,4 +102,4 @@ def save_options(file_name):
     data[c.OG_MW_Bounds] = [rect.x(), rect.y(), rect.width(), rect.height()]
 
     # write to file
-    write_json(file_name, data)
+    write_as_yaml(file_name, data)

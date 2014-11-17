@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import json, zlib, random
-from functools import partial
+import zlib
+import yaml
 
 from PySide import QtCore, QtNetwork
 
@@ -24,7 +24,7 @@ def serialize_compress_and_write_to_socket(socket, value):
 
     """
     # serialize value to json
-    serialized = json.dumps(value, indent=0)
+    serialized = yaml.dump(value, allow_unicode=True)
 
     # encode to utf-8 bytes and compress
     compressed = zlib.compress(serialized.encode())
@@ -50,7 +50,8 @@ def read_from_socket_uncompress_and_deserialize(socket):
     uncompressed = zlib.decompress(bytearray.data())
 
     # decode from utf-8 bytes to unicode and deserialize from json
-    deserialized = json.loads(uncompressed.decode())
+    # TODO security risk (scan and only allow safe Python objects)
+    deserialized = yaml.load(uncompressed.decode())
 
     return deserialized
 
@@ -104,7 +105,7 @@ class Client(QtCore.QObject):
         """
         while self.socket.bytesAvailable() > 0:
             value = read_from_socket_uncompress_and_deserialize(self.socket)
-            print('connection id {} received {}'.format(self.id, json.dumps(value)))
+            print('connection id {} received {}'.format(self.id, value))
             self.received.emit(value)
 
     def send(self, value):

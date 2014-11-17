@@ -66,7 +66,7 @@ class ServerManager(QtCore.QObject):
         scenario_titles = []
         for scenario_file in scenario_files:
             reader = u.ZipArchiveReader(scenario_file)
-            properties = reader.read_as_json('properties')
+            properties = reader.read_as_yaml('properties')
             scenario_titles.append(properties['title'])
 
         # zip files and titles together
@@ -84,17 +84,18 @@ class ServerManager(QtCore.QObject):
     def scenario_preview(self, client, message):
         scenario = Scenario()
         file_name = message['scenario'] # should be the file name
+        # TODO existing? can be loaded?
         scenario.load(file_name)
 
         preview = {}
         preview['scenario'] = file_name
 
-        # scenario copy keys
+        # some scenario properties should be copied
         scenario_copy_keys = [TITLE, MAP_COLUMNS, MAP_ROWS]
         for key in scenario_copy_keys:
             preview[key] = scenario[key]
 
-        # copy a bit of nations
+        # some nations properties should be copied
         nations = {}
         nation_copy_keys = ['color', 'name']
         for nation in scenario.all_nations():
@@ -103,7 +104,7 @@ class ServerManager(QtCore.QObject):
                 nations[key] = scenario.get_nation_property(nation, key)
         preview['nations'] = nations
 
-        # assemble map
+        # a nation map must be assembled
         columns = scenario[MAP_COLUMNS]
         rows = scenario[MAP_ROWS]
         map = [0] * (columns * rows)

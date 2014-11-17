@@ -22,9 +22,10 @@
 
 import os
 
-from base import constants as c
-
 os.chdir('..')
+
+from base import constants as c
+from lib import utils as u
 
 # create the playlist, a list of (filename, title)
 playlist = [('01 Imperialism Theme.ogg', 'Imperialism Theme'),
@@ -32,4 +33,4 @@ playlist = [('01 Imperialism Theme.ogg', 'Imperialism Theme'),
 
 # write
 print('write to {}'.format(c.Soundtrack_Playlist))
-t.write_json(c.Soundtrack_Playlist, playlist)
+u.write_as_yaml(c.Soundtrack_Playlist, playlist)

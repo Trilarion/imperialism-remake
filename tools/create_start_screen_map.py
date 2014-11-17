@@ -20,9 +20,10 @@
 
 import os
 
-from base import constants as c
-
 os.chdir('..')
+
+from base import constants as c
+from lib import utils as u
 
 # hot areas map
 map = {}
@@ -65,4 +66,4 @@ map['options'] = {
 # write
 file_name = os.path.join(c.Graphics_UI_Folder, 'start.overlay.info')
 print('write to {}'.format(file_name))
-t.write_json(file_name, map)
+u.write_as_yaml(file_name, map)

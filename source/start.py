@@ -25,8 +25,9 @@ if __name__ == '__main__':
     import sys
 
     # test for python version
-    if sys.version_info < (3, 3):
-        raise RuntimeError('Python version must be 3.3 at least.')
+    required_version = (3, 4)
+    if sys.version_info < required_version:
+        raise RuntimeError('Python version must be {}.{} at least.'.format(*required_version))
 
     # test for existence of PySide
     try:

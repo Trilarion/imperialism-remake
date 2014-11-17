@@ -20,9 +20,10 @@
 
 import os
 
-from base import constants as c
-
 os.chdir('..')
+
+from base import constants as c
+from lib import utils as u
 
 # options are stored as a dictionary
 options = {
@@ -38,4 +39,4 @@ options = {
 
 # save
 print('write to {}'.format(c.Options_Default_File))
-t.write_json(c.Options_Default_File, options)
+u.write_as_yaml(c.Options_Default_File, options)

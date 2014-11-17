@@ -35,8 +35,6 @@ class NetworkClient(Client):
         self.services.pop(id)
 
     def process(self, message):
-        # convert signature
-        message['id'] = c.MsgIDs(message['id'])
         id = message['id']
 
         # do we have receivers in this category
@@ -53,6 +51,6 @@ class NetworkClient(Client):
     def send(self, id, message=None):
         if message is None:
             message = {}
-        # need to convert enum to int (cannot be serialized)
-        message['id'] = id.value
+        # set id
+        message['id'] = id
         super().send(message)

@@ -33,10 +33,6 @@ MAP_ROWS = 'map.rows'
 RIVERS = 'rivers'
 
 
-def convert_keys_to_int(dict):
-    return {int(k): v for k, v in dict.items()}
-
-
 class Scenario(QtCore.QObject):
     """
         Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
@@ -271,31 +267,25 @@ class Scenario(QtCore.QObject):
         """
         self.reset()
         reader = u.ZipArchiveReader(file_name)
-        self._properties = reader.read_as_json('properties')
-        self._map = reader.read_as_json('map')
-        self._provinces = reader.read_as_json('provinces')
-        # convert keys from str to int
-        self._provinces = convert_keys_to_int(self._provinces)
+        self._properties = reader.read_as_yaml('properties')
+        self._map = reader.read_as_yaml('map')
+        self._provinces = reader.read_as_yaml('provinces')
         # TODO check all ids are smaller then len()
-        self._nations = reader.read_as_json('nations')
-        # convert keys from str to int
-        self._nations = convert_keys_to_int(self._nations)
+        self._nations = reader.read_as_yaml('nations')
         # TODO check all ids are smaller then len()
         self.load_rules()
 
     def load_rules(self):
         # read rules
         rule_file = c.extend(c.Scenario_Ruleset_Folder, self._properties['rules'])
-        self._properties['rules'] = u.read_json(rule_file)
-        # replace terrain_names
-        self._properties['rules']['terrain.names'] = convert_keys_to_int(self._properties['rules']['terrain.names'])
+        self._properties['rules'] = u.read_as_yaml(rule_file)
 
     def save(self, file_name):
         """
             Saves/serializes all internal variables via JSON into a zipped archive.
         """
         writer = u.ZipArchiveWriter(file_name)
-        writer.write_json('properties', self._properties)
-        writer.write_json('map', self._map)
-        writer.write_json('provinces', self._provinces)
-        writer.write_json('nations', self._nations)
+        writer.write_as_yaml('properties', self._properties)
+        writer.write_as_yaml('map', self._map)
+        writer.write_as_yaml('provinces', self._provinces)
+        writer.write_as_yaml('nations', self._nations)
