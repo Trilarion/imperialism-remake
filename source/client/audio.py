@@ -18,12 +18,11 @@
     Plays soundtrack music.
 """
 
-import json
-
 from PySide import QtCore
 from PySide.phonon import Phonon
 
 from base import constants as c
+from lib import utils as u
 
 
 def is_mime_type_ogg_available():
@@ -40,8 +39,7 @@ def load_soundtrack_playlist():
 
         A playlist is a list where each entry is a list of two strings: filepath, title
     """
-    file = open(c.Soundtrack_Playlist, 'r')
-    playlist = json.load(file)
+    playlist = u.read_as_yaml(c.Soundtrack_Playlist)
     # add the soundtrack folder to each file name
     for entry in playlist:
         entry[0] = c.extend(c.Soundtrack_Folder, entry[0])

@@ -510,7 +510,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         layout = QtGui.QVBoxLayout(box)
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(300)
-        edit.setPlaceholderText(self.properties[TITLE])
+        edit.setText(self.properties[TITLE])
         self.properties[TITLE] = edit
         layout.addWidget(edit)
         widget_layout.addWidget(box)
@@ -523,7 +523,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(50)
         edit.setValidator(QtGui.QIntValidator(0, 1000))
-        edit.setPlaceholderText(str(self.properties[MAP_COLUMNS]))
+        edit.setText(str(self.properties[MAP_COLUMNS]))
         self.properties[MAP_COLUMNS] = edit
         layout.addWidget(edit)
 
@@ -531,7 +531,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(50)
         edit.setValidator(QtGui.QIntValidator(0, 1000))
-        edit.setPlaceholderText(str(self.properties[MAP_ROWS]))
+        edit.setText(str(self.properties[MAP_ROWS]))
         self.properties[MAP_ROWS] = edit
         layout.addWidget(edit)
         layout.addStretch()
@@ -555,7 +555,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         """
         p = {}
         p[TITLE] = self.properties[TITLE].text()
-        # TODO conversion can fail, placeholder values are not transferred here, only ''!
+        # TODO conversion can fail, (ValueError) give error message
         p[MAP_COLUMNS] = int(self.properties[MAP_COLUMNS].text())
         p[MAP_ROWS] = int(self.properties[MAP_ROWS].text())
         # we close the parent window and emit the appropriate signal

@@ -28,13 +28,13 @@ from lib import utils as u
 rules = {}
 
 terrain_names = {
-    '0': 'Sea',
-    '1': 'Plain',
-    '2': 'Hills',
-    '3': 'Mountains',
-    '4': 'Tundra',
-    '5': 'Swamp',
-    '6': 'Desert'
+    0: 'Sea',
+    1: 'Plain',
+    2: 'Hills',
+    3: 'Mountains',
+    4: 'Tundra',
+    5: 'Swamp',
+    6: 'Desert'
 }
 rules['terrain.names'] = terrain_names
 

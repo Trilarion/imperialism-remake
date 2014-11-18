@@ -116,8 +116,7 @@ class StartScreen(QtGui.QWidget):
         }
 
         image_map_file = c.extend(c.Graphics_UI_Folder, 'start.overlay.info')
-        with open(image_map_file, 'r') as f:
-            image_map = json.load(f)
+        image_map = u.read_as_yaml(image_map_file)
 
         # security check, they have to be the same
         if actions.keys() != image_map.keys():

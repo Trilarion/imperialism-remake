@@ -28,8 +28,8 @@ from base import constants as c
 from lib import utils as u
 
 # create the playlist, a list of (filename, title)
-playlist = [('01 Imperialism Theme.ogg', 'Imperialism Theme'),
-            ('02 Silent Ashes.ogg', 'Silent Ashes')]
+playlist = [['01 Imperialism Theme.ogg', 'Imperialism Theme']]
+playlist.append(['02 Silent Ashes.ogg', 'Silent Ashes'])
 
 # write
 print('write to {}'.format(c.Soundtrack_Playlist))

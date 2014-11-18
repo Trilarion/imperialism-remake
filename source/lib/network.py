@@ -19,42 +19,6 @@ import yaml
 
 from PySide import QtCore, QtNetwork
 
-def serialize_compress_and_write_to_socket(socket, value):
-    """
-
-    """
-    # serialize value to json
-    serialized = yaml.dump(value, allow_unicode=True)
-
-    # encode to utf-8 bytes and compress
-    compressed = zlib.compress(serialized.encode())
-
-    # wrap in QByteArray
-    bytearray = QtCore.QByteArray(compressed)
-
-    # write using a data stream
-    writer = QtCore.QDataStream(socket)
-    writer.setVersion(QtCore.QDataStream.Qt_4_8)
-    writer << bytearray
-
-def read_from_socket_uncompress_and_deserialize(socket):
-    """
-
-    """
-    # read a QByteArray using a data stream
-    reader = QtCore.QDataStream(socket)
-    bytearray = QtCore.QByteArray()
-    reader >> bytearray
-
-    # uncompress bytes from bytearray
-    uncompressed = zlib.decompress(bytearray.data())
-
-    # decode from utf-8 bytes to unicode and deserialize from json
-    # TODO security risk (scan and only allow safe Python objects)
-    deserialized = yaml.load(uncompressed.decode())
-
-    return deserialized
-
 SCOPE = {
     'local': QtNetwork.QHostAddress.LocalHost,
     'any': QtNetwork.QHostAddress.Any
@@ -101,18 +65,45 @@ class Client(QtCore.QObject):
 
     def receive(self):
         """
-
+            While there are messages available read them and process them.
+            Reading is reading of a QByteArray from the TCPSocket, uncompressing and deserializing.
         """
         while self.socket.bytesAvailable() > 0:
-            value = read_from_socket_uncompress_and_deserialize(self.socket)
+            # read a QByteArray using a data stream
+            reader = QtCore.QDataStream(self.socket)
+            bytearray = QtCore.QByteArray()
+            reader >> bytearray
+
+            # uncompress bytes from bytearray
+            uncompressed = zlib.decompress(bytearray.data())
+
+            # security validator (check for everything that we do not like (!!python)
+            # TODO implement this
+
+            # decode from utf-8 bytes to unicode and deserialize from yaml
+            value = yaml.load(uncompressed.decode())
+
             print('connection id {} received {}'.format(self.id, value))
             self.received.emit(value)
 
     def send(self, value):
         """
             We send a message back to the client.
+            We do it by serialization, compressing and writing of a QByteArray to the TCPSocket.
         """
-        serialize_compress_and_write_to_socket(self.socket, value)
+        # serialize value to yaml
+        serialized = yaml.dump(value, allow_unicode=True)
+
+        # encode to utf-8 bytes and compress
+        compressed = zlib.compress(serialized.encode())
+
+        # wrap in QByteArray
+        bytearray = QtCore.QByteArray(compressed)
+
+        # write using a data stream
+        writer = QtCore.QDataStream(self.socket)
+        writer.setVersion(QtCore.QDataStream.Qt_4_8)
+        writer << bytearray
 
     def count_bytes_written(self, bytes):
         self.bytes_written += bytes

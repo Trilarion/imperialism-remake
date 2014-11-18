@@ -1,2 +1,1 @@
-terrain.names: {'0': Sea, '1': Plain, '2': Hills, '3': Mountains, '4': Tundra, '5': Swamp,
-  '6': Desert}
+terrain.names: {0: Sea, 1: Plain, 2: Hills, 3: Mountains, 4: Tundra, 5: Swamp, 6: Desert}

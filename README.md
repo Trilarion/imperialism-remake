@@ -32,7 +32,7 @@ Download and install latest [Python 3.X](https://www.python.org/downloads/). The
 
 ### Third Party Modules for Python
 
-Only PySide is required for running, Markdown and cx_Freeze are additionally required for developing.
+Only PySide and PyYAML are required for running, Markdown and cx_Freeze are additionally required for developing.
 
 #### PySide
 

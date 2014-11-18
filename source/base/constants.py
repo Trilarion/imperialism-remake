@@ -91,3 +91,14 @@ class MsgIDs(u.AutoNumber):
     Scenario_Preview = ()
     Core_Scenario_Titles = ()
     Single_Player_Selection = ()
+
+class TileDirections(u.AutoNumber):
+    """
+        Six directions for six neighbored tiles in clockwise order.
+    """
+    West = ()
+    NorthWest = ()
+    NorthEast = ()
+    East = ()
+    SouthEast = ()
+    SouthWest = ()

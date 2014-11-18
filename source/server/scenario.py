@@ -119,46 +119,71 @@ class Scenario(QtCore.QObject):
         index = row * self._properties[MAP_COLUMNS] + column
         return index
 
+    def get_neighbor_position(self, column, row, direction):
+        """
+
+        """
+        if direction is c.TileDirections.West:
+            # west
+            if column > 0:
+                return [column - 1, row]
+            else:
+                return None
+        elif direction is c.TileDirections.NorthWest:
+            # north-west
+            if row > 0:
+                if row % 2 == 0:
+                    # even rows (0, 2, 4, ..)
+                    return [column - 1, row - 1]
+                else:
+                    # odd rows (1, 3, 5, ..)
+                    return [column, row - 1]
+            else:
+                return None
+        elif direction is c.TileDirections.NorthEast:
+            # north-east
+            if row > 0:
+                if row % 2 == 0:
+                    # even rows (0, 2, 4, ..)
+                    return [column, row - 1]
+                else:
+                    # odd rows (1, 3, 5, ..)
+                    return [column + 1, row - 1]
+            else:
+                return None
+        elif direction is c.TileDirections.East:
+            # east
+            if column < self._properties[MAP_COLUMNS] - 1:
+                return [column + 1, row]
+            else:
+                return None
+        elif direction is c.TileDirections.SouthEast:
+            # south-east
+            if row < self._properties[MAP_ROWS] - 1:
+                if row % 2 == 0:
+                    # even rows (0, 2, 4, ..)
+                    return [column, row + 1]
+                else:
+                    # odd rows (1, 3, 5, ..)
+                    return [column + 1, row + 1]
+            else:
+                return None
+        elif direction is c.TileDirections.SouthWest:
+            # south-west
+            if row < self._properties[MAP_ROWS] - 1:
+                if row % 2 == 0:
+                    # even rows (0, 2, 4, ..)
+                    return [column - 1, row + 1]
+                else:
+                    # odd rows (1, 3, 5, ..)
+                    return [column, row + 1]
+            else:
+                return None
+
     def get_neighbored_tiles(self, column, row):
         tiles = []
-        # west
-        if column > 0:
-            tiles.append((column - 1, row))
-        # east
-        if column < self._properties[MAP_COLUMNS] - 1:
-            tiles.append((column + 1, row))
-        if row % 2 == 0:
-            # even row (0, 2, 4, ..)
-            # north
-            if row > 0:
-                # north-west
-                if column > 0:
-                    tiles.append((column - 1, row - 1))
-                # north-east always exists
-                tiles.append((column, row - 1))
-            # south
-            if row < self._properties[MAP_ROWS] - 1:
-                # south-west
-                if column > 0:
-                    tiles.append((column - 1, row + 1))
-                # south-east always exists
-                tiles.append((column, row + 1))
-        else:
-            # odd row (1, 3, 5, ..)
-            # north
-            if row > 0:
-                # north-west always exists
-                tiles.append((column, row - 1))
-                # north-east
-                if column < self._properties[MAP_COLUMNS] - 1:
-                    tiles.append((column + 1, row - 1))
-            # south
-            if row < self._properties[MAP_ROWS] - 1:
-                # south-west always exists
-                tiles.append((column, row + 1))
-                # south-east
-                if column < self._properties[MAP_COLUMNS] - 1:
-                    tiles.append((column + 1, row + 1))
+        for direction in c.TileDirections:
+            tiles.append(self.get_neighbor_position(column, row, direction))
         return tiles
 
     def __setitem__(self, key, value):

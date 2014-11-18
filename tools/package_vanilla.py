@@ -24,7 +24,7 @@ import os, shutil, zipfile
 import manual_markdown_converter
 
 # version string for file name encoding
-version = '0.2.0'
+version = '0.2.1'
 
 # change to project root
 os.chdir('..')

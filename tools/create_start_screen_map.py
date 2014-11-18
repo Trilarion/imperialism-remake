@@ -31,35 +31,35 @@ map = {}
 # exit
 map['exit'] = {
     'overlay': 'start.overlay.door.right.png',
-    'offset': (575, 412),
+    'offset': [575, 412],
     'label': 'Exit'
 }
 
 # help browser
 map['help'] = {
     'overlay': 'start.overlay.window.left.png',
-    'offset': (127, 397),
+    'offset': [127, 397],
     'label': 'Help'
 }
 
 # game lobby
 map['lobby'] = {
     'overlay': 'start.overlay.throne.png',
-    'offset': (421, 459),
+    'offset': [421, 459],
     'label': 'Game Lobby'
 }
 
 # editor
 map['editor'] = {
     'overlay': 'start.overlay.map.png',
-    'offset': (821, 60),
+    'offset': [821, 60],
     'label': 'Scenario Editor'
 }
 
 # options
 map['options'] = {
     'overlay': 'start.overlay.fireplace.png',
-    'offset': (832, 505),
+    'offset': [832, 505],
     'label': 'Preferences'
 }
 
