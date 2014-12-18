@@ -57,7 +57,7 @@ class EditorMiniMap(QtGui.QWidget):
         Small overview map
     """
 
-    Fixed_Width = 300
+    VIEW_WIDTH = 300
 
     focus_moved = QtCore.Signal(float, float)
 
@@ -69,55 +69,67 @@ class EditorMiniMap(QtGui.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
+        # the content is a scene
         self.scene = QtGui.QGraphicsScene()
 
+        # tracker rectangle that tracks the view of the main map
         self.tracker = QtGui.QGraphicsRectItem()
         self.tracker.setCursor(QtCore.Qt.PointingHandCursor)
         self.tracker.setZValue(1000)
         self.tracker.hide()
         self.scene.addItem(self.tracker)
 
+        # keeps the rectangle coordinates in normalized (0,1) coordinates
         self.tracker_bounds = None
 
+        # the view on the scene (no scroll bars)
         self.view = QtGui.QGraphicsView(self.scene)
         self.view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         layout.addWidget(self.view)
 
-        self.view.setFixedWidth(self.Fixed_Width)
-        self.view.setFixedHeight(math.floor(0.6 * self.Fixed_Width))
+        # the width and height (fixed width throughout the game)
+        self.view.setFixedWidth(self.VIEW_WIDTH)
+        view_height = math.floor(0.6 * self.VIEW_WIDTH)
+        self.view.setFixedHeight(view_height)
 
+        # tool bar below the mini map
         self.toolbar = QtGui.QToolBar()
         self.toolbar.setIconSize(QtCore.QSize(20, 20))
 
+        # action group (only one of them can be checked at each time)
         action_group = QtGui.QActionGroup(self.toolbar)
+        # political view in the beginning
         action_initial = g.create_action(t.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group, self.switch_to_political, True)
         self.toolbar.addAction(action_initial)
+        # geographical view
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group, self.switch_to_geographical, True))
 
+        # wrap tool bar into horizontal layout with stretch
         l = QtGui.QHBoxLayout()
         l.setContentsMargins(0, 0, 0, 0)
         l.addWidget(self.toolbar)
         l.addStretch()
 
-        # layout.addWidget(self.toolbar)
+        # add layout containing tool bar
         layout.addLayout(l)
 
+        # store scenario
         self.scenario = scenario
-        self.map_mode = 'political'
         self.removable_items = []
 
-        # we start in political mode
+        # and switch to political mode
+        self.map_mode = None
         action_initial.trigger()
 
     def redraw_map(self):
         # adjust view height
         columns = self.scenario[MAP_COLUMNS]
         rows = self.scenario[MAP_ROWS]
-        scale = self.Fixed_Width / columns
-        height = math.floor(scale * rows)
-        self.view.setFixedHeight(height)
-        self.view.setSceneRect(0, 0, self.Fixed_Width, height)
+        view_height = math.floor(rows / columns * self.VIEW_WIDTH)
+        tile_size = self.VIEW_WIDTH / columns
+        self.view.setFixedHeight(view_height)
+        self.scene.setSceneRect(0, 0, self.VIEW_WIDTH, view_height)
 
         # remove everything except tracker from the scene
         for item in self.removable_items:
@@ -127,11 +139,12 @@ class EditorMiniMap(QtGui.QWidget):
         if self.map_mode is 'political':
 
             # fill the ground layer with a neutral color
-            item = self.scene.addRect(0, 0, self.Fixed_Width, height)
+            item = self.scene.addRect(0, 0, self.VIEW_WIDTH, view_height)
             item.setBrush(QtCore.Qt.lightGray)
             item.setPen(g.TRANSPARENT_PEN)
             item.setZValue(0)
             self.removable_items.extend([item])
+            self.tracker.setPos(0, 0)
 
             # draw the nation borders and content (non-smooth)
 
@@ -151,7 +164,7 @@ class EditorMiniMap(QtGui.QWidget):
                 path = QtGui.QPainterPath()
                 for map_position in tiles:
                     sx, sy = self.scenario.scene_position(map_position[0], map_position[1])
-                    path.addRect(sx * scale, sy * scale, scale, scale)
+                    path.addRect(sx * self.VIEW_WIDTH, sy * view_height, tile_size, tile_size)
                 # simply (creates outline)
                 path = path.simplified()
                 # create a brush from the color
@@ -163,7 +176,7 @@ class EditorMiniMap(QtGui.QWidget):
         elif self.map_mode is 'geographical':
 
             # fill the background with sea (blue)
-            item = self.scene.addRect(0, 0, self.Fixed_Width, height)
+            item = self.scene.addRect(0, 0, self.VIEW_WIDTH, view_height)
             item.setBrush(QtCore.Qt.blue)
             item.setPen(g.TRANSPARENT_PEN)
             item.setZValue(0)
@@ -181,7 +194,7 @@ class EditorMiniMap(QtGui.QWidget):
                     if t != 0:
                         # not for sea
                         sx, sy = self.scenario.scene_position(column, row)
-                        paths[t].addRect(sx * scale, sy * scale, scale, scale)
+                        paths[t].addRect(sx * self.VIEW_WIDTH, sy * view_height, tile_size, tile_size)
             colors = {
                 1: QtCore.Qt.green,
                 2: QtCore.Qt.darkGreen,
@@ -227,6 +240,7 @@ class EditorMiniMap(QtGui.QWidget):
             self.tracker_bounds.moveTo(x, y)
             self.tracker.setPos(x * self.view.width(), y * self.view.height())
             self.focus_moved.emit(x, y)
+        #self.tracker.setPos(0, 0)
 
     def reset_tracker(self, bounds):
         """
@@ -258,20 +272,20 @@ class EditorMainMap(QtGui.QGraphicsView):
         self.setMouseTracking(True)
         self.current_column = -1
         self.current_row = -1
-        self.tile_size = 80
+        self.TILE_SIZE = 80
         self.scenario = scenario
 
     def redraw_map(self):
         """
-            When a scenario is loaded anew we need to draw the whole map new.
+            When a scenario is loaded new we need to draw the whole map new.
         """
         self.scene.clear()
 
         columns = self.scenario[MAP_COLUMNS]
         rows = self.scenario[MAP_ROWS]
 
-        width = (columns + 0.5) * self.tile_size
-        height = rows * self.tile_size
+        width = (columns + 0.5) * self.TILE_SIZE
+        height = rows * self.TILE_SIZE
         self.scene.setSceneRect(0, 0, width, height)
 
         # TODO should load only once and cache (universal cache)
@@ -301,7 +315,7 @@ class EditorMainMap(QtGui.QGraphicsView):
                 if t != 0:
                     # not for sea
                     sx, sy = self.scenario.scene_position(column, row)
-                    paths[t].addRect(sx * self.tile_size, sy * self.tile_size, self.tile_size, self.tile_size)
+                    paths[t].addRect(sx * self.TILE_SIZE, sy * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
         for t in paths:
             path = paths[t]
             path = path.simplified()
@@ -312,9 +326,9 @@ class EditorMainMap(QtGui.QGraphicsView):
         brush = QtGui.QBrush(QtCore.Qt.darkGray)
         for row in range(0, rows):
             if row % 2 == 0:
-                item = self.scene.addRect(columns * self.tile_size, row * self.tile_size, self.tile_size / 2, self.tile_size, pen=g.TRANSPARENT_PEN)
+                item = self.scene.addRect(columns * self.TILE_SIZE, row * self.TILE_SIZE, self.TILE_SIZE / 2, self.TILE_SIZE, pen=g.TRANSPARENT_PEN)
             else:
-                item = self.scene.addRect(0, row * self.tile_size, self.tile_size / 2, self.tile_size, pen=g.TRANSPARENT_PEN)
+                item = self.scene.addRect(0, row * self.TILE_SIZE, self.TILE_SIZE / 2, self.TILE_SIZE, pen=g.TRANSPARENT_PEN)
             item.setBrush(brush)
             item.setZValue(1)
 
@@ -327,8 +341,8 @@ class EditorMainMap(QtGui.QGraphicsView):
             path = QtGui.QPainterPath()
             for tile in tiles:
                 sx, sy = self.scenario.scene_position(tile[0], tile[1])
-                x = (sx + 0.5) * self.tile_size
-                y = (sy + 0.5) * self.tile_size
+                x = (sx + 0.5) * self.TILE_SIZE
+                y = (sy + 0.5) * self.TILE_SIZE
                 if tile == tiles[0]:
                     path.moveTo(x, y)
                 else:
@@ -356,7 +370,7 @@ class EditorMainMap(QtGui.QGraphicsView):
                 tiles = self.scenario.get_province_property(province, 'tiles')
                 for column, row in tiles:
                     sx, sy = self.scenario.scene_position(column, row)
-                    province_path.addRect(sx * self.tile_size, sy * self.tile_size, self.tile_size, self.tile_size)
+                    province_path.addRect(sx * self.TILE_SIZE, sy * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
                 province_path = province_path.simplified()
                 item = self.scene.addPath(province_path, pen=province_border_pen)
                 item.setZValue(4)
@@ -375,8 +389,8 @@ class EditorMainMap(QtGui.QGraphicsView):
                 column, row = self.scenario.get_province_property(province, 'town_location')
                 sx, sy = self.scenario.scene_position(column, row)
                 # center city image on center of tile
-                x = (sx + 0.5) * self.tile_size - city_pixmap.width() / 2
-                y = (sy + 0.5) * self.tile_size - city_pixmap.height() / 2
+                x = (sx + 0.5) * self.TILE_SIZE - city_pixmap.width() / 2
+                y = (sy + 0.5) * self.TILE_SIZE - city_pixmap.height() / 2
                 item = self.scene.addPixmap(city_pixmap)
                 item.setOffset(x, y)
                 item.setZValue(6)
@@ -385,8 +399,8 @@ class EditorMainMap(QtGui.QGraphicsView):
                 item = self.scene.addSimpleText(province_name)
                 item.setPen(g.TRANSPARENT_PEN)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.darkRed))
-                x = (sx + 0.5) * self.tile_size - item.boundingRect().width() / 2
-                y = (sy + 1) * self.tile_size - item.boundingRect().height()
+                x = (sx + 0.5) * self.TILE_SIZE - item.boundingRect().width() / 2
+                y = (sy + 1) * self.TILE_SIZE - item.boundingRect().height()
                 item.setPos(x, y)
                 item.setZValue(6)
                 # display rounded rectangle below province name
@@ -407,7 +421,7 @@ class EditorMainMap(QtGui.QGraphicsView):
                 text = '({},{})'.format(column, row)
                 item = QtGui.QGraphicsSimpleTextItem(text)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.black))
-                item.setPos((sx + 0.5) * self.tile_size - item.boundingRect().width() / 2, sy * self.tile_size)
+                item.setPos((sx + 0.5) * self.TILE_SIZE - item.boundingRect().width() / 2, sy * self.TILE_SIZE)
                 item.setZValue(1001)
                 self.scene.addItem(item)
 
@@ -431,7 +445,7 @@ class EditorMainMap(QtGui.QGraphicsView):
 
     def mouseMoveEvent(self, event):
         # get mouse position in scene coordinates
-        scene_position = self.mapToScene(event.pos()) / self.tile_size
+        scene_position = self.mapToScene(event.pos()) / self.TILE_SIZE
         column, row = self.scenario.map_position(scene_position.x(), scene_position.y())
         if column != self.current_column or row != self.current_row:
             self.current_column = column
@@ -492,10 +506,11 @@ class InfoBox(QtGui.QWidget):
         pass
 
 
-# TODO widget without any focus, otherwise the placeholder texts are overwritten
 class NewScenarioDialogWidget(QtGui.QWidget):
     """
         New scenario dialog.
+
+        Here as in many other dialogs we do not use placeholders because in Qt 4.8 they are not returned by text() afterwards
     """
     create_scenario = QtCore.Signal(dict)
 
@@ -612,8 +627,10 @@ class EditorScreen(QtGui.QWidget):
         super().__init__()
 
         self.client = client
+
+        # create a standard scenario
         self.scenario = EditorScenario()
-        self.scenario.everything_changed.connect(self.scenario_change)
+        self.create_new_scenario(NEW_SCENARIO_DEFAULT_PROPERTIES)
 
         self.toolbar = QtGui.QToolBar()
         self.toolbar.setIconSize(QtCore.QSize(32, 32))
@@ -661,8 +678,8 @@ class EditorScreen(QtGui.QWidget):
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
 
-        # create a new scenario (to have something displayed at the beginning)
-        self.create_new_scenario(NEW_SCENARIO_DEFAULT_PROPERTIES)
+        # whenever the scenario changes completely, update the editor
+        self.scenario.everything_changed.connect(self.scenario_change)
 
     def create_new_scenario(self, properties):
         self.scenario.reset()

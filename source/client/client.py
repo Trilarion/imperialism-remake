@@ -171,11 +171,17 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         layout.setColumnStretch(1, 1) # map gets all the width
 
     def scenario_titles(self, client, message):
+        """
+            Receive all available scenario titles.
+        """
         scenario_titles, self.scenario_files = zip(*message['scenarios'])
         self.list_selection.addItems(scenario_titles)
         return True # will only be used once as receiver
 
     def list_selection_changed(self):
+        """
+            A new scenario title was selected. Send a message.
+        """
         # get selected file
         row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself
         file_name = self.scenario_files[row]
@@ -185,6 +191,9 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         network_client.send(c.MsgIDs.Scenario_Preview, {'scenario': file_name})
 
     def scenario_preview(self, client, message):
+        """
+            Receive scenario preview.
+        """
         text = 'Title: {}'.format(message[TITLE])
         text += '<br>Number nations: {}'.format(len(message['nations']))
         self.info.setText(text)

@@ -104,10 +104,10 @@ class ServerManager(QtCore.QObject):
                 nations[key] = scenario.get_nation_property(nation, key)
         preview['nations'] = nations
 
-        # a nation map must be assembled
+        # assemble a nations map (-1 means no nation)
         columns = scenario[MAP_COLUMNS]
         rows = scenario[MAP_ROWS]
-        map = [0] * (columns * rows)
+        map = [-1] * (columns * rows)
         for nation in scenario.all_nations():
             provinces = scenario.get_provinces_of_nation(nation)
             for province in provinces:

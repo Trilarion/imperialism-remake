@@ -208,6 +208,7 @@ class Scenario(QtCore.QObject):
         province = len(self._provinces)  # this always works because we check after loading
         self._provinces[province] = {}
         self._provinces[province]['tiles'] = []
+        self._provinces[province]['nation'] = None
         return province
 
     def set_province_property(self, province, key, value):
@@ -281,7 +282,9 @@ class Scenario(QtCore.QObject):
             Moves a province to a nation.
         """
         # TODO this is not right yet
+        # wire it in both ways
         self._nations[nation]['provinces'].append(province)
+        self._provinces[province]['nation'] = nation
 
     def get_terrain_name(self, terrain):
         return self._properties['rules']['terrain.names'][terrain]
