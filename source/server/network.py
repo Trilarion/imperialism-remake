@@ -20,8 +20,8 @@
 
 import random
 import os
+import time
 
-import lib.utils as u
 from lib.network import Server
 from base.network import NetworkClient
 from server.scenario import *
@@ -87,16 +87,19 @@ class ServerManager(QtCore.QObject):
         """
 
         """
+        t0 = time.clock()
+
         scenario = Scenario()
         file_name = message['scenario'] # should be the file name
         # TODO existing? can be loaded?
         scenario.load(file_name)
+        print('reading the file took {}s'.format(time.clock() - t0))
 
         preview = {}
         preview['scenario'] = file_name
 
         # some scenario properties should be copied
-        scenario_copy_keys = [MAP_COLUMNS, MAP_ROWS]
+        scenario_copy_keys = [MAP_COLUMNS, MAP_ROWS, TITLE, DESCRIPTION]
         for key in scenario_copy_keys:
             preview[key] = scenario[key]
 
@@ -106,7 +109,7 @@ class ServerManager(QtCore.QObject):
         for nation in scenario.all_nations():
             nations[nation] = {}
             for key in nation_copy_keys:
-                nations[key] = scenario.get_nation_property(nation, key)
+                nations[nation][key] = scenario.get_nation_property(nation, key)
         preview['nations'] = nations
 
         # assemble a nations map (-1 means no nation)
@@ -123,6 +126,8 @@ class ServerManager(QtCore.QObject):
 
         # send return message
         client.send(message['reply-to'], preview)
+
+        print('generating preview took {}s'.format(time.clock() - t0))
 
 # create a local server
 server_manager = ServerManager()

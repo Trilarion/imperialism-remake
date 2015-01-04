@@ -146,6 +146,9 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
 
     """
 
+    CH_TITLES = 'SP.scenario-selection.titles'
+    CH_PREVIEW = 'SP.scenario-selection.preview'
+
     def __init__(self):
         """
 
@@ -171,10 +174,28 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
 
         # info box
         self.info_box = QtGui.QWidget()
-        self.info_box.setFixedHeight(200)
-        layout.addWidget(self.info_box, 1, 0, 1, 2)
+        self.info_box.setFixedHeight(250)
+        layout.addWidget(self.info_box, 1, 0, 1, 2) # always row, column
 
         # content of info box
+        l = QtGui.QGridLayout(self.info_box)
+        l.setContentsMargins(0, 0, 0, 0)
+        self.scenario_description = QtGui.QTextEdit()
+        self.scenario_description.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.scenario_description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.scenario_description.setReadOnly(True)
+        self.scenario_description.setFixedHeight(80)
+        l.addWidget(self.scenario_description, 0, 0, 1, 2)
+        self.list_nations = QtGui.QListWidget()
+        self.list_nations.setFixedWidth(150)
+        self.list_nations.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        l.addWidget(self.list_nations, 1, 0)
+        self.nation_description = QtGui.QTextEdit()
+        self.nation_description.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.nation_description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.nation_description.setReadOnly(True)
+        l.addWidget(self.nation_description, 1, 1)
+
 
         # stretching of the elements
         layout.setRowStretch(0, 1) # info box gets all the height
@@ -185,11 +206,12 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar, self.start_scenario_clicked))
         layout.addWidget(toolbar, 2, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
-        # TODO unregister if destroyed?
+        # add two channels
+        network_client.connect_to_channel(self.CH_TITLES, self.scenario_titles)
+        network_client.connect_to_channel(self.CH_PREVIEW, self.scenario_preview)
 
         # send message and ask for scenario titles
-        network_client.connect_to_channel('SP.scenario-selection.titles', self.scenario_titles)
-        network_client.send(c.CH_CORE_SCENARIO_TITLES, {'reply-to': 'SP.scenario-selection.titles'})
+        network_client.send(c.CH_CORE_SCENARIO_TITLES, {'reply-to': self.CH_TITLES})
 
     def scenario_titles(self, client, message):
         """
@@ -197,7 +219,6 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         """
         scenario_titles, self.scenario_files = zip(*message['scenarios'])
         self.list_selection.addItems(scenario_titles)
-        return True # will only be used once as receiver
 
     def list_selection_changed(self):
         """
@@ -207,20 +228,26 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself
         file_name = self.scenario_files[row]
         # register us
-        #network_client.add_service(c.MsgIDs.Scenario_Preview, self.scenario_preview)
         # send a message
-        network_client.send(c.CH_SCENARIO_PREVIEW, {'scenario': file_name})
+        network_client.send(c.CH_SCENARIO_PREVIEW, {'scenario': file_name, 'reply-to': self.CH_PREVIEW})
 
     def scenario_preview(self, client, message):
         """
             Receive scenario preview.
         """
-        #text = '<br>Number nations: {}'.format(len(message['nations']))
-        #self.info_box.setText(text)
-        return True # will only be used once
+        self.scenario_description.setText(message[DESCRIPTION])
+        nations = [[message['nations'][key]['name'], key] for key in message['nations']]
+        nations = sorted(nations) # by first element, which is the name
+        nation_names, self.nation_ids = zip(*nations)
+        self.list_nations.addItems(nation_names)
 
     def start_scenario_clicked(self):
         pass
+
+    def closeEvent(self, event):
+        # remove all channels that might have been opened
+        network_client.remove_channel(self.CH_TITLES, ignore_not_existing=True)
+        network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
 
 class GameLobbyWidget(QtGui.QWidget):
     """
@@ -604,6 +631,7 @@ def network_start():
 
     # start local server
     from server.network import server_manager
+    # TODO in own thread
     server_manager.server.start(c.Network_Port)
 
     # connect network client of client
