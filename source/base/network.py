@@ -13,9 +13,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from base import constants as c
 
+from PySide import QtCore
 from lib.network import Client
+
+
+class Channel(QtCore.QObject):
+    """
+        Just contains a single signal you can connect/disconnect to/from.
+    """
+
+    received = QtCore.Signal(object, object)
+
+    def __init__(self):
+        super().__init__()
+        self.message_counter = 0
 
 
 class NetworkClient(Client):
@@ -23,34 +35,46 @@ class NetworkClient(Client):
     def __init__(self):
         super().__init__()
         self.received.connect(self.process)
-        self.services = {}
-        self.id = -1
+        self.channels = {}
 
-    def add_service(self, id, service):
-        if id in self.services:
-            raise RuntimeError('Already a service with this id registered.')
-        self.services[id] = service
+    def create_new_channel(self, channel_name):
+        if channel_name in self.channels:
+            raise RuntimeError('Channel with this name already existing.')
+        self.channels[channel_name] = Channel()
 
-    def remove_service(self, id):
-        self.services.pop(id)
+    def remove_channel(self, channel_name, ignore_not_existing=False):
+        if channel_name in self.channels:
+            del self.channels[channel_name]
+        elif not ignore_not_existing:
+            raise RuntimeError('Channel with this name not existing.')
+
+
+    def connect_to_channel(self, channel_name, callable):
+        if channel_name not in self.channels:
+            self.create_new_channel(channel_name)
+        self.channels[channel_name].received.connect(callable)
+
+    def disconnect_from_channel(self, channel_name, callable):
+        if channel_name not in self.channels:
+            raise RuntimeError('Channel with this name not existing.')
+        self.channels[channel_name].received.disconnect(callable)
 
     def process(self, message):
-        id = message['id']
+        channel_name = message['channel']
 
         # do we have receivers in this category
-        if id not in self.services:
-            raise RuntimeError('No suitable service for this id.')
+        if channel_name not in self.channels:
+            raise RuntimeError('Channel with this name not existing.')
 
-        # execute service with message
-        response = self.services[id](self, message)
+        # send to channel and increase counter
+        self.channels[channel_name].received.emit(self, message['content'])
+        self.channels[channel_name].message_counter += 1
 
-        # if return value is true, remove service from services list
-        if response is True:
-            self.services.pop(id)
-
-    def send(self, id, message=None):
-        if message is None:
-            message = {}
-        # set id
-        message['id'] = id
-        super().send(message)
+    def send(self, channel_name, message=None):
+        # wrap content
+        letter = {
+            'channel': channel_name,
+            'content': message
+        }
+        # send
+        super().send(letter)

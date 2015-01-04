@@ -87,10 +87,10 @@ OG_Fullscreen_Supported = 'graphics.full_screen_supported'
 OM_Phonon_Supported = 'music.phonon_supported'
 OM_BG_Mute = 'music.background.mute'
 
-class MsgIDs(u.AutoNumber):
-    Scenario_Preview = ()
-    Core_Scenario_Titles = ()
-    Single_Player_Selection = ()
+
+# predefined channel names for network communication
+CH_SCENARIO_PREVIEW = 'general.scenario.preview'
+CH_CORE_SCENARIO_TITLES = 'general.core.scenarios.titles'
 
 class TileDirections(u.AutoNumber):
     """

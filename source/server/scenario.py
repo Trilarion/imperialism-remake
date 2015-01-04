@@ -27,7 +27,8 @@ from base import constants as c
 import lib.utils as u
 
 # some constants
-TITLE = 'title'
+TITLE = 'scenario.title'
+DESCRIPTION = 'scenario.description'
 MAP_COLUMNS = 'map.columns'
 MAP_ROWS = 'map.rows'
 RIVERS = 'rivers'

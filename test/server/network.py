@@ -7,7 +7,7 @@ from client.network import network_client
 
 def setup():
     server_manager.server.start(c.Network_Port)
-    network_client.connectToHost(c.Network_Port)
+    network_client.connect_to_host(c.Network_Port)
 
 def send():
     message = {

@@ -46,16 +46,18 @@ class ServerManager(QtCore.QObject):
             if not any([id == client.id for client in self.server_clients]):
                 # not any == none
                 found_id = True
-        client.id = id
+        client.client_id = id
 
-        # add a GeneralActionListener
-        client.add_service(c.MsgIDs.Core_Scenario_Titles, self.core_scenario_titles)
-        client.add_service(c.MsgIDs.Scenario_Preview, self.scenario_preview)
+        # add some general channels
+        client.connect_to_channel(c.CH_SCENARIO_PREVIEW, self.scenario_preview)
+        client.connect_to_channel(c.CH_CORE_SCENARIO_TITLES, self.core_scenario_titles)
 
         # finally add to list of clients
         self.server_clients.append(client)
 
     def core_scenario_titles(self, client, message):
+        """
+        """
         # get all core scenario files
         scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
 
@@ -67,7 +69,7 @@ class ServerManager(QtCore.QObject):
         for scenario_file in scenario_files:
             reader = u.ZipArchiveReader(scenario_file)
             properties = reader.read_as_yaml('properties')
-            scenario_titles.append(properties['title'])
+            scenario_titles.append(properties[TITLE])
 
         # zip files and titles together
         scenarios = zip(scenario_titles, scenario_files)
@@ -76,12 +78,15 @@ class ServerManager(QtCore.QObject):
         scenarios = sorted(scenarios) # default sort order is by first element anyway
 
         # return message
-        answer = {
+        titles = {
             'scenarios' : scenarios
         }
-        client.send(c.MsgIDs.Core_Scenario_Titles, answer)
+        client.send(message['reply-to'], titles)
 
     def scenario_preview(self, client, message):
+        """
+
+        """
         scenario = Scenario()
         file_name = message['scenario'] # should be the file name
         # TODO existing? can be loaded?
@@ -91,7 +96,7 @@ class ServerManager(QtCore.QObject):
         preview['scenario'] = file_name
 
         # some scenario properties should be copied
-        scenario_copy_keys = [TITLE, MAP_COLUMNS, MAP_ROWS]
+        scenario_copy_keys = [MAP_COLUMNS, MAP_ROWS]
         for key in scenario_copy_keys:
             preview[key] = scenario[key]
 
@@ -117,7 +122,7 @@ class ServerManager(QtCore.QObject):
         preview['map'] = map
 
         # send return message
-        client.send(c.MsgIDs.Scenario_Preview, preview)
+        client.send(message['reply-to'], preview)
 
 # create a local server
 server_manager = ServerManager()

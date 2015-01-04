@@ -26,7 +26,9 @@ SCOPE = {
 
 class Client(QtCore.QObject):
     """
+        Wrapper around QtNetwork.QTcpSocket (set it from outside via set_socket(..)).
 
+        Additionally sends and reads messages via serialization (yaml), compression (zlib) and wrapping (QByteArray).
     """
     connected = QtCore.Signal()
     disconnected = QtCore.Signal()
@@ -35,30 +37,41 @@ class Client(QtCore.QObject):
 
     def __init__(self):
         """
-
+            Initially we do not have any socket and no bytes are written.
         """
         super().__init__()
         self.socket = None
         self.bytes_written = 0
-        #print('new connection id {}, address {}, port {}'.format(id, socket.peerAddress().toString(), socket.peerPort()))
 
     def set_socket(self, socket=None):
+        """
+            Set a socket (from outside) and does some wiring. If socket is None, a new one is created.
+        """
+        # only if no socket is set before
         if self.socket is not None:
             raise RuntimeError('Socket already set!')
+        # or if none is set, just create one
         if socket is None:
             socket = QtNetwork.QTcpSocket()
+        # store in local variable
         self.socket = socket
-        # self.socket.setParent(self)
+        # new data is handled by receive()
         self.socket.readyRead.connect(self.receive)
         self.socket.error.connect(self.error)
         self.socket.connected.connect(self.connected)
         self.socket.disconnected.connect(self.disconnected)
         self.socket.bytesWritten.connect(self.count_bytes_written)
 
-    def disconnectFromHost(self):
+    def disconnect_from_host(self):
+        """
+            If you want to disconnect, just call this method which basically just calls the same method on the socket.
+        """
         self.socket.disconnectFromHost()
 
-    def connectToHost(self, port, host='local'):
+    def connect_to_host(self, port, host='local'):
+        """
+            If you want to connect
+        """
         if host is 'local':
             host = SCOPE['local']
         self.socket.connectToHost(host, port)
@@ -83,7 +96,7 @@ class Client(QtCore.QObject):
             # decode from utf-8 bytes to unicode and deserialize from yaml
             value = yaml.load(uncompressed.decode())
 
-            print('connection id {} received {}'.format(self.id, value))
+            # print('connection id {} received {}'.format(self.id, value))
             self.received.emit(value)
 
     def send(self, value):

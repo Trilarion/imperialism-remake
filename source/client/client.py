@@ -142,33 +142,54 @@ class StartScreen(QtGui.QWidget):
         layout.addWidget(version_label)
 
 class SinglePlayerScenarioSelection(QtGui.QWidget):
+    """
+
+    """
 
     def __init__(self):
+        """
+
+        """
         super().__init__()
 
+        # dialog is in grid layout
         layout = QtGui.QGridLayout(self)
 
+        # list widget for selection of the scenario
         self.list_selection = QtGui.QListWidget()
         self.list_selection.setFixedWidth(150)
         self.list_selection.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-
-        # register us as recipient of server answer
-        network_client.add_service(c.MsgIDs.Core_Scenario_Titles, self.scenario_titles)
-        # TODO unregister if destroyed?
-        # send message and ask for scenario titles
-        network_client.send(c.MsgIDs.Core_Scenario_Titles)
-
         self.list_selection.itemSelectionChanged.connect(self.list_selection_changed)
-
         layout.addWidget(self.list_selection, 0, 0)
-        map = QtGui.QWidget()
-        layout.addWidget(map, 0, 1, 2)
-        scenario_alternative_button = QtGui.QPushButton('Select another')
-        layout.addWidget(scenario_alternative_button, 1, 0)
-        self.info = QtGui.QLabel()
-        layout.addWidget(self.info, 2, 0, 1, 2)
-        layout.setRowStretch(2, 1) # infobox gets all the height
-        layout.setColumnStretch(1, 1) # map gets all the width
+
+        # map view (no scroll bars)
+        self.scene = QtGui.QGraphicsScene()
+        self.view = QtGui.QGraphicsView(self.scene)
+        self.view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        layout.addWidget(self.view, 0, 1)
+
+        # info box
+        self.info_box = QtGui.QWidget()
+        self.info_box.setFixedHeight(200)
+        layout.addWidget(self.info_box, 1, 0, 1, 2)
+
+        # content of info box
+
+        # stretching of the elements
+        layout.setRowStretch(0, 1) # info box gets all the height
+        layout.setColumnStretch(1, 1) # map gets all the available width
+
+        # add the start button
+        toolbar = QtGui.QToolBar()
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar, self.start_scenario_clicked))
+        layout.addWidget(toolbar, 2, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
+
+        # TODO unregister if destroyed?
+
+        # send message and ask for scenario titles
+        network_client.connect_to_channel('SP.scenario-selection.titles', self.scenario_titles)
+        network_client.send(c.CH_CORE_SCENARIO_TITLES, {'reply-to': 'SP.scenario-selection.titles'})
 
     def scenario_titles(self, client, message):
         """
@@ -185,19 +206,21 @@ class SinglePlayerScenarioSelection(QtGui.QWidget):
         # get selected file
         row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself
         file_name = self.scenario_files[row]
-        # regist5er us
-        network_client.add_service(c.MsgIDs.Scenario_Preview, self.scenario_preview)
+        # register us
+        #network_client.add_service(c.MsgIDs.Scenario_Preview, self.scenario_preview)
         # send a message
-        network_client.send(c.MsgIDs.Scenario_Preview, {'scenario': file_name})
+        network_client.send(c.CH_SCENARIO_PREVIEW, {'scenario': file_name})
 
     def scenario_preview(self, client, message):
         """
             Receive scenario preview.
         """
-        text = 'Title: {}'.format(message[TITLE])
-        text += '<br>Number nations: {}'.format(len(message['nations']))
-        self.info.setText(text)
+        #text = '<br>Number nations: {}'.format(len(message['nations']))
+        #self.info_box.setText(text)
         return True # will only be used once
+
+    def start_scenario_clicked(self):
+        pass
 
 class GameLobbyWidget(QtGui.QWidget):
     """
@@ -584,7 +607,7 @@ def network_start():
     server_manager.server.start(c.Network_Port)
 
     # connect network client of client
-    network_client.connectToHost(c.Network_Port)
+    network_client.connect_to_host(c.Network_Port)
 
 
     # TODO must be run at the end before app finishes
