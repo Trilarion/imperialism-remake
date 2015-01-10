@@ -535,9 +535,14 @@ class ClockLabel(QtGui.QLabel):
 # some constant expressions
 TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
 
-def create_action(icon, text, parent, receiver, checkable=False):
+def create_action(icon, text, parent, trigger_connection=None, toggle_connection=None, checkable=False):
+    """
+        Shortcut for creation of an action and wiring.
+    """
     action = QtGui.QAction(icon, text, parent)
-    if receiver is not None:
-        action.triggered.connect(receiver)
+    if trigger_connection is not None:
+        action.triggered.connect(trigger_connection)
+    if toggle_connection is not None:
+        action.toggled.connect(toggle_connection)
     action.setCheckable(checkable)
     return action

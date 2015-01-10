@@ -100,10 +100,10 @@ class EditorMiniMap(QtGui.QWidget):
         # action group (only one of them can be checked at each time)
         action_group = QtGui.QActionGroup(self.toolbar)
         # political view in the beginning
-        action_initial = g.create_action(t.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group, self.switch_to_political, True)
-        self.toolbar.addAction(action_initial)
+        action_political = g.create_action(t.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group, toggle_connection=self.toggled_political, checkable=True)
+        self.toolbar.addAction(action_political)
         # geographical view
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group, self.switch_to_geographical, True))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group, toggle_connection=self.toggled_geographical, checkable=True))
 
         # wrap tool bar into horizontal layout with stretch
         l = QtGui.QHBoxLayout()
@@ -119,8 +119,7 @@ class EditorMiniMap(QtGui.QWidget):
         self.removable_items = []
 
         # and switch to political mode
-        self.map_mode = None
-        action_initial.trigger()
+        action_political.setChecked(True)
 
     def redraw_map(self):
         # adjust view height
@@ -211,13 +210,15 @@ class EditorMiniMap(QtGui.QWidget):
                 item.setZValue(1)
                 self.removable_items.extend([item])
 
-    def switch_to_political(self):
-        if self.map_mode is not 'political':
+    def toggled_political(self, checked):
+        if checked is True:
+            # self.map_mode should be 'geographical'
             self.map_mode = 'political'
             self.redraw_map()
 
-    def switch_to_geographical(self):
-        if self.map_mode is not 'geographical':
+    def toggled_geographical(self, checked):
+        if checked is True:
+            # self.map_mode should be 'political'
             self.map_mode = 'geographical'
             self.redraw_map()
 
@@ -713,7 +714,7 @@ class EditorScreen(QtGui.QWidget):
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
             self.scenario.load(file_name)
-            self.client.schedule_notification('Loaded scenario {}'.format(self.scenario['title']))
+            self.client.schedule_notification('Loaded scenario {}'.format(self.scenario[TITLE]))
 
     def save_scenario_dialog(self):
         """
