@@ -513,6 +513,7 @@ def makeDraggableGraphicsItem(parent):
 DraggableToolBar = makeDraggableWidget(QtGui.QToolBar)
 ClickableWidget = makeWidgetClickable(QtGui.QWidget)
 ClickablePixmapItem = makeClickableGraphicsItem(QtGui.QGraphicsPixmapItem)
+ClickablePathItem = makeClickableGraphicsItem(QtGui.QGraphicsPathItem)
 DraggableRectItem = makeDraggableGraphicsItem(QtGui.QGraphicsRectItem)
 
 class ClockLabel(QtGui.QLabel):
@@ -546,3 +547,15 @@ def create_action(icon, text, parent, trigger_connection=None, toggle_connection
         action.toggled.connect(toggle_connection)
     action.setCheckable(checkable)
     return action
+
+def wrap_in_groupbox(item, title):
+    """
+
+    """
+    box = QtGui.QGroupBox(title)
+    if isinstance(item, QtGui.QWidget):
+        layout = QtGui.QVBoxLayout(box)
+        layout.addWidget(item)
+    elif isinstance(item, QtGui.QLayout):
+        box.setLayout(item)
+    return box

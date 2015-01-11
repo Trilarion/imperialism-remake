@@ -116,6 +116,7 @@ class Scenario(QtCore.QObject):
         """
             Converts a map position to a scene position
         """
+        # TODO move to client side, has nothing to do with server (or has it?)
         return column + (row % 2) / 2, row
 
     def map_index(self, column, row):

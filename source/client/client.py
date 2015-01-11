@@ -253,32 +253,38 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         # fill the widget with useful stuff
         layout = QtGui.QGridLayout(self)
 
+        # selection list for nations
+        self.nations_list = QtGui.QListWidget()
+        self.nations_list.setFixedWidth(200)
+        self.nations_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        layout.addWidget(g.wrap_in_groupbox(self.nations_list, 'Nations'), 0, 0)
+
         # map view (no scroll bars)
         self.map_scene = QtGui.QGraphicsScene()
         self.map_view = QtGui.QGraphicsView(self.map_scene)
         self.map_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        layout.addWidget(self.map_view, 0, 1, QtCore.Qt.AlignCenter)
+        self.map_view.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
+        layout.addWidget(g.wrap_in_groupbox(self.map_view, 'Map'), 0, 1)
 
+        # scenario description
         self.description = QtGui.QTextEdit()
         self.description.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.description.setReadOnly(True)
-        self.description.setFixedHeight(80)
-        layout.addWidget(self.description, 1, 0, 1, 2) # goes over two columns
+        self.description.setFixedHeight(60)
+        layout.addWidget(g.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1, 2) # goes over two columns
 
-        self.nations_list = QtGui.QListWidget()
-        self.nations_list.setFixedWidth(150)
-        self.nations_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        layout.addWidget(self.nations_list, 0, 0)
-
+        # nation description
         self.nation_info = QtGui.QTextEdit()
         self.nation_info.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.nation_info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.nation_info.setReadOnly(True)
-        layout.addWidget(self.nation_info, 2, 0, 1, 2)
+        self.nation_info.setFixedHeight(100)
+        layout.addWidget(g.wrap_in_groupbox(self.nation_info, 'Nation Info'), 2, 0, 1, 2)
 
         # stretching of the elements
+        layout.setRowStretch(0, 1) # nation list and map get all the available height
         layout.setColumnStretch(1, 1) # map gets all the available width
 
         # add the start button
@@ -297,13 +303,54 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         # draw the map
         columns = message[k.MAP_COLUMNS]
         rows = message[k.MAP_ROWS]
-        width = self.view.height() / rows * columns
-        if width < self.view.width():
-            self.setFixedWidth(width)
+        self.map_scene.setSceneRect(0, 0, columns, rows)
+        map_view_aspect_ratio = self.map_view.width() / self.map_view.height()
+        if map_view_aspect_ratio < columns / rows:
+            # free space left and right
+            view_width = rows * map_view_aspect_ratio
+            width_margin = (view_width - columns) / 2
+            #self.map_view.fitInView(-width_margin, 0, view_width, rows)
+            #self.map_view.fitInView(self.map_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
         else:
-            # need to make heigh even smaller
-            height = self.view.height() / width * self.view.width()
-            self.view.setFixedHeight(height)
+            # free space top and bottom
+            view_height = columns / map_view_aspect_ratio
+            height_margin = (view_height - rows) / 2
+            #self.map_view.fitInView(0, -height_margin, columns, view_height)
+            #self.map_view.fitInView(self.map_scene.sceneRect())
+        # TODO aspect ratio is wrong
+        self.map_view.fitInView(self.map_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
+
+        # fill the ground layer with a neutral color
+        item = self.map_scene.addRect(0, 0, columns, rows)
+        item.setBrush(QtCore.Qt.lightGray)
+        item.setPen(g.TRANSPARENT_PEN)
+        item.setZValue(0)
+
+        # for all nations
+        for nation_id, nation in message['nations'].items():
+
+            # get nation color
+            color_string = nation['color']
+            color = QtGui.QColor()
+            color.setNamedColor(color_string)
+
+            path = QtGui.QPainterPath()
+            # TODO traversing everything is quite slow go only once and add to paths
+            for column in range(0, columns):
+                for row in range(0, rows):
+                    if nation_id == message['map'][column + row * columns]:
+                        path.addRect(column, row, 1, 1)
+            path = path.simplified()
+            item = g.ClickablePathItem(path)
+            # TODO connect to something useful
+            item.entered.connect(print)
+            brush = QtGui.QBrush(color)
+            item.setBrush(brush)
+            item.setZValue(1)
+            self.map_scene.addItem(item)
+            # item = self.map_scene.addPath(path, brush=brush) # will use the default pen for outline
+
+
 
     def start_scenario_clicked(self):
         pass

@@ -119,12 +119,12 @@ class ServerManager(QtCore.QObject):
         columns = scenario[k.MAP_COLUMNS]
         rows = scenario[k.MAP_ROWS]
         map = [-1] * (columns * rows)
-        for nation in scenario.all_nations():
-            provinces = scenario.get_provinces_of_nation(nation)
+        for nation_id in scenario.all_nations():
+            provinces = scenario.get_provinces_of_nation(nation_id)
             for province in provinces:
                 tiles = scenario.get_province_property(province, 'tiles')
                 for column, row in tiles:
-                    map[row * columns + column] = nation
+                    map[row * columns + column] = nation_id
         preview['map'] = map
 
         # send return message
