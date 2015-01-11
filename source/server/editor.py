@@ -79,8 +79,6 @@ class EditorMiniMap(QtGui.QWidget):
         self.tracker.hide()
         self.scene.addItem(self.tracker)
 
-        # keeps the rectangle coordinates in normalized (0,1) coordinates
-        self.tracker_bounds = None
 
         # the view on the scene (no scroll bars)
         self.view = QtGui.QGraphicsView(self.scene)
@@ -122,13 +120,19 @@ class EditorMiniMap(QtGui.QWidget):
         action_political.setChecked(True)
 
     def redraw_map(self):
+        """
+        """
+
         # adjust view height
         columns = self.scenario[MAP_COLUMNS]
         rows = self.scenario[MAP_ROWS]
         view_height = math.floor(rows / columns * self.VIEW_WIDTH)
-        tile_size = self.VIEW_WIDTH / columns
         self.view.setFixedHeight(view_height)
-        self.scene.setSceneRect(0, 0, self.VIEW_WIDTH, view_height)
+        self.scene.setSceneRect(0, 0, 1, 1)
+        self.view.fitInView(self.scene.sceneRect()) # simple and should work
+
+        tile_width = 1 / (columns + 1)
+        tile_height = 1 / rows
 
         # remove everything except tracker from the scene
         for item in self.removable_items:
@@ -138,7 +142,7 @@ class EditorMiniMap(QtGui.QWidget):
         if self.map_mode is 'political':
 
             # fill the ground layer with a neutral color
-            item = self.scene.addRect(0, 0, self.VIEW_WIDTH, view_height)
+            item = self.scene.addRect(0, 0, 1, 1)
             item.setBrush(QtCore.Qt.lightGray)
             item.setPen(g.TRANSPARENT_PEN)
             item.setZValue(0)
@@ -150,9 +154,9 @@ class EditorMiniMap(QtGui.QWidget):
             # for all nations
             for nation in self.scenario.all_nations():
                 # get nation color
-                color = self.scenario.get_nation_property(nation, 'color')
-                c = QtGui.QColor()
-                c.setNamedColor(color)
+                color_string = self.scenario.get_nation_property(nation, 'color')
+                color = QtGui.QColor()
+                color.setNamedColor(color_string)
                 # get all provinces
                 provinces = self.scenario.get_provinces_of_nation(nation)
                 tiles = []
@@ -161,13 +165,13 @@ class EditorMiniMap(QtGui.QWidget):
                     tiles.extend(self.scenario.get_province_property(province, 'tiles'))
                 # get rectangular path for each tile
                 path = QtGui.QPainterPath()
-                for map_position in tiles:
-                    sx, sy = self.scenario.scene_position(map_position[0], map_position[1])
-                    path.addRect(sx * self.VIEW_WIDTH, sy * view_height, tile_size, tile_size)
+                for tile in tiles:
+                    sx, sy = self.scenario.scene_position(*tile)
+                    path.addRect(sx * tile_width, sy * tile_height, tile_width, tile_height)
                 # simply (creates outline)
                 path = path.simplified()
                 # create a brush from the color
-                brush = QtGui.QBrush(c)
+                brush = QtGui.QBrush(color)
                 item = self.scene.addPath(path, brush=brush) # will use the default pen for outline
                 item.setZValue(1)
                 self.removable_items.extend([item])
@@ -175,7 +179,7 @@ class EditorMiniMap(QtGui.QWidget):
         elif self.map_mode is 'geographical':
 
             # fill the background with sea (blue)
-            item = self.scene.addRect(0, 0, self.VIEW_WIDTH, view_height)
+            item = self.scene.addRect(0, 0, 1, 1)
             item.setBrush(QtCore.Qt.blue)
             item.setPen(g.TRANSPARENT_PEN)
             item.setZValue(0)
@@ -193,7 +197,7 @@ class EditorMiniMap(QtGui.QWidget):
                     if t != 0:
                         # not for sea
                         sx, sy = self.scenario.scene_position(column, row)
-                        paths[t].addRect(sx * self.VIEW_WIDTH, sy * view_height, tile_size, tile_size)
+                        paths[t].addRect(sx * tile_width, sy * tile_height, tile_width, tile_height)
             colors = {
                 1: QtCore.Qt.green,
                 2: QtCore.Qt.darkGreen,
@@ -230,26 +234,24 @@ class EditorMiniMap(QtGui.QWidget):
             return
 
         # get normalized coordinates and subtract half width and length
-        x = event.x() / self.view.width() - self.tracker_bounds.width() / 2
-        y = event.y() / self.view.height() - self.tracker_bounds.height() / 2
+        tracker_rect = self.tracker.rect()
+        x = event.x() / self.view.width() - tracker_rect.width() / 2
+        y = event.y() / self.view.height() - tracker_rect.height() / 2
         # apply min/max to keep inside the map area
-        x = min(max(x, 0), 1 - self.tracker_bounds.width())
-        y = min(max(y, 0), 1 - self.tracker_bounds.height())
+        x = min(max(x, 0), 1 - tracker_rect.width())
+        y = min(max(y, 0), 1 - tracker_rect.height())
         # check if they are different
-        if x != self.tracker_bounds.x() or y != self.tracker_bounds.y():
+        if x != tracker_rect.x() or y != tracker_rect.y():
             # they are different, update stored bounds, tracker and emit signal
-            self.tracker_bounds.moveTo(x, y)
-            self.tracker.setPos(x * self.view.width(), y * self.view.height())
+            tracker_rect.moveTo(x, y)
+            self.tracker.setRect(tracker_rect)
             self.focus_moved.emit(x, y)
-        #self.tracker.setPos(0, 0)
 
     def reset_tracker(self, bounds):
         """
             The main map tells us how large its view is (in terms of the game map) and where it is currently.
         """
-        self.tracker_bounds = bounds
-        self.tracker.setRect(bounds.x() * self.view.width(), bounds.y() * self.view.height(), bounds.width() * \
-                             self.view.width(), bounds.height() * self.view.height())
+        self.tracker.setRect(bounds)
         self.tracker.show()
 
 

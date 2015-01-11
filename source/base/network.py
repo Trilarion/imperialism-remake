@@ -67,8 +67,10 @@ class NetworkClient(Client):
             raise RuntimeError('Channel with this name not existing.')
 
         # send to channel and increase counter
-        self.channels[channel_name].received.emit(self, message['content'])
         self.channels[channel_name].message_counter += 1
+        self.channels[channel_name].received.emit(self, message['content'])
+
+        # channel_name may now already not be existing anymore
 
     def send(self, channel_name, message=None):
         # wrap content

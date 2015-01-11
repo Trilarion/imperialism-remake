@@ -21,9 +21,7 @@
 # TODO automatic placement of help dialog depending on if another dialog is open
 # TODO help dialog has close button in focus initially (why?) remove this
 
-import json
-
-from PySide import QtGui
+from PySide import QtGui, QtCore
 
 import base.tools as t
 import lib.graphics as g
@@ -141,125 +139,6 @@ class StartScreen(QtGui.QWidget):
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
-class SinglePlayerScenarioSelectio2n(QtGui.QWidget):
-    """
-
-    """
-
-    CH_TITLES = 'SP.scenario-selection.titles'
-    CH_PREVIEW = 'SP.scenario-selection.preview'
-
-    def __init__(self):
-        """
-
-        """
-        super().__init__()
-
-        # dialog is in grid layout
-        layout = QtGui.QGridLayout(self)
-
-        # list widget for selection of the scenario
-        self.list_selection = QtGui.QListWidget()
-        self.list_selection.setFixedWidth(150)
-        self.list_selection.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        self.list_selection.itemSelectionChanged.connect(self.list_selection_changed)
-        layout.addWidget(self.list_selection, 0, 0)
-
-        # map view (no scroll bars)
-        self.scene = QtGui.QGraphicsScene()
-        self.view = QtGui.QGraphicsView(self.scene)
-        self.view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        layout.addWidget(self.view, 0, 1, QtCore.Qt.AlignCenter)
-
-        # info box
-        self.info_box = QtGui.QWidget()
-        self.info_box.setFixedHeight(250)
-        layout.addWidget(self.info_box, 1, 0, 1, 2) # always row, column
-
-        # content of info box
-        l = QtGui.QGridLayout(self.info_box)
-        l.setContentsMargins(0, 0, 0, 0)
-        self.scenario_description = QtGui.QTextEdit()
-        self.scenario_description.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.scenario_description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
-        self.scenario_description.setReadOnly(True)
-        self.scenario_description.setFixedHeight(80)
-        l.addWidget(self.scenario_description, 0, 0, 1, 2)
-        self.list_nations = QtGui.QListWidget()
-        self.list_nations.setFixedWidth(150)
-        self.list_nations.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        l.addWidget(self.list_nations, 1, 0)
-        self.nation_description = QtGui.QTextEdit()
-        self.nation_description.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.nation_description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
-        self.nation_description.setReadOnly(True)
-        l.addWidget(self.nation_description, 1, 1)
-
-
-        # stretching of the elements
-        layout.setRowStretch(0, 1) # info box gets all the height
-        layout.setColumnStretch(1, 1) # map gets all the available width
-
-        # add the start button
-        toolbar = QtGui.QToolBar()
-        toolbar.addAction(g.create_action(t.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar, self.start_scenario_clicked))
-        layout.addWidget(toolbar, 2, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
-
-        # add two channels
-        network_client.connect_to_channel(self.CH_TITLES, self.scenario_titles)
-        network_client.connect_to_channel(self.CH_PREVIEW, self.scenario_preview)
-
-        # send message and ask for scenario titles
-        network_client.send(c.CH_CORE_SCENARIO_TITLES, {'reply-to': self.CH_TITLES})
-
-    def scenario_titles(self, client, message):
-        """
-            Receive all available scenario titles.
-        """
-        scenario_titles, self.scenario_files = zip(*message['scenarios'])
-        self.list_selection.addItems(scenario_titles)
-
-    def list_selection_changed(self):
-        """
-            A new scenario title was selected. Send a message.
-        """
-        # get selected file
-        row = self.list_selection.currentRow() # only useful if QListWidget does not sort by itself
-        file_name = self.scenario_files[row]
-        # register us
-        # send a message
-        network_client.send(c.CH_SCENARIO_PREVIEW, {'scenario': file_name, 'reply-to': self.CH_PREVIEW})
-
-    def scenario_preview(self, client, message):
-        """
-            Receive scenario preview.
-        """
-        self.scenario_description.setText(message[DESCRIPTION])
-        nations = [[message['nations'][key]['name'], key] for key in message['nations']]
-        nations = sorted(nations) # by first element, which is the name
-        nation_names, self.nation_ids = zip(*nations)
-        self.list_nations.addItems(nation_names)
-        # draw the map
-        columns = message[MAP_COLUMNS]
-        rows = message[MAP_ROWS]
-        width = self.view.height() / rows * columns
-        if width < self.view.width():
-            self.setFixedWidth(width)
-        else:
-            # need to make heigh even smaller
-            height = self.view.height() / width * self.view.width()
-            self.view.setFixedHeight(height)
-
-
-    def start_scenario_clicked(self):
-        pass
-
-    def closeEvent(self, event):
-        # remove all channels that might have been opened
-        network_client.remove_channel(self.CH_TITLES, ignore_not_existing=True)
-        network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
-
 class GameLobbyWidget(QtGui.QWidget):
     """
         Content widget for the game lobby.
@@ -290,9 +169,11 @@ class GameLobbyWidget(QtGui.QWidget):
 
         layout.addWidget(toolbar)
 
-        self.content = QtGui.QWidget()
+        content = QtGui.QWidget()
+        self.content_layout = QtGui.QVBoxLayout(content)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
 
-        layout.addWidget(self.content)
+        layout.addWidget(content)
 
     def toggled_single_player_scenario_selection(self, checked):
         """
@@ -302,7 +183,26 @@ class GameLobbyWidget(QtGui.QWidget):
 
         if checked is True:
             # create new widget
-            title_selection = SinglePlayerScenarioTitleSelection()
+            widget = SinglePlayerScenarioTitleSelection()
+            widget.title_selected.connect(self.single_player_scenario_selection_preview, QtCore.Qt.QueuedConnection)
+
+            # add to layout
+            self.content_layout.addWidget(widget)
+            self.content_layout.itemAt(0).setAlignment(QtCore.Qt.AlignCenter)
+
+    def single_player_scenario_selection_preview(self, scenario_file):
+        """
+        """
+
+        # remove SinglePlayerScenarioTitleSelection widget
+        item = self.content_layout.takeAt(0) # QLayoutItem we know it's only one
+        widget = item.widget() # widget from item
+        widget.setParent(None) # no parent
+
+        # create new widget
+        widget = SinglePlayerScenarioPreview(scenario_file)
+        self.content_layout.addWidget(widget)
+
 
     def toggled_single_player_load_scenario(self, checked):
         """
@@ -330,20 +230,153 @@ class GameLobbyWidget(QtGui.QWidget):
         if checked is True:
             pass
 
+class SinglePlayerScenarioPreview(QtGui.QWidget):
+
+    CH_PREVIEW = 'SP.scenario-selection.preview'
+
+    def __init__(self, scenario_file):
+        super().__init__()
+
+        # add a channel for us
+        network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
+
+        # send a message and ask for preview
+        network_client.send(c.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
+
+    def received_preview(self, client, message):
+        """
+        """
+        # immediately close the channel, we do not want to get this message twice
+        network_client.remove_channel(self.CH_PREVIEW)
+
+        # fill the widget with useful stuff
+        layout = QtGui.QGridLayout(self)
+
+        # map view (no scroll bars)
+        self.map_scene = QtGui.QGraphicsScene()
+        self.map_view = QtGui.QGraphicsView(self.map_scene)
+        self.map_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.map_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        layout.addWidget(self.map_view, 0, 1, QtCore.Qt.AlignCenter)
+
+        self.description = QtGui.QTextEdit()
+        self.description.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.description.setReadOnly(True)
+        self.description.setFixedHeight(80)
+        layout.addWidget(self.description, 1, 0, 1, 2) # goes over two columns
+
+        self.nations_list = QtGui.QListWidget()
+        self.nations_list.setFixedWidth(150)
+        self.nations_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        layout.addWidget(self.nations_list, 0, 0)
+
+        self.nation_info = QtGui.QTextEdit()
+        self.nation_info.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.nation_info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.nation_info.setReadOnly(True)
+        layout.addWidget(self.nation_info, 2, 0, 1, 2)
+
+        # stretching of the elements
+        layout.setColumnStretch(1, 1) # map gets all the available width
+
+        # add the start button
+        toolbar = QtGui.QToolBar()
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar, trigger_connection=self.start_scenario_clicked))
+        layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
+
+        # set the content from the message
+        self.description.setText(message[DESCRIPTION])
+
+        nations = [[message['nations'][key]['name'], key] for key in message['nations']]
+        nations = sorted(nations) # by first element, which is the name
+        nation_names, self.nation_ids = zip(*nations)
+        self.nations_list.addItems(nation_names)
+
+        # draw the map
+        columns = message[MAP_COLUMNS]
+        rows = message[MAP_ROWS]
+        width = self.view.height() / rows * columns
+        if width < self.view.width():
+            self.setFixedWidth(width)
+        else:
+            # need to make heigh even smaller
+            height = self.view.height() / width * self.view.width()
+            self.view.setFixedHeight(height)
+
+    def start_scenario_clicked(self):
+        pass
+
+    def stop(self):
+        """
+            Interruption. Clean up network channels and the like.
+        """
+        # network channel might still be open
+        network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
+
 class SinglePlayerScenarioTitleSelection(QtGui.QGroupBox):
+    """
+
+    """
+
+    title_selected = QtCore.Signal(str) # make sure to only connect with QtCore.Qt.QueuedConnection to this signal
+
+    CH_TITLES = 'SP.scenario-selection.titles'
 
     def __init__(self):
         super().__init__()
         self.setTitle('Select Scenario')
+        QtGui.QVBoxLayout(self) # just set a standard layout
 
-        layout = QtGui.QVBoxLayout(self)
+        # add a channel for us
+        network_client.connect_to_channel(self.CH_TITLES, self.received_titles)
 
+        # send message and ask for scenario titles
+        network_client.send(c.CH_CORE_SCENARIO_TITLES, {'reply-to': self.CH_TITLES})
+
+    def received_titles(self, client, message):
+        """
+            Received all available scenario titles as a list together with the file names
+            which act as unique identifiers. The list is sorted by title.
+        """
+
+        # immediately close the channel, we do not want to get this message twice
+        network_client.remove_channel(self.CH_TITLES)
+
+        # unpack message
+        scenario_titles, self.scenario_files = zip(*message['scenarios'])
+
+        # create list widget
         self.list = QtGui.QListWidget()
+        self.list.itemSelectionChanged.connect(self.selection_changed)
+        self.list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.list.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        # self.list.setFixedSize(self.list.sizeHintForColumn(0) + 2 * self.list.frameWidth(), self.list.sizeHintForRow(0) * self.list.count() + 2 * self.list.frameWidth())
+        self.list.addItems(scenario_titles)
+        # set size fixed to content, width at least 200px
+        self.list.setFixedSize(max(self.list.sizeHintForColumn(0) + 2 * self.list.frameWidth(), 200), self.list.sizeHintForRow(0) * self.list.count() + 2 * self.list.frameWidth())
 
-        layout.addWidget(self.list)
+        self.layout().addWidget(self.list)
+
+        # TODO if the height is higher than the window we may have to enable scroll bars, not now with one scenario though
+
+    def selection_changed(self):
+        """
+
+        """
+        # get selected file
+        row = self.list.currentRow() # only useful if QListWidget does not sort by itself
+        scenario_file = self.scenario_files[row]
+        # emit title selected signal
+        self.title_selected.emit(scenario_file)
+
+    def stop(self):
+        """
+            Interruption. Clean up network channels and the like.
+        """
+        # network channel might still be open
+        network_client.remove_channel(self.CH_TITLES, ignore_not_existing=True)
+
 
 
 class OptionsContentWidget(QtGui.QWidget):
