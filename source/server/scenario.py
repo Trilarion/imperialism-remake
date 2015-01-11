@@ -26,12 +26,16 @@ from PySide import QtCore
 from base import constants as c
 import lib.utils as u
 
-# some constants
-TITLE = 'scenario.title'
-DESCRIPTION = 'scenario.description'
-MAP_COLUMNS = 'map.columns'
-MAP_ROWS = 'map.rows'
-RIVERS = 'rivers'
+class KeyNames:
+    """
+
+    """
+
+    TITLE = 'scenario.title'
+    DESCRIPTION = 'scenario.description'
+    MAP_COLUMNS = 'map.columns'
+    MAP_ROWS = 'map.rows'
+    RIVERS = 'rivers'
 
 
 class Scenario(QtCore.QObject):
@@ -51,7 +55,7 @@ class Scenario(QtCore.QObject):
             Just empty
         """
         self._properties = {}
-        self._properties[RIVERS] = []
+        self._properties[KeyNames.RIVERS] = []
         self._provinces = {}
         self._nations = {}
         self._map = {}
@@ -60,8 +64,8 @@ class Scenario(QtCore.QObject):
         """
             Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
         """
-        self._properties[MAP_COLUMNS] = columns
-        self._properties[MAP_ROWS] = rows
+        self._properties[KeyNames.MAP_COLUMNS] = columns
+        self._properties[KeyNames.MAP_ROWS] = rows
         number_tiles = columns * rows
         self._map['terrain'] = [0] * number_tiles
         self._map['resource'] = [0] * number_tiles
@@ -71,7 +75,7 @@ class Scenario(QtCore.QObject):
             'name': name,
             'tiles': tiles
         }
-        self._properties[RIVERS].extend([river])
+        self._properties[KeyNames.RIVERS].extend([river])
 
     def set_terrain_at(self, column, row, terrain):
         """
@@ -103,11 +107,12 @@ class Scenario(QtCore.QObject):
         """
         column = math.floor(x - (y % 2) / 2)
         row = math.floor(y)
-        if row < 0 or row >= self._properties[MAP_ROWS] or column < 0 or column >= self._properties[MAP_COLUMNS]:
+        if row < 0 or row >= self._properties[KeyNames.MAP_ROWS] or column < 0 or column >= self._properties[KeyNames.MAP_COLUMNS]:
             return -1, -1
         return column, row
 
-    def scene_position(self, column, row):
+    @staticmethod
+    def scene_position(column, row):
         """
             Converts a map position to a scene position
         """
@@ -117,7 +122,7 @@ class Scenario(QtCore.QObject):
         """
             Calculates the index in the linear map for a given 2D position (first row, then column)?
         """
-        index = row * self._properties[MAP_COLUMNS] + column
+        index = row * self._properties[KeyNames.MAP_COLUMNS] + column
         return index
 
     def get_neighbor_position(self, column, row, direction):
@@ -154,13 +159,13 @@ class Scenario(QtCore.QObject):
                 return None
         elif direction is c.TileDirections.East:
             # east
-            if column < self._properties[MAP_COLUMNS] - 1:
+            if column < self._properties[KeyNames.MAP_COLUMNS] - 1:
                 return [column + 1, row]
             else:
                 return None
         elif direction is c.TileDirections.SouthEast:
             # south-east
-            if row < self._properties[MAP_ROWS] - 1:
+            if row < self._properties[KeyNames.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column, row + 1]
@@ -171,7 +176,7 @@ class Scenario(QtCore.QObject):
                 return None
         elif direction is c.TileDirections.SouthWest:
             # south-west
-            if row < self._properties[MAP_ROWS] - 1:
+            if row < self._properties[KeyNames.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column - 1, row + 1]

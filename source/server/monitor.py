@@ -29,6 +29,7 @@ class ServerMonitorWidget(QtGui.QWidget):
 
         # set timer for update
         self.timer = QtCore.QTimer()
+        # noinspection PyUnresolvedReferences
         self.timer.timeout.connect(self.update_monitor)
         self.timer.setInterval(60000) # every second
         self.timer.start()

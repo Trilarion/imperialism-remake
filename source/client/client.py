@@ -24,14 +24,15 @@
 from PySide import QtGui, QtCore
 
 import base.tools as t
+import base.constants as c
 import lib.graphics as g
+import lib.utils as u
 import client.graphics as cg
 import client.audio as audio
-
 from lib.browser import BrowserWidget
 from server.editor import EditorScreen
 from server.monitor import ServerMonitorWidget
-from server.scenario import * # TODO only temporary until we move everything back to the server
+from server.scenario import KeyNames as k
 from client.network import network_client
 
 class MapItem(QtCore.QObject):
@@ -286,7 +287,7 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
         # set the content from the message
-        self.description.setText(message[DESCRIPTION])
+        self.description.setText(message[k.DESCRIPTION])
 
         nations = [[message['nations'][key]['name'], key] for key in message['nations']]
         nations = sorted(nations) # by first element, which is the name
@@ -294,8 +295,8 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         self.nations_list.addItems(nation_names)
 
         # draw the map
-        columns = message[MAP_COLUMNS]
-        rows = message[MAP_ROWS]
+        columns = message[k.MAP_COLUMNS]
+        rows = message[k.MAP_ROWS]
         width = self.view.height() / rows * columns
         if width < self.view.width():
             self.setFixedWidth(width)

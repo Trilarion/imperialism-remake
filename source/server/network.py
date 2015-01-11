@@ -22,9 +22,13 @@ import random
 import os
 import time
 
+from PySide import QtCore
+
 from lib.network import Server
+import lib.utils as u
+import base.constants as c
 from base.network import NetworkClient
-from server.scenario import *
+from server.scenario import Scenario, KeyNames as k
 
 class ServerManager(QtCore.QObject):
 
@@ -39,13 +43,12 @@ class ServerManager(QtCore.QObject):
         client.set_socket(socket)
 
         # give a new id
-        found_id = False
-        while not found_id:
+        while True:
             # theoretically this could take forever, practically only if we have 1e6 clients already
             id = random.randint(0, 1e6)
             if not any([id == client.id for client in self.server_clients]):
                 # not any == none
-                found_id = True
+                break
         client.client_id = id
 
         # add some general channels
@@ -69,7 +72,7 @@ class ServerManager(QtCore.QObject):
         for scenario_file in scenario_files:
             reader = u.ZipArchiveReader(scenario_file)
             properties = reader.read_as_yaml('properties')
-            scenario_titles.append(properties[TITLE])
+            scenario_titles.append(properties[k.TITLE])
 
         # zip files and titles together
         scenarios = zip(scenario_titles, scenario_files)
@@ -99,7 +102,7 @@ class ServerManager(QtCore.QObject):
         preview['scenario'] = file_name
 
         # some scenario properties should be copied
-        scenario_copy_keys = [MAP_COLUMNS, MAP_ROWS, TITLE, DESCRIPTION]
+        scenario_copy_keys = [k.MAP_COLUMNS, k.MAP_ROWS, k.TITLE, k.DESCRIPTION]
         for key in scenario_copy_keys:
             preview[key] = scenario[key]
 
@@ -113,8 +116,8 @@ class ServerManager(QtCore.QObject):
         preview['nations'] = nations
 
         # assemble a nations map (-1 means no nation)
-        columns = scenario[MAP_COLUMNS]
-        rows = scenario[MAP_ROWS]
+        columns = scenario[k.MAP_COLUMNS]
+        rows = scenario[k.MAP_ROWS]
         map = [-1] * (columns * rows)
         for nation in scenario.all_nations():
             provinces = scenario.get_provinces_of_nation(nation)

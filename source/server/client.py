@@ -22,10 +22,13 @@ class ServerClientManager():
         self.clients_chat = []
 
     def chat_register(self, client):
+        pass
 
     def chat_unregister(self, client):
+        pass
 
     def chat_broadcast(self, client, text):
+        pass
 
 manager = ServerClientManager()
 
