@@ -28,7 +28,7 @@ import base.tools as t
 import base.constants as c
 import lib.graphics as g
 import client.graphics as cg
-from server.scenario import Scenario, KeyNames as k
+from server.scenario import Scenario, PropertyKeyNames as k
 
 # TODO in the beginning of the editor just automatically create a new scenario with the default values, to show at least something
 

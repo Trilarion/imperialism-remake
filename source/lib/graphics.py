@@ -559,3 +559,15 @@ def wrap_in_groupbox(item, title):
     elif isinstance(item, QtGui.QLayout):
         box.setLayout(item)
     return box
+
+class FitSceneInViewGraphicsView(QtGui.QGraphicsView):
+    """
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def showEvent(self, event):
+        self.fitInView(self.sceneRect(), QtCore.Qt.KeepAspectRatio)
+        super().showEvent(event)

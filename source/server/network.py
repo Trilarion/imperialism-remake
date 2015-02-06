@@ -28,7 +28,7 @@ from lib.network import Server
 import lib.utils as u
 import base.constants as c
 from base.network import NetworkClient
-from server.scenario import Scenario, KeyNames as k
+from server.scenario import Scenario, PropertyKeyNames as k, NationPropertyKeyNames as kn
 
 class ServerManager(QtCore.QObject):
 
@@ -108,7 +108,7 @@ class ServerManager(QtCore.QObject):
 
         # some nations properties should be copied
         nations = {}
-        nation_copy_keys = ['color', 'name']
+        nation_copy_keys = [kn.COLOR, kn.NAME, kn.DESCRIPTION]
         for nation in scenario.all_nations():
             nations[nation] = {}
             for key in nation_copy_keys:

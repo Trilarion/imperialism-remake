@@ -21,6 +21,8 @@
 # TODO automatic placement of help dialog depending on if another dialog is open
 # TODO help dialog has close button in focus initially (why?) remove this
 
+from functools import partial
+
 from PySide import QtGui, QtCore
 
 import base.tools as t
@@ -32,7 +34,8 @@ import client.audio as audio
 from lib.browser import BrowserWidget
 from server.editor import EditorScreen
 from server.monitor import ServerMonitorWidget
-from server.scenario import KeyNames as k
+from server.scenario import PropertyKeyNames as k, NationPropertyKeyNames as kn
+from client.main_screen import GameMainScreen
 from client.network import network_client
 
 class MapItem(QtCore.QObject):
@@ -145,7 +148,7 @@ class GameLobbyWidget(QtGui.QWidget):
         Content widget for the game lobby.
     """
 
-    switch = QtCore.Signal()
+    single_player_start = QtCore.Signal(str, str)
 
     def __init__(self):
         """
@@ -202,8 +205,8 @@ class GameLobbyWidget(QtGui.QWidget):
 
         # create new widget
         widget = SinglePlayerScenarioPreview(scenario_file)
+        widget.nation_selected.connect(partial(self.single_player_start.emit, scenario_file))
         self.content_layout.addWidget(widget)
-
 
     def toggled_single_player_load_scenario(self, checked):
         """
@@ -231,9 +234,33 @@ class GameLobbyWidget(QtGui.QWidget):
         if checked is True:
             pass
 
+class PreviewMapNationItem(g.ClickablePathItem):
+
+    def __init__(self, path):
+        super().__init__(path)
+        self.entered.connect(self.entered_item)
+        self.left.connect(self.left_item)
+        self.hover_effect = QtGui.QGraphicsDropShadowEffect()
+        self.hover_effect.setOffset(4, 4)
+        self.setGraphicsEffect(self.hover_effect)
+        # the default state
+        self.left_item()
+
+    def entered_item(self):
+        self.setZValue(2)
+        self.hover_effect.setEnabled(True)
+
+    def left_item(self):
+        self.hover_effect.setEnabled(False)
+        self.setZValue(1)
+
+
+
 class SinglePlayerScenarioPreview(QtGui.QWidget):
 
     CH_PREVIEW = 'SP.scenario-selection.preview'
+
+    nation_selected = QtCore.Signal(str)
 
     def __init__(self, scenario_file):
         super().__init__()
@@ -243,6 +270,8 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
 
         # send a message and ask for preview
         network_client.send(c.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
+
+        self.selected_nation = None
 
     def received_preview(self, client, message):
         """
@@ -257,11 +286,12 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         self.nations_list = QtGui.QListWidget()
         self.nations_list.setFixedWidth(200)
         self.nations_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        self.nations_list.itemSelectionChanged.connect(self.nations_list_selection_changed)
         layout.addWidget(g.wrap_in_groupbox(self.nations_list, 'Nations'), 0, 0)
 
         # map view (no scroll bars)
         self.map_scene = QtGui.QGraphicsScene()
-        self.map_view = QtGui.QGraphicsView(self.map_scene)
+        self.map_view = g.FitSceneInViewGraphicsView(self.map_scene)
         self.map_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
@@ -304,27 +334,19 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         columns = message[k.MAP_COLUMNS]
         rows = message[k.MAP_ROWS]
         self.map_scene.setSceneRect(0, 0, columns, rows)
-        map_view_aspect_ratio = self.map_view.width() / self.map_view.height()
-        if map_view_aspect_ratio < columns / rows:
-            # free space left and right
-            view_width = rows * map_view_aspect_ratio
-            width_margin = (view_width - columns) / 2
-            #self.map_view.fitInView(-width_margin, 0, view_width, rows)
-            #self.map_view.fitInView(self.map_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
-        else:
-            # free space top and bottom
-            view_height = columns / map_view_aspect_ratio
-            height_margin = (view_height - rows) / 2
-            #self.map_view.fitInView(0, -height_margin, columns, view_height)
-            #self.map_view.fitInView(self.map_scene.sceneRect())
-        # TODO aspect ratio is wrong
-        self.map_view.fitInView(self.map_scene.sceneRect(), QtCore.Qt.KeepAspectRatio)
 
         # fill the ground layer with a neutral color
         item = self.map_scene.addRect(0, 0, columns, rows)
         item.setBrush(QtCore.Qt.lightGray)
         item.setPen(g.TRANSPARENT_PEN)
         item.setZValue(0)
+
+        # text display
+        self.map_name_item = self.map_scene.addSimpleText('')
+        self.map_name_item.setPen(g.TRANSPARENT_PEN)
+        self.map_name_item.setBrush(QtGui.QBrush(QtCore.Qt.darkRed))
+        self.map_name_item.setZValue(3)
+        self.map_name_item.setPos(0, 0)
 
         # for all nations
         for nation_id, nation in message['nations'].items():
@@ -334,6 +356,10 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
             color = QtGui.QColor()
             color.setNamedColor(color_string)
 
+            # get nation name
+            nation_name = nation['name']
+
+            # get nation outline
             path = QtGui.QPainterPath()
             # TODO traversing everything is quite slow go only once and add to paths
             for column in range(0, columns):
@@ -341,19 +367,35 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
                     if nation_id == message['map'][column + row * columns]:
                         path.addRect(column, row, 1, 1)
             path = path.simplified()
-            item = g.ClickablePathItem(path)
-            # TODO connect to something useful
-            item.entered.connect(print)
+
+            item = PreviewMapNationItem(path)
+            item.clicked.connect(partial(self.map_selected_nation, u.find_in_list(nation_names, nation_name)))
+            item.entered.connect(partial(self.change_map_name, nation_name))
+            item.left.connect(partial(self.change_map_name, ''))
             brush = QtGui.QBrush(color)
             item.setBrush(brush)
-            item.setZValue(1)
+
             self.map_scene.addItem(item)
             # item = self.map_scene.addPath(path, brush=brush) # will use the default pen for outline
 
+        self.preview = message
 
+    def change_map_name(self, nation_name, event):
+        self.map_name_item.setText(nation_name)
+
+    def map_selected_nation(self, nation_row, event):
+        self.nations_list.setCurrentRow(nation_row)
+
+    def nations_list_selection_changed(self):
+        row = self.nations_list.currentRow()
+        id = self.nation_ids[row]
+        self.selected_nation = self.preview['nations'][id][kn.NAME]
+        nation_description = self.preview['nations'][id][kn.DESCRIPTION]
+        self.nation_info.setText(nation_description)
 
     def start_scenario_clicked(self):
-        pass
+        if self.selected_nation is not None:
+            self.nation_selected.emit(self.selected_nation)
 
     def stop(self):
         """
@@ -720,10 +762,15 @@ class Client():
             Shows the game lobby dialog.
         """
         lobby_widget = GameLobbyWidget()
-        dialog = cg.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby',
-                               help_callback=self.show_help_browser)
+        dialog = cg.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby', help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))
+        lobby_widget.single_player_start.connect(partial(self.single_player_start, dialog))
         dialog.show()
+
+    def single_player_start(self, lobby_dialog, scenario_file, selected_nation):
+        lobby_dialog.close()
+        widget = GameMainScreen()
+        self.main_window.change_content_widget(widget)
 
     def switch_to_editor_screen(self):
         """
