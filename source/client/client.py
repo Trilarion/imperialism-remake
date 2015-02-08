@@ -769,7 +769,7 @@ class Client():
 
     def single_player_start(self, lobby_dialog, scenario_file, selected_nation):
         lobby_dialog.close()
-        widget = GameMainScreen()
+        widget = GameMainScreen(self)
         self.main_window.change_content_widget(widget)
 
     def switch_to_editor_screen(self):

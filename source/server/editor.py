@@ -291,17 +291,17 @@ class EditorMainMap(QtGui.QGraphicsView):
 
         # TODO should load only once and cache (universal cache)
         # load all textures
-        textures = {}
-        textures[0] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_ocean.jpg')))
-        textures[1] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_plain.png')))
-        textures[2] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_plain.png')))
-        textures[3] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_plain.png')))
-        textures[4] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_tundra.png')))
-        textures[5] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_swamp.png')))
-        textures[6] = QtGui.QBrush(QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'texture_desert.png')))
+        brushes = {}
+        brushes[0] = QtGui.QBrush(QtGui.QColor(64, 64, 255))
+        brushes[1] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
+        brushes[2] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
+        brushes[3] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
+        brushes[4] = QtGui.QBrush(QtGui.QColor(222, 222, 222))
+        brushes[5] = QtGui.QBrush(QtGui.QColor(0, 128, 0))
+        brushes[6] = QtGui.QBrush(QtGui.QColor(222, 222, 0))
 
         # fill the ground layer with ocean
-        item = self.scene.addRect(0, 0, width, height, brush=textures[0], pen=g.TRANSPARENT_PEN)
+        item = self.scene.addRect(0, 0, width, height, brush=brushes[0], pen=g.TRANSPARENT_PEN)
         item.setZValue(0)
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
@@ -320,7 +320,7 @@ class EditorMainMap(QtGui.QGraphicsView):
         for t in paths:
             path = paths[t]
             path = path.simplified()
-            item = self.scene.addPath(path, brush=textures[t], pen=g.TRANSPARENT_PEN)
+            item = self.scene.addPath(path, brush=brushes[t], pen=g.TRANSPARENT_PEN)
             item.setZValue(1)
 
         # fill the half tiles which are not part of the map
