@@ -102,3 +102,26 @@ class TileDirections(u.AutoNumber):
     East = ()
     SouthEast = ()
     SouthWest = ()
+
+
+class PropertyKeyNames:
+    """
+        Key names for general properties of a scenario.
+    """
+
+    TITLE = 'scenario.title'
+    DESCRIPTION = 'scenario.description'
+    MAP_COLUMNS = 'map.columns'
+    MAP_ROWS = 'map.rows'
+    RIVERS = 'rivers'
+
+
+class NationPropertyKeyNames:
+    """
+        Key names for nation properties of a scenario.
+    """
+
+    COLOR = 'color'
+    NAME = 'name'
+    DESCRIPTION = 'description'
+    CAPITAL_PROVINCE = 'capital_province'

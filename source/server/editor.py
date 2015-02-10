@@ -28,7 +28,8 @@ import base.tools as t
 import base.constants as c
 import lib.graphics as g
 import client.graphics as cg
-from server.scenario import Scenario, PropertyKeyNames as k
+from server.scenario import Scenario
+from base.constants import PropertyKeyNames as k
 
 # TODO in the beginning of the editor just automatically create a new scenario with the default values, to show at least something
 
@@ -129,8 +130,8 @@ class EditorMiniMap(QtGui.QWidget):
         self.scene.setSceneRect(0, 0, 1, 1)
         self.view.fitInView(self.scene.sceneRect()) # simple and should work
 
-        tile_width = 1 / (columns + 1)
-        tile_height = 1 / rows
+        tile_width = round(1 / (columns + 0.5), 3)
+        tile_height = round(1 / rows, 3)
 
         # remove everything except tracker from the scene
         for item in self.removable_items:

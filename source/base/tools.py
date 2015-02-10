@@ -71,7 +71,10 @@ def log_write_entry(writer, prefix, text, exception=None):
         print(header + exception, end='\r\n', file=writer)
 
 def find_unused_resources():
-    pass
+    """
+        Report on unused ressources.
+    """
+    pass # TODO not implemented yet
 
 # singleton options dictionary (we only need one throughout the application)
 options = {}

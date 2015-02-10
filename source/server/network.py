@@ -27,8 +27,9 @@ from PySide import QtCore
 from lib.network import Server
 import lib.utils as u
 import base.constants as c
+from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
 from base.network import NetworkClient
-from server.scenario import Scenario, PropertyKeyNames as k, NationPropertyKeyNames as kn
+from server.scenario import Scenario
 
 class ServerManager(QtCore.QObject):
 

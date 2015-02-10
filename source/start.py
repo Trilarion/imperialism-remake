@@ -113,7 +113,7 @@ if __name__ == '__main__':
     t.save_options(Options_File)
     t.log_info('options saved')
 
-    # unused resources
+    # report on unused resources
     if c.Debug_Mode:
         t.find_unused_resources()
 

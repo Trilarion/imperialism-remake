@@ -34,7 +34,7 @@ import client.audio as audio
 from lib.browser import BrowserWidget
 from server.editor import EditorScreen
 from server.monitor import ServerMonitorWidget
-from server.scenario import PropertyKeyNames as k, NationPropertyKeyNames as kn
+from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
 from client.main_screen import GameMainScreen
 from client.network import network_client
 
