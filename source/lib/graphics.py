@@ -15,7 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from datetime import datetime
+
 from PySide import QtCore, QtGui
+
 
 """
     Graphics (Qt) based objects and algorithms that do not depend specifically on the project but only on Qt.
@@ -438,7 +440,6 @@ def makeDraggableWidget(parent):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
-
         def mousePressEvent(self, event):
             self.position_on_click = event.globalPos()
             super().mousePressEvent(event)
@@ -485,13 +486,15 @@ def makeClickableGraphicsItem(parent):
 
     return ClickableGraphicsItem
 
+
 def makeDraggableGraphicsItem(parent):
     """
-
+        Takes a QtGui.QGraphicsItem and adds signals for dragging the object around. For this the item must have the
+        ItemIsMovable and ItemSendsScenePositionChanges flags set. Only use it when really needed because there is
+        some performance hit attached.
     """
 
-    class DraggableGraphicsRectItem(parent, QtCore.QObject):
-
+    class DraggableGraphicsItem(parent, QtCore.QObject):
         changed = QtCore.Signal(object)
 
         def __init__(self, *args, **kwargs):
@@ -507,7 +510,7 @@ def makeDraggableGraphicsItem(parent):
 
             return parent.itemChange(self, change, value)
 
-    return DraggableGraphicsRectItem
+    return DraggableGraphicsItem
 
 # Some classes we need (just to make the naming clear), Name will be used in Stylesheet selectors
 DraggableToolBar = makeDraggableWidget(QtGui.QToolBar)
@@ -515,6 +518,7 @@ ClickableWidget = makeWidgetClickable(QtGui.QWidget)
 ClickablePixmapItem = makeClickableGraphicsItem(QtGui.QGraphicsPixmapItem)
 ClickablePathItem = makeClickableGraphicsItem(QtGui.QGraphicsPathItem)
 DraggableRectItem = makeDraggableGraphicsItem(QtGui.QGraphicsRectItem)
+
 
 class ClockLabel(QtGui.QLabel):
     """
@@ -536,6 +540,7 @@ class ClockLabel(QtGui.QLabel):
 # some constant expressions
 TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
 
+
 def create_action(icon, text, parent, trigger_connection=None, toggle_connection=None, checkable=False):
     """
         Shortcut for creation of an action and wiring.
@@ -548,9 +553,10 @@ def create_action(icon, text, parent, trigger_connection=None, toggle_connection
     action.setCheckable(checkable)
     return action
 
+
 def wrap_in_groupbox(item, title):
     """
-
+        Shortcut for putting a widget or a layout into a QGroupBox (with a title). Returns the group box.
     """
     box = QtGui.QGroupBox(title)
     if isinstance(item, QtGui.QWidget):
@@ -560,9 +566,12 @@ def wrap_in_groupbox(item, title):
         box.setLayout(item)
     return box
 
+
 class FitSceneInViewGraphicsView(QtGui.QGraphicsView):
     """
-
+        Extension of QGraphicsView that fits the scene rectangle of the scene into the view when the view is shown.
+        This avoids problems with the size of the view different before any layout can take place and therefore
+        fitInView failing.
     """
 
     def __init__(self, *args, **kwargs):

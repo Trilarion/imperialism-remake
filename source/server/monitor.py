@@ -19,7 +19,9 @@
 """
 
 from PySide import QtCore, QtGui
+
 from server.network import server_manager
+
 
 class ServerMonitorWidget(QtGui.QWidget):
     """
@@ -38,7 +40,7 @@ class ServerMonitorWidget(QtGui.QWidget):
         self.timer = QtCore.QTimer()
         # noinspection PyUnresolvedReferences
         self.timer.timeout.connect(self.update_monitor)
-        self.timer.setInterval(5000) # update every 5 seconds
+        self.timer.setInterval(5000)  # update every 5 seconds
         self.timer.start()
         # and one initial update
         self.update_monitor()

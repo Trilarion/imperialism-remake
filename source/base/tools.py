@@ -34,6 +34,7 @@ def load_ui_icon(name):
     file_name = c.extend(c.Graphics_UI_Folder, name)
     return QtGui.QIcon(file_name)
 
+
 def log_info(text):
     """
         Prints a INFO message to stdout.
@@ -70,14 +71,16 @@ def log_write_entry(writer, prefix, text, exception=None):
     if exception is not None:
         print(header + exception, end='\r\n', file=writer)
 
+
 def find_unused_resources():
     """
         Report on unused ressources.
     """
-    pass # TODO not implemented yet
+    pass  # TODO not implemented yet
 
 # singleton options dictionary (we only need one throughout the application)
 options = {}
+
 
 def load_options(file_name):
     """

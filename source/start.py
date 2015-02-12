@@ -54,6 +54,7 @@ if __name__ == '__main__':
 
     # determine Debug_Mode from runtime arguments
     from base import constants as c
+
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         c.Debug_Mode = True
         print('debug mode on')
@@ -107,6 +108,7 @@ if __name__ == '__main__':
 
     # start client
     from client import client
+
     client.start()
 
     # save options

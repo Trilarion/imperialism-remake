@@ -2,7 +2,7 @@ from PySide import QtCore
 
 from base import constants as c
 from server.network import server_manager
-from client.network import network_client
+from client.client import network_client
 
 
 def setup():

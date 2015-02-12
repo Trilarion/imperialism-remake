@@ -31,15 +31,27 @@ from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
 from base.network import NetworkClient
 from server.scenario import Scenario
 
+
+"""
+"""
+
+
 class ServerManager(QtCore.QObject):
+    """
+
+    """
 
     def __init__(self):
+        """
+        """
         super().__init__()
         self.server = Server()
         self.server.new_client.connect(self.new_client)
         self.server_clients = []
 
     def new_client(self, socket):
+        """
+        """
         client = NetworkClient()
         client.set_socket(socket)
 
@@ -61,6 +73,7 @@ class ServerManager(QtCore.QObject):
 
     def core_scenario_titles(self, client, message):
         """
+
         """
         # get all core scenario files
         scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
@@ -79,11 +92,11 @@ class ServerManager(QtCore.QObject):
         scenarios = zip(scenario_titles, scenario_files)
 
         # sort them
-        scenarios = sorted(scenarios) # default sort order is by first element anyway
+        scenarios = sorted(scenarios)  # default sort order is by first element anyway
 
         # return message
         titles = {
-            'scenarios' : scenarios
+            'scenarios': scenarios
         }
         client.send(message['reply-to'], titles)
 
@@ -94,7 +107,7 @@ class ServerManager(QtCore.QObject):
         t0 = time.clock()
 
         scenario = Scenario()
-        file_name = message['scenario'] # should be the file name
+        file_name = message['scenario']  # should be the file name
         # TODO existing? can be loaded?
         scenario.load(file_name)
         print('reading the file took {}s'.format(time.clock() - t0))

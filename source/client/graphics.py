@@ -18,7 +18,6 @@ from PySide import QtGui, QtCore
 
 from base import tools as t
 
-
 """
     Graphics elements that are dependent on the tools and lib.graphics library, but not on any game specific (constants,
     scenario or otherwise) logic. Therefore kind of a intermediate abstraction between the fully independent lib.graphics
@@ -101,3 +100,31 @@ class GameDialog(QtGui.QWidget):
         """
         if self.close_callback and not self.close_callback(self):
             event.ignore()
+
+
+class MiniMapNationItem(g.ClickablePathItem):
+    """
+        The outline of a nation in any mini map that should be clickable. Has an effect.
+    """
+
+    def __init__(self, path):
+        """
+            Adds a QGraphicsDropShadowEffect when hovering over the item. Otherwise it is just a clickable
+            QGraphicsPathItem.
+        """
+        super().__init__(path)
+        self.entered.connect(self.entered_item)
+        self.left.connect(self.left_item)
+        self.hover_effect = QtGui.QGraphicsDropShadowEffect()
+        self.hover_effect.setOffset(4, 4)
+        self.setGraphicsEffect(self.hover_effect)
+        # the default state
+        self.left_item()
+
+    def entered_item(self):
+        self.setZValue(2)
+        self.hover_effect.setEnabled(True)
+
+    def left_item(self):
+        self.hover_effect.setEnabled(False)
+        self.setZValue(1)

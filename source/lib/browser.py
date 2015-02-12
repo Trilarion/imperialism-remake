@@ -142,7 +142,7 @@ class BrowserWidget(QtGui.QWidget):
         # page_title = self.web_view.title()
         # if not page_title:
         # self.widget.setWindowTitle(self.title)
-        #else:
+        # else:
         #    self.widget.setWindowTitle('{} - {}'.format(self.title, self.web_view.title()))
 
         # update tooltips of forward/backward button

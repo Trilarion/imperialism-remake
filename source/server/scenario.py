@@ -14,17 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
-    thin client).
-"""
-
 import math
 
 from PySide import QtCore
 
 from base import constants as c
 import lib.utils as u
+
+
+"""
+    Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
+    thin client).
+"""
+
 
 class Scenario(QtCore.QObject):
     """
@@ -59,6 +61,9 @@ class Scenario(QtCore.QObject):
         self._map['resource'] = [0] * number_tiles
 
     def add_river(self, name, tiles):
+        """
+
+        """
         river = {
             'name': name,
             'tiles': tiles
@@ -95,7 +100,8 @@ class Scenario(QtCore.QObject):
         """
         column = math.floor(x - (y % 2) / 2)
         row = math.floor(y)
-        if row < 0 or row >= self._properties[c.PropertyKeyNames.MAP_ROWS] or column < 0 or column >= self._properties[c.PropertyKeyNames.MAP_COLUMNS]:
+        if row < 0 or row >= self._properties[c.PropertyKeyNames.MAP_ROWS] or column < 0 or column >= self._properties[
+            c.PropertyKeyNames.MAP_COLUMNS]:
             return -1, -1
         return column, row
 
@@ -176,6 +182,9 @@ class Scenario(QtCore.QObject):
                 return None
 
     def get_neighbored_tiles(self, column, row):
+        """
+
+        """
         tiles = []
         for direction in c.TileDirections:
             tiles.append(self.get_neighbor_position(column, row, direction))
@@ -225,10 +234,16 @@ class Scenario(QtCore.QObject):
             raise RuntimeError('Unknown province {} or property {}.'.format(province, key))
 
     def add_province_map_tile(self, province, position):
+        """
+
+        """
         if province in self._provinces and self.is_valid_position(position):
             self._provinces[province]['tiles'].append(position)
 
     def all_nations(self):
+        """
+
+        """
         return self._nations.keys()
 
     def new_nation(self):
@@ -260,13 +275,19 @@ class Scenario(QtCore.QObject):
             raise RuntimeError('Unknown nation {} or property {}.'.format(nation, key))
 
     def get_provinces_of_nation(self, nation):
+        """
+
+        """
         if nation in self._nations:
             return self._nations[nation]['provinces']
         else:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
     def get_province_at(self, column, row):
-        position = [column, row] # internally because of JSON saving we only have []
+        """
+
+        """
+        position = [column, row]  # internally because of JSON saving we only have []
         for province in self._provinces:
             if position in self._provinces[province]['tiles']:
                 return province
@@ -282,6 +303,9 @@ class Scenario(QtCore.QObject):
         self._provinces[province]['nation'] = nation
 
     def get_terrain_name(self, terrain):
+        """
+
+        """
         return self._properties['rules']['terrain.names'][terrain]
 
     def load(self, file_name):
@@ -299,6 +323,9 @@ class Scenario(QtCore.QObject):
         self.load_rules()
 
     def load_rules(self):
+        """
+
+        """
         # read rules
         rule_file = c.extend(c.Scenario_Ruleset_Folder, self._properties['rules'])
         self._properties['rules'] = u.read_as_yaml(rule_file)

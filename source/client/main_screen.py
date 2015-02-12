@@ -14,29 +14,46 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-"""
-
 from PySide import QtGui
 
 import base.tools as t
 
+"""
+    The main game screen.
+"""
+
+
 class MiniMap(QtGui.QWidget):
+    """
+        Mini map on the left upper side.
+    """
 
     def __init__(self):
         super().__init__()
+
 
 class MainMap(QtGui.QGraphicsView):
+    """
+        Main map on the right side.
+    """
 
     def __init__(self):
         super().__init__()
+
 
 class InfoBox(QtGui.QWidget):
+    """
+        Info box on the left lower side.
+    """
 
     def __init__(self):
         super().__init__()
 
+
 class GameMainScreen(QtGui.QWidget):
+    """
+        The whole screen (layout of single elements and interactions.
+    """
 
     def __init__(self, client):
         super().__init__()
@@ -67,5 +84,3 @@ class GameMainScreen(QtGui.QWidget):
         layout.addWidget(self.main_map, 0, 1, 3, 1)
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
-
-
