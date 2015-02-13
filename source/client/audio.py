@@ -14,16 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    Plays soundtrack music.
-"""
-
 from PySide import QtCore
 from PySide.phonon import Phonon
 
-from base import constants as c
 from lib import utils as u
+from base import constants as c
 
+"""
+    Plays soundtrack music.
+"""
 
 def is_mime_type_ogg_available():
     """

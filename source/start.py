@@ -16,7 +16,6 @@
 
 """
     Starts the application.
-
     Start in project root folder and with 'debug' as parameter if wished.
 """
 

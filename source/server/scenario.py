@@ -18,15 +18,15 @@ import math
 
 from PySide import QtCore
 
-from base import constants as c
 import lib.utils as u
-
+from base import constants as c
 
 """
     Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
     thin client).
 """
 
+# TODO rivers are implemented inefficiently
 
 class Scenario(QtCore.QObject):
     """
@@ -62,7 +62,7 @@ class Scenario(QtCore.QObject):
 
     def add_river(self, name, tiles):
         """
-
+            Adds a river with a list of tiles and a name.
         """
         river = {
             'name': name,
@@ -122,7 +122,9 @@ class Scenario(QtCore.QObject):
 
     def get_neighbor_position(self, column, row, direction):
         """
-
+            Given a positon (column, row) and a direction (c.TileDirections) return the position of the next neighbor
+            tile in that direction given our staggered tile layout where the second and all other odd rows are shifted
+            half a tile to the right. Returns None if we would be outside of the map area.
         """
         if direction is c.TileDirections.West:
             # west
@@ -183,7 +185,7 @@ class Scenario(QtCore.QObject):
 
     def get_neighbored_tiles(self, column, row):
         """
-
+            For all directions, get all neighbored tiles.
         """
         tiles = []
         for direction in c.TileDirections:
@@ -235,14 +237,15 @@ class Scenario(QtCore.QObject):
 
     def add_province_map_tile(self, province, position):
         """
-
+            Adds a position to a province.
+            TODO we should check that this position is not yet in another province (it should be cleared before). fail fast, fail often
         """
         if province in self._provinces and self.is_valid_position(position):
             self._provinces[province]['tiles'].append(position)
 
     def all_nations(self):
         """
-
+            Return a list of ids for all nations.
         """
         return self._nations.keys()
 
@@ -276,7 +279,7 @@ class Scenario(QtCore.QObject):
 
     def get_provinces_of_nation(self, nation):
         """
-
+            Return ids for all provinces in a nation.
         """
         if nation in self._nations:
             return self._nations[nation]['provinces']
@@ -285,7 +288,9 @@ class Scenario(QtCore.QObject):
 
     def get_province_at(self, column, row):
         """
+            Given a position (column, row) returns the province.
 
+            TODO speed up by having a reference in the map. (see also programmers.SE question)
         """
         position = [column, row]  # internally because of JSON saving we only have []
         for province in self._provinces:
@@ -304,7 +309,9 @@ class Scenario(QtCore.QObject):
 
     def get_terrain_name(self, terrain):
         """
+            Get a special property from the rules.
 
+            TODO move this to a special rules class. Only have rules() and setRules() here.
         """
         return self._properties['rules']['terrain.names'][terrain]
 

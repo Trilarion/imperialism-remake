@@ -14,10 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    Server network code. Only deals with the network connection, client connection management and message distribution.
-"""
-
 import random
 import os
 import time
@@ -31,18 +27,21 @@ from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
 from base.network import NetworkClient
 from server.scenario import Scenario
 
-
 """
+    Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
+# TODO ping server clients regularly and throw them out if not reacting
 
 class ServerManager(QtCore.QObject):
     """
-
+        Manages the server, the clients on the server and the general services on the server. In particular creates new
+        clients on the server (server clients),
     """
 
     def __init__(self):
         """
+            We start with a server and an empty list of server clients.
         """
         super().__init__()
         self.server = Server()
@@ -51,6 +50,8 @@ class ServerManager(QtCore.QObject):
 
     def new_client(self, socket):
         """
+            A new connection to the server. Give an id and add some general receivers to the new server client.
+            Finally append new server client to the internal client list.
         """
         client = NetworkClient()
         client.set_socket(socket)
@@ -64,7 +65,7 @@ class ServerManager(QtCore.QObject):
                 break
         client.client_id = id
 
-        # add some general channels
+        # add some general receivers.
         client.connect_to_channel(c.CH_SCENARIO_PREVIEW, self.scenario_preview)
         client.connect_to_channel(c.CH_CORE_SCENARIO_TITLES, self.core_scenario_titles)
 
@@ -73,7 +74,8 @@ class ServerManager(QtCore.QObject):
 
     def core_scenario_titles(self, client, message):
         """
-
+            A server client received a message on the c.CH_CORE_SCENARIO_TITLES channel. Return all available core
+            scenario titles and file names.
         """
         # get all core scenario files
         scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
@@ -102,7 +104,8 @@ class ServerManager(QtCore.QObject):
 
     def scenario_preview(self, client, message):
         """
-
+            A client got a message on the c.CH_SCENARIO_PREVIEW channel. In the message should be a scenario file name
+            (key = 'scenario'). Assemble a preview and send it back.
         """
         t0 = time.clock()
 

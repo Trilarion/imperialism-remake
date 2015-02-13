@@ -14,18 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import os
+
+from lib import utils as u
+from base import constants as c
+
 """
     Generates the playlist of the soundtrack (file names and titles displayed
     in the game). Phonon cannot read metadata under Windows sometimes, see:
     http://stackoverflow.com/questions/23288557/phonon-cant-get-meta-data-of-audio-files-in-python
 """
 
-import os
-
 os.chdir('..')
-
-from base import constants as c
-from lib import utils as u
 
 # create the playlist, a list of (filename, title)
 playlist = [['01 Imperialism Theme.ogg', 'Imperialism Theme']]

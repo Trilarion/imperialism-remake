@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import os, shutil
+
+import markdown  # https://pypi.python.org/pypi/Markdown
+
 """
     Converts the help files written in Markdown syntax to html using the markdown
     converter.
 """
-
-import os, shutil
-import markdown  # https://pypi.python.org/pypi/Markdown
 
 def convert():
     """

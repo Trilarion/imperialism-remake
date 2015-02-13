@@ -14,14 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import os, shutil, zipfile
+
+import manual_markdown_converter
+
 """
     Creates an OS independent package (as zip file) that contains the sources and the
     data but requires Python and PySide to be installed manually also saving space.
     It serves as generic non Windows distribution for the moment.
 """
-
-import os, shutil, zipfile
-import manual_markdown_converter
 
 # version string for file name encoding
 version = '0.2.1'

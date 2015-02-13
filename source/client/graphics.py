@@ -16,6 +16,7 @@
 
 from PySide import QtGui, QtCore
 
+import lib.graphics as g
 from base import tools as t
 
 """
@@ -23,9 +24,6 @@ from base import tools as t
     scenario or otherwise) logic. Therefore kind of a intermediate abstraction between the fully independent lib.graphics
     module and the client game specific logic under folder client.
 """
-
-import lib.graphics as g
-
 
 class GameDialog(QtGui.QWidget):
     """
@@ -107,24 +105,32 @@ class MiniMapNationItem(g.ClickablePathItem):
         The outline of a nation in any mini map that should be clickable. Has an effect.
     """
 
-    def __init__(self, path):
+    def __init__(self, path, z_left, z_entered):
         """
             Adds a QGraphicsDropShadowEffect when hovering over the item. Otherwise it is just a clickable
             QGraphicsPathItem.
         """
         super().__init__(path)
+        self.z_entered = z_entered
+        self.z_left = z_left
         self.entered.connect(self.entered_item)
         self.left.connect(self.left_item)
         self.hover_effect = QtGui.QGraphicsDropShadowEffect()
         self.hover_effect.setOffset(4, 4)
         self.setGraphicsEffect(self.hover_effect)
-        # the default state
+        # the graphics effect is enabled initially, disable by calling left_item
         self.left_item()
 
     def entered_item(self):
-        self.setZValue(2)
+        """
+            Set z value and enables the hover effect.
+        """
+        self.setZValue(self.z_entered)
         self.hover_effect.setEnabled(True)
 
     def left_item(self):
+        """
+            Set the z value and disables the hover effect.
+        """
         self.hover_effect.setEnabled(False)
-        self.setZValue(1)
+        self.setZValue(self.z_left)

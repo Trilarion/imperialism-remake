@@ -14,20 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import os
+
+from lib import utils as u
+from base import constants as c
+
 """
     Generates the default options.
 """
 
-import os
-
 os.chdir('..')
-
-from base import constants as c
-from lib import utils as u
 
 # options are stored as a dictionary
 options = {
-    c.O_Version: 'v0.2.1 (2014-11-??)', # to be displayed on the start screen
+    c.O_Version: 'v0.2.1 (2015-02-13)', # to be displayed on the start screen
     c.O_Options_Version: 1, # version of options
 
     c.OG_MW_Fullscreen: True, # we start full screen (can be unset by the program for some linux desktop environments

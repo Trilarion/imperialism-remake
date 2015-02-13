@@ -14,15 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    Using Signals of Qt, we refine on the network Client class in lib/network.py. Channels are introduced which have
-    names and a signal to connect/disconnect to.
-"""
-
 from PySide import QtCore
 
 from lib.network import Client
 
+"""
+    Using Signals of Qt, we refine on the network Client class in lib/network.py. Channels are introduced which have
+    names and a signal to connect/disconnect to.
+"""
 
 class NetworkClient(Client):
     """

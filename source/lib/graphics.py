@@ -18,13 +18,11 @@ from datetime import datetime
 
 from PySide import QtCore, QtGui
 
-
 """
     Graphics (Qt) based objects and algorithms that do not depend specifically on the project but only on Qt.
 
     Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
 """
-
 
 class RelativeLayoutConstraint():
     """
@@ -441,10 +439,18 @@ def makeDraggableWidget(parent):
             super().__init__(*args, **kwargs)
 
         def mousePressEvent(self, event):
+            """
+                The mouse is now pressed. Store initial position on screen.
+            """
             self.position_on_click = event.globalPos()
             super().mousePressEvent(event)
 
         def mouseMoveEvent(self, event):
+            """
+                The mouse has moved. Calculate difference to previous position and emit signal dragged. Update position.
+
+                Note: This slot is only called if the mouse is also pressed (see documentation).
+            """
             super().mouseMoveEvent(event)
             position_now = event.globalPos()
             self.dragged.emit(position_now - self.position_on_click)
@@ -466,6 +472,10 @@ def makeClickableGraphicsItem(parent):
         clicked = QtCore.Signal(QtGui.QGraphicsSceneMouseEvent)
 
         def __init__(self, *args, **kwargs):
+            """
+                QGraphicsItems by default do not accept hover events or accept mouse buttons (for performance reasons).
+                So we need to turn both on.
+            """
             parent.__init__(self, *args, **kwargs)
             QtCore.QObject.__init__(self)
             self.parent = parent
@@ -473,16 +483,26 @@ def makeClickableGraphicsItem(parent):
             self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
 
         def hoverEnterEvent(self, event):
-            self.entered.emit(event)
+            """
+                Emit the entered signal after default handling.
+            """
             self.parent.hoverEnterEvent(self, event)
+            self.entered.emit(event)
 
         def hoverLeaveEvent(self, event):
-            self.left.emit(event)
+            """
+                Emit the left signal after default handling.
+            """
             self.parent.hoverLeaveEvent(self, event)
+            self.left.emit(event)
 
         def mousePressEvent(self, event):
-            self.clicked.emit(event)
+            """
+                Emit the clicked signal after default handling.
+            """
             self.parent.mousePressEvent(self, event)
+            self.clicked.emit(event)
+
 
     return ClickableGraphicsItem
 
@@ -498,6 +518,10 @@ def makeDraggableGraphicsItem(parent):
         changed = QtCore.Signal(object)
 
         def __init__(self, *args, **kwargs):
+            """
+                By default QGraphicsItems are not movable and also do not emit signals when the position is changed for
+                performance reasons. We need to turn this on.
+            """
             parent.__init__(self, *args, **kwargs)
             self.parent = parent
             QtCore.QObject.__init__(self)
@@ -505,6 +529,9 @@ def makeDraggableGraphicsItem(parent):
             self.setFlags(QtGui.QGraphicsItem.ItemIsMovable | QtGui.QGraphicsItem.ItemSendsScenePositionChanges)
 
         def itemChange(self, change, value):
+            """
+                Catch all item position changes and emit the changed signal with the value (which will be the position).
+            """
             if change == QtGui.QGraphicsItem.ItemPositionChange:
                 self.changed.emit(value)
 
@@ -526,6 +553,10 @@ class ClockLabel(QtGui.QLabel):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+            We initialize the timer and set the update interval (one minute) and start it and update the clock at least
+            once.
+        """
         super().__init__(*args, **kwargs)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_clock)
@@ -534,6 +565,9 @@ class ClockLabel(QtGui.QLabel):
         self.update_clock()
 
     def update_clock(self):
+        """
+            We get the time and format as hour:minute and update the label text.
+        """
         text = datetime.now().strftime('%H:%M')
         self.setText(text)
 
@@ -578,5 +612,9 @@ class FitSceneInViewGraphicsView(QtGui.QGraphicsView):
         super().__init__(*args, **kwargs)
 
     def showEvent(self, event):
+        """
+            The view is shown (and therefore has correct size). We fit the scene rectangle into the view without
+            distorting the scene proportions.
+        """
         self.fitInView(self.sceneRect(), QtCore.Qt.KeepAspectRatio)
         super().showEvent(event)

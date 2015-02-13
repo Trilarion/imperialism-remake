@@ -14,10 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
-"""
-
 # TODO automatic placement of help dialog depending on if another dialog is open
 # TODO help dialog has close button in focus initially (why?) remove this
 
@@ -25,23 +21,26 @@ from functools import partial
 
 from PySide import QtGui, QtCore
 
-import base.tools as t
-import base.constants as c
-from client.graphics import MiniMapNationItem
 import lib.graphics as g
 import lib.utils as u
+from lib.browser import BrowserWidget
+import base.tools as t
+import base.constants as c
+import base.network as net
+from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
+from client.graphics import MiniMapNationItem
 import client.graphics as cg
 import client.audio as audio
-from lib.browser import BrowserWidget
+from client.main_screen import GameMainScreen
 from server.editor import EditorScreen
 from server.monitor import ServerMonitorWidget
-from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
-from client.main_screen import GameMainScreen
-import base.network as net
+
+"""
+    Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
+"""
 
 network_client = net.NetworkClient()
 network_client.set_socket()
-
 
 class MapItem(QtCore.QObject):
     """
@@ -376,7 +375,7 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
                         path.addRect(column, row, 1, 1)
             path = path.simplified()
 
-            item = MiniMapNationItem(path)
+            item = MiniMapNationItem(path, 1, 2)
             item.clicked.connect(partial(self.map_selected_nation, u.find_in_list(nation_names, nation_name)))
             item.entered.connect(partial(self.change_map_name, nation_name))
             item.left.connect(partial(self.change_map_name, ''))
@@ -481,7 +480,7 @@ class SinglePlayerScenarioTitleSelection(QtGui.QGroupBox):
 
     def selection_changed(self):
         """
-
+            A scenario title has been selected in the list.
         """
         # get selected file
         row = self.list.currentRow()  # only useful if QListWidget does not sort by itself
@@ -536,23 +535,23 @@ class OptionsContentWidget(QtGui.QWidget):
         self.checkboxes = []
 
         # add tabs
-        self.create_tab_general()
-        self.create_tab_graphics()
-        self.create_tab_music()
+        self.create_general_options_widget()
+        self.create_graphics_options_widget()
+        self.create_music_options_widget()
 
         # show general preferences
         action_preferences_general.setChecked(True)
 
     def toggled_general(self, checked):
         """
-
+            Toolbar button for general preferences toggled.
         """
         if checked is True:
             self.stacked_layout.setCurrentWidget(self.tab_general)
 
-    def create_tab_general(self):
+    def create_general_options_widget(self):
         """
-            General options tab
+            Create general options widget.
         """
         tab = QtGui.QWidget()
         tab_layout = QtGui.QVBoxLayout(tab)
@@ -566,14 +565,14 @@ class OptionsContentWidget(QtGui.QWidget):
 
     def toggled_graphics(self, checked):
         """
-
+            Toolbar button for graphical preferences toggled.
         """
         if checked is True:
             self.stacked_layout.setCurrentWidget(self.tab_graphics)
 
-    def create_tab_graphics(self):
+    def create_graphics_options_widget(self):
         """
-
+            Create graphical options widget.
         """
 
         tab = QtGui.QWidget()
@@ -593,14 +592,14 @@ class OptionsContentWidget(QtGui.QWidget):
 
     def toggled_music(self, checked):
         """
-
+            Toolbar button for music preferences toggled.
         """
         if checked is True:
             self.stacked_layout.setCurrentWidget(self.tab_music)
 
-    def create_tab_music(self):
+    def create_music_options_widget(self):
         """
-            Music options tab
+            Create music options widget.
         """
         tab = QtGui.QWidget()
         tab_layout = QtGui.QVBoxLayout(tab)
@@ -697,6 +696,7 @@ class MainWindow(QtGui.QWidget):
 
     def change_content_widget(self, widget):
         """
+            Another screen shall be displayed. Exchange the content widget with a new one.
         """
         if self.content:
             self.layout.removeWidget(self.content)
@@ -795,7 +795,11 @@ class Client():
 
     def show_server_monitor(self):
         """
+            Displays the server monitor as a modal window.
 
+            TODO Do we want that non-modal?
+
+            Is invoked when pressing F2.
         """
         monitor_widget = ServerMonitorWidget()
         dialog = cg.GameDialog(self.main_window, monitor_widget, delete_on_close=True, title='Server Monitor')
@@ -821,6 +825,9 @@ class Client():
         dialog.show()
 
     def single_player_start(self, lobby_dialog, scenario_file, selected_nation):
+        """
+            Shows the main game screen which will start a scenario file and a selected nation.
+        """
         lobby_dialog.close()
         widget = GameMainScreen(self)
         self.main_window.change_content_widget(widget)
@@ -859,7 +866,7 @@ class Client():
 
 def network_start():
     """
-
+        Starts the local server and connects the local client to it.
     """
 
     # start local server
@@ -879,6 +886,10 @@ def network_start():
 
 
 def start():
+    """
+        Creates the Qt application and shows the main window.
+    """
+
     # create app
     app = QtGui.QApplication([])
 

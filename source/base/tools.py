@@ -14,18 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import sys
+import datetime
+from PySide import QtGui, QtCore
+
+from lib.utils import read_as_yaml, write_as_yaml
+from base import constants as c
+
 """
     Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.
 """
-
-import sys
-import datetime
-
-from PySide import QtGui, QtCore
-
-from base import constants as c
-from lib.utils import read_as_yaml, write_as_yaml
-
 
 def load_ui_icon(name):
     """

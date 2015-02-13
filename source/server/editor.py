@@ -14,35 +14,37 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
-    know anything about the scenario, we put it in the server module.
-"""
-
 import os
 import math
 
 from PySide import QtGui, QtCore
 
+import lib.graphics as g
 import base.tools as t
 import base.constants as c
-import lib.graphics as g
+from base.constants import PropertyKeyNames as k
 import client.graphics as cg
 from server.scenario import Scenario
-from base.constants import PropertyKeyNames as k
+
+"""
+    GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
+    know anything about the scenario, we put it in the server module.
+"""
 
 # TODO in the beginning of the editor just automatically create a new scenario with the default values, to show at least something
 
+# A dictionary with all the default properties of a new scenario.
+# TODO should this rather go to scenario as a static function?
 NEW_SCENARIO_DEFAULT_PROPERTIES = {
     k.TITLE: 'Unnamed',
     k.MAP_COLUMNS: 100,
     k.MAP_ROWS: 60
 }
 
-
 class EditorScenario(Scenario):
     """
-
+        As a small wrapper this is a Scenario with a everything_changed signal that is emitted, if a new scenario is loaded.
+        TODO Do we really need it or can we call the connected slot(s) also manually after loading?
     """
 
     everything_changed = QtCore.Signal()
@@ -57,11 +59,15 @@ class EditorMiniMap(QtGui.QWidget):
         Small overview map
     """
 
+    # Fixed width of 300 pixels
     VIEW_WIDTH = 300
 
     focus_moved = QtCore.Signal(float, float)
 
     def __init__(self, scenario):
+        """
+            Sets up the graphics view, the toolbar and the tracker rectangle.
+        """
         super().__init__()
         self.setObjectName('minimap')
 
@@ -123,6 +129,7 @@ class EditorMiniMap(QtGui.QWidget):
 
     def redraw_map(self):
         """
+            The map is not yet drawn or has changed or the mode has changed. Redraw it.
         """
 
         # adjust view height
@@ -217,18 +224,27 @@ class EditorMiniMap(QtGui.QWidget):
                 self.removable_items.extend([item])
 
     def toggled_political(self, checked):
+        """
+            The toolbar button for the political view has been toggled.
+        """
         if checked is True:
             # self.map_mode should be 'geographical'
             self.map_mode = 'political'
             self.redraw_map()
 
     def toggled_geographical(self, checked):
+        """
+            The toolbar button for the geographical view has been toggled.
+        """
         if checked is True:
             # self.map_mode should be 'political'
             self.map_mode = 'geographical'
             self.redraw_map()
 
     def mousePressEvent(self, event):
+        """
+            The mouse has been pressed inside the view. Center the tracker rectangle.
+        """
         super().mouseMoveEvent(event)
 
         # if the tracker is not yet visible, don't do anything
@@ -435,6 +451,10 @@ class EditorMainMap(QtGui.QGraphicsView):
                 self.scene.addItem(item)
 
     def get_bounds(self):
+        """
+            Returns the visible part of the map view relative to the total scene rectangle as a rectangle (with all
+            values between 0 and 1).
+        """
         # total rectangle of the scene (0, 0, width, height)
         s = self.scene.sceneRect()
         # visible rectangle of the view
@@ -442,6 +462,9 @@ class EditorMainMap(QtGui.QGraphicsView):
         return QtCore.QRectF(v.x() / s.width(), v.y() / s.height(), v.width() / s.width(), v.height() / s.height())
 
     def set_position(self, x, y):
+        """
+            Changes the visible part of the view.
+        """
         # total rectangle of the scene (0, 0, width, height)
         s = self.scene.sceneRect()
         # visible rectangle of the view
@@ -453,6 +476,9 @@ class EditorMainMap(QtGui.QGraphicsView):
         self.centerOn(x, y)
 
     def mouseMoveEvent(self, event):
+        """
+            The mouse on the view has been moved. Emit signal tile_at_focus_changed if we now hover over a different tile.
+        """
         # get mouse position in scene coordinates
         scene_position = self.mapToScene(event.pos()) / self.TILE_SIZE
         column, row = self.scenario.map_position(scene_position.x(), scene_position.y())
@@ -469,6 +495,9 @@ class InfoBox(QtGui.QWidget):
     """
 
     def __init__(self, scenario):
+        """
+            Layout.
+        """
         super().__init__()
         self.setObjectName('infobox')
         layout = QtGui.QVBoxLayout(self)
@@ -488,6 +517,9 @@ class InfoBox(QtGui.QWidget):
         self.scenario = scenario
 
     def create_toolbar(self):
+        """
+            Setup toolbar at the bottom.
+        """
         layout = QtGui.QHBoxLayout()
 
         toolbar = QtGui.QToolBar()
@@ -500,7 +532,10 @@ class InfoBox(QtGui.QWidget):
 
         return layout
 
-    def new_map_position(self, column, row):
+    def update_tile_information(self, column, row):
+        """
+            Displays data of a new tile (hovered or clicked in the main map).
+        """
         text = 'Position ({}, {})'.format(column, row)
         terrain = self.scenario.terrain_at(column, row)
         terrain_name = self.scenario.get_terrain_name(terrain)
@@ -513,6 +548,9 @@ class InfoBox(QtGui.QWidget):
         self.text_label.setText(text)
 
     def change_terrain(self):
+        """
+            The change terrain type button has been clicked.
+        """
         pass
 
 
@@ -525,6 +563,9 @@ class NewScenarioDialogWidget(QtGui.QWidget):
     create_scenario = QtCore.Signal(dict)
 
     def __init__(self, properties):
+        """
+            Sets up all the input elements of the create new scenario dialog.
+        """
         super().__init__()
         self.properties = properties
 
@@ -590,6 +631,10 @@ class NewScenarioDialogWidget(QtGui.QWidget):
 
 
 class GeneralPropertiesWidget(QtGui.QWidget):
+    """
+        Modify general properties of a scenario dialog.
+    """
+
     def __init__(self, scenario):
         super().__init__()
         self.scenario = scenario
@@ -610,16 +655,27 @@ class GeneralPropertiesWidget(QtGui.QWidget):
         widget_layout.addStretch()
 
     def close_request(self, parent_widget):
+        """
+            Dialog will be closed, save data.
+        """
         self.scenario[k.TITLE] = self.edit.text()
         return True
 
 
 class NationPropertiesWidget(QtGui.QWidget):
+    """
+        Modify nation properties dialog.
+    """
+
     def __init__(self):
         super().__init__()
 
 
 class ProvincePropertiesWidget(QtGui.QWidget):
+    """
+        Modify provinces properties dialog.
+    """
+
     def __init__(self):
         super().__init__()
 
@@ -680,7 +736,7 @@ class EditorScreen(QtGui.QWidget):
 
         # the main map
         self.map = EditorMainMap(self.scenario)
-        self.map.tile_at_focus_changed.connect(self.info_box.new_map_position)
+        self.map.tile_at_focus_changed.connect(self.info_box.update_tile_information)
 
         # the mini map
         self.mini_map = EditorMiniMap(self.scenario)
@@ -698,6 +754,9 @@ class EditorScreen(QtGui.QWidget):
         self.scenario.everything_changed.connect(self.scenario_change)
 
     def create_new_scenario(self, properties):
+        """
+            Create new scenario (from the create new scenario dialog).
+        """
         self.scenario.reset()
         self.scenario[k.TITLE] = properties[k.TITLE]
         self.scenario.create_map(properties[k.MAP_COLUMNS], properties[k.MAP_ROWS])
@@ -753,6 +812,9 @@ class EditorScreen(QtGui.QWidget):
         self.mini_map.reset_tracker(self.map.get_bounds())
 
     def show_general_properties_dialog(self):
+        """
+            Display the modify general properties dialog.
+        """
         content_widget = GeneralPropertiesWidget(self.scenario)
         dialog = cg.GameDialog(self.client.main_window, content_widget, title='General Properties',
                                delete_on_close=True,
@@ -771,6 +833,9 @@ class EditorScreen(QtGui.QWidget):
         dialog.show()
 
     def show_provinces_dialog(self):
+        """
+            Display the modfiy provinces dialog.
+        """
         content_widget = ProvincePropertiesWidget()
         dialog = cg.GameDialog(self.client.main_window, content_widget, title='Provinces', delete_on_close=True,
                                help_callback=self.client.show_help_browser)

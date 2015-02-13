@@ -14,16 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    Basic general network functionality (client and server) wrapping around QtNetwork.QTcpSocket. Messages are sent using
-    yaml (for serialization) and zlib (for compression).
-"""
-
 import zlib
 
 import yaml
 from PySide import QtCore, QtNetwork
 
+"""
+    Basic general network functionality (client and server) wrapping around QtNetwork.QTcpSocket. Messages are sent using
+    yaml (for serialization) and zlib (for compression).
+"""
 
 SCOPE = {
     'local': QtNetwork.QHostAddress.LocalHost,

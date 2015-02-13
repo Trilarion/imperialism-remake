@@ -14,16 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    Game specific path locations for artwork, music, ...
-
-    Only real static values go here.
-"""
-
 import os
 
 import lib.utils as u
 
+"""
+    Game specific path locations for artwork, music, ...
+    Only static values here.
+"""
 
 def extend(path, *parts):
     """

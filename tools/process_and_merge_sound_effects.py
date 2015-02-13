@@ -16,7 +16,5 @@
 
 import wavfile
 
-if __name__ == '__main__':
-
-    # read sound effects configuration
-    pass
+# read sound effects configuration
+pass

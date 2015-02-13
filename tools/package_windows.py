@@ -14,15 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import os, shutil, sys
+
+from cx_Freeze import setup, Executable
+
+import  manual_markdown_converter
+
 """
     Creates a Windows standalone package (including Python3 and PySide) via cx_Freeze.
     Run with script parameter build
     See also: http://cx-freeze.readthedocs.org/en/latest/index.html
 """
-
-import os, shutil, sys
-from cx_Freeze import setup, Executable
-import  manual_markdown_converter
 
 # version string
 version = '0.2.1'

@@ -14,16 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import os
+
+from lib import utils as u
+from base import constants as c
+
 """
     Generates the hot image areas map of the start screen.
 """
 
-import os
-
 os.chdir('..')
-
-from base import constants as c
-from lib import utils as u
 
 # hot areas map
 map = {}

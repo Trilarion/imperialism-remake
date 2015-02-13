@@ -14,14 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-"""
-    Monitors the server state
-"""
-
 from PySide import QtCore, QtGui
 
 from server.network import server_manager
 
+"""
+    Monitors the server state
+"""
 
 class ServerMonitorWidget(QtGui.QWidget):
     """
