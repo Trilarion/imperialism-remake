@@ -1,6 +1,6 @@
 # Imperialism Remake Manual
 
-Current version: 0.2.0 (2014-09-07)
+Current version: 0.2.1 (2015-02-15)
 
 Content
 

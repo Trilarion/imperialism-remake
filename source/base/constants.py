@@ -74,7 +74,8 @@ Network_Port = 42932
 Screen_Min_Size = (1024, 768)
 
 # actual options version
-Options_Version = 1
+# TODO we need a better way of doing this
+Options_Version = 2
 
 # option names
 O_Version = 'misc.version'

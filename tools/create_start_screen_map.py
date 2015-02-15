@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os
+os.chdir('..')
 
 from lib import utils as u
 from base import constants as c
@@ -22,8 +23,6 @@ from base import constants as c
 """
     Generates the hot image areas map of the start screen.
 """
-
-os.chdir('..')
 
 # hot areas map
 map = {}

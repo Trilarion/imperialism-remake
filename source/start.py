@@ -69,16 +69,17 @@ if __name__ == '__main__':
     from base import constants as c
     from base import tools as t
 
-    # search for existing options file, load it
+    # search for existing options file, if not existing, copy default options file to the place
     Options_File = os.path.join(User_Folder, 'options.info')
     if not os.path.exists(Options_File):
         shutil.copyfile(c.Options_Default_File, Options_File)
 
-    # create the single options object, load options and send a log message
+    # create single options object, load options and send a log message
     t.load_options(Options_File)
     t.log_info('options loaded from user folder ({})'.format(User_Folder))
 
     # between versions the format of the options might change, then it's better to overwrite old options
+    # TODO handle this better (more control by user)
     if t.options[c.O_Options_Version] < c.Options_Version:
         t.log_warning('outdated version of options, have been overwritten')
         shutil.copyfile(c.Options_Default_File, Options_File)

@@ -500,7 +500,7 @@ class OptionsContentWidget(QtGui.QWidget):
     """
         Content widget for the options/preferences dialog window, based on QTabWidget.
 
-        TODO change to toolbar style since we use toolbars everywhere else in the application.
+        TODO add option to go back to default settings
     """
 
     def __init__(self):

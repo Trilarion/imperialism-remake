@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os
+os.chdir('..')
 
 from lib import utils as u
 from base import constants as c
@@ -24,8 +25,6 @@ from base import constants as c
     in the game). Phonon cannot read metadata under Windows sometimes, see:
     http://stackoverflow.com/questions/23288557/phonon-cant-get-meta-data-of-audio-files-in-python
 """
-
-os.chdir('..')
 
 # create the playlist, a list of (filename, title)
 playlist = [['01 Imperialism Theme.ogg', 'Imperialism Theme']]

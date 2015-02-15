@@ -1,5 +1,19 @@
 # Credits
 
+## Release 0.2.1
+
+Date: 2015-02-15
+
+Changes:
+
+- More details (cities, rivers, borders, nation colors) in map displayed in the editor
+- Network messaging protocol invented and implemented
+- Game lobby with single player scenario selection
+
+Contribution
+
+- Programming: Trilarion
+
 ## Release 0.2.0
 
 Date: 2014-09-07
