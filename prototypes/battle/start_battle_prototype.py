@@ -19,13 +19,15 @@ from PySide import QtCore, QtGui
 if __name__ == '__main__':
 
     app = QtGui.QApplication([])
+    app.setStyleSheet('')
 
-    window = QtGui.QWidget()
-    window.setWindowTitle('Prototype: Battle')
+    window = QtGui.QMainWindow()
+    window.setWindowTitle('Battle prototype')
+    window.setMinimumSize(800, 600)
 
-    layout = QtGui.QGridLayout(window)
-    toolbar = QtGui.QToolBar()
-    layout.addWidget(toolbar)
+    general_menu = window.menuBar().addMenu('General')
+
+
 
     window.show()
     app.exec_()
