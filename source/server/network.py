@@ -60,11 +60,11 @@ class ServerManager(QtCore.QObject):
         # give a new id
         while True:
             # theoretically this could take forever, practically only if we have 1e6 clients already
-            id = random.randint(0, 1e6)
-            if not any([id == client.id for client in self.server_clients]):
+            new_id = random.randint(0, 1e6)
+            if not any([new_id == client.id for client in self.server_clients]):
                 # not any == none
                 break
-        client.client_id = id
+        client.client_id = new_id
 
         # add some general receivers.
         client.connect_to_channel(c.CH_SCENARIO_PREVIEW, self.scenario_preview)
@@ -73,7 +73,8 @@ class ServerManager(QtCore.QObject):
         # finally add to list of clients
         self.server_clients.append(client)
 
-    def core_scenario_titles(self, client, message):
+    @staticmethod
+    def core_scenario_titles(client, message):
         """
             A server client received a message on the c.CH_CORE_SCENARIO_TITLES channel. Return all available core
             scenario titles and file names.
@@ -116,8 +117,7 @@ class ServerManager(QtCore.QObject):
         scenario.load(file_name)
         print('reading the file took {}s'.format(time.clock() - t0))
 
-        preview = {}
-        preview['scenario'] = file_name
+        preview = {'scenario': file_name}
 
         # some scenario properties should be copied
         scenario_copy_keys = [k.MAP_COLUMNS, k.MAP_ROWS, k.TITLE, k.DESCRIPTION]
@@ -136,14 +136,14 @@ class ServerManager(QtCore.QObject):
         # assemble a nations map (-1 means no nation)
         columns = scenario[k.MAP_COLUMNS]
         rows = scenario[k.MAP_ROWS]
-        map = [-1] * (columns * rows)
+        nations_map = [-1] * (columns * rows)
         for nation_id in scenario.all_nations():
             provinces = scenario.get_provinces_of_nation(nation_id)
             for province in provinces:
                 tiles = scenario.get_province_property(province, 'tiles')
                 for column, row in tiles:
-                    map[row * columns + column] = nation_id
-        preview['map'] = map
+                    nations_map[row * columns + column] = nation_id
+        preview['map'] = nations_map
 
         # send return message
         client.send(message['reply-to'], preview)

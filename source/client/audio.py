@@ -25,6 +25,7 @@ from base import constants as c
     Plays soundtrack music.
 """
 
+
 def is_mime_type_ogg_available():
     """
         Checks if the ogg mime type 'audio/ogg' is contained in the list of available mime types
@@ -77,6 +78,7 @@ class Player(QtCore.QObject):
         # default values
         self.playlist = []
         self.auto_rewind = True
+        self.song_index = 0
 
     def set_playlist(self, playlist):
         """
@@ -124,7 +126,7 @@ class Player(QtCore.QObject):
             self.song_index += 1
             self.schedule_next()
 
-    def state_changed(self, new_state, old_state):
+    def state_changed(self, new_state):
         """
             The state (Phonon.State) changed.
 
@@ -133,7 +135,7 @@ class Player(QtCore.QObject):
 
             See Phonon.MediaObject.stateChanged
         """
-        # print('time {} state {} to {}'.format(time.clock(), oldState, newState))
+        # print('new state {}'.format(new_state))
         if new_state == Phonon.ErrorState:
             print(self.media_object.errorType())
             print(self.media_object.errorString())

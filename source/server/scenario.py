@@ -40,12 +40,12 @@ class Scenario(QtCore.QObject):
         super().__init__()
         self.reset()
 
+    # noinspection PyAttributeOutsideInit
     def reset(self):
         """
             Just empty
         """
-        self._properties = {}
-        self._properties[c.PropertyKeyNames.RIVERS] = []
+        self._properties = {c.PropertyKeyNames.RIVERS: []}
         self._provinces = {}
         self._nations = {}
         self._map = {}
@@ -100,8 +100,8 @@ class Scenario(QtCore.QObject):
         """
         column = math.floor(x - (y % 2) / 2)
         row = math.floor(y)
-        if row < 0 or row >= self._properties[c.PropertyKeyNames.MAP_ROWS] or column < 0 or column >= self._properties[
-            c.PropertyKeyNames.MAP_COLUMNS]:
+        if row < 0 or row >= self._properties[c.PropertyKeyNames.MAP_ROWS] or column < 0\
+                or column >= self._properties[c.PropertyKeyNames.MAP_COLUMNS]:
             return -1, -1
         return column, row
 

@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 # TODO automatic placement of help dialog depending on if another dialog is open
-# TODO help dialog has close button in focus initially (why?) remove this
 
 from functools import partial
 
@@ -41,6 +40,7 @@ from server.monitor import ServerMonitorWidget
 
 network_client = net.NetworkClient()
 network_client.set_socket()
+
 
 class MapItem(QtCore.QObject):
     """
@@ -105,7 +105,7 @@ class StartScreen(QtGui.QWidget):
         view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setSceneRect(0, 0, start_image.width(), start_image.height())
-        view.layout_constraint = g.RelativeLayoutConstraint().centerH().centerV()
+        view.layout_constraint = g.RelativeLayoutConstraint().center_horizontal().center_vertical()
         layout.addWidget(view)
 
         subtitle = QtGui.QLabel('')
@@ -231,6 +231,7 @@ class GameLobbyWidget(QtGui.QWidget):
 
         if checked is True:
 
+            # noinspection PyCallByClass
             file_name = QtGui.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', c.Scenario_Folder,
                                                           'Scenario Files (*.scenario)')[0]
             if file_name:
@@ -740,7 +741,7 @@ class Client():
 
         # for the notifications
         self.pending_notifications = []
-        self.notification_position_constraint = g.RelativeLayoutConstraint().centerH().south(20)
+        self.notification_position_constraint = g.RelativeLayoutConstraint().center_horizontal().south(20)
         self.notification = None
 
         # audio player
@@ -899,12 +900,13 @@ def start():
     desktop = app.desktop()
     rect = desktop.screenGeometry()
     if rect.width() < c.Screen_Min_Size[0] or rect.height() < c.Screen_Min_Size[1]:
+        # noinspection PyTypeChecker
         QtGui.QMessageBox.warning(None, 'Warning',
                                   'Actual screen size below minimal screen size {}.'.format(c.Screen_Min_Size))
         return
 
     # if no bounds are set, set resonable bounds
-    if not c.OG_MW_Bounds in t.options:
+    if c.OG_MW_Bounds not in t.options:
         t.options[c.OG_MW_Bounds] = desktop.availableGeometry().adjusted(50, 50, -100, -100)
         t.options[c.OG_MW_Maximized] = True
         t.log_info('No bounds of the main window stored, start maximized')
@@ -919,5 +921,6 @@ def start():
     client.switch_to_start_screen()
 
     t.log_info('client initialized, start Qt app execution')
+    # TODO is this necessary to run as event?
     QtCore.QTimer.singleShot(0, network_start)
     app.exec_()

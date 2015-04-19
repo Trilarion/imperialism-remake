@@ -27,6 +27,7 @@ from base import constants as c
     Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.
 """
 
+
 def load_ui_icon(name):
     """
         Load an icon from a base icon path.

@@ -42,6 +42,7 @@ NEW_SCENARIO_DEFAULT_PROPERTIES = {
     k.MAP_ROWS: 60
 }
 
+
 class EditorScenario(Scenario):
     """
         As a small wrapper this is a Scenario with a everything_changed signal that is emitted, if a new scenario is loaded.
@@ -357,9 +358,9 @@ class EditorMainMap(QtGui.QGraphicsView):
             item.setZValue(1)
 
         # draw rivers
-        # TODO get rivers via a method (generator)
         river_pen = QtGui.QPen(QtGui.QColor(64, 64, 255))
         river_pen.setWidth(5)
+        # TODO get rivers via a method (generator)
         for river in self.scenario._properties['rivers']:
             tiles = river['tiles']
             path = QtGui.QPainterPath()
@@ -621,11 +622,10 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         """
             "Create scenario" is clicked.
         """
-        p = {}
-        p[k.TITLE] = self.properties[k.TITLE].text()
+        p = {k.TITLE: self.properties[k.TITLE].text(),
+             k.MAP_COLUMNS: int(self.properties[k.MAP_COLUMNS].text()),
+             k.MAP_ROWS: int(self.properties[k.MAP_ROWS].text())}
         # TODO conversion can fail, (ValueError) give error message
-        p[k.MAP_COLUMNS] = int(self.properties[k.MAP_COLUMNS].text())
-        p[k.MAP_ROWS] = int(self.properties[k.MAP_ROWS].text())
         # we close the parent window and emit the appropriate signal
         self.parent().close()
         self.create_scenario.emit(p)
@@ -784,6 +784,7 @@ class EditorScreen(QtGui.QWidget):
         """
             Show the load a scenario dialog. Then loads it if the user has selected one.
         """
+        # noinspection PyCallByClass
         file_name = \
             QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
                 0]
@@ -796,6 +797,7 @@ class EditorScreen(QtGui.QWidget):
         """
             Show the save a scenario dialog. Then saves it.
         """
+        # noinspection PyCallByClass
         file_name = \
             QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
                 0]

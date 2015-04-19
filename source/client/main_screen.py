@@ -22,6 +22,7 @@ import base.tools as t
     The main game screen.
 """
 
+
 class MiniMap(QtGui.QWidget):
     """
         Mini map on the left upper side.

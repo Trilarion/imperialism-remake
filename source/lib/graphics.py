@@ -24,6 +24,7 @@ from PySide import QtCore, QtGui
     Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
 """
 
+
 class RelativeLayoutConstraint():
     """
         Defines a relative position. The position depends on our own size, the parent rectangle and a constant offset.
@@ -66,7 +67,7 @@ class RelativeLayoutConstraint():
         self.x = (1, -1, -gap)
         return self
 
-    def centerH(self):
+    def center_horizontal(self):
         """
             Centers the object horizontally, eg. the left upper corner of the element will be at the center of the
             parent frame horizontally and half the element size to the left, so the center of the element will exactly
@@ -75,7 +76,7 @@ class RelativeLayoutConstraint():
         self.x = (0.5, -0.5, 0)
         return self
 
-    def centerV(self):
+    def center_vertical(self):
         """
             Same as center horizontally (centerH) but in the vertical directiokn.
         """
@@ -93,7 +94,6 @@ def calculate_relative_position(parent_rect, own_size, constraint):
     return x, y
 
 
-# TODO add signal clicked to listen for clicks
 class Notification(QtCore.QObject):
     """
         Holding a small widget (notification), the fading animations and a position specifier together.
@@ -101,6 +101,7 @@ class Notification(QtCore.QObject):
         Also has signals, currently only when finished. Connect to if you want to be notified of the ending.
     """
     finished = QtCore.Signal()
+    clicked = QtCore.Signal(QtGui.QMouseEvent)
 
     def __init__(self, parent, content, fade_duration=2000, stay_duration=2000, position_constraint=None):
         """
@@ -114,10 +115,13 @@ class Notification(QtCore.QObject):
         super().__init__()
 
         # create a clickable widget as standalone window and without a frame
-        self.widget = QtGui.QWidget(parent, QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
+        self.widget = ClickableWidget(parent, QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
 
         # widget must be translucent, otherwise when setting semi-transparent background colors
         self.widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+        # connect widget clicked signal to our clicked signal
+        self.widget.clicked.connect(self.clicked.emit)
 
         # replace content by QLabel if content is a string
         if isinstance(content, str):
@@ -237,7 +241,6 @@ class RelativeLayout(QtGui.QLayout):
         return QtCore.QSize(min_width, min_height)
 
 
-# TODO make this more flexible to work with widget and graphicsitem as well as override duration
 class FadeAnimation(QtCore.QObject):
     """
         Fade animation on a QtGui.QGraphicsItem. As usual a reference to an instance must be stored.
@@ -407,7 +410,7 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
         super().wheelEvent(event)
 
 
-def makeWidgetClickable(parent):
+def make_widget_clickable(parent):
     """
         Takes any QtGui.QWidget derived class and emits a signal emitting on mousePressEvent.
     """
@@ -425,7 +428,7 @@ def makeWidgetClickable(parent):
     return ClickableWidgetSubclass
 
 
-def makeDraggableWidget(parent):
+def make_widget_draggable(parent):
     """
         Takes any QtGui.QWidget derived class and emits a signal on mouseMoveEvent emitting the position change since
         the last mousePressEvent. By default mouseMoveEvents are only invoked while the mouse is pressed. Therefore
@@ -459,7 +462,7 @@ def makeDraggableWidget(parent):
     return DraggableWidgetSubclass
 
 
-def makeClickableGraphicsItem(parent):
+def make_GraphicsItem_clickable(parent):
     """
         Takes a QtGui.QGraphicsItem and adds signals for entering, leaving and clicking on the item. For this the item
         must have setAcceptHoverEvents and it must also inherit from QObject to have signals. Only use it when really
@@ -503,11 +506,10 @@ def makeClickableGraphicsItem(parent):
             self.parent.mousePressEvent(self, event)
             self.clicked.emit(event)
 
-
     return ClickableGraphicsItem
 
 
-def makeDraggableGraphicsItem(parent):
+def make_GraphicsItem_draggable(parent):
     """
         Takes a QtGui.QGraphicsItem and adds signals for dragging the object around. For this the item must have the
         ItemIsMovable and ItemSendsScenePositionChanges flags set. Only use it when really needed because there is
@@ -540,11 +542,11 @@ def makeDraggableGraphicsItem(parent):
     return DraggableGraphicsItem
 
 # Some classes we need (just to make the naming clear), Name will be used in Stylesheet selectors
-DraggableToolBar = makeDraggableWidget(QtGui.QToolBar)
-ClickableWidget = makeWidgetClickable(QtGui.QWidget)
-ClickablePixmapItem = makeClickableGraphicsItem(QtGui.QGraphicsPixmapItem)
-ClickablePathItem = makeClickableGraphicsItem(QtGui.QGraphicsPathItem)
-DraggableRectItem = makeDraggableGraphicsItem(QtGui.QGraphicsRectItem)
+DraggableToolBar = make_widget_draggable(QtGui.QToolBar)
+ClickableWidget = make_widget_clickable(QtGui.QWidget)
+ClickablePixmapItem = make_GraphicsItem_clickable(QtGui.QGraphicsPixmapItem)
+ClickablePathItem = make_GraphicsItem_clickable(QtGui.QGraphicsPathItem)
+DraggableRectItem = make_GraphicsItem_draggable(QtGui.QGraphicsRectItem)
 
 
 class ClockLabel(QtGui.QLabel):

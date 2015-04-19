@@ -25,6 +25,7 @@ from base import tools as t
     module and the client game specific logic under folder client.
 """
 
+
 class GameDialog(QtGui.QWidget):
     """
         Create a dialog (widget) with many preconfigured properties (modality, title, parent, content, help callback, ...

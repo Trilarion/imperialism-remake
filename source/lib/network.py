@@ -151,11 +151,12 @@ class Server(QtCore.QObject):
         if not self.server.listen(host, port):
             raise RuntimeError('Network error: cannot listen')
 
-    def isListening(self):
+    def is_listening(self):
         return self.server.isListening()
 
     def scope(self):
-        if self.isListening():
+        if self.is_listening():
+            # TODO is this the easiest way?
             return SCOPE.keys()[SCOPE.values().index(self.server.serverAddress())]
         else:
             return None
@@ -164,7 +165,7 @@ class Server(QtCore.QObject):
         """
             Stopps listening.
         """
-        if self.isListening():
+        if self.is_listening():
             self.server.close()
 
     def new_connection(self):

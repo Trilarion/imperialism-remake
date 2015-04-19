@@ -109,6 +109,7 @@ if __name__ == '__main__':
 
     # start client, we will return when the programm finishes
     from client import client
+
     client.start()
 
     # save options

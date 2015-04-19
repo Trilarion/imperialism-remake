@@ -22,7 +22,7 @@ import lib.graphics as g
 
 def show_notification(text):
     text = 'Playing {}'.format(text)
-    g.Notification(window, text, positioner=g.Relative_Positioner().centerH().south(20))
+    g.Notification(window, text, positioner=g.Relative_Positioner().center_horizontal().south(20))
 
 app = QtGui.QApplication([])
 

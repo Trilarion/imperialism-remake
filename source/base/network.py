@@ -23,6 +23,7 @@ from lib.network import Client
     names and a signal to connect/disconnect to.
 """
 
+
 class NetworkClient(Client):
     """
         Extending the Client class (wrapper around QTcpSocket sending and receiving messages) with channels (see Channel
@@ -61,24 +62,24 @@ class NetworkClient(Client):
         elif not ignore_not_existing:
             raise RuntimeError('Channel with this name not existing.')
 
-    def connect_to_channel(self, channel_name, callable):
+    def connect_to_channel(self, channel_name, callback):
         """
-            Connect a callable to a channel with a specific name.
+            Connect a callback to a channel with a specific name.
 
             As a convenience shortcut, if a channel of this name is not yet existing, creates a new one before.
         """
         if channel_name not in self.channels:
             self.create_new_channel(channel_name)
-        self.channels[channel_name].received.connect(callable)
+        self.channels[channel_name].received.connect(callback)
 
-    def disconnect_from_channel(self, channel_name, callable):
+    def disconnect_from_channel(self, channel_name, callback):
         """
-            Given a channel name (which must exist, otherwise an error is raised) disconnects a callable from this
+            Given a channel name (which must exist, otherwise an error is raised) disconnects a callback from this
             channel.
         """
         if channel_name not in self.channels:
             raise RuntimeError('Channel with this name not existing.')
-        self.channels[channel_name].received.disconnect(callable)
+        self.channels[channel_name].received.disconnect(callback)
 
     def process(self, message):
         """

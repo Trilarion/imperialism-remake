@@ -22,6 +22,7 @@ from server.network import server_manager
     Monitors the server state
 """
 
+
 class ServerMonitorWidget(QtGui.QWidget):
     """
         Displays server stats

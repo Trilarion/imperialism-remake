@@ -23,6 +23,7 @@ import lib.utils as u
     Only static values here.
 """
 
+
 def extend(path, *parts):
     """
         Uses os.path.join to join parts of a path. Also checks for existence and raises an error

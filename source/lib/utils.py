@@ -62,7 +62,7 @@ def write_as_yaml(file_name, value):
     """
     with open(file_name, 'w') as file:
         yaml.dump(value, file, allow_unicode=True, Dumper=Dumper)
-
+# TODO are keys of dictionaries in YAML sorted automatically?
 
 class ZipArchiveReader():
     """
@@ -120,7 +120,6 @@ class ZipArchiveWriter():
             Write a Python object via YAML into an entry in the zip file.
         """
         bytes = yaml.dump(obj, allow_unicode=True, Dumper=Dumper).encode()
-        # TODO sort keys in yaml
         self.write(name, bytes)
 
     def __del__(self):
@@ -160,12 +159,12 @@ class List2D():
         self._array[index] = v
 
 
-def find_in_list(list, element):
+def find_in_list(data, element):
     """
         Finds the index of a certain element in a list. Returns the index of the first occurence or ValueError if the
         element is not contained in the list. This is a slow operation (O(n)).
     """
-    for index, e in enumerate(list):
+    for index, e in enumerate(data):
         if e == element:
             return index
     return ValueError
