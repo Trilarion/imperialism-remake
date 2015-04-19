@@ -93,12 +93,12 @@ def calculate_relative_position(parent_rect, own_size, constraint):
     return x, y
 
 
+# TODO add signal clicked to listen for clicks
 class Notification(QtCore.QObject):
     """
         Holding a small widget (notification), the fading animations and a position specifier together.
 
         Also has signals, currently only when finished. Connect to if you want to be notified of the ending.
-        TODO add signal clicked to listen for clicks
     """
     finished = QtCore.Signal()
 
@@ -154,7 +154,7 @@ class Notification(QtCore.QObject):
 
     def show(self):
         """
-            show and start fade in
+            Show and start fade in
         """
         self.widget.show()
         self.fade.fadein()

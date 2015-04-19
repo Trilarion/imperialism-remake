@@ -27,6 +27,7 @@ from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
 from base.network import NetworkClient
 from server.scenario import Scenario
 
+
 """
     Server network code. Only deals with the network connection, client connection management and message distribution.
 """

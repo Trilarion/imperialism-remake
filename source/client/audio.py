@@ -20,6 +20,7 @@ from PySide.phonon import Phonon
 from lib import utils as u
 from base import constants as c
 
+
 """
     Plays soundtrack music.
 """

@@ -56,11 +56,12 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         c.Debug_Mode = True
-        print('debug mode on')
+        print('debug mode is on')
 
-    # redirect output to log files (will be overwritten each time)
+    # redirect output to log files (will be overwritten at each start)
     Log_File = os.path.join(User_Folder, 'remake.log')
     Error_File = os.path.join(User_Folder, 'remake.error.log')
+    # in debug mode print to the console instead
     if not c.Debug_Mode:
         sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
         sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
@@ -81,7 +82,7 @@ if __name__ == '__main__':
     # between versions the format of the options might change, then it's better to overwrite old options
     # TODO handle this better (more control by user)
     if t.options[c.O_Options_Version] < c.Options_Version:
-        t.log_warning('outdated version of options, have been overwritten')
+        t.log_warning('Old preferences are incompatible, reset to default.')
         shutil.copyfile(c.Options_Default_File, Options_File)
         t.load_options(Options_File)
 
@@ -106,9 +107,8 @@ if __name__ == '__main__':
 
     # now we can safely assume that the environment is good to us
 
-    # start client
+    # start client, we will return when the programm finishes
     from client import client
-
     client.start()
 
     # save options
@@ -119,5 +119,5 @@ if __name__ == '__main__':
     if c.Debug_Mode:
         t.find_unused_resources()
 
-    # finished
+    # good bye message
     t.log_info('will exit soon - good bye')

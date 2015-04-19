@@ -19,6 +19,7 @@ import zipfile
 
 import yaml
 
+
 """
     General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
     to our project.

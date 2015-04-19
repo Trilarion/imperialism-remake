@@ -16,10 +16,12 @@
 
 import sys
 import datetime
+
 from PySide import QtGui, QtCore
 
 from lib.utils import read_as_yaml, write_as_yaml
 from base import constants as c
+
 
 """
     Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.

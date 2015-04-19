@@ -26,6 +26,7 @@ from base.constants import PropertyKeyNames as k
 import client.graphics as cg
 from server.scenario import Scenario
 
+
 """
     GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
     know anything about the scenario, we put it in the server module.
