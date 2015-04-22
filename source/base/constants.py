@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os
+from enum import unique
 
 import lib.utils as u
 
@@ -62,7 +63,6 @@ Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 Graphics_Map_Folder = extend(Graphics_Folder, 'map')
 
 # special locations
-Options_Default_File = extend(Data_Folder, 'options.info.default')
 Manual_Index = extend(Data_Folder, 'manual', 'index.html')
 Global_Stylesheet = extend(Graphics_UI_Folder, 'style.css')
 
@@ -74,27 +74,43 @@ Network_Port = 42932
 # minimal screen resolution
 Screen_Min_Size = (1024, 768)
 
-# actual options version
-# TODO we need a better way of doing this
-Options_Version = 2
+# options
 
-# option names
-O_Version = 'misc.version'
-O_Options_Version = 'misc.version.options'
-OG_MW_Bounds = 'graphics.mainwindow.bounds'
-OG_MW_Maximized = 'graphics.mainwindow.maximized'
-OG_MW_Fullscreen = 'graphics.full_screen'
-OG_Fullscreen_Supported = 'graphics.full_screen_supported'
-OM_Phonon_Supported = 'music.phonon_supported'
-OM_BG_Mute = 'music.background.mute'
+@unique
+class O(u.AutoNumberedEnum):
+    VERSION = ()
+        # to be displayed on the start screen
+    LS_OPEN = ()
+        # local server accepts outside connections
+    LS_NAME = ()
+    MW_BOUNDS = ()
+    MW_MAXIMIZED = ()
+    FULLSCREEN = ()
+        # we start full screen (can be unset by the program for some linux desktop environments
+    FULLSCREEN_SUPPORTED = ()
+        # is full screen supported
+    PHONON_SUPPORTED = ()
+    BG_MUTE = ()
 
+    def __init__(self):
+        self.default = None
+
+Options = O.__members__ # dictionary of name, Enum-value pairs
+
+# default values for the Options
+O.VERSION.default = 'v0.2.2 (2015-??-??)'
+O.LS_OPEN.default = False
+O.LS_NAME.default = 'server name'
+O.FULLSCREEN.default = True
+O.PHONON_SUPPORTED.default = True
+O.BG_MUTE.default = False
 
 # predefined channel names for network communication
 CH_SCENARIO_PREVIEW = 'general.scenario.preview'
 CH_CORE_SCENARIO_TITLES = 'general.core.scenarios.titles'
 
 
-class TileDirections(u.AutoNumber):
+class TileDirections(u.AutoNumberedEnum):
     """
         Six directions for six neighbored tiles in clockwise order.
     """

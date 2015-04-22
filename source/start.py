@@ -34,7 +34,7 @@ if __name__ == '__main__':
     except ImportError:
         raise RuntimeError('PySide must be installed.')
 
-    import os, codecs, shutil
+    import os, codecs
 
     # determine home dir
     if os.name == 'posix':
@@ -70,40 +70,33 @@ if __name__ == '__main__':
     from base import constants as c
     from base import tools as t
 
-    # search for existing options file, if not existing, copy default options file to the place
+    # search for existing options file, if not existing, save it once (should just save an empty dictionary
     Options_File = os.path.join(User_Folder, 'options.info')
     if not os.path.exists(Options_File):
-        shutil.copyfile(c.Options_Default_File, Options_File)
+        t.save_options(Options_File)
 
     # create single options object, load options and send a log message
     t.load_options(Options_File)
     t.log_info('options loaded from user folder ({})'.format(User_Folder))
 
-    # between versions the format of the options might change, then it's better to overwrite old options
-    # TODO handle this better (more control by user)
-    if t.options[c.O_Options_Version] < c.Options_Version:
-        t.log_warning('Old preferences are incompatible, reset to default.')
-        shutil.copyfile(c.Options_Default_File, Options_File)
-        t.load_options(Options_File)
-
     # test for phonon availability
-    if t.options[c.OM_Phonon_Supported]:
+    if t.get_option(c.O.PHONON_SUPPORTED):
         try:
             from PySide.phonon import Phonon
         except ImportError:
             t.log_error('Phonon backend not available, no sound.')
-            t.options[c.OM_Phonon_Supported] = False
+            t.set_option(c.O.PHONON_SUPPORTED, False)
 
     # special case of some desktop environments under Linux where full screen mode does not work well
-    if t.options[c.OG_Fullscreen_Supported]:
+    if t.get_option(c.O.FULLSCREEN_SUPPORTED):
         desktop_session = os.environ.get("DESKTOP_SESSION")
         if desktop_session and (desktop_session.startswith('ubuntu') or 'xfce' in desktop_session
                                 or desktop_session.startswith('xubuntu') or 'gnome' in desktop_session):
-            t.options[c.OG_Fullscreen_Supported] = False
+            t.set_option(c.O.FULLSCREEN_SUPPORTED, False)
             t.log_warning(
                 'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
-    if not t.options[c.OG_Fullscreen_Supported]:
-        t.options[c.OG_MW_Fullscreen] = False
+    if not t.get_option(c.O.FULLSCREEN_SUPPORTED):
+        t.set_option(c.O.FULLSCREEN, False)
 
     # now we can safely assume that the environment is good to us
 

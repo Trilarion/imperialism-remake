@@ -36,7 +36,7 @@ else:
     Dumper = yaml.Dumper
 
 
-class AutoNumber(Enum):
+class AutoNumberedEnum(Enum):
     """
         Enum that is automatically numbered with increasing integers.
     """

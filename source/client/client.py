@@ -143,7 +143,7 @@ class StartScreen(QtGui.QWidget):
             frame_item.setZValue(4)
             scene.addItem(mapitem.item)
 
-        version_label = QtGui.QLabel('<font color=#ffffff>{}</font>'.format(t.options[c.O_Version]))
+        version_label = QtGui.QLabel('<font color=#ffffff>{}</font>'.format(t.get_option(c.O.VERSION)))
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
@@ -168,22 +168,13 @@ class GameLobbyWidget(QtGui.QWidget):
         toolbar = QtGui.QToolBar()
         action_group = QtGui.QActionGroup(toolbar)
 
-        toolbar.addAction(
-            g.create_action(t.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario',
-                            action_group, toggle_connection=self.toggled_single_player_scenario_selection,
-                            checkable=True))
-        toolbar.addAction(
-            g.create_action(t.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario',
-                            action_group, toggle_connection=self.toggled_single_player_load_scenario, checkable=True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario', action_group, toggle_connection=self.toggled_single_player_scenario_selection, checkable=True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario', action_group, toggle_connection=self.toggled_single_player_load_scenario, checkable=True))
 
         toolbar.addSeparator()
 
-        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group,
-                                          toggle_connection=self.toggled_server_lobby, checkable=True))
-        toolbar.addAction(
-            g.create_action(t.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario',
-                            action_group, toggle_connection=self.toggled_multiplayer_scenario_selection,
-                            checkable=True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group, toggle_connection=self.toggled_server_lobby, checkable=True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario', action_group, toggle_connection=self.toggled_multiplayer_scenario_selection, checkable=True))
 
         layout.addWidget(toolbar)
 
@@ -514,16 +505,12 @@ class OptionsContentWidget(QtGui.QWidget):
         toolbar.setIconSize(QtCore.QSize(32, 32))
         action_group = QtGui.QActionGroup(toolbar)
 
-        action_preferences_general = g.create_action(t.load_ui_icon('icon.preferences.general.png'),
-                                                     'Show general preferences', action_group,
-                                                     toggle_connection=self.toggled_general, checkable=True)
+        action_preferences_general = g.create_action(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, toggle_connection=self.toggled_general, checkable=True)
         toolbar.addAction(action_preferences_general)
-        toolbar.addAction(
-            g.create_action(t.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group,
-                            toggle_connection=self.toggled_graphics, checkable=True))
-        toolbar.addAction(
-            g.create_action(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group,
-                            toggle_connection=self.toggled_music, checkable=True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.network.png'), 'Show network preferences', action_group, toggle_connection=self.toggled_network, checkable=True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group, toggle_connection=self.toggled_graphics, checkable=True))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, toggle_connection=self.toggled_music, checkable=True))
+
 
         self.stacked_layout = QtGui.QStackedLayout()
 
@@ -534,11 +521,13 @@ class OptionsContentWidget(QtGui.QWidget):
 
         # empty lists
         self.checkboxes = []
+        self.lineedits = []
 
         # add tabs
-        self.create_general_options_widget()
-        self.create_graphics_options_widget()
-        self.create_music_options_widget()
+        self.create_options_widget_general()
+        self.create_options_widget_graphics()
+        self.create_options_widget_music()
+        self.create_options_widget_network()
 
         # show general preferences
         action_preferences_general.setChecked(True)
@@ -550,7 +539,7 @@ class OptionsContentWidget(QtGui.QWidget):
         if checked is True:
             self.stacked_layout.setCurrentWidget(self.tab_general)
 
-    def create_general_options_widget(self):
+    def create_options_widget_general(self):
         """
             Create general options widget.
         """
@@ -571,7 +560,14 @@ class OptionsContentWidget(QtGui.QWidget):
         if checked is True:
             self.stacked_layout.setCurrentWidget(self.tab_graphics)
 
-    def create_graphics_options_widget(self):
+    def toggled_network(self, checked):
+        """
+            Toolbar button for network preferences toggled.
+        """
+        if checked is True:
+            self.stacked_layout.setCurrentWidget(self.tab_network)
+
+    def create_options_widget_graphics(self):
         """
             Create graphical options widget.
         """
@@ -581,7 +577,7 @@ class OptionsContentWidget(QtGui.QWidget):
 
         # full screen mode
         checkbox = QtGui.QCheckBox('Full screen mode')
-        self.register_checkbox(checkbox, c.OG_MW_Fullscreen)
+        self.register_checkbox(checkbox, c.O.FULLSCREEN)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -598,7 +594,7 @@ class OptionsContentWidget(QtGui.QWidget):
         if checked is True:
             self.stacked_layout.setCurrentWidget(self.tab_music)
 
-    def create_music_options_widget(self):
+    def create_options_widget_music(self):
         """
             Create music options widget.
         """
@@ -607,7 +603,7 @@ class OptionsContentWidget(QtGui.QWidget):
 
         # mute checkbox
         checkbox = QtGui.QCheckBox('Mute background music')
-        self.register_checkbox(checkbox, c.OM_BG_Mute)
+        self.register_checkbox(checkbox, c.O.BG_MUTE)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -617,13 +613,63 @@ class OptionsContentWidget(QtGui.QWidget):
         self.tab_music = tab
         self.stacked_layout.addWidget(tab)
 
+    def create_options_widget_network(self):
+        """
+            Create network options widget.
+        """
+        tab = QtGui.QWidget()
+        tab_layout = QtGui.QVBoxLayout(tab)
+
+        l = QtGui.QVBoxLayout()
+        l.addWidget(QtGui.QLabel('Connected to ...'))
+        button_connect = QtGui.QPushButton('Connect to nonlocal server')
+        l.addWidget(button_connect)
+        tab_layout.addWidget(g.wrap_in_groupbox(l, 'Connected Server'))
+
+        l = QtGui.QVBoxLayout()
+        checkbox = QtGui.QCheckBox('Accepts incoming connections')
+        self.register_checkbox(checkbox, c.O.LS_OPEN)
+        l.addWidget(checkbox)
+        l2 = QtGui.QHBoxLayout()
+        l2.addWidget(QtGui.QLabel('Alias'))
+        edit = QtGui.QLineEdit()
+        edit.setFixedWidth(300)
+        l2.addWidget(edit)
+        l2.addStretch()
+        self.register_lineedit(edit, c.O.LS_NAME)
+        l.addLayout(l2)
+        l2 = QtGui.QHBoxLayout()
+        toolbar = QtGui.QToolBar()
+        toolbar.setIconSize(QtCore.QSize(24, 24))
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.network.png'), 'Show network preferences', toolbar))
+
+        # button_local_server_monitor = QtGui.QPushButton('Monitor local server')
+        l2.addWidget(toolbar)
+        l2.addStretch()
+        l.addLayout(l2)
+        tab_layout.addWidget(g.wrap_in_groupbox(l, 'Local Server'))
+
+        # vertical stretch
+        tab_layout.addStretch()
+
+        # add tab
+        self.tab_network = tab
+        self.stacked_layout.addWidget(tab)
+
     def register_checkbox(self, checkbox, option):
         """
             Takes an option identifier (str) where the option value must be True/False and sets a checkbox according
             to the current value. Stores the checkbox, option pair in a list.
         """
-        checkbox.setChecked(t.options[option])
+        checkbox.setChecked(t.get_option(option))
         self.checkboxes.append((checkbox, option))
+
+    def register_lineedit(self, edit, option):
+        """
+
+        """
+        edit.setText(t.get_option(option))
+        self.lineedits.append((edit, option))
 
     def close_request(self, parent_widget):
         """
@@ -634,16 +680,16 @@ class OptionsContentWidget(QtGui.QWidget):
             We immediately : start/stop music (mute option)
         """
         # check if something was changed
-        options_modified = any([box.isChecked() is not t.options[option] for (box, option) in self.checkboxes])
+        options_modified = any([box.isChecked() is not t.get_option(option) for (box, option) in self.checkboxes])
         if options_modified:
             answer = QtGui.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences',
                                                 QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.Yes)
             if answer == QtGui.QMessageBox.Yes:
                 # all checkboxes
                 for (box, option) in self.checkboxes:
-                    t.options[option] = box.isChecked()
+                    t.set_option(option, box.isChecked())
                 # what else do we need to do?
-                if t.options[c.OM_BG_Mute]:
+                if t.get_option(c.O.BG_MUTE):
                     # t.player.stop()
                     pass
                 else:
@@ -666,7 +712,7 @@ class MainWindow(QtGui.QWidget):
         """
         super().__init__()
         # set geometry
-        self.setGeometry(t.options[c.OG_MW_Bounds])
+        self.setGeometry(t.get_option(c.O.MW_BOUNDS))
         # set icon
         self.setWindowIcon(t.load_ui_icon('icon.ico'))
         # set title
@@ -678,10 +724,10 @@ class MainWindow(QtGui.QWidget):
         self.content = None
 
         # show in full screen, maximized or normal
-        if t.options[c.OG_MW_Fullscreen]:
+        if t.get_option(c.O.FULLSCREEN):
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
             self.showFullScreen()
-        elif t.options[c.OG_MW_Maximized]:
+        elif t.get_option(c.O.MW_MAXIMIZED):
             self.showMaximized()
         else:
             self.show()
@@ -749,7 +795,7 @@ class Client():
         self.player.next.connect(self.audio_notification)
         self.player.set_playlist(audio.load_soundtrack_playlist())
         # start audio player if wished
-        if not t.options[c.OM_BG_Mute]:
+        if not t.get_option(c.O.BG_MUTE):
             self.player.start()
 
         # after the player starts, the main window is not active anymore
@@ -855,8 +901,8 @@ class Client():
             Cleans up and closes the main window which causes app.exec_() to finish.
         """
         # store state in options
-        t.options[c.OG_MW_Bounds] = self.main_window.normalGeometry()
-        t.options[c.OG_MW_Maximized] = self.main_window.isMaximized()
+        t.set_option(c.O.MW_BOUNDS, self.main_window.normalGeometry())
+        t.set_option(c.O.MW_MAXIMIZED, self.main_window.isMaximized())
 
         # audio
         # self.player.stop()
@@ -906,10 +952,10 @@ def start():
         return
 
     # if no bounds are set, set resonable bounds
-    if c.OG_MW_Bounds not in t.options:
-        t.options[c.OG_MW_Bounds] = desktop.availableGeometry().adjusted(50, 50, -100, -100)
-        t.options[c.OG_MW_Maximized] = True
-        t.log_info('No bounds of the main window stored, start maximized')
+    if t.get_option(c.O.MW_BOUNDS) is None:
+        t.set_option(c.O.MW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
+        t.set_option(c.O.MW_MAXIMIZED, True)
+        t.log_info('No previous bounds of the main window stored, start maximized')
 
     # load global stylesheet to app
     with open(c.Global_Stylesheet, 'r', encoding='utf-8') as file:

@@ -91,22 +91,42 @@ def load_options(file_name):
     global options
     options = read_as_yaml(file_name)
 
-    # main window bounding rectangle from list to QRect
-    if c.OG_MW_Bounds in options:
-        rect = options[c.OG_MW_Bounds]
-        options[c.OG_MW_Bounds] = QtCore.QRect(*rect)
+    # delete entries that are not in Constants.Options
+    for key in list(options.keys()):
+        if key not in c.Options:
+            del options[key]
 
+    # copy values that are in Constants.Options but not here
+    for key in c.Options:
+        if key not in options:
+            options[key] = c.Options[key].default
+
+    # main window bounding rectangle, convert from list to QRect
+    rect = get_option(c.O.MW_BOUNDS)
+    if rect is not None:
+        set_option(c.O.MW_BOUNDS, QtCore.QRect(*rect))
+
+def get_option(option):
+    """
+        For an option (OptionEnum in Constants), returns the entry in the options dictionary stored here.
+    """
+    return options[option.name]
+
+def set_option(option, value):
+    """
+        For an option (OptionEnum in Constants), sets the entry of the options dictionary store here to a certain value.
+    """
+    options[option.name] = value
 
 def save_options(file_name):
     """
-        Saves the options into a JSON file after performing some conversions from types like QtCore.QRect to types
-        supported by JSON.
+        Saves the options into a YAML file after performing some conversions from types like QtCore.QRect to list, ...
     """
     data = options.copy()
 
-    # main window bounding rectangle fromn QRect to list
-    rect = data[c.OG_MW_Bounds]
-    data[c.OG_MW_Bounds] = [rect.x(), rect.y(), rect.width(), rect.height()]
+    # main window bounding rectangle, convert from QRect to list
+    rect = data[c.O.MW_BOUNDS.name]
+    data[c.O.MW_BOUNDS.name] = [rect.x(), rect.y(), rect.width(), rect.height()]
 
     # write to file
     write_as_yaml(file_name, data)
