@@ -31,8 +31,7 @@ from client.graphics import MiniMapNationItem
 import client.graphics as cg
 import client.audio as audio
 from client.main_screen import GameMainScreen
-from server.editor import EditorScreen
-from server.monitor import ServerMonitorWidget
+from client.editor import EditorScreen
 
 """
     Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
@@ -234,7 +233,12 @@ class GameLobbyWidget(QtGui.QWidget):
             Toolbar action switch to server lobby.
         """
         if checked is True:
-            pass
+            # create new widget
+            widget = ServerLobby()
+
+            # add to layout
+            self.content_layout.addWidget(widget)
+            self.content_layout.itemAt(0).setAlignment(QtCore.Qt.AlignCenter)
 
     def toggled_multiplayer_scenario_selection(self, checked):
         """
@@ -242,6 +246,41 @@ class GameLobbyWidget(QtGui.QWidget):
         """
         if checked is True:
             pass
+
+class ServerLobby(QtGui.QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        l1 = QtGui.QHBoxLayout(self)
+
+        l2 = QtGui.QVBoxLayout()
+        edit = QtGui.QTextEdit()
+        edit.setEnabled(False)
+        box = g.wrap_in_groupbox(edit, 'Server')
+        box.setFixedSize(200, 150)
+        l2.addWidget(box)
+
+        list = QtGui.QListWidget()
+        # list.itemSelectionChanged.connect(self.selection_changed)
+        # list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+        list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        list.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        list.addItems(['Alf', 'Rolf', 'Marcel'])
+        box = g.wrap_in_groupbox(list, 'Clients')
+        box.setFixedWidth(200)
+        l2.addWidget(box)
+
+        l1.addLayout(l2)
+
+        l2 = QtGui.QVBoxLayout()
+        edit = QtGui.QTextEdit()
+        edit.setEnabled(False)
+        l2.addWidget(g.wrap_in_groupbox(edit, 'Chat log'))
+        edit = QtGui.QLineEdit()
+        l2.addWidget(g.wrap_in_groupbox(edit, 'Chat input'))
+
+        l1.addLayout(l2)
 
 
 class SinglePlayerScenarioPreview(QtGui.QWidget):
@@ -620,16 +659,38 @@ class OptionsContentWidget(QtGui.QWidget):
         tab = QtGui.QWidget()
         tab_layout = QtGui.QVBoxLayout(tab)
 
-        l = QtGui.QVBoxLayout()
-        l.addWidget(QtGui.QLabel('Connected to ...'))
-        button_connect = QtGui.QPushButton('Connect to nonlocal server')
-        l.addWidget(button_connect)
-        tab_layout.addWidget(g.wrap_in_groupbox(l, 'Connected Server'))
+        # status label
+        self.network_status_label = QtGui.QLabel('')
+        tab_layout.addWidget(self.network_status_label)
 
+        # remote server groupbox
         l = QtGui.QVBoxLayout()
+        # remote server address
+        l2 = QtGui.QHBoxLayout()
+        l2.addWidget(QtGui.QLabel('Remote IP address'))
+        edit = QtGui.QLineEdit()
+        edit.setFixedWidth(300)
+        l2.addWidget(edit)
+        l2.addStretch()
+        l.addLayout(l2)
+        # actions toolbar
+        l2 = QtGui.QHBoxLayout()
+        toolbar = QtGui.QToolBar()
+        toolbar.setIconSize(QtCore.QSize(24, 24))
+        # connect to remote server
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server', toolbar, checkable=True))
+        l2.addWidget(toolbar)
+        l2.addStretch()
+        l.addLayout(l2)
+        tab_layout.addWidget(g.wrap_in_groupbox(l, 'Remote Server'))
+
+        # local server group box
+        l = QtGui.QVBoxLayout()
+        # accepts incoming connections checkbox
         checkbox = QtGui.QCheckBox('Accepts incoming connections')
         self.register_checkbox(checkbox, c.O.LS_OPEN)
         l.addWidget(checkbox)
+        # alias name edit box
         l2 = QtGui.QHBoxLayout()
         l2.addWidget(QtGui.QLabel('Alias'))
         edit = QtGui.QLineEdit()
@@ -638,12 +699,14 @@ class OptionsContentWidget(QtGui.QWidget):
         l2.addStretch()
         self.register_lineedit(edit, c.O.LS_NAME)
         l.addLayout(l2)
+        # actions toolbar
         l2 = QtGui.QHBoxLayout()
         toolbar = QtGui.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
-        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.network.png'), 'Show network preferences', toolbar))
-
-        # button_local_server_monitor = QtGui.QPushButton('Monitor local server')
+        # show local server monitor
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor', toolbar))
+        # local server is on/off
+        toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.network.png'), 'Turn local server on/off', toolbar, checkable=True))
         l2.addWidget(toolbar)
         l2.addStretch()
         l.addLayout(l2)
@@ -916,21 +979,12 @@ def network_start():
         Starts the local server and connects the local client to it.
     """
 
-    # start local server
-    from server.network import server_manager
-    # TODO in own thread
-    server_manager.server.start(c.Network_Port)
-
     # connect network client of client
     network_client.connect_to_host(c.Network_Port)
 
     # TODO must be run at the end before app finishes
     # disconnect client
     # network_client.disconnectFromHost()
-
-    # stop server
-    # server_manager.server.stop()
-
 
 def start():
     """

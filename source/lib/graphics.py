@@ -580,6 +580,9 @@ TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
 def create_action(icon, text, parent, trigger_connection=None, toggle_connection=None, checkable=False):
     """
         Shortcut for creation of an action and wiring.
+
+        trigger_connection is the slot if the triggered signal of the QAction is fired
+        toggle_connection is the slot if the toggled signal of the QAction is fired
     """
     action = QtGui.QAction(icon, text, parent)
     if trigger_connection is not None:

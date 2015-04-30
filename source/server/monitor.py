@@ -16,8 +16,6 @@
 
 from PySide import QtCore, QtGui
 
-from server.network import server_manager
-
 """
     Monitors the server state
 """

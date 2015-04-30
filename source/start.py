@@ -100,10 +100,20 @@ if __name__ == '__main__':
 
     # now we can safely assume that the environment is good to us
 
+    # start server
+    from server.network import ServerProcess
+    from multiprocessing import Pipe
+    parent_conn, child_conn = Pipe()
+    server_process = ServerProcess(c.Network_Port, child_conn)
+    server_process.start()
+
     # start client, we will return when the programm finishes
     from client import client
-
     client.start()
+
+    # stop server
+    parent_conn.send('quit')
+    server_process.join()
 
     # save options
     t.save_options(Options_File)

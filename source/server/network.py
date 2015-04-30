@@ -17,6 +17,8 @@
 import random
 import os
 import time
+from multiprocessing import Process
+from threading import Thread
 
 from PySide import QtCore
 
@@ -32,7 +34,36 @@ from server.scenario import Scenario
     Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
+# TODO start this in its own process
 # TODO ping server clients regularly and throw them out if not reacting
+
+class ServerProcess(Process):
+
+    def __init__(self, port, child_conn):
+        super().__init__()
+        self.port = port
+        self.child_conn = child_conn
+
+    def run(self):
+        app = QtCore.QCoreApplication([])
+        server_manager = ServerManager()
+        server_manager.server.start(self.port)
+
+        # start thread which listens on the child_connection
+        t = Thread(target=self.listen, args = (app, server_manager))
+        t.start()
+
+        # run event loop of app
+        app.exec_()
+
+    def listen(self, app, server_manager):
+        while True:
+            message = self.child_conn.recv()
+            if message == 'quit':
+                server_manager.server.stop()
+                app.quit()
+                return
+
 
 class ServerManager(QtCore.QObject):
     """
@@ -149,6 +180,3 @@ class ServerManager(QtCore.QObject):
         client.send(message['reply-to'], preview)
 
         print('generating preview took {}s'.format(time.clock() - t0))
-
-# create a local server
-server_manager = ServerManager()
