@@ -28,11 +28,11 @@ if __name__ == '__main__':
     if sys.version_info < required_version:
         raise RuntimeError('Python version must be {}.{} at least.'.format(*required_version))
 
-    # test for existence of PySide
+    # test for existence of PyQt5
     try:
-        from PySide import QtCore
+        from PyQt5 import QtCore
     except ImportError:
-        raise RuntimeError('PySide must be installed.')
+        raise RuntimeError('PyQt5 must be installed.')
 
     import os, codecs
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     # test for phonon availability
     if t.get_option(c.O.PHONON_SUPPORTED):
         try:
-            from PySide.phonon import Phonon
+            from PyQt5.phonon import Phonon
         except ImportError:
             t.log_error('Phonon backend not available, no sound.')
             t.set_option(c.O.PHONON_SUPPORTED, False)

@@ -17,7 +17,7 @@
 import sys
 import datetime
 
-from PySide import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
 from lib.utils import read_as_yaml, write_as_yaml
 from base import constants as c

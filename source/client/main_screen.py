@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtGui
+from PyQt5 import QtGui, QtWidgets
 
 import base.tools as t
 
@@ -23,7 +23,7 @@ import base.tools as t
 """
 
 
-class MiniMap(QtGui.QWidget):
+class MiniMap(QtWidgets.QWidget):
     """
         Mini map on the left upper side.
     """
@@ -32,7 +32,7 @@ class MiniMap(QtGui.QWidget):
         super().__init__()
 
 
-class MainMap(QtGui.QGraphicsView):
+class MainMap(QtWidgets.QGraphicsView):
     """
         Main map on the right side.
     """
@@ -41,7 +41,7 @@ class MainMap(QtGui.QGraphicsView):
         super().__init__()
 
 
-class InfoBox(QtGui.QWidget):
+class InfoBox(QtWidgets.QWidget):
     """
         Info box on the left lower side.
     """
@@ -50,7 +50,7 @@ class InfoBox(QtGui.QWidget):
         super().__init__()
 
 
-class GameMainScreen(QtGui.QWidget):
+class GameMainScreen(QtWidgets.QWidget):
     """
         The whole screen (layout of single elements and interactions.
     """
@@ -58,13 +58,13 @@ class GameMainScreen(QtGui.QWidget):
     def __init__(self, client):
         super().__init__()
 
-        self.toolbar = QtGui.QToolBar()
-        action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
+        self.toolbar = QtWidgets.QToolBar()
+        action_help = QtWidgets.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
         action_help.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
-        action_quit = QtGui.QAction(t.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
-        # action_quit.triggered.connect(client.switch_to_start_screen)
+        action_quit = QtWidgets.QAction(t.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
+        action_quit.triggered.connect(client.switch_to_start_screen)
         self.toolbar.addAction(action_quit)
 
         # mini map

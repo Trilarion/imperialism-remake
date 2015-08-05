@@ -16,7 +16,7 @@
 
 from datetime import datetime
 
-from PySide import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 """
     Graphics (Qt) based objects and algorithms that do not depend specifically on the project but only on Qt.
@@ -100,8 +100,8 @@ class Notification(QtCore.QObject):
 
         Also has signals, currently only when finished. Connect to if you want to be notified of the ending.
     """
-    finished = QtCore.Signal()
-    clicked = QtCore.Signal(QtGui.QMouseEvent)
+    finished = QtCore.pyqtSignal()
+    clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
 
     def __init__(self, parent, content, fade_duration=2000, stay_duration=2000, position_constraint=None):
         """
@@ -125,11 +125,11 @@ class Notification(QtCore.QObject):
 
         # replace content by QLabel if content is a string
         if isinstance(content, str):
-            content = QtGui.QLabel(content)
+            content = QtWidgets.QLabel(content)
             content.setObjectName('notification')
 
         # set background
-        layout = QtGui.QVBoxLayout(self.widget)
+        layout = QtWidgets.QVBoxLayout(self.widget)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(content)
 
@@ -164,7 +164,7 @@ class Notification(QtCore.QObject):
         self.fade.fadein()
 
 
-class RelativeLayout(QtGui.QLayout):
+class RelativeLayout(QtWidgets.QLayout):
     """
         An implementation of QLayout working with RelativeLayoutConstraints so the position can be estimated by
         method calculate_relative_position()
@@ -243,28 +243,28 @@ class RelativeLayout(QtGui.QLayout):
 
 class FadeAnimation(QtCore.QObject):
     """
-        Fade animation on a QtGui.QGraphicsItem. As usual a reference to an instance must be stored.
+        Fade animation on a QtWidgets.QGraphicsItem. As usual a reference to an instance must be stored.
     """
 
-    fadein_finished = QtCore.Signal()
-    fadeout_finished = QtCore.Signal()
+    fadein_finished = QtCore.pyqtSignal()
+    fadeout_finished = QtCore.pyqtSignal()
 
     def __init__(self, parent):
         """
             Create property animations, sets the opacity to zero initially.
         """
         super().__init__()
-        if isinstance(parent, QtGui.QGraphicsItem):
+        if isinstance(parent, QtWidgets.QGraphicsItem):
             # create opacity effect
-            self.effect = QtGui.QGraphicsOpacityEffect()
+            self.effect = QtWidgets.QGraphicsOpacityEffect()
             self.effect.setOpacity(0)
             parent.setGraphicsEffect(self.effect)
-            self.fade = QtCore.QPropertyAnimation(self.effect, 'opacity')
-        elif isinstance(parent, QtGui.QWidget):
+            self.fade = QtCore.QPropertyAnimation(self.effect, 'opacity'.encode('utf-8'))
+        elif isinstance(parent, QtWidgets.QWidget):
             parent.setWindowOpacity(0)
-            self.fade = QtCore.QPropertyAnimation(parent, 'windowOpacity')
+            self.fade = QtCore.QPropertyAnimation(parent, 'windowOpacity'.encode('utf-8'))
         else:
-            raise RuntimeError('Type of parameter must be QtGui.QGraphicsItem or QtGui.QWidget.')
+            raise RuntimeError('Type of parameter must be QtWidgets.QGraphicsItem or QtWidgets.QWidget.')
 
         # set start and stop value
         self.fade.setStartValue(0)
@@ -317,9 +317,9 @@ class GraphicsItemSet():
     def add_item(self, item):
         """
             Adds an item to the content list. Should be
-            item -- QtGui.QGraphicsItem
+            item -- QtWidgets.QGraphicsItem
         """
-        if not isinstance(item, QtGui.QGraphicsItem):
+        if not isinstance(item, QtWidgets.QGraphicsItem):
             raise RuntimeError('Expected instance of QGraphicsItem!')
         self._content.add(item)
 
@@ -333,7 +333,7 @@ class GraphicsItemSet():
 
 class ZStackingManager():
     """
-        Puts several QtGui.QGraphicsItem into different sets (floors) and in the end sets their z-value so that lower
+        Puts several QtWidgets.QGraphicsItem into different sets (floors) and in the end sets their z-value so that lower
         floors have lower z-value.
     """
 
@@ -373,9 +373,9 @@ class ZStackingManager():
             self._floors[z].set_zvalue(z)
 
 
-class ZoomableGraphicsView(QtGui.QGraphicsView):
+class ZoomableGraphicsView(QtWidgets.QGraphicsView):
     """
-        QtGui.QGraphicsView where you can zoom around the current mouse position with the mouse wheel.
+        QtWidgets.QGraphicsView where you can zoom around the current mouse position with the mouse wheel.
     """
     ScaleFactor = 1.15
     MinScaling = 0.5
@@ -386,7 +386,7 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
             Set the transformation anchor to below the current mouse position.
         """
         super().__init__(*args, **kwargs)
-        self.setTransformationAnchor(QtGui.QGraphicsView.AnchorUnderMouse)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.standard_scale = 1
 
     def wheelEvent(self, event):
@@ -412,11 +412,11 @@ class ZoomableGraphicsView(QtGui.QGraphicsView):
 
 def make_widget_clickable(parent):
     """
-        Takes any QtGui.QWidget derived class and emits a signal emitting on mousePressEvent.
+        Takes any QtWidgets.QWidget derived class and emits a signal emitting on mousePressEvent.
     """
 
     class ClickableWidgetSubclass(parent):
-        clicked = QtCore.Signal(QtGui.QMouseEvent)
+        clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -430,13 +430,13 @@ def make_widget_clickable(parent):
 
 def make_widget_draggable(parent):
     """
-        Takes any QtGui.QWidget derived class and emits a signal on mouseMoveEvent emitting the position change since
+        Takes any QtWidgets.QWidget derived class and emits a signal on mouseMoveEvent emitting the position change since
         the last mousePressEvent. By default mouseMoveEvents are only invoked while the mouse is pressed. Therefore
         we can use it to listen to dragging or implement dragging.
     """
 
     class DraggableWidgetSubclass(parent):
-        dragged = QtCore.Signal(QtCore.QPoint)
+        dragged = QtCore.pyqtSignal(QtCore.QPoint)
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -464,15 +464,16 @@ def make_widget_draggable(parent):
 
 def make_GraphicsItem_clickable(parent):
     """
-        Takes a QtGui.QGraphicsItem and adds signals for entering, leaving and clicking on the item. For this the item
+        Takes a QtWidgets.QGraphicsItem and adds signals for entering, leaving and clicking on the item. For this the item
         must have setAcceptHoverEvents and it must also inherit from QObject to have signals. Only use it when really
         needed because there is some performance hit attached.
     """
 
-    class ClickableGraphicsItem(parent, QtCore.QObject):
-        entered = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
-        left = QtCore.Signal(QtGui.QGraphicsSceneHoverEvent)
-        clicked = QtCore.Signal(QtGui.QGraphicsSceneMouseEvent)
+    # class ClickableGraphicsItem(parent, QtCore.QObject):
+    class ClickableGraphicsItem(parent):
+        entered = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
+        left = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
+        clicked = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneMouseEvent)
 
         def __init__(self, *args, **kwargs):
             """
@@ -480,7 +481,7 @@ def make_GraphicsItem_clickable(parent):
                 So we need to turn both on.
             """
             parent.__init__(self, *args, **kwargs)
-            QtCore.QObject.__init__(self)
+            # QtCore.QObject.__init__(self)
             self.parent = parent
             self.setAcceptHoverEvents(True)
             self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
@@ -511,13 +512,13 @@ def make_GraphicsItem_clickable(parent):
 
 def make_GraphicsItem_draggable(parent):
     """
-        Takes a QtGui.QGraphicsItem and adds signals for dragging the object around. For this the item must have the
+        Takes a QtWidgets.QGraphicsItem and adds signals for dragging the object around. For this the item must have the
         ItemIsMovable and ItemSendsScenePositionChanges flags set. Only use it when really needed because there is
         some performance hit attached.
     """
 
     class DraggableGraphicsItem(parent, QtCore.QObject):
-        changed = QtCore.Signal(object)
+        changed = QtCore.pyqtSignal(object)
 
         def __init__(self, *args, **kwargs):
             """
@@ -528,13 +529,13 @@ def make_GraphicsItem_draggable(parent):
             self.parent = parent
             QtCore.QObject.__init__(self)
 
-            self.setFlags(QtGui.QGraphicsItem.ItemIsMovable | QtGui.QGraphicsItem.ItemSendsScenePositionChanges)
+            self.setFlags(QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemSendsScenePositionChanges)
 
         def itemChange(self, change, value):
             """
                 Catch all item position changes and emit the changed signal with the value (which will be the position).
             """
-            if change == QtGui.QGraphicsItem.ItemPositionChange:
+            if change == QtWidgets.QGraphicsItem.ItemPositionChange:
                 self.changed.emit(value)
 
             return parent.itemChange(self, change, value)
@@ -542,14 +543,14 @@ def make_GraphicsItem_draggable(parent):
     return DraggableGraphicsItem
 
 # Some classes we need (just to make the naming clear), Name will be used in Stylesheet selectors
-DraggableToolBar = make_widget_draggable(QtGui.QToolBar)
-ClickableWidget = make_widget_clickable(QtGui.QWidget)
-ClickablePixmapItem = make_GraphicsItem_clickable(QtGui.QGraphicsPixmapItem)
-ClickablePathItem = make_GraphicsItem_clickable(QtGui.QGraphicsPathItem)
-DraggableRectItem = make_GraphicsItem_draggable(QtGui.QGraphicsRectItem)
+DraggableToolBar = make_widget_draggable(QtWidgets.QToolBar)
+ClickableWidget = make_widget_clickable(QtWidgets.QWidget)
+ClickablePixmapItem = make_GraphicsItem_clickable(QtWidgets.QGraphicsPixmapItem)
+ClickablePathItem = make_GraphicsItem_clickable(QtWidgets.QGraphicsPathItem)
+DraggableRectItem = make_GraphicsItem_draggable(QtWidgets.QGraphicsRectItem)
 
 
-class ClockLabel(QtGui.QLabel):
+class ClockLabel(QtWidgets.QLabel):
     """
         Just a clock label that shows hour : minute and updates itself every minute for as long as it lives.
     """
@@ -584,7 +585,7 @@ def create_action(icon, text, parent, trigger_connection=None, toggle_connection
         trigger_connection is the slot if the triggered signal of the QAction is fired
         toggle_connection is the slot if the toggled signal of the QAction is fired
     """
-    action = QtGui.QAction(icon, text, parent)
+    action = QtWidgets.QAction(icon, text, parent)
     if trigger_connection is not None:
         action.triggered.connect(trigger_connection)
     if toggle_connection is not None:
@@ -597,16 +598,16 @@ def wrap_in_groupbox(item, title):
     """
         Shortcut for putting a widget or a layout into a QGroupBox (with a title). Returns the group box.
     """
-    box = QtGui.QGroupBox(title)
-    if isinstance(item, QtGui.QWidget):
-        layout = QtGui.QVBoxLayout(box)
+    box = QtWidgets.QGroupBox(title)
+    if isinstance(item, QtWidgets.QWidget):
+        layout = QtWidgets.QVBoxLayout(box)
         layout.addWidget(item)
-    elif isinstance(item, QtGui.QLayout):
+    elif isinstance(item, QtWidgets.QLayout):
         box.setLayout(item)
     return box
 
 
-class FitSceneInViewGraphicsView(QtGui.QGraphicsView):
+class FitSceneInViewGraphicsView(QtWidgets.QGraphicsView):
     """
         Extension of QGraphicsView that fits the scene rectangle of the scene into the view when the view is shown.
         This avoids problems with the size of the view different before any layout can take place and therefore

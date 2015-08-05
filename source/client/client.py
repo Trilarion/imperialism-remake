@@ -18,7 +18,7 @@
 
 from functools import partial
 
-from PySide import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 import lib.graphics as g
 import lib.utils as u
@@ -47,7 +47,7 @@ class MapItem(QtCore.QObject):
 
         TODO use signals to show the text instead
     """
-    description_change = QtCore.Signal(str)
+    description_change = QtCore.pyqtSignal(str)
 
     def __init__(self, parent, pixmap, label, description):
         super().__init__(parent)
@@ -75,14 +75,14 @@ class MapItem(QtCore.QObject):
         self.label.setText('')
 
 
-class StartScreen(QtGui.QWidget):
+class StartScreen(QtWidgets.QWidget):
     """
         Creates the start screen
 
         TODO convert to simple method which does it, no need to be a class
     """
 
-    frame_pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 255, 255, 64)), 6, j=QtCore.Qt.BevelJoin)
+    frame_pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 255, 255, 64)), 6, join=QtCore.Qt.BevelJoin)
 
     def __init__(self, client):
         super().__init__()
@@ -93,13 +93,13 @@ class StartScreen(QtGui.QWidget):
         layout = g.RelativeLayout(self)
 
         start_image = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, 'start.background.jpg'))
-        start_image_item = QtGui.QGraphicsPixmapItem(start_image)
+        start_image_item = QtWidgets.QGraphicsPixmapItem(start_image)
         start_image_item.setZValue(1)
 
-        scene = QtGui.QGraphicsScene(self)
+        scene = QtWidgets.QGraphicsScene(self)
         scene.addItem(start_image_item)
 
-        view = QtGui.QGraphicsView(scene)
+        view = QtWidgets.QGraphicsView(scene)
         view.resize(start_image.size())
         view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -107,7 +107,7 @@ class StartScreen(QtGui.QWidget):
         view.layout_constraint = g.RelativeLayoutConstraint().center_horizontal().center_vertical()
         layout.addWidget(view)
 
-        subtitle = QtGui.QLabel('')
+        subtitle = QtWidgets.QLabel('')
         subtitle.layout_constraint = g.RelativeLayoutConstraint((0.5, -0.5, 0),
                                                                 (0.5, -0.5, start_image.height() / 2 + 20))
         layout.addWidget(subtitle)
@@ -142,17 +142,17 @@ class StartScreen(QtGui.QWidget):
             frame_item.setZValue(4)
             scene.addItem(mapitem.item)
 
-        version_label = QtGui.QLabel('<font color=#ffffff>{}</font>'.format(t.get_option(c.O.VERSION)))
+        version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'.format(t.get_option(c.O.VERSION)))
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
 
-class GameLobbyWidget(QtGui.QWidget):
+class GameLobbyWidget(QtWidgets.QWidget):
     """
         Content widget for the game lobby.
     """
 
-    single_player_start = QtCore.Signal(str, str)
+    single_player_start = QtCore.pyqtSignal(str, str)
 
     def __init__(self):
         """
@@ -160,12 +160,12 @@ class GameLobbyWidget(QtGui.QWidget):
         """
         super().__init__()
 
-        layout = QtGui.QVBoxLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
         # create tool bar
-        toolbar = QtGui.QToolBar()
-        action_group = QtGui.QActionGroup(toolbar)
+        toolbar = QtWidgets.QToolBar()
+        action_group = QtWidgets.QActionGroup(toolbar)
 
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario', action_group, toggle_connection=self.toggled_single_player_scenario_selection, checkable=True))
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario', action_group, toggle_connection=self.toggled_single_player_load_scenario, checkable=True))
@@ -177,8 +177,8 @@ class GameLobbyWidget(QtGui.QWidget):
 
         layout.addWidget(toolbar)
 
-        content = QtGui.QWidget()
-        self.content_layout = QtGui.QVBoxLayout(content)
+        content = QtWidgets.QWidget()
+        self.content_layout = QtWidgets.QVBoxLayout(content)
         self.content_layout.setContentsMargins(0, 0, 0, 0)
 
         layout.addWidget(content)
@@ -247,14 +247,14 @@ class GameLobbyWidget(QtGui.QWidget):
         if checked is True:
             pass
 
-class ServerLobby(QtGui.QWidget):
+class ServerLobby(QtWidgets.QWidget):
 
     def __init__(self):
         super().__init__()
 
-        l1 = QtGui.QHBoxLayout(self)
+        l1 = QtWidgets.QHBoxLayout(self)
 
-        l2 = QtGui.QVBoxLayout()
+        l2 = QtWidgets.QVBoxLayout()
         edit = QtGui.QTextEdit()
         edit.setEnabled(False)
         box = g.wrap_in_groupbox(edit, 'Server')
@@ -273,7 +273,7 @@ class ServerLobby(QtGui.QWidget):
 
         l1.addLayout(l2)
 
-        l2 = QtGui.QVBoxLayout()
+        l2 = QtWidgets.QVBoxLayout()
         edit = QtGui.QTextEdit()
         edit.setEnabled(False)
         l2.addWidget(g.wrap_in_groupbox(edit, 'Chat log'))
@@ -283,7 +283,7 @@ class ServerLobby(QtGui.QWidget):
         l1.addLayout(l2)
 
 
-class SinglePlayerScenarioPreview(QtGui.QWidget):
+class SinglePlayerScenarioPreview(QtWidgets.QWidget):
     """
         Displays the preview of a single player scenario in the game lobby.
 
@@ -292,7 +292,7 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
 
     CH_PREVIEW = 'SP.scenario-selection.preview'
 
-    nation_selected = QtCore.Signal(str)
+    nation_selected = QtCore.pyqtSignal(str)
 
     def __init__(self, scenario_file):
         """
@@ -327,11 +327,11 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         layout.addWidget(g.wrap_in_groupbox(self.nations_list, 'Nations'), 0, 0)
 
         # map view (no scroll bars)
-        self.map_scene = QtGui.QGraphicsScene()
+        self.map_scene = QtWidgets.QGraphicsScene()
         self.map_view = g.FitSceneInViewGraphicsView(self.map_scene)
         self.map_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.map_view.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.MinimumExpanding)
+        self.map_view.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         layout.addWidget(g.wrap_in_groupbox(self.map_view, 'Map'), 0, 1)
 
         # scenario description
@@ -355,7 +355,7 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         layout.setColumnStretch(1, 1)  # map gets all the available width
 
         # add the start button
-        toolbar = QtGui.QToolBar()
+        toolbar = QtWidgets.QToolBar()
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
                                           trigger_connection=self.start_scenario_clicked))
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
@@ -457,14 +457,14 @@ class SinglePlayerScenarioPreview(QtGui.QWidget):
         network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
 
 
-class SinglePlayerScenarioTitleSelection(QtGui.QGroupBox):
+class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
     """
         Displays a widget with all available scenario titles for starting new single player scenarios.
 
         If a title is selected, emits the title_selected signal.
     """
 
-    title_selected = QtCore.Signal(str)  # make sure to only connect with QtCore.Qt.QueuedConnection to this signal
+    title_selected = QtCore.pyqtSignal(str)  # make sure to only connect with QtCore.Qt.QueuedConnection to this signal
 
     CH_TITLES = 'SP.scenario-selection.titles'
 
@@ -474,7 +474,7 @@ class SinglePlayerScenarioTitleSelection(QtGui.QGroupBox):
         """
         super().__init__()
         self.setTitle('Select Scenario')
-        QtGui.QVBoxLayout(self)  # just set a standard layout
+        QtWidgets.QVBoxLayout(self)  # just set a standard layout
 
         # add a channel for us
         network_client.connect_to_channel(self.CH_TITLES, self.received_titles)
@@ -527,7 +527,7 @@ class SinglePlayerScenarioTitleSelection(QtGui.QGroupBox):
         network_client.remove_channel(self.CH_TITLES, ignore_not_existing=True)
 
 
-class OptionsContentWidget(QtGui.QWidget):
+class OptionsContentWidget(QtWidgets.QWidget):
     """
         Content widget for the options/preferences dialog window, based on QTabWidget.
 
@@ -540,9 +540,9 @@ class OptionsContentWidget(QtGui.QWidget):
         """
         super().__init__()
 
-        toolbar = QtGui.QToolBar()
+        toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(32, 32))
-        action_group = QtGui.QActionGroup(toolbar)
+        action_group = QtWidgets.QActionGroup(toolbar)
 
         action_preferences_general = g.create_action(t.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, toggle_connection=self.toggled_general, checkable=True)
         toolbar.addAction(action_preferences_general)
@@ -553,7 +553,7 @@ class OptionsContentWidget(QtGui.QWidget):
 
         self.stacked_layout = QtGui.QStackedLayout()
 
-        layout = QtGui.QVBoxLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(toolbar)
         layout.addLayout(self.stacked_layout)
@@ -582,8 +582,8 @@ class OptionsContentWidget(QtGui.QWidget):
         """
             Create general options widget.
         """
-        tab = QtGui.QWidget()
-        tab_layout = QtGui.QVBoxLayout(tab)
+        tab = QtWidgets.QWidget()
+        tab_layout = QtWidgets.QVBoxLayout(tab)
 
         # vertical stretch
         tab_layout.addStretch()
@@ -611,8 +611,8 @@ class OptionsContentWidget(QtGui.QWidget):
             Create graphical options widget.
         """
 
-        tab = QtGui.QWidget()
-        tab_layout = QtGui.QVBoxLayout(tab)
+        tab = QtWidgets.QWidget()
+        tab_layout = QtWidgets.QVBoxLayout(tab)
 
         # full screen mode
         checkbox = QtGui.QCheckBox('Full screen mode')
@@ -637,8 +637,8 @@ class OptionsContentWidget(QtGui.QWidget):
         """
             Create music options widget.
         """
-        tab = QtGui.QWidget()
-        tab_layout = QtGui.QVBoxLayout(tab)
+        tab = QtWidgets.QWidget()
+        tab_layout = QtWidgets.QVBoxLayout(tab)
 
         # mute checkbox
         checkbox = QtGui.QCheckBox('Mute background music')
@@ -656,26 +656,26 @@ class OptionsContentWidget(QtGui.QWidget):
         """
             Create network options widget.
         """
-        tab = QtGui.QWidget()
-        tab_layout = QtGui.QVBoxLayout(tab)
+        tab = QtWidgets.QWidget()
+        tab_layout = QtWidgets.QVBoxLayout(tab)
 
         # status label
-        self.network_status_label = QtGui.QLabel('')
+        self.network_status_label = QtWidgets.QLabel('')
         tab_layout.addWidget(self.network_status_label)
 
         # remote server groupbox
-        l = QtGui.QVBoxLayout()
+        l = QtWidgets.QVBoxLayout()
         # remote server address
-        l2 = QtGui.QHBoxLayout()
-        l2.addWidget(QtGui.QLabel('Remote IP address'))
+        l2 = QtWidgets.QHBoxLayout()
+        l2.addWidget(QtWidgets.QLabel('Remote IP address'))
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(300)
         l2.addWidget(edit)
         l2.addStretch()
         l.addLayout(l2)
         # actions toolbar
-        l2 = QtGui.QHBoxLayout()
-        toolbar = QtGui.QToolBar()
+        l2 = QtWidgets.QHBoxLayout()
+        toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # connect to remote server
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server', toolbar, checkable=True))
@@ -685,14 +685,14 @@ class OptionsContentWidget(QtGui.QWidget):
         tab_layout.addWidget(g.wrap_in_groupbox(l, 'Remote Server'))
 
         # local server group box
-        l = QtGui.QVBoxLayout()
+        l = QtWidgets.QVBoxLayout()
         # accepts incoming connections checkbox
         checkbox = QtGui.QCheckBox('Accepts incoming connections')
         self.register_checkbox(checkbox, c.O.LS_OPEN)
         l.addWidget(checkbox)
         # alias name edit box
-        l2 = QtGui.QHBoxLayout()
-        l2.addWidget(QtGui.QLabel('Alias'))
+        l2 = QtWidgets.QHBoxLayout()
+        l2.addWidget(QtWidgets.QLabel('Alias'))
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(300)
         l2.addWidget(edit)
@@ -700,8 +700,8 @@ class OptionsContentWidget(QtGui.QWidget):
         self.register_lineedit(edit, c.O.LS_NAME)
         l.addLayout(l2)
         # actions toolbar
-        l2 = QtGui.QHBoxLayout()
-        toolbar = QtGui.QToolBar()
+        l2 = QtWidgets.QHBoxLayout()
+        toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # show local server monitor
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor', toolbar))
@@ -761,7 +761,7 @@ class OptionsContentWidget(QtGui.QWidget):
         return True
 
 
-class MainWindow(QtGui.QWidget):
+class MainWindow(QtWidgets.QWidget):
     """
         The main window (widget) which is the top level window of the application. It can be full screen or not and hold
         a single widget in a margin-less layout.
@@ -782,7 +782,7 @@ class MainWindow(QtGui.QWidget):
         self.setWindowTitle('Imperialism Remake')
 
         # just a layout but nothing else
-        self.layout = QtGui.QHBoxLayout(self)
+        self.layout = QtWidgets.QHBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.content = None
 
@@ -799,7 +799,7 @@ class MainWindow(QtGui.QWidget):
         # TODO animation right and start, stop in client
         self.animation = QtGui.QMovie(c.extend(c.Graphics_UI_Folder, 'loading.gif'))
         # self.animation.start()
-        self.loading_label = QtGui.QLabel(self, f=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
+        self.loading_label = QtWidgets.QLabel(self, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
         self.loading_label.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.loading_label.setMovie(self.animation)
         # self.loading_label.show()
@@ -837,13 +837,13 @@ class Client():
                               self.main_window.y() + self.main_window.height() - 600)
 
         # add help browser keyboard shortcut
-        action = QtGui.QAction(self.main_window)
+        action = QtWidgets.QAction(self.main_window)
         action.setShortcut(QtGui.QKeySequence('F1'))
         action.triggered.connect(self.show_help_browser)
         self.main_window.addAction(action)
 
         # add server monitor keyboard shortcut
-        action = QtGui.QAction(self.main_window)
+        action = QtWidgets.QAction(self.main_window)
         action.setShortcut(QtGui.QKeySequence('F2'))
         action.triggered.connect(self.show_server_monitor)
         self.main_window.addAction(action)
@@ -992,7 +992,7 @@ def start():
     """
 
     # create app
-    app = QtGui.QApplication([])
+    app = QtWidgets.QApplication([])
 
     # TODO multiple screen support?
 

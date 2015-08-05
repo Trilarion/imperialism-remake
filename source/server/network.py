@@ -20,7 +20,7 @@ import time
 from multiprocessing import Process
 from threading import Thread
 
-from PySide import QtCore
+from PyQt5 import QtCore
 
 from lib.network import Server
 import lib.utils as u

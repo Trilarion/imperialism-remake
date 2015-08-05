@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtGui, QtWebKit
+from PyQt5 import QtGui, QtWebKit, QtWidgets, QtWebKitWidgets
 
 """
     Browser based on QtWebKit.QtWebView. Provides Home, Forward, Backward (in history) functionality.
@@ -22,7 +22,7 @@ from PySide import QtGui, QtWebKit
 
 # TODO base instead on QtWebPage?
 
-class BrowserWidget(QtGui.QWidget):
+class BrowserWidget(QtWidgets.QWidget):
     def __init__(self, home_url, icon_provider):
         super().__init__()
 
@@ -30,23 +30,23 @@ class BrowserWidget(QtGui.QWidget):
         self.home_url = home_url
 
         # create and add tool bar on top (non floatable or movable)
-        tool_bar = QtGui.QToolBar(self)
+        tool_bar = QtWidgets.QToolBar(self)
 
         # create actions, connect to methods, add to tool bar
-        action_home = QtGui.QAction(self)
+        action_home = QtWidgets.QAction(self)
         action_home.setIcon(icon_provider('icon.home.png'))
         action_home.setToolTip('Home')
         action_home.triggered.connect(self.actionHomeTriggered)
         tool_bar.addAction(action_home)
 
-        action_backward = QtGui.QAction(self)
+        action_backward = QtWidgets.QAction(self)
         action_backward.setEnabled(False)
         action_backward.setIcon(icon_provider('icon.backward.png'))
         action_backward.triggered.connect(self.actionBackwardTriggered)
         tool_bar.addAction(action_backward)
         self.action_backward = action_backward
 
-        action_forward = QtGui.QAction(self)
+        action_forward = QtWidgets.QAction(self)
         action_forward.setEnabled(False)
         action_forward.setIcon(icon_provider('icon.forward.png'))
         action_forward.triggered.connect(self.actionForwardTriggered)
@@ -54,14 +54,14 @@ class BrowserWidget(QtGui.QWidget):
         self.action_forward = action_forward
 
         # create and add web view, connect linkClicked signal with our newPage method
-        web_view = QtWebKit.QWebView()
+        web_view = QtWebKitWidgets.QWebView()
         # must set DelegationPolicy to include all links
-        web_view.page().setLinkDelegationPolicy(QtWebKit.QWebPage.DelegateAllLinks)
+        web_view.page().setLinkDelegationPolicy(QtWebKitWidgets.QWebPage.DelegateAllLinks)
         web_view.linkClicked.connect(self.newPage)
         self.web_view = web_view
 
         # set Layout
-        layout = QtGui.QVBoxLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(tool_bar)
         layout.addWidget(web_view)

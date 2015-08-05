@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtCore
+from PyQt5 import QtCore
 
 from lib.network import Client
 
@@ -120,7 +120,7 @@ class Channel(QtCore.QObject):
         boundaries easily.
     """
 
-    received = QtCore.Signal(NetworkClient, dict)
+    received = QtCore.pyqtSignal(NetworkClient, dict)
 
     def __init__(self):
         super().__init__()

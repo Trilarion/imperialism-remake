@@ -17,7 +17,7 @@
 import zlib
 
 import yaml
-from PySide import QtCore, QtNetwork
+from PyQt5 import QtCore, QtNetwork
 
 """
     Basic general network functionality (client and server) wrapping around QtNetwork.QTcpSocket. Messages are sent using
@@ -36,10 +36,10 @@ class Client(QtCore.QObject):
 
         Additionally sends and reads messages via serialization (yaml), compression (zlib) and wrapping (QByteArray).
     """
-    connected = QtCore.Signal()
-    disconnected = QtCore.Signal()
-    error = QtCore.Signal(QtNetwork.QAbstractSocket.SocketError)
-    received = QtCore.Signal(object)
+    connected = QtCore.pyqtSignal()
+    disconnected = QtCore.pyqtSignal()
+    error = QtCore.pyqtSignal(QtNetwork.QAbstractSocket.SocketError)
+    received = QtCore.pyqtSignal(object)
 
     def __init__(self):
         """
@@ -133,7 +133,7 @@ class Server(QtCore.QObject):
         Wrapper around QtNetwork.QTcpServer and a management of several clients (each a QtNetwork.QTcpSocket).
     """
 
-    new_client = QtCore.Signal(QtNetwork.QTcpSocket)
+    new_client = QtCore.pyqtSignal(QtNetwork.QTcpSocket)
 
     def __init__(self):
         """

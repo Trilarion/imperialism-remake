@@ -17,7 +17,7 @@
 import os
 import math
 
-from PySide import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 import lib.graphics as g
 import base.tools as t
@@ -49,14 +49,14 @@ class EditorScenario(Scenario):
         TODO Do we really need it or can we call the connected slot(s) also manually after loading?
     """
 
-    everything_changed = QtCore.Signal()
+    everything_changed = QtCore.pyqtSignal()
 
     def load(self, file_name):
         super().load(file_name)
         self.everything_changed.emit()
 
 
-class EditorMiniMap(QtGui.QWidget):
+class EditorMiniMap(QtWidgets.QWidget):
     """
         Small overview map
     """
@@ -64,7 +64,7 @@ class EditorMiniMap(QtGui.QWidget):
     # Fixed width of 300 pixels
     VIEW_WIDTH = 300
 
-    focus_moved = QtCore.Signal(float, float)
+    focus_moved = QtCore.pyqtSignal(float, float)
 
     def __init__(self, scenario):
         """
@@ -73,22 +73,22 @@ class EditorMiniMap(QtGui.QWidget):
         super().__init__()
         self.setObjectName('minimap')
 
-        layout = QtGui.QVBoxLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
         # the content is a scene
-        self.scene = QtGui.QGraphicsScene()
+        self.scene = QtWidgets.QGraphicsScene()
 
         # tracker rectangle that tracks the view of the main map
-        self.tracker = QtGui.QGraphicsRectItem()
+        self.tracker = QtWidgets.QGraphicsRectItem()
         self.tracker.setCursor(QtCore.Qt.PointingHandCursor)
         self.tracker.setZValue(1000)
         self.tracker.hide()
         self.scene.addItem(self.tracker)
 
         # the view on the scene (no scroll bars)
-        self.view = QtGui.QGraphicsView(self.scene)
+        self.view = QtWidgets.QGraphicsView(self.scene)
         self.view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         layout.addWidget(self.view)
@@ -99,11 +99,11 @@ class EditorMiniMap(QtGui.QWidget):
         self.view.setFixedHeight(view_height)
 
         # tool bar below the mini map
-        self.toolbar = QtGui.QToolBar()
+        self.toolbar = QtWidgets.QToolBar()
         self.toolbar.setIconSize(QtCore.QSize(20, 20))
 
         # action group (only one of them can be checked at each time)
-        action_group = QtGui.QActionGroup(self.toolbar)
+        action_group = QtWidgets.QActionGroup(self.toolbar)
         # political view in the beginning
         action_political = g.create_action(t.load_ui_icon('icon.mini.political.png'), 'Show political view',
                                            action_group, toggle_connection=self.toggled_political, checkable=True)
@@ -114,7 +114,7 @@ class EditorMiniMap(QtGui.QWidget):
                             toggle_connection=self.toggled_geographical, checkable=True))
 
         # wrap tool bar into horizontal layout with stretch
-        l = QtGui.QHBoxLayout()
+        l = QtWidgets.QHBoxLayout()
         l.setContentsMargins(0, 0, 0, 0)
         l.addWidget(self.toolbar)
         l.addStretch()
@@ -275,23 +275,23 @@ class EditorMiniMap(QtGui.QWidget):
         self.tracker.show()
 
 
-class EditorMainMap(QtGui.QGraphicsView):
+class EditorMainMap(QtWidgets.QGraphicsView):
     """
         The big map holding the game map and everything.
     """
 
-    tile_at_focus_changed = QtCore.Signal(int, int)
+    tile_at_focus_changed = QtCore.pyqtSignal(int, int)
 
     def __init__(self, scenario):
         super().__init__()
 
-        self.scene = QtGui.QGraphicsScene()
+        self.scene = QtWidgets.QGraphicsScene()
         self.setScene(self.scene)
         self.setObjectName('map')
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setTransformationAnchor(QtGui.QGraphicsView.NoAnchor)
-        self.setResizeAnchor(QtGui.QGraphicsView.NoAnchor)
+        self.setTransformationAnchor(QtWidgets.QGraphicsView.NoAnchor)
+        self.setResizeAnchor(QtWidgets.QGraphicsView.NoAnchor)
         self.setMouseTracking(True)
         self.current_column = -1
         self.current_row = -1
@@ -491,7 +491,7 @@ class EditorMainMap(QtGui.QGraphicsView):
         super().mouseMoveEvent(event)
 
 
-class InfoBox(QtGui.QWidget):
+class InfoBox(QtWidgets.QWidget):
     """
         Info box on the right side of the editor.
     """
@@ -502,16 +502,16 @@ class InfoBox(QtGui.QWidget):
         """
         super().__init__()
         self.setObjectName('infobox')
-        layout = QtGui.QVBoxLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
 
-        self.text_label = QtGui.QLabel()
+        self.text_label = QtWidgets.QLabel()
         self.text_label.setTextFormat(QtCore.Qt.RichText)
         layout.addWidget(self.text_label)
 
-        self.province_label = QtGui.QLabel()
+        self.province_label = QtWidgets.QLabel()
         layout.addWidget(self.province_label)
 
-        self.nation_label = QtGui.QLabel()
+        self.nation_label = QtWidgets.QLabel()
         layout.addWidget(self.nation_label)
 
         layout.addStretch()
@@ -522,9 +522,9 @@ class InfoBox(QtGui.QWidget):
         """
             Setup toolbar at the bottom.
         """
-        layout = QtGui.QHBoxLayout()
+        layout = QtWidgets.QHBoxLayout()
 
-        toolbar = QtGui.QToolBar()
+        toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(20, 20))
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self,
                                           self.change_terrain))
@@ -556,13 +556,13 @@ class InfoBox(QtGui.QWidget):
         pass
 
 
-class NewScenarioDialogWidget(QtGui.QWidget):
+class NewScenarioDialogWidget(QtWidgets.QWidget):
     """
         New scenario dialog.
 
         Here as in many other dialogs we do not use placeholders because in Qt 4.8 they are not returned by text() afterwards
     """
-    create_scenario = QtCore.Signal(dict)
+    create_scenario = QtCore.pyqtSignal(dict)
 
     def __init__(self, properties):
         """
@@ -571,11 +571,11 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         super().__init__()
         self.properties = properties
 
-        widget_layout = QtGui.QVBoxLayout(self)
+        widget_layout = QtWidgets.QVBoxLayout(self)
 
         # title box
-        box = QtGui.QGroupBox('Title')
-        layout = QtGui.QVBoxLayout(box)
+        box = QtWidgets.QGroupBox('Title')
+        layout = QtWidgets.QVBoxLayout(box)
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(300)
         edit.setText(self.properties[k.TITLE])
@@ -584,10 +584,10 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         widget_layout.addWidget(box)
 
         # map size
-        box = QtGui.QGroupBox('Map size')
-        layout = QtGui.QHBoxLayout(box)
+        box = QtWidgets.QGroupBox('Map size')
+        layout = QtWidgets.QHBoxLayout(box)
 
-        layout.addWidget(QtGui.QLabel('Width'))
+        layout.addWidget(QtWidgets.QLabel('Width'))
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(50)
         edit.setValidator(QtGui.QIntValidator(0, 1000))
@@ -595,7 +595,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         self.properties[k.MAP_COLUMNS] = edit
         layout.addWidget(edit)
 
-        layout.addWidget(QtGui.QLabel('Height'))
+        layout.addWidget(QtWidgets.QLabel('Height'))
         edit = QtGui.QLineEdit()
         edit.setFixedWidth(50)
         edit.setValidator(QtGui.QIntValidator(0, 1000))
@@ -610,8 +610,8 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         widget_layout.addStretch()
 
         # add the button
-        layout = QtGui.QHBoxLayout()
-        toolbar = QtGui.QToolBar()
+        layout = QtWidgets.QHBoxLayout()
+        toolbar = QtWidgets.QToolBar()
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar,
                                           self.create_scenario_clicked))
         layout.addStretch()
@@ -631,7 +631,7 @@ class NewScenarioDialogWidget(QtGui.QWidget):
         self.create_scenario.emit(p)
 
 
-class GeneralPropertiesWidget(QtGui.QWidget):
+class GeneralPropertiesWidget(QtWidgets.QWidget):
     """
         Modify general properties of a scenario dialog.
     """
@@ -640,12 +640,12 @@ class GeneralPropertiesWidget(QtGui.QWidget):
         super().__init__()
         self.scenario = scenario
 
-        widget_layout = QtGui.QVBoxLayout(self)
+        widget_layout = QtWidgets.QVBoxLayout(self)
 
         # title box
         # TODO validator for title, no empty string
-        box = QtGui.QGroupBox('Title')
-        layout = QtGui.QVBoxLayout(box)
+        box = QtWidgets.QGroupBox('Title')
+        layout = QtWidgets.QVBoxLayout(box)
         self.edit = QtGui.QLineEdit()
         self.edit.setFixedWidth(300)
         self.edit.setText(self.scenario[k.TITLE])
@@ -663,7 +663,7 @@ class GeneralPropertiesWidget(QtGui.QWidget):
         return True
 
 
-class NationPropertiesWidget(QtGui.QWidget):
+class NationPropertiesWidget(QtWidgets.QWidget):
     """
         Modify nation properties dialog.
     """
@@ -672,7 +672,7 @@ class NationPropertiesWidget(QtGui.QWidget):
         super().__init__()
 
 
-class ProvincePropertiesWidget(QtGui.QWidget):
+class ProvincePropertiesWidget(QtWidgets.QWidget):
     """
         Modify provinces properties dialog.
     """
@@ -681,7 +681,7 @@ class ProvincePropertiesWidget(QtGui.QWidget):
         super().__init__()
 
 
-class EditorScreen(QtGui.QWidget):
+class EditorScreen(QtWidgets.QWidget):
     """
         The screen the contains the whole scenario editor. Is copied into the application main window if the user
         clicks on the editor pixmap in the client main screen.
@@ -699,7 +699,7 @@ class EditorScreen(QtGui.QWidget):
         self.scenario = EditorScenario()
         self.create_new_scenario(NEW_SCENARIO_DEFAULT_PROPERTIES)
 
-        self.toolbar = QtGui.QToolBar()
+        self.toolbar = QtWidgets.QToolBar()
         self.toolbar.setIconSize(QtCore.QSize(32, 32))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
                                                self.show_new_scenario_dialog))
@@ -711,18 +711,18 @@ class EditorScreen(QtGui.QWidget):
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self, self.show_provinces_dialog))
 
-        spacer = QtGui.QWidget()
-        spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        spacer = QtWidgets.QWidget()
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.toolbar.addWidget(spacer)
 
         clock = g.ClockLabel()
         self.toolbar.addWidget(clock)
 
-        action_help = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
+        action_help = QtWidgets.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
         action_help.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
-        action_quit = QtGui.QAction(t.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
+        action_quit = QtWidgets.QAction(t.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
         action_quit.triggered.connect(client.switch_to_start_screen)
         # TODO ask if something is changed we should save.. (you might loose progress)
         self.toolbar.addAction(action_quit)
