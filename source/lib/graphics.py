@@ -461,6 +461,15 @@ def make_widget_draggable(parent):
 
     return DraggableWidgetSubclass
 
+class ClickableGraphicsItemSignaller(QtCore.QObject):
+
+    entered = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
+    left = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
+    clicked = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneMouseEvent)
+
+    def __init__(self):
+        super().__init__()
+
 
 def make_GraphicsItem_clickable(parent):
     """
@@ -471,9 +480,6 @@ def make_GraphicsItem_clickable(parent):
 
     # class ClickableGraphicsItem(parent, QtCore.QObject):
     class ClickableGraphicsItem(parent):
-        entered = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
-        left = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
-        clicked = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneMouseEvent)
 
         def __init__(self, *args, **kwargs):
             """
@@ -485,27 +491,28 @@ def make_GraphicsItem_clickable(parent):
             self.parent = parent
             self.setAcceptHoverEvents(True)
             self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
+            self.signaller = ClickableGraphicsItemSignaller()
 
         def hoverEnterEvent(self, event):
             """
                 Emit the entered signal after default handling.
             """
             self.parent.hoverEnterEvent(self, event)
-            self.entered.emit(event)
+            self.signaller.entered.emit(event)
 
         def hoverLeaveEvent(self, event):
             """
                 Emit the left signal after default handling.
             """
             self.parent.hoverLeaveEvent(self, event)
-            self.left.emit(event)
+            self.signaller.left.emit(event)
 
         def mousePressEvent(self, event):
             """
                 Emit the clicked signal after default handling.
             """
             self.parent.mousePressEvent(self, event)
-            self.clicked.emit(event)
+            self.signaller.clicked.emit(event)
 
     return ClickableGraphicsItem
 

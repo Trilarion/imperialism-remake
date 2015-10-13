@@ -61,12 +61,12 @@ class MapItem(QtCore.QObject):
         self.fade.set_duration(300)
 
         # wire to fade in/out
-        self.item.entered.connect(self.fade.fadein)
-        self.item.left.connect(self.fade.fadeout)
+        self.item.signaller.entered.connect(self.fade.fadein)
+        self.item.signaller.left.connect(self.fade.fadeout)
 
-        # wire to show/hide connection
-        self.item.entered.connect(self.show_description)
-        self.item.left.connect(self.hide_description)
+        # wire to show/hide description
+        self.item.signaller.entered.connect(self.show_description)
+        self.item.signaller.left.connect(self.hide_description)
 
     def show_description(self):
         self.label.setText('<font color=#ffffff size=6>{}</font>'.format(self.description))
@@ -134,7 +134,7 @@ class StartScreen(QtWidgets.QWidget):
             mapitem.item.setZValue(3)
             offset = v['offset']
             mapitem.item.setOffset(QtCore.QPointF(offset[0], offset[1]))
-            mapitem.item.clicked.connect(actions[k])
+            mapitem.item.signaller.clicked.connect(actions[k])
 
             frame_path = QtGui.QPainterPath()
             frame_path.addRect(mapitem.item.boundingRect())
@@ -407,9 +407,9 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             path = path.simplified()
 
             item = MiniMapNationItem(path, 1, 2)
-            item.clicked.connect(partial(self.map_selected_nation, u.find_in_list(nation_names, nation_name)))
-            item.entered.connect(partial(self.change_map_name, nation_name))
-            item.left.connect(partial(self.change_map_name, ''))
+            item.signaller.clicked.connect(partial(self.map_selected_nation, u.find_in_list(nation_names, nation_name)))
+            item.signaller.entered.connect(partial(self.change_map_name, nation_name))
+            item.signaller.left.connect(partial(self.change_map_name, ''))
             brush = QtGui.QBrush(color)
             item.setBrush(brush)
 

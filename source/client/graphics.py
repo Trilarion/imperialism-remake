@@ -114,8 +114,8 @@ class MiniMapNationItem(g.ClickablePathItem):
         super().__init__(path)
         self.z_entered = z_entered
         self.z_left = z_left
-        self.entered.connect(self.entered_item)
-        self.left.connect(self.left_item)
+        self.signaller.entered.connect(self.entered_item)
+        self.signaller.left.connect(self.left_item)
         self.hover_effect = QtGui.QGraphicsDropShadowEffect()
         self.hover_effect.setOffset(4, 4)
         self.setGraphicsEffect(self.hover_effect)
