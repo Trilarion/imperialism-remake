@@ -165,7 +165,7 @@ class Server(QtCore.QObject):
         """
             Stopps listening.
         """
-        if self.is_listening():
+        if self.server.isListening():
             self.server.close()
 
     def new_connection(self):

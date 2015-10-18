@@ -434,7 +434,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
                 background = QtCore.QRectF(x - bx, y - by, item.boundingRect().width() + 2 * bx,
                                            item.boundingRect().height() + 2 * by)
                 path = QtGui.QPainterPath()
-                path.addRoundRect(background, 50, 50)
+                path.addRoundedRect(background, 50, 50)
                 item = self.scene.addPath(path, pen=g.TRANSPARENT_PEN,
                                           brush=QtGui.QBrush(QtGui.QColor(128, 128, 255, 64)))
                 item.setZValue(5)
@@ -446,7 +446,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
                 # item = self.scene.addRect(sx * self.tile_size, sy * self.tile_size,  self.tile_size,  self.tile_size)
                 # item.setZValue(1000)
                 text = '({},{})'.format(column, row)
-                item = QtGui.QGraphicsSimpleTextItem(text)
+                item = QtWidgets.QGraphicsSimpleTextItem(text)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.black))
                 item.setPos((sx + 0.5) * self.TILE_SIZE - item.boundingRect().width() / 2, sy * self.TILE_SIZE)
                 item.setZValue(1001)
@@ -576,7 +576,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         # title box
         box = QtWidgets.QGroupBox('Title')
         layout = QtWidgets.QVBoxLayout(box)
-        edit = QtGui.QLineEdit()
+        edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
         edit.setText(self.properties[k.TITLE])
         self.properties[k.TITLE] = edit
@@ -588,7 +588,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout(box)
 
         layout.addWidget(QtWidgets.QLabel('Width'))
-        edit = QtGui.QLineEdit()
+        edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(50)
         edit.setValidator(QtGui.QIntValidator(0, 1000))
         edit.setText(str(self.properties[k.MAP_COLUMNS]))
@@ -596,7 +596,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         layout.addWidget(edit)
 
         layout.addWidget(QtWidgets.QLabel('Height'))
-        edit = QtGui.QLineEdit()
+        edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(50)
         edit.setValidator(QtGui.QIntValidator(0, 1000))
         edit.setText(str(self.properties[k.MAP_ROWS]))
@@ -646,7 +646,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
         # TODO validator for title, no empty string
         box = QtWidgets.QGroupBox('Title')
         layout = QtWidgets.QVBoxLayout(box)
-        self.edit = QtGui.QLineEdit()
+        self.edit = QtWidgets.QLineEdit()
         self.edit.setFixedWidth(300)
         self.edit.setText(self.scenario[k.TITLE])
         layout.addWidget(self.edit)
@@ -738,7 +738,7 @@ class EditorScreen(QtWidgets.QWidget):
         self.mini_map = EditorMiniMap(self.scenario)
         self.mini_map.focus_moved.connect(self.map.set_position)
 
-        layout = QtGui.QGridLayout(self)
+        layout = QtWidgets.QGridLayout(self)
         layout.addWidget(self.toolbar, 0, 0, 1, 2)
         layout.addWidget(self.mini_map, 1, 0)
         layout.addWidget(self.info_box, 2, 0)
@@ -781,7 +781,7 @@ class EditorScreen(QtWidgets.QWidget):
         """
         # noinspection PyCallByClass
         file_name = \
-            QtGui.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
                 0]
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
@@ -794,7 +794,7 @@ class EditorScreen(QtWidgets.QWidget):
         """
         # noinspection PyCallByClass
         file_name = \
-            QtGui.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
+            QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
                 0]
         if file_name:
             self.scenario.save(file_name)

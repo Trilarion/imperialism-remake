@@ -29,7 +29,7 @@ class ServerMonitorWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
-        layout = QtGui.QGridLayout(self)
+        layout = QtWidgets.QGridLayout(self)
 
         self.status_label = QtWidgets.QLabel()
         layout.addWidget(self.status_label, 0, 0)

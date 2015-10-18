@@ -77,7 +77,7 @@ class GameMainScreen(QtWidgets.QWidget):
         self.main_map = MainMap()
 
         # layout
-        layout = QtGui.QGridLayout(self)
+        layout = QtWidgets.QGridLayout(self)
         layout.addWidget(self.toolbar, 0, 0)
         layout.addWidget(self.mini_map, 1, 0)
         layout.addWidget(self.info_box, 2, 0)

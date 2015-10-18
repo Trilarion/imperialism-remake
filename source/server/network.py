@@ -55,10 +55,12 @@ class ServerProcess(Process):
 
         # run event loop of app
         app.exec_()
+        print('end process')
 
     def listen(self, app, server_manager):
         while True:
             message = self.child_conn.recv()
+            print('received message {}'.format(message))
             if message == 'quit':
                 server_manager.server.stop()
                 app.quit()

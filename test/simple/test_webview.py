@@ -1,24 +1,15 @@
-# Imperialism remake
-# Copyright (C) 2014 Trilarion
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>
+from PyQt5 import QtGui, QtCore, QtWidgets, QtWebKitWidgets
+import base.constants as c, base.tools as t
+from lib.browser import BrowserWidget
+import os
 
-from PyQt5 import QtWidgets, QtWebKitWidgets
+def local_url(relative_path):
+    absolute_path = os.path.abspath(relative_path)
+    url = QtCore.QUrl.fromLocalFile(absolute_path)
+    return url
 
-"""
-    Browser based on QtWebKit.QtWebView. Provides Home, Forward, Backward (in history) functionality.
-"""
+def icon_provider(text):
+    return None
 
 class BrowserWidget(QtWidgets.QWidget):
 
@@ -33,20 +24,20 @@ class BrowserWidget(QtWidgets.QWidget):
 
         # create actions, connect to methods, add to tool bar
         action_home = QtWidgets.QAction(self)
-        action_home.setIcon(icon_provider('icon.home.png'))
+        #action_home.setIcon(icon_provider('icon.home.png'))
         action_home.setToolTip('Home')
         action_home.triggered.connect(self.load_home_url)
         tool_bar.addAction(action_home)
 
         action_backward = QtWidgets.QAction(self)
         action_backward.setEnabled(False)
-        action_backward.setIcon(icon_provider('icon.backward.png'))
+        #action_backward.setIcon(icon_provider('icon.backward.png'))
         tool_bar.addAction(action_backward)
         self.action_backward = action_backward
 
         action_forward = QtWidgets.QAction(self)
         action_forward.setEnabled(False)
-        action_forward.setIcon(icon_provider('icon.forward.png'))
+        #action_forward.setIcon(icon_provider('icon.forward.png'))
         tool_bar.addAction(action_forward)
         self.action_forward = action_forward
 
@@ -77,3 +68,21 @@ class BrowserWidget(QtWidgets.QWidget):
         history = self.web_view.history()
         self.action_backward.setEnabled(history.canGoBack())
         self.action_forward.setEnabled(history.canGoForward())
+
+
+app = QtWidgets.QApplication([])
+
+# load global stylesheet to app
+with open(c.Global_Stylesheet, 'r', encoding='utf-8') as file:
+    style_sheet = file.read()
+app.setStyleSheet(style_sheet)
+
+#help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
+#help_browser_widget.show()
+
+home_url = local_url('./data/manual/index.html')
+w = BrowserWidget(home_url, icon_provider)
+w.load_home_url()
+w.show()
+
+app.exec_()

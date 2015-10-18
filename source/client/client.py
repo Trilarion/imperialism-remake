@@ -222,7 +222,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
         if checked is True:
 
             # noinspection PyCallByClass
-            file_name = QtGui.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', c.Scenario_Folder,
+            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', c.Scenario_Folder,
                                                           'Scenario Files (*.scenario)')[0]
             if file_name:
                 # TODO check that it is a valid single player scenario in play
@@ -255,13 +255,13 @@ class ServerLobby(QtWidgets.QWidget):
         l1 = QtWidgets.QHBoxLayout(self)
 
         l2 = QtWidgets.QVBoxLayout()
-        edit = QtGui.QTextEdit()
+        edit = QtWidgets.QTextEdit()
         edit.setEnabled(False)
         box = g.wrap_in_groupbox(edit, 'Server')
         box.setFixedSize(200, 150)
         l2.addWidget(box)
 
-        list = QtGui.QListWidget()
+        list = QtWidgets.QListWidget()
         # list.itemSelectionChanged.connect(self.selection_changed)
         # list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
@@ -274,10 +274,10 @@ class ServerLobby(QtWidgets.QWidget):
         l1.addLayout(l2)
 
         l2 = QtWidgets.QVBoxLayout()
-        edit = QtGui.QTextEdit()
+        edit = QtWidgets.QTextEdit()
         edit.setEnabled(False)
         l2.addWidget(g.wrap_in_groupbox(edit, 'Chat log'))
-        edit = QtGui.QLineEdit()
+        edit = QtWidgets.QLineEdit()
         l2.addWidget(g.wrap_in_groupbox(edit, 'Chat input'))
 
         l1.addLayout(l2)
@@ -317,10 +317,10 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         network_client.remove_channel(self.CH_PREVIEW)
 
         # fill the widget with useful stuff
-        layout = QtGui.QGridLayout(self)
+        layout = QtWidgets.QGridLayout(self)
 
         # selection list for nations
-        self.nations_list = QtGui.QListWidget()
+        self.nations_list = QtWidgets.QListWidget()
         self.nations_list.setFixedWidth(200)
         self.nations_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.nations_list.itemSelectionChanged.connect(self.nations_list_selection_changed)
@@ -335,7 +335,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         layout.addWidget(g.wrap_in_groupbox(self.map_view, 'Map'), 0, 1)
 
         # scenario description
-        self.description = QtGui.QTextEdit()
+        self.description = QtWidgets.QTextEdit()
         self.description.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.description.setReadOnly(True)
@@ -343,7 +343,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         layout.addWidget(g.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1, 2)  # goes over two columns
 
         # nation description
-        self.nation_info = QtGui.QTextEdit()
+        self.nation_info = QtWidgets.QTextEdit()
         self.nation_info.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.nation_info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.nation_info.setReadOnly(True)
@@ -495,7 +495,7 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
         scenario_titles, self.scenario_files = zip(*message['scenarios'])
 
         # create list widget
-        self.list = QtGui.QListWidget()
+        self.list = QtWidgets.QListWidget()
         self.list.itemSelectionChanged.connect(self.selection_changed)
         self.list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -551,7 +551,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
         toolbar.addAction(g.create_action(t.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, toggle_connection=self.toggled_music, checkable=True))
 
 
-        self.stacked_layout = QtGui.QStackedLayout()
+        self.stacked_layout = QtWidgets.QStackedLayout()
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -615,7 +615,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
         tab_layout = QtWidgets.QVBoxLayout(tab)
 
         # full screen mode
-        checkbox = QtGui.QCheckBox('Full screen mode')
+        checkbox = QtWidgets.QCheckBox('Full screen mode')
         self.register_checkbox(checkbox, c.O.FULLSCREEN)
         tab_layout.addWidget(checkbox)
 
@@ -641,7 +641,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
         tab_layout = QtWidgets.QVBoxLayout(tab)
 
         # mute checkbox
-        checkbox = QtGui.QCheckBox('Mute background music')
+        checkbox = QtWidgets.QCheckBox('Mute background music')
         self.register_checkbox(checkbox, c.O.BG_MUTE)
         tab_layout.addWidget(checkbox)
 
@@ -668,7 +668,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
         # remote server address
         l2 = QtWidgets.QHBoxLayout()
         l2.addWidget(QtWidgets.QLabel('Remote IP address'))
-        edit = QtGui.QLineEdit()
+        edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
         l2.addWidget(edit)
         l2.addStretch()
@@ -687,13 +687,13 @@ class OptionsContentWidget(QtWidgets.QWidget):
         # local server group box
         l = QtWidgets.QVBoxLayout()
         # accepts incoming connections checkbox
-        checkbox = QtGui.QCheckBox('Accepts incoming connections')
+        checkbox = QtWidgets.QCheckBox('Accepts incoming connections')
         self.register_checkbox(checkbox, c.O.LS_OPEN)
         l.addWidget(checkbox)
         # alias name edit box
         l2 = QtWidgets.QHBoxLayout()
         l2.addWidget(QtWidgets.QLabel('Alias'))
-        edit = QtGui.QLineEdit()
+        edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
         l2.addWidget(edit)
         l2.addStretch()
@@ -829,7 +829,8 @@ class Client():
         self.main_window = MainWindow()
 
         # help browser
-        self.help_browser_widget = BrowserWidget(QtCore.QUrl(c.Manual_Index), t.load_ui_icon)
+        self.help_browser_widget = BrowserWidget(c.local_url(c.Manual_Index), t.load_ui_icon)
+        self.help_browser_widget.load_home_url()
         self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
         # move to lower right border, so that overlap with other windows is not that strong
@@ -894,13 +895,14 @@ class Client():
         else:
             self.notification = None
 
-    def show_help_browser(self, url=None):
+    def show_help_browser(self, path=None):
         """
             Displays the help browser somewhere on screen. Can set a special page if needed.
         """
         # we sometimes wire signals that send parameters for url (mouseevents for example) which we do not like
-        if isinstance(url, QtCore.QUrl):
-            self.help_browser_widget.displayPage(url)
+        if isinstance(path, str):
+            url = c.local_url(path)
+            self.help_browser_widget.load(url)
         self.help_dialog.show()
 
     def show_server_monitor(self):
