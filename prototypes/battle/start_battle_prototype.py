@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import sys
+import sys, math
 from PySide import QtCore, QtGui
 
 class Ui_BattleWindow(object):
@@ -169,19 +169,34 @@ class Ui_BattleWindow(object):
         self.graphicsView_currentUnit.setObjectName("graphicsView_currentUnit")
         self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1,QtCore.Qt.AlignCenter)
        
+    def transformflag(self,pixmap, type):
+        transform = QtGui.QTransform()
+        if type == 1:
+            transform.scale(-1, 1);
+            transform.rotate(45)
+        elif type == 2 :
+            transform.rotate(45)
+        pixmap = QtGui.QPixmap(pixmap.transformed(transform))
+        return pixmap.scaled(45, 120)  
 
-    def setupFlagView(self):
-        self.graphicsView_flag = QtGui.QGraphicsView(self.centralWidget)
+    def setupFlagView(self,flag_attacker,flag_defender):
+        self.graphicsScene_flag= QtGui.QGraphicsScene()
+        item = self.graphicsScene_flag.addPixmap(self.transformflag(QtGui.QPixmap(flag_attacker),1))
+        self.graphicsScene_flag.addPixmap(self.transformflag(QtGui.QPixmap(flag_defender),2))
+        item.setPos(-20,0);
+        self.graphicsView_flag = QtGui.QGraphicsView(self.graphicsScene_flag)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graphicsView_flag.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(self.graphicsView_flag.sizePolicy().hasHeightForWidth())       
         self.graphicsView_flag.setSizePolicy(sizePolicy)
         self.graphicsView_flag.setMinimumSize(QtCore.QSize(90, 120))
         self.graphicsView_flag.setMaximumSize(QtCore.QSize(90, 120))
         self.graphicsView_flag.setObjectName("graphicsView_flag")
-        self.gridLayout.addWidget(self.graphicsView_flag, 3, 1, 1, 1)
-        
+        self.graphicsView_flag.setStyleSheet("border-style: none;background: transparent")
+        self.graphicsView_flag.setCacheMode(QtGui.QGraphicsView.CacheBackground)
+        self.gridLayout.addWidget(self.graphicsView_flag, 3, 1, 1, 1)       
+
         
     def setupMainView(self):
         self.graphicsView = QtGui.QGraphicsView(self.centralWidget)
@@ -218,7 +233,7 @@ class Ui_BattleWindow(object):
         self.setupCurrentUnitView()
         self.setupCurrentUnitView()
 		#Flag view
-        self.setupFlagView()
+        self.setupFlagView("res/flag/flag0.png","res/flag/flag1.png")
         #Main view
         self.setupMainView()
         
