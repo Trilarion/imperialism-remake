@@ -55,6 +55,7 @@ Graphics_Folder = extend(Artwork_Folder, 'graphics')
 Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 Graphics_Map_Folder = extend(Graphics_Folder, 'map')
 Graphics_Flag_Folder = extend(Graphics_Folder, 'flag')
+Graphics_Unit_Folder = extend(Graphics_Folder, 'unit')
 
 #UI file
 Graphics_Background = extend(Graphics_UI_Folder,'background.jpg')
@@ -77,6 +78,17 @@ Graphics_Flag8 = extend(Graphics_Flag_Folder,'flag8.png')
 Graphics_Flag9 = extend(Graphics_Flag_Folder,'flag9.png')
 Graphics_Flag10 = extend(Graphics_Flag_Folder,'flag10.png')
 Graphics_Flag11 = extend(Graphics_Flag_Folder,'flag11.png')
+
+#Unit File
+Graphics_Unit0 = extend(Graphics_Unit_Folder,'unit0.png')
+Graphics_Unit1 = extend(Graphics_Unit_Folder,'unit1.png')
+Graphics_Unit2 = extend(Graphics_Unit_Folder,'unit2.png')
+Graphics_Unit3 = extend(Graphics_Unit_Folder,'unit3.png')
+Graphics_Unit0_small = extend(Graphics_Unit_Folder,'unit0_128.png')
+Graphics_Unit1_small = extend(Graphics_Unit_Folder,'unit1_128.png')
+Graphics_Unit2_small = extend(Graphics_Unit_Folder,'unit2_128.png')
+Graphics_Unit3_small = extend(Graphics_Unit_Folder,'unit3_128.png')
+
 
 # minimal screen resolution
 Screen_Min_Size = (800, 600)

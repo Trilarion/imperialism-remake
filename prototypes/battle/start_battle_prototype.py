@@ -141,32 +141,43 @@ class Ui_BattleWindow(object):
         self.gridLayout.addWidget(self.status, 0, 0, 1, 1)     
         
         
-    def setupTargetedUnitView(self):
-        self.graphicsView_targetedUnit = QtGui.QGraphicsView(self.centralWidget)
+    def setupTargetedUnitView(self,targetedUnit):
+        self.graphicsScene_targetedUnit= QtGui.QGraphicsScene()
+        self.graphicsScene_targetedUnit.addPixmap(self.mirorPixmap(QtGui.QPixmap(targetedUnit)).scaled(55, 55))
+        self.graphicsView_targetedUnit = QtGui.QGraphicsView(self.graphicsScene_targetedUnit)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_targetedUnit.sizePolicy().hasHeightForWidth())
         self.graphicsView_targetedUnit.setSizePolicy(sizePolicy)
-        self.graphicsView_targetedUnit.setMinimumSize(QtCore.QSize(50, 50))
-        self.graphicsView_targetedUnit.setMaximumSize(QtCore.QSize(50, 50))
+        self.graphicsView_targetedUnit.setMinimumSize(QtCore.QSize(60, 60))
+        self.graphicsView_targetedUnit.setMaximumSize(QtCore.QSize(60, 60))
         self.gridLayout.addWidget(self.graphicsView_targetedUnit, 9, 1, 1, 1,QtCore.Qt.AlignCenter) 
         
-    def setupCurrentUnitView(self):   
-        self.graphicsView_currentUnit = QtGui.QGraphicsView(self.centralWidget)
+    def setupCurrentUnitView(self,currentUnit):   
+        self.graphicsScene_currentUnit= QtGui.QGraphicsScene()
+        self.graphicsScene_currentUnit.addPixmap(QtGui.QPixmap(currentUnit).scaled(55, 55))
+        self.graphicsView_currentUnit = QtGui.QGraphicsView(self.graphicsScene_currentUnit)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_currentUnit.sizePolicy().hasHeightForWidth())
         self.graphicsView_currentUnit.setSizePolicy(sizePolicy)
-        self.graphicsView_currentUnit.setMinimumSize(QtCore.QSize(50, 50))
-        self.graphicsView_currentUnit.setMaximumSize(QtCore.QSize(50, 50))
+        self.graphicsView_currentUnit.setMinimumSize(QtCore.QSize(60, 60))
+        self.graphicsView_currentUnit.setMaximumSize(QtCore.QSize(60, 60))
         self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1,QtCore.Qt.AlignCenter)
        
+       
+    def mirorPixmap(self,pixmap):
+        transform = QtGui.QTransform()  
+        transform.scale(-1, 1)
+        return QtGui.QPixmap(pixmap.transformed(transform))
+        
+        
     def transformflag(self,pixmap, type):
         transform = QtGui.QTransform()
         if type == 1:
-            transform.scale(-1, 1);
+            transform.scale(-1, 1)
             transform.rotate(45)
         elif type == 2 :
             transform.rotate(45)
@@ -220,10 +231,13 @@ class Ui_BattleWindow(object):
         #Label
         self.setupZoneText()
 		#Targeted Unit view
-        self.setupTargetedUnitView()
+        int_targetedUnit = random.randint(0, 3)
+        self.setupTargetedUnitView(c.extend(c.Graphics_Unit_Folder,'unit'+str(int_targetedUnit)+'_128.png'))
 		#Current Unit View
-        self.setupCurrentUnitView()
-        self.setupCurrentUnitView()
+        int_currentUnit = random.randint(0, 3)
+        while int_currentUnit == int_targetedUnit:
+            int_currentUnit = random.randint(0, 3)
+        self.setupCurrentUnitView(c.extend(c.Graphics_Unit_Folder,'unit'+str(int_currentUnit)+'_128.png'))
 		#Flag view
         int_flag0 = random.randint(0, 11)
         int_flag1 = random.randint(0, 11)
