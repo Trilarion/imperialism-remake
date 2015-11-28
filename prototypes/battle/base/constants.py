@@ -16,6 +16,7 @@
 
 import os
 from enum import unique
+from PySide import QtGui, QtCore
 
 import lib.utils as u
 
@@ -44,11 +45,6 @@ Used_Resources = set()
 # base folders (do not directly contain data)
 Data_Folder = extend('.', 'data')
 Artwork_Folder = extend(Data_Folder, 'artwork')
-
-# scenarios (save games)
-Battle_Folder = extend(Data_Folder, 'battle')
-Battle_Ruleset_Folder = extend(Battle_Folder, 'rules')
-Battle_Ruleset_Standard_File = extend(Battle_Ruleset_Folder, 'standard.rules')
 
 # graphics related folders
 Graphics_Folder = extend(Artwork_Folder, 'graphics')
@@ -123,6 +119,17 @@ Graphics_Unit_list = [
     Graphics_Unit_8_0, Graphics_Unit_8_1
 ]
 
+#color
+Green = QtCore.Qt.GlobalColor.darkGreen
+
+terrain_brushes = {}
+terrain_brushes[0] = QtGui.QBrush(Green)
+terrain_brushes[1] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
+terrain_brushes[2] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
+terrain_brushes[3] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
+terrain_brushes[4] = QtGui.QBrush(QtGui.QColor(222, 222, 222))
+terrain_brushes[5] = QtGui.QBrush(QtGui.QColor(0, 128, 0))
+terrain_brushes[6] = QtGui.QBrush(QtGui.QColor(222, 222, 0))
 
 # minimal screen resolution
 Screen_Min_Size = (800, 600)

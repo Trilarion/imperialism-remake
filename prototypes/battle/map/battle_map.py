@@ -22,8 +22,7 @@ from base import constants as c
 import lib.graphics as g
 
 """
-    Defines a battle, can be loaded and saved. Should only be known to the server, never to the client (which is a
-    thin client).
+    Defines a battle.
 """
 
 class BattlePropertyKeyNames:
@@ -36,17 +35,15 @@ class BattlePropertyKeyNames:
     MAP_COLUMNS = 'map.columns'
     MAP_ROWS = 'map.rows'
     FORTIFICATION = 'fortification'
+    TILE_MAXSIZE = 'title.size.max'
 
 NEW_BATTLE_DEFAULT_PROPERTIES = {
     BattlePropertyKeyNames.TITLE: 'Battle',
-    BattlePropertyKeyNames.MAP_COLUMNS: 22,
-    BattlePropertyKeyNames.MAP_ROWS: 12
+    BattlePropertyKeyNames.MAP_COLUMNS: 40,
+    BattlePropertyKeyNames.MAP_ROWS: 17
 }
 
 class BattleMap(QtCore.QObject):
-    """
-        Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
-    """
 
     def __init__(self):
         """
@@ -76,9 +73,9 @@ class BattleMap(QtCore.QObject):
         self._map['terrain'] = [0] * number_tiles
         self._map['resource'] = [0] * number_tiles
 
-    def add_river(self, name, tiles):
+    def add_fortification(self, name, tiles):
         """
-            Adds a river with a list of tiles and a name.
+            Adds a fortification with a list of tiles and a name.
         """
         river = {
             'name': name,
@@ -254,14 +251,13 @@ class BattleMapView(QtGui.QGraphicsView):
         self.scene = QtGui.QGraphicsScene()
         self.setScene(self.scene)
         self.setObjectName('map')
-        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        #self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setTransformationAnchor(QtGui.QGraphicsView.NoAnchor)
         self.setResizeAnchor(QtGui.QGraphicsView.NoAnchor)
         self.setMouseTracking(True)
         self.current_column = -1
         self.current_row = -1
-        self.TILE_SIZE = 80
         self.battle = battle
 
     def redraw_map(self):
@@ -269,27 +265,17 @@ class BattleMapView(QtGui.QGraphicsView):
             When a battle is loaded new we need to draw the whole map new.
         """
         self.scene.clear()
-
+        self.TitleSize = self.height()/NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS]
         columns = self.battle[BattlePropertyKeyNames.MAP_COLUMNS]
         rows = self.battle[BattlePropertyKeyNames.MAP_ROWS]
 
-        width = (columns + 0.5) * self.TILE_SIZE
-        height = rows * self.TILE_SIZE
+        width = (columns + 0.5) * self.TitleSize
+        height = rows * self.TitleSize
         self.scene.setSceneRect(0, 0, width, height)
 
-        # TODO should load only once and cache (universal cache)
-        # load all textures
-        brushes = {}
-        brushes[0] = QtGui.QBrush(QtGui.QColor(64, 64, 255))
-        brushes[1] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-        brushes[2] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-        brushes[3] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-        brushes[4] = QtGui.QBrush(QtGui.QColor(222, 222, 222))
-        brushes[5] = QtGui.QBrush(QtGui.QColor(0, 128, 0))
-        brushes[6] = QtGui.QBrush(QtGui.QColor(222, 222, 0))
 
         # fill the ground layer with ocean
-        item = self.scene.addRect(0, 0, width, height, brush=brushes[0], pen=g.TRANSPARENT_PEN)
+        item = self.scene.addRect(0, 0, width, height, brush=c.terrain_brushes[0], pen=g.TRANSPARENT_PEN)
         item.setZValue(0)
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
@@ -304,53 +290,35 @@ class BattleMapView(QtGui.QGraphicsView):
                 if t != 0:
                     # not for sea
                     sx, sy = self.battle.scene_position(column, row)
-                    paths[t].addRect(sx * self.TILE_SIZE, sy * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
+                    paths[t].addRect(sx * self.TitleSize, sy * self.TitleSize, self.TitleSize, self.TitleSize)
         for t in paths:
             path = paths[t]
             path = path.simplified()
-            item = self.scene.addPath(path, brush=brushes[t], pen=g.TRANSPARENT_PEN)
+            item = self.scene.addPath(path, brush=c.terrain_brushes[t], pen=g.TRANSPARENT_PEN)
             item.setZValue(1)
 
         # fill the half tiles which are not part of the map
-        brush = QtGui.QBrush(QtCore.Qt.darkGray)
+        brush = QtGui.QBrush(QtCore.Qt.darkGreen)
         for row in range(0, rows):
             if row % 2 == 0:
-                item = self.scene.addRect(columns * self.TILE_SIZE, row * self.TILE_SIZE, self.TILE_SIZE / 2,
-                                          self.TILE_SIZE, pen=g.TRANSPARENT_PEN)
+                item = self.scene.addRect(columns * self.TitleSize, row * self.TitleSize, self.TitleSize / 2,
+                                          self.TitleSize, pen=g.TRANSPARENT_PEN)
             else:
-                item = self.scene.addRect(0, row * self.TILE_SIZE, self.TILE_SIZE / 2, self.TILE_SIZE,
+                item = self.scene.addRect(0, row * self.TitleSize, self.TitleSize / 2, self.TitleSize,
                                           pen=g.TRANSPARENT_PEN)
             item.setBrush(brush)
             item.setZValue(1)
-
-        # draw rivers
-        river_pen = QtGui.QPen(QtGui.QColor(64, 64, 255))
-        river_pen.setWidth(5)
-        # TODO get rivers via a method (generator)
-        for river in self.battle._properties[BattlePropertyKeyNames.FORTIFICATION]:
-            tiles = river['tiles']
-            path = QtGui.QPainterPath()
-            for tile in tiles:
-                sx, sy = self.battle.scene_position(tile[0], tile[1])
-                x = (sx + 0.5) * self.TILE_SIZE
-                y = (sy + 0.5) * self.TILE_SIZE
-                if tile == tiles[0]:
-                    path.moveTo(x, y)
-                else:
-                    path.lineTo(x, y)
-            item = self.scene.addPath(path, pen=river_pen)
-            item.setZValue(2)
 
         # draw the grid and the coordinates
         for column in range(0, columns):
             for row in range(0, rows):
                 sx, sy = self.battle.scene_position(column, row)
-                # item = self.scene.addRect(sx * self.tile_size, sy * self.tile_size,  self.tile_size,  self.tile_size)
+                # item = self.scene.addRect(sx * self.TitleSize, sy * self.TitleSize,  self.TitleSize,  self.TitleSize)
                 # item.setZValue(1000)
                 text = '({},{})'.format(column, row)
                 item = QtGui.QGraphicsSimpleTextItem(text)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.black))
-                item.setPos((sx + 0.5) * self.TILE_SIZE - item.boundingRect().width() / 2, sy * self.TILE_SIZE)
+                item.setPos((sx + 0.5) * self.TitleSize - item.boundingRect().width() / 2, sy * self.TitleSize)
                 item.setZValue(1001)
                 self.scene.addItem(item)
 
@@ -384,11 +352,14 @@ class BattleMapView(QtGui.QGraphicsView):
             The mouse on the view has been moved. Emit signal tile_at_focus_changed if we now hover over a different tile.
         """
         # get mouse position in scene coordinates
-        scene_position = self.mapToScene(event.pos()) / self.TILE_SIZE
+        scene_position = self.mapToScene(event.pos()) / self.TitleSize
         column, row = self.battle.map_position(scene_position.x(), scene_position.y())
         if column != self.current_column or row != self.current_row:
             self.current_column = column
             self.current_row = row
             self.tile_at_focus_changed.emit(column, row)
         super().mouseMoveEvent(event)
+
+    def resizeEvent(self, evt=None):
+        self.redraw_map()
 
