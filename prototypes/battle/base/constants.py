@@ -18,7 +18,6 @@ import os
 from enum import unique
 from PySide import QtGui, QtCore
 
-import lib.utils as u
 
 """
     Game specific path locations for artwork, music, ...

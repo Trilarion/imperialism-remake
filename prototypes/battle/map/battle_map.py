@@ -15,11 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import math
-import lib.utils as u
+
 from enum import Enum
 from PySide import QtGui, QtCore
 from base import constants as c
-import lib.graphics as g
+
 
 """
     Defines a battle.
@@ -187,10 +187,8 @@ class BattleMap(QtCore.QObject):
             # south-east
             if row < self._properties[BattlePropertyKeyNames.MAP_ROWS] - 1:
                 if row % 2 == 0:
-                    # even rows (0, 2, 4, ..)
                     return [column, row + 1]
                 else:
-                    # odd rows (1, 3, 5, ..)
                     return [column + 1, row + 1]
             else:
                 return None
@@ -267,7 +265,7 @@ class BattleMapView(QtGui.QGraphicsView):
 
 
         # fill the ground layer with ocean
-        item = self.scene.addRect(0, 0, width, height, brush=DefaultBrush, pen=g.TRANSPARENT_PEN)
+        item = self.scene.addRect(0, 0, width, height, brush=DefaultBrush, pen=QtGui.QPen(QtCore.Qt.transparent))
         item.setZValue(0)
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
@@ -284,7 +282,7 @@ class BattleMapView(QtGui.QGraphicsView):
         for t in paths:
             path = paths[t]
             path = path.simplified()
-            item = self.scene.addPath(path, brush=Terrain.getTerrainBrush(t), pen=g.TRANSPARENT_PEN)
+            item = self.scene.addPath(path, brush=Terrain.getTerrainBrush(t), pen=QtGui.QPen(QtCore.Qt.transparent))
             item.setZValue(1)
 
         # fill the half tiles which are not part of the map
@@ -292,10 +290,10 @@ class BattleMapView(QtGui.QGraphicsView):
         for row in range(0, rows):
             if row % 2 == 0:
                 item = self.scene.addRect(columns * self.TitleSize, row * self.TitleSize, self.TitleSize / 2,
-                                          self.TitleSize, pen=g.TRANSPARENT_PEN)
+                                          self.TitleSize, pen=QtGui.QPen(QtCore.Qt.transparent))
             else:
                 item = self.scene.addRect(0, row * self.TitleSize, self.TitleSize / 2, self.TitleSize,
-                                          pen=g.TRANSPARENT_PEN)
+                                          pen=QtGui.QPen(QtCore.Qt.transparent))
             item.setBrush(brush)
             item.setZValue(1)
 
