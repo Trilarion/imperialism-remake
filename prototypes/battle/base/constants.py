@@ -119,17 +119,6 @@ Graphics_Unit_list = [
     Graphics_Unit_8_0, Graphics_Unit_8_1
 ]
 
-#color
-Green = QtCore.Qt.GlobalColor.darkGreen
-
-terrain_brushes = {}
-terrain_brushes[0] = QtGui.QBrush(Green)
-terrain_brushes[1] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-terrain_brushes[2] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-terrain_brushes[3] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-terrain_brushes[4] = QtGui.QBrush(QtGui.QColor(222, 222, 222))
-terrain_brushes[5] = QtGui.QBrush(QtGui.QColor(0, 128, 0))
-terrain_brushes[6] = QtGui.QBrush(QtGui.QColor(222, 222, 0))
 
 # minimal screen resolution
 Screen_Min_Size = (800, 600)

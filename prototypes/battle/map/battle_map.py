@@ -16,7 +16,7 @@
 
 import math
 import lib.utils as u
-
+from enum import Enum
 from PySide import QtGui, QtCore
 from base import constants as c
 import lib.graphics as g
@@ -24,6 +24,9 @@ import lib.graphics as g
 """
     Defines a battle.
 """
+
+
+
 
 class BattlePropertyKeyNames:
     """
@@ -43,6 +46,34 @@ NEW_BATTLE_DEFAULT_PROPERTIES = {
     BattlePropertyKeyNames.MAP_ROWS: 17
 }
 
+
+
+class TerrainType(Enum):
+    Grass = 0
+    Sand = 1
+    River = 2
+    
+DefaultBrushColor = QtCore.Qt.GlobalColor.darkGreen
+DefaultBrush = QtGui.QBrush(DefaultBrushColor)
+
+
+class Terrain:
+    type = TerrainType.Grass
+    fortication = False
+    accessible = True
+
+    @staticmethod
+    def getTerrainBrush(int_type):
+        if int_type == TerrainType.Grass:
+            return QtGui.QBrush(QtCore.Qt.GlobalColor.darkGreen)
+        elif int_type == TerrainType.Sand:
+            return QtGui.QBrush(QtGui.QColor(254,232,214))
+        elif int_type == TerrainType.River:
+            return QtGui.QBrush(QtGui.QColor(64,64,255))
+        else:
+            return DefaultBrush;
+
+
 class BattleMap(QtCore.QObject):
 
     def __init__(self):
@@ -59,8 +90,6 @@ class BattleMap(QtCore.QObject):
             Just empty
         """
         self._properties = {BattlePropertyKeyNames.FORTIFICATION: []}
-        self._provinces = {}
-        self._nations = {}
         self._map = {}
 
     def create_map(self, columns, rows):
@@ -70,42 +99,23 @@ class BattleMap(QtCore.QObject):
         self._properties[BattlePropertyKeyNames.MAP_COLUMNS] = columns
         self._properties[BattlePropertyKeyNames.MAP_ROWS] = rows
         number_tiles = columns * rows
-        self._map['terrain'] = [0] * number_tiles
-        self._map['resource'] = [0] * number_tiles
+        self._map = [Terrain()] * number_tiles
 
-    def add_fortification(self, name, tiles):
-        """
-            Adds a fortification with a list of tiles and a name.
-        """
-        river = {
-            'name': name,
-            'tiles': tiles
-        }
-        self._properties[BattlePropertyKeyNames.FORTIFICATION].extend([river])
+
+    def add_fortification(self, column, row):
+        self._map[self.map_index(column, row)].fortication = True
 
     def set_terrain_at(self, column, row, terrain):
         """
             Sets the terrain at a given position.
         """
-        self._map['terrain'][self.map_index(column, row)] = terrain
+        self._map[self.map_index(column, row)] = terrain
 
     def terrain_at(self, column, row):
         """
             Returns the terrain at a given position.
         """
-        return self._map['terrain'][self.map_index(column, row)]
-
-    def set_resource_at(self, column, row, resource):
-        """
-            Sets the resource value at a given position.
-        """
-        self._map['resource'][self.map_index(column, row)] = resource
-
-    def resource_at(self, column, row):
-        """
-            Returns the resource value at a given position from the map.
-        """
-        return self._map['resource'][self.map_index(column, row)]
+        return self._map[self.map_index(column, row)]
 
     def map_position(self, x, y):
         """
@@ -220,22 +230,6 @@ class BattleMap(QtCore.QObject):
         else:
             raise RuntimeError('Unknown property {}.'.format(key))
 
-    def get_terrain_name(self, terrain):
-        """
-            Get a special property from the rules.
-
-            TODO move this to a special rules class. Only have rules() and setRules() here.
-        """
-        return self._properties['rules']['terrain.names'][terrain]
-
-    def load_rules(self):
-        """
-
-        """
-        # read rules
-        rule_file = c.extend(c.Battle_Ruleset_Folder, self._properties['rules'])
-        self._properties['rules'] = u.read_as_yaml(rule_file)
-
 
 
 class BattleMapView(QtGui.QGraphicsView):
@@ -247,10 +241,8 @@ class BattleMapView(QtGui.QGraphicsView):
 
     def __init__(self, battle):
         super().__init__()
-
         self.scene = QtGui.QGraphicsScene()
         self.setScene(self.scene)
-        self.setObjectName('map')
         #self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setTransformationAnchor(QtGui.QGraphicsView.NoAnchor)
@@ -275,26 +267,24 @@ class BattleMapView(QtGui.QGraphicsView):
 
 
         # fill the ground layer with ocean
-        item = self.scene.addRect(0, 0, width, height, brush=c.terrain_brushes[0], pen=g.TRANSPARENT_PEN)
+        item = self.scene.addRect(0, 0, width, height, brush=DefaultBrush, pen=g.TRANSPARENT_PEN)
         item.setZValue(0)
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
 
         # go through each position
         paths = {}
-        for t in range(1, 7):
+        for t in TerrainType:
             paths[t] = QtGui.QPainterPath()
         for column in range(0, columns):
             for row in range(0, rows):
-                t = self.battle.terrain_at(column, row)
-                if t != 0:
-                    # not for sea
-                    sx, sy = self.battle.scene_position(column, row)
-                    paths[t].addRect(sx * self.TitleSize, sy * self.TitleSize, self.TitleSize, self.TitleSize)
+                t = self.battle.terrain_at(column, row).type
+                sx, sy = self.battle.scene_position(column, row)
+                paths[t].addRect(sx * self.TitleSize, sy * self.TitleSize, self.TitleSize, self.TitleSize)
         for t in paths:
             path = paths[t]
             path = path.simplified()
-            item = self.scene.addPath(path, brush=c.terrain_brushes[t], pen=g.TRANSPARENT_PEN)
+            item = self.scene.addPath(path, brush=Terrain.getTerrainBrush(t), pen=g.TRANSPARENT_PEN)
             item.setZValue(1)
 
         # fill the half tiles which are not part of the map
@@ -313,7 +303,7 @@ class BattleMapView(QtGui.QGraphicsView):
         for column in range(0, columns):
             for row in range(0, rows):
                 sx, sy = self.battle.scene_position(column, row)
-                # item = self.scene.addRect(sx * self.TitleSize, sy * self.TitleSize,  self.TitleSize,  self.TitleSize)
+                #item = self.scene.addRect(sx * self.TitleSize, sy * self.TitleSize,  self.TitleSize,  self.TitleSize)
                 # item.setZValue(1000)
                 text = '({},{})'.format(column, row)
                 item = QtGui.QGraphicsSimpleTextItem(text)
