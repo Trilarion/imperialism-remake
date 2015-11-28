@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import sys, math, random
+import sys, math, random, map.battle_map
 from PySide import QtCore, QtGui
 from base import constants as c
+
 
 
 class Ui_BattleWindow(object):
@@ -204,8 +205,10 @@ class Ui_BattleWindow(object):
 
         
     def setupMainView(self):
-        self.graphicsView = QtGui.QGraphicsView(self.centralWidget)
+        bmap = map.battle_map.BattleMap()
+        self.graphicsView = map.battle_map.BattleMapView(bmap)
         self.gridLayout.addWidget(self.graphicsView, 1, 0, 12, 1)
+        self.graphicsView.redraw_map()
     
     def setupUi(self, BattleWindow):
         background =  QtGui.QPixmap(c.Graphics_Background)

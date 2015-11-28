@@ -1,5 +1,5 @@
 # Imperialism remake
-# Copyright (C) 2014 Trilarion
+# Copyright (C) 2015 Spitaels <spitaelsantoine@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -126,3 +126,4 @@ Graphics_Unit_list = [
 
 # minimal screen resolution
 Screen_Min_Size = (800, 600)
+
