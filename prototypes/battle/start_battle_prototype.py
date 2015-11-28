@@ -143,28 +143,28 @@ class Ui_BattleWindow(object):
         
     def setupTargetedUnitView(self,targetedUnit):
         self.graphicsScene_targetedUnit= QtGui.QGraphicsScene()
-        self.graphicsScene_targetedUnit.addPixmap(self.mirorPixmap(QtGui.QPixmap(targetedUnit)).scaled(55, 55))
+        self.graphicsScene_targetedUnit.addPixmap(self.mirorPixmap(QtGui.QPixmap(targetedUnit)).scaled(75, 75))
         self.graphicsView_targetedUnit = QtGui.QGraphicsView(self.graphicsScene_targetedUnit)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_targetedUnit.sizePolicy().hasHeightForWidth())
         self.graphicsView_targetedUnit.setSizePolicy(sizePolicy)
-        self.graphicsView_targetedUnit.setMinimumSize(QtCore.QSize(60, 60))
-        self.graphicsView_targetedUnit.setMaximumSize(QtCore.QSize(60, 60))
+        self.graphicsView_targetedUnit.setMinimumSize(QtCore.QSize(90, 90))
+        self.graphicsView_targetedUnit.setMaximumSize(QtCore.QSize(90, 90))
         self.gridLayout.addWidget(self.graphicsView_targetedUnit, 9, 1, 1, 1,QtCore.Qt.AlignCenter) 
         
     def setupCurrentUnitView(self,currentUnit):   
         self.graphicsScene_currentUnit= QtGui.QGraphicsScene()
-        self.graphicsScene_currentUnit.addPixmap(QtGui.QPixmap(currentUnit).scaled(55, 55))
+        self.graphicsScene_currentUnit.addPixmap(QtGui.QPixmap(currentUnit).scaled(75, 75))
         self.graphicsView_currentUnit = QtGui.QGraphicsView(self.graphicsScene_currentUnit)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_currentUnit.sizePolicy().hasHeightForWidth())
         self.graphicsView_currentUnit.setSizePolicy(sizePolicy)
-        self.graphicsView_currentUnit.setMinimumSize(QtCore.QSize(60, 60))
-        self.graphicsView_currentUnit.setMaximumSize(QtCore.QSize(60, 60))
+        self.graphicsView_currentUnit.setMinimumSize(QtCore.QSize(90, 90))
+        self.graphicsView_currentUnit.setMaximumSize(QtCore.QSize(90, 90))
         self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1,QtCore.Qt.AlignCenter)
        
        
@@ -216,34 +216,26 @@ class Ui_BattleWindow(object):
         self.centralWidget = QtGui.QWidget(BattleWindow)
         self.gridLayout = QtGui.QGridLayout(self.centralWidget)
         self.gridLayout.setVerticalSpacing(0)
-		#Space item
+        #Space item
         self.setupSpace()
         #Help Push Button
         self.setupHelpButton()
-		#Next Target Button
+        #Next Target Button
         self.setupNextTargetButton()
-		#End Unit Button		
+        #End Unit Button
         self.setupEndUnitButton()
-		#Retreat Button
+        #Retreat Button
         self.setupRetreatButton()
         #Automatic battle button
         self.setupAutoButton()
         #Label
         self.setupZoneText()
-		#Targeted Unit view
-        int_targetedUnit = random.randint(0, 3)
-        self.setupTargetedUnitView(c.extend(c.Graphics_Unit_Folder,'unit'+str(int_targetedUnit)+'_128.png'))
-		#Current Unit View
-        int_currentUnit = random.randint(0, 3)
-        while int_currentUnit == int_targetedUnit:
-            int_currentUnit = random.randint(0, 3)
-        self.setupCurrentUnitView(c.extend(c.Graphics_Unit_Folder,'unit'+str(int_currentUnit)+'_128.png'))
-		#Flag view
-        int_flag0 = random.randint(0, 11)
-        int_flag1 = random.randint(0, 11)
-        while int_flag0 == int_flag1:
-            int_flag1 = random.randint(0, 11)
-        self.setupFlagView(c.extend(c.Graphics_Flag_Folder,'flag'+str(int_flag0)+'.png'),c.extend(c.Graphics_Flag_Folder,'flag'+str(int_flag1)+'.png'))
+        #Targeted Unit view
+        self.setupTargetedUnitView(random.choice(c.Graphics_Unit_list))
+        #Current Unit View
+        self.setupCurrentUnitView(random.choice(c.Graphics_Unit_list))
+        #Flag view
+        self.setupFlagView(random.choice(c.Graphics_Flag_list),random.choice(c.Graphics_Flag_list))
         #Main view
         self.setupMainView()
         BattleWindow.setPalette(palette)
@@ -255,8 +247,9 @@ class Ui_BattleWindow(object):
     def retranslateUi(self, BattleWindow):
         BattleWindow.setWindowTitle(QtGui.QApplication.translate("BattleWindow", "BattleWindow", None, QtGui.QApplication.UnicodeUTF8))
         self.status.setText(QtGui.QApplication.translate("BattleWindow", "status ....", None, QtGui.QApplication.UnicodeUTF8))
-		
-		
+
+
+
 class ControlMainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(ControlMainWindow, self).__init__(parent)

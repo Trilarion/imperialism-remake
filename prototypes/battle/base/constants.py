@@ -78,16 +78,50 @@ Graphics_Flag8 = extend(Graphics_Flag_Folder,'flag8.png')
 Graphics_Flag9 = extend(Graphics_Flag_Folder,'flag9.png')
 Graphics_Flag10 = extend(Graphics_Flag_Folder,'flag10.png')
 Graphics_Flag11 = extend(Graphics_Flag_Folder,'flag11.png')
+Graphics_Flag_list = [Graphics_Flag0,
+    Graphics_Flag1,
+    Graphics_Flag2,
+    Graphics_Flag3,
+    Graphics_Flag4,
+    Graphics_Flag5,
+    Graphics_Flag6,
+    Graphics_Flag7,
+    Graphics_Flag8,
+    Graphics_Flag9,
+    Graphics_Flag10,
+    Graphics_Flag11,
+]
 
 #Unit File
-Graphics_Unit0 = extend(Graphics_Unit_Folder,'unit0.png')
-Graphics_Unit1 = extend(Graphics_Unit_Folder,'unit1.png')
-Graphics_Unit2 = extend(Graphics_Unit_Folder,'unit2.png')
-Graphics_Unit3 = extend(Graphics_Unit_Folder,'unit3.png')
-Graphics_Unit0_small = extend(Graphics_Unit_Folder,'unit0_128.png')
-Graphics_Unit1_small = extend(Graphics_Unit_Folder,'unit1_128.png')
-Graphics_Unit2_small = extend(Graphics_Unit_Folder,'unit2_128.png')
-Graphics_Unit3_small = extend(Graphics_Unit_Folder,'unit3_128.png')
+Graphics_Unit_0_0 = extend(Graphics_Unit_Folder,'unit0_0.png')
+Graphics_Unit_0_1 = extend(Graphics_Unit_Folder,'unit0_1.png')
+Graphics_Unit_1_0 = extend(Graphics_Unit_Folder,'unit1_0.png')
+Graphics_Unit_1_1 = extend(Graphics_Unit_Folder,'unit1_1.png')
+Graphics_Unit_2_0 = extend(Graphics_Unit_Folder,'unit2_0.png')
+Graphics_Unit_2_1 = extend(Graphics_Unit_Folder,'unit2_1.png')
+Graphics_Unit_3_0 = extend(Graphics_Unit_Folder,'unit3_0.png')
+Graphics_Unit_3_1 = extend(Graphics_Unit_Folder,'unit3_1.png')
+Graphics_Unit_4_0 = extend(Graphics_Unit_Folder,'unit4_0.png')
+Graphics_Unit_4_1 = extend(Graphics_Unit_Folder,'unit4_1.png')
+Graphics_Unit_5_0 = extend(Graphics_Unit_Folder,'unit5_0.png')
+Graphics_Unit_5_1 = extend(Graphics_Unit_Folder,'unit5_1.png')
+Graphics_Unit_6_0 = extend(Graphics_Unit_Folder,'unit6_0.png')
+Graphics_Unit_6_1 = extend(Graphics_Unit_Folder,'unit6_1.png')
+Graphics_Unit_7_0 = extend(Graphics_Unit_Folder,'unit7_0.png')
+Graphics_Unit_7_1 = extend(Graphics_Unit_Folder,'unit7_1.png')
+Graphics_Unit_8_0 = extend(Graphics_Unit_Folder,'unit8_0.png')
+Graphics_Unit_8_1 = extend(Graphics_Unit_Folder,'unit8_1.png')
+Graphics_Unit_list = [
+	Graphics_Unit_0_0, Graphics_Unit_0_1, 
+    Graphics_Unit_1_0, Graphics_Unit_1_1, 
+    Graphics_Unit_2_0, Graphics_Unit_2_1, 
+    Graphics_Unit_3_0, Graphics_Unit_3_1, 
+    Graphics_Unit_4_0, Graphics_Unit_4_1, 
+    Graphics_Unit_5_0, Graphics_Unit_5_1, 
+    Graphics_Unit_6_0, Graphics_Unit_6_1, 
+    Graphics_Unit_7_0, Graphics_Unit_7_1, 
+    Graphics_Unit_8_0, Graphics_Unit_8_1
+]
 
 
 # minimal screen resolution
