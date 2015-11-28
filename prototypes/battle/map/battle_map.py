@@ -39,11 +39,14 @@ class BattlePropertyKeyNames:
     MAP_ROWS = 'map.rows'
     FORTIFICATION = 'fortification'
     TILE_MAXSIZE = 'title.size.max'
+    FORTIFICATION_COLUMNS = 'fortification.columns'
 
 NEW_BATTLE_DEFAULT_PROPERTIES = {
     BattlePropertyKeyNames.TITLE: 'Battle',
-    BattlePropertyKeyNames.MAP_COLUMNS: 40,
+    BattlePropertyKeyNames.MAP_COLUMNS: 35,
+    BattlePropertyKeyNames.FORTIFICATION_COLUMNS: 29,
     BattlePropertyKeyNames.MAP_ROWS: 17
+
 }
 
 
@@ -59,7 +62,7 @@ DefaultBrush = QtGui.QBrush(DefaultBrushColor)
 
 class Terrain:
     type = TerrainType.Grass
-    fortication = False
+    fortification = False
     accessible = True
 
     @staticmethod
@@ -82,7 +85,7 @@ class BattleMap(QtCore.QObject):
         """
         super().__init__()
         self.reset()
-        self.create_map(NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_COLUMNS],NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS])
+        self.create_map(NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_COLUMNS],NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS],NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.FORTIFICATION_COLUMNS])
 
     # noinspection PyAttributeOutsideInit
     def reset(self):
@@ -92,15 +95,18 @@ class BattleMap(QtCore.QObject):
         self._properties = {BattlePropertyKeyNames.FORTIFICATION: []}
         self._map = {}
 
-    def create_map(self, columns, rows):
+    def create_map(self, columns, rows, fortification_columns):
         """
             Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
         """
         self._properties[BattlePropertyKeyNames.MAP_COLUMNS] = columns
         self._properties[BattlePropertyKeyNames.MAP_ROWS] = rows
+        self._properties[BattlePropertyKeyNames.FORTIFICATION_COLUMNS] = fortification_columns
         number_tiles = columns * rows
         self._map = [Terrain()] * number_tiles
-
+        for i in range (0, self._properties[BattlePropertyKeyNames.MAP_ROWS]):
+            self._map[i+self._properties[BattlePropertyKeyNames.FORTIFICATION_COLUMNS]].fortication=True
+        
 
     def add_fortification(self, column, row):
         self._map[self.map_index(column, row)].fortication = True
@@ -255,18 +261,13 @@ class BattleMapView(QtGui.QGraphicsView):
             When a battle is loaded new we need to draw the whole map new.
         """
         self.scene.clear()
-        self.TitleSize = self.height()/NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS]
+        self.TitleSize = (self.height()-18)/NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS]
         columns = self.battle[BattlePropertyKeyNames.MAP_COLUMNS]
         rows = self.battle[BattlePropertyKeyNames.MAP_ROWS]
 
         width = (columns + 0.5) * self.TitleSize
         height = rows * self.TitleSize
         self.scene.setSceneRect(0, 0, width, height)
-
-
-        # fill the ground layer with ocean
-        item = self.scene.addRect(0, 0, width, height, brush=DefaultBrush, pen=QtGui.QPen(QtCore.Qt.transparent))
-        item.setZValue(0)
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
 
@@ -276,8 +277,18 @@ class BattleMapView(QtGui.QGraphicsView):
             paths[t] = QtGui.QPainterPath()
         for column in range(0, columns):
             for row in range(0, rows):
-                t = self.battle.terrain_at(column, row).type
+                terrain = self.battle.terrain_at(column, row)
+                t = terrain.type
                 sx, sy = self.battle.scene_position(column, row)
+                font = QtGui.QFont()
+                font.setPointSize(self.TitleSize/1.26)
+                font.setBold(False)
+                if self.battle[BattlePropertyKeyNames.FORTIFICATION_COLUMNS] == column:
+                    if row % 2 == 0:
+                        paths[t].addText(sx * self.TitleSize + self.TitleSize/2, sy * self.TitleSize + self.TitleSize/1.26,font, "\\")
+                    else:
+                        paths[t].addText(sx * self.TitleSize + self.TitleSize/8, sy * self.TitleSize + self.TitleSize/1.26,font, "/")
+                
                 paths[t].addRect(sx * self.TitleSize, sy * self.TitleSize, self.TitleSize, self.TitleSize)
         for t in paths:
             path = paths[t]
@@ -301,52 +312,14 @@ class BattleMapView(QtGui.QGraphicsView):
         for column in range(0, columns):
             for row in range(0, rows):
                 sx, sy = self.battle.scene_position(column, row)
-                #item = self.scene.addRect(sx * self.TitleSize, sy * self.TitleSize,  self.TitleSize,  self.TitleSize)
-                # item.setZValue(1000)
+                item = self.scene.addRect(sx * self.TitleSize, sy * self.TitleSize,  self.TitleSize,  self.TitleSize)
+                item.setZValue(1000)
                 text = '({},{})'.format(column, row)
                 item = QtGui.QGraphicsSimpleTextItem(text)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.black))
                 item.setPos((sx + 0.5) * self.TitleSize - item.boundingRect().width() / 2, sy * self.TitleSize)
                 item.setZValue(1001)
                 self.scene.addItem(item)
-
-    def get_bounds(self):
-        """
-            Returns the visible part of the map view relative to the total scene rectangle as a rectangle (with all
-            values between 0 and 1).
-        """
-        # total rectangle of the scene (0, 0, width, height)
-        s = self.scene.sceneRect()
-        # visible rectangle of the view
-        v = self.mapToScene(self.rect()).boundingRect()
-        return QtCore.QRectF(v.x() / s.width(), v.y() / s.height(), v.width() / s.width(), v.height() / s.height())
-
-    def set_position(self, x, y):
-        """
-            Changes the visible part of the view.
-        """
-        # total rectangle of the scene (0, 0, width, height)
-        s = self.scene.sceneRect()
-        # visible rectangle of the view
-        v = self.mapToScene(self.rect()).boundingRect()
-        # adjust x, y to scene coordinates and find center
-        x = x * s.width() + v.width() / 2
-        y = y * s.height() + v.height() / 2
-        # center on it
-        self.centerOn(x, y)
-
-    def mouseMoveEvent(self, event):
-        """
-            The mouse on the view has been moved. Emit signal tile_at_focus_changed if we now hover over a different tile.
-        """
-        # get mouse position in scene coordinates
-        scene_position = self.mapToScene(event.pos()) / self.TitleSize
-        column, row = self.battle.map_position(scene_position.x(), scene_position.y())
-        if column != self.current_column or row != self.current_row:
-            self.current_column = column
-            self.current_row = row
-            self.tile_at_focus_changed.emit(column, row)
-        super().mouseMoveEvent(event)
 
     def resizeEvent(self, evt=None):
         self.redraw_map()

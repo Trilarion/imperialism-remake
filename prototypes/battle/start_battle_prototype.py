@@ -279,9 +279,11 @@ class CustomButton(QtGui.QPushButton):
 
     def enterEvent(self, event):
         self.label.setText(str(self.text) + "  ")
+        super().enterEvent(event)
 
     def leaveEvent(self, event):
         self.label.setText("")
+        super().leaveEvent(event)
 
 class ControlMainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
