@@ -18,9 +18,40 @@ import sys, math, random, map.battle_map
 from PySide import QtCore, QtGui
 from base import constants as c
 
-
+def formatMoney(money):
+    str_init = str(money)
+    retval = ""
+    for i in range(0,len(str_init)):
+        if (len(str_init) - i) % 3 == 0 and i != 0:
+            retval += ","
+        retval += str_init[i]
+    return retval;
 
 class Ui_BattleWindow(object):
+
+
+        
+    def setupZoneText(self, date, money):
+        self.status = QtGui.QLabel(self.centralWidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.status.sizePolicy().hasHeightForWidth())
+        self.status.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setWeight(75)
+        font.setBold(True)
+        self.status.setFont(font)
+        self.status.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.gridLayout.addWidget(self.status, 0, 0, 1, 1)   
+        self.status1 = QtGui.QLabel(self.centralWidget)
+        self.status1.setSizePolicy(sizePolicy)
+        self.status1.setFont(font)
+        self.status1.setText(str(date) + "\t\t$" + formatMoney(money))
+        self.status1.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.gridLayout.addWidget(self.status1, 0, 0, 1, 1)   
+  
 
 
     def setupSpace(self):
@@ -39,7 +70,8 @@ class Ui_BattleWindow(object):
 
         
     def setupNextTargetButton(self):
-        self.pushButton_NextTarget = QtGui.QPushButton(self.centralWidget)
+        self.pushButton_NextTarget = CustomButton(self.centralWidget)
+        self.pushButton_NextTarget.setStatusText("Next Target",self.status)
         sizePolicy= QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -56,7 +88,8 @@ class Ui_BattleWindow(object):
       
       
     def setupEndUnitButton(self):
-        self.pushButton_endUnitTurn = QtGui.QPushButton(self.centralWidget)
+        self.pushButton_endUnitTurn = CustomButton(self.centralWidget)
+        self.pushButton_endUnitTurn.setStatusText("End Unit's Turn",self.status)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -73,7 +106,8 @@ class Ui_BattleWindow(object):
       
       
     def setupRetreatButton(self):  
-        self.pushButton_retreat = QtGui.QPushButton(self.centralWidget)
+        self.pushButton_retreat = CustomButton(self.centralWidget)
+        self.pushButton_retreat.setStatusText("retreat All Units",self.status)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -93,7 +127,8 @@ class Ui_BattleWindow(object):
       
 
     def setupHelpButton(self):  
-        self.pushButton_help = QtGui.QPushButton(self.centralWidget)
+        self.pushButton_help = CustomButton(self.centralWidget)
+        self.pushButton_help.setStatusText("Help on Tactical Battles",self.status)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -110,7 +145,8 @@ class Ui_BattleWindow(object):
         
     
     def setupAutoButton(self):
-        self.pushButton_auto = QtGui.QPushButton(self.centralWidget)
+        self.pushButton_auto = CustomButton(self.centralWidget)
+        self.pushButton_auto.setStatusText("Auto-Play",self.status)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -124,22 +160,7 @@ class Ui_BattleWindow(object):
         self.pushButton_auto.setIcon(icon4)
         self.pushButton_auto.setIconSize(QtCore.QSize(80, 80))
         self.gridLayout.addWidget(self.pushButton_auto, 12, 1, 1, 1) 
-        
-        
-    def setupZoneText(self):
-        self.status = QtGui.QLabel(self.centralWidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.status.sizePolicy().hasHeightForWidth())
-        self.status.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        font.setWeight(75)
-        font.setBold(True)
-        self.status.setFont(font)
-        self.status.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.gridLayout.addWidget(self.status, 0, 0, 1, 1)     
+       
         
         
     def setupTargetedUnitView(self,targetedUnit):
@@ -211,6 +232,7 @@ class Ui_BattleWindow(object):
         self.graphicsView.redraw_map()
     
     def setupUi(self, BattleWindow):
+        BattleWindow.setWindowTitle("BattleWindow")
         background =  QtGui.QPixmap(c.Graphics_Background)
         palette = QtGui.QPalette()
         palette.setBrush(QtGui.QPalette.Background, background)
@@ -219,6 +241,8 @@ class Ui_BattleWindow(object):
         self.centralWidget = QtGui.QWidget(BattleWindow)
         self.gridLayout = QtGui.QGridLayout(self.centralWidget)
         self.gridLayout.setVerticalSpacing(0)
+        #Label
+        self.setupZoneText("Spring, 1811", 10000)
         #Space item
         self.setupSpace()
         #Help Push Button
@@ -231,8 +255,6 @@ class Ui_BattleWindow(object):
         self.setupRetreatButton()
         #Automatic battle button
         self.setupAutoButton()
-        #Label
-        self.setupZoneText()
         #Targeted Unit view
         self.setupTargetedUnitView(random.choice(c.Graphics_Unit_list))
         #Current Unit View
@@ -243,21 +265,31 @@ class Ui_BattleWindow(object):
         self.setupMainView()
         BattleWindow.setPalette(palette)
         BattleWindow.setCentralWidget(self.centralWidget)
-        self.retranslateUi(BattleWindow)
         QtCore.QMetaObject.connectSlotsByName(BattleWindow)
+    
 
-        
-    def retranslateUi(self, BattleWindow):
-        BattleWindow.setWindowTitle(QtGui.QApplication.translate("BattleWindow", "BattleWindow", None, QtGui.QApplication.UnicodeUTF8))
-        self.status.setText(QtGui.QApplication.translate("BattleWindow", "status ....", None, QtGui.QApplication.UnicodeUTF8))
+class CustomButton(QtGui.QPushButton):
+    text = ""
+   
+
+    def setStatusText(self, text, label):
+        self.text = text
+        self.label = label
 
 
+    def enterEvent(self, event):
+        self.label.setText(str(self.text) + "  ")
+
+    def leaveEvent(self, event):
+        self.label.setText("")
 
 class ControlMainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(ControlMainWindow, self).__init__(parent)
         self.ui = Ui_BattleWindow()
         self.ui.setupUi(self)
+
+
  
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
