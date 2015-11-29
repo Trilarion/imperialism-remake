@@ -56,6 +56,7 @@ class unitTypes:
         for child in tree.xpath("/unitTypes/unitType"):
             utype = unitType()
             utype.id = child.get("id")
+            utype.name = child.findtext("name")
             utype.type = child.findtext("type")
             utype.evol = child.findtext("evol")
             utype.technologyId = child.findtext("technologyId")
@@ -82,6 +83,7 @@ class unitType:
     type = -1
     evol = -1
     technologyId = -1
+    name = ""
 
     #graphics data
     pixmap = "none"
@@ -104,6 +106,7 @@ class unitType:
     def __str__(self):
         retval = "\n\nUnit Main Info\n"
         retval += "\t - id: " + str(self.id) + "\n"
+        retval += "\t - name: " + str(self.name) + "\n"
         retval += "\t - type: " + str(self.type) + "\n"
         retval += "\t - period: " + str(self.evol) + "\n"
         retval += "\t - technologyId: " + str(self.technologyId) + "\n"
