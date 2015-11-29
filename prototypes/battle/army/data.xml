@@ -1,0 +1,25 @@
+<unitTypes>
+    <unitType id="0">
+	    <type>111</type>
+	    <evol>222</evol>
+	    <technologyId>333</technologyId>
+	    <graphics>
+		    <pixmap>path.png</pixmap>
+	    </graphics>
+	    <caracteritics>
+		    <life>444</life>
+		    <firepower>555</firepower>
+		    <move>666</move>
+		    <range>777</range>
+		    <entrench>True</entrench>
+		    <description>azertyuio</description>
+	    </caracteritics>
+	    <cost>
+		    <money>888</money>
+		    <arms>999</arms>
+		    <horses>000</horses>
+		    <petrol>123</petrol>
+		    <worker>0</worker>
+	    </cost>
+    </unitType>
+</unitTypes>
