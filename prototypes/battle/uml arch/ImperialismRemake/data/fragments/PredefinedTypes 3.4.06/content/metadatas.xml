@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ram-component manifest-version="2.0"
+               name="PredefinedTypes" version="3" release="4" clevel="6">
+    <description>
+        <![CDATA[<p><strong>Predefined types</strong> model component provides the default types for <strong>UML</strong> and<strong> Analyst </strong>models.</p>
+]]>
+    </description>
+    <dependencies>
+    </dependencies>
+    <contributors>
+      <contributor name="ModelerModule" version="8.5.01"></contributor>
+    </contributors>
+    <metamodels>
+      <metamodel name="Standard" version="1.0.9026"/>
+    </metamodels>
+    <roots>
+      <root metaclass="AnalystProject" name="Analyst Properties" uuid="85508765-309d-44f9-a12c-3327a41ec60e"></root>
+      <root metaclass="Project" name="UML Types" uuid="6bf38d0a-80fe-4634-8526-84ad432064c6"></root>
+    </roots>
+</ram-component>

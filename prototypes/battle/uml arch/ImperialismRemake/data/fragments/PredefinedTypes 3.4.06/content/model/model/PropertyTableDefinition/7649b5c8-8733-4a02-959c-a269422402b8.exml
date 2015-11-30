@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="No Properties" version="4">
+  <OBJECT>
+    <ID name="No Properties" mc="Standard.PropertyTableDefinition" uid="7649b5c8-8733-4a02-959c-a269422402b8"/>
+    <PID name="Analyst Properties" mc="Standard.PropertyContainer" uid="359fc1cf-b11c-4922-acdf-731582c24643"/>
+    <ATTRIBUTES>
+      <ATT name="Name"><![CDATA[No Properties]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES></DEPENDENCIES>
+  </OBJECT>
+</EXT>

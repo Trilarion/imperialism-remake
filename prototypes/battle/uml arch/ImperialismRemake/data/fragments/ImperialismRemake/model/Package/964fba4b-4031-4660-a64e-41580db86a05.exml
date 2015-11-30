@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="imperialismremake" version="4">
+  <OBJECT>
+    <ID name="imperialismremake" mc="Standard.Package" uid="964fba4b-4031-4660-a64e-41580db86a05"/>
+    <PID name="ImperialismRemake" mc="Standard.Project" uid="72505957-4821-48bb-a2aa-3842c809be10"/>
+    <ATTRIBUTES>
+      <ATT name="IsInstantiable">false</ATT>
+      <ATT name="IsAbstract">false</ATT>
+      <ATT name="IsLeaf">false</ATT>
+      <ATT name="IsRoot">false</ATT>
+      <ATT name="Visibility">Public</ATT>
+      <ATT name="Name"><![CDATA[imperialismremake]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="OwnedElement">
+        <COMPID name="Worker" mc="Standard.Class" uid="48764778-ceb7-4eb7-b1b8-3e7176b06363"/>
+        <COMPID name="ResourceType" mc="Standard.Class" uid="4481c87d-1922-4161-9cc9-43c2debc903e"/>
+        <COMPID name="Price" mc="Standard.Class" uid="62782d3c-2414-4b18-88b6-3090d6a60cbd"/>
+        <COMPID name="Cost" mc="Standard.Class" uid="6f3f5516-341a-42fe-ac6b-866da5f46f3c"/>
+        <COMPID name="Fortification" mc="Standard.Class" uid="97c7e147-a490-4e8c-b6e2-ab7e6be14a31"/>
+        <COMPID name="Technology" mc="Standard.Class" uid="358566f7-66f3-4e0e-b7e6-4d62d24ded9c"/>
+        <COMPID name="unitType" mc="Standard.Class" uid="d9e8c0b4-477d-4821-bbb1-b414cf023a14"/>
+        <COMPID name="unitCaracteristics" mc="Standard.Class" uid="e64b380d-080a-443c-ae5a-c162e0c2a587"/>
+        <COMPID name="Description" mc="Standard.Class" uid="cdb0cc7a-85eb-4342-8eab-36be727e1586"/>
+        <COMPID name="upgradeUnitCost" mc="Standard.Class" uid="4454073b-0fe2-4986-9fa3-92e475fd1dd5"/>
+        <COMPID name="Unit" mc="Standard.Class" uid="e9a70baa-b303-46c0-8f61-74d7caa9356f"/>
+        <COMPID name="Army" mc="Standard.Class" uid="d72ed380-f806-413c-b038-f676ab7c28d3"/>
+        <COMPID name="Fighter" mc="Standard.Class" uid="eb20ebb7-2ff8-463a-ab12-cca04fc5fa2a"/>
+        <COMPID name="Nation" mc="Standard.Class" uid="0e21a13f-5ba3-4c4f-bfc7-a5255940628d"/>
+        <COMPID name="GroundFight" mc="Standard.Class" uid="e2ec0fad-e822-4268-a5d4-c6d66b860be8"/>
+      </COMP>
+      <COMP relation="Product">
+        <COMPID name="overview diagram" mc="Standard.ClassDiagram" uid="7c0f42c2-e8d1-43d2-84c8-9e110b16483c"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>

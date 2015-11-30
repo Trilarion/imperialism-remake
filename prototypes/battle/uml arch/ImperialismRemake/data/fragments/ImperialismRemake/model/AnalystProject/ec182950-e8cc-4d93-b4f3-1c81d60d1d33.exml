@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!--GENERATED FILE, PLEASE DO NOT EDIT!!!--><EXT object="ImperialismRemake" version="4">
+  <OBJECT>
+    <ID name="ImperialismRemake" mc="Standard.AnalystProject" uid="ec182950-e8cc-4d93-b4f3-1c81d60d1d33"/>
+    <ATTRIBUTES>
+      <ATT name="Name"><![CDATA[ImperialismRemake]]></ATT>
+      <ATT name="status">1970354901745664</ATT>
+    </ATTRIBUTES>
+    <DEPENDENCIES>
+      <COMP relation="PropertyRoot">
+        <COMPID name="ImperialismRemake" mc="Standard.PropertyContainer" uid="108813c3-bacb-41b2-81f4-e98ec2e4ca41"/>
+      </COMP>
+    </DEPENDENCIES>
+  </OBJECT>
+</EXT>
