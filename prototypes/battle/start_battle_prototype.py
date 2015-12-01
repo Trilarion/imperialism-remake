@@ -15,8 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import sys, math, random, map.battle_map
-from PySide import QtCore, QtGui
 from base import constants as c
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow, QGridLayout, QLabel, QSizePolicy, QSpacerItem, QSizePolicy,  QGraphicsScene, QGraphicsView
+from PyQt5.QtGui import QPixmap, QPalette, QBrush, QFont, QIcon,  QTransform
+from PyQt5.QtCore import QSize, Qt, QMetaObject
 
 def formatMoney(money):
     str_init = str(money)
@@ -32,196 +34,196 @@ class Ui_BattleWindow(object):
 
         
     def setupZoneText(self, date, money):
-        self.status = QtGui.QLabel(self.centralWidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
+        self.status = QLabel(self.centralWidget)
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.status.sizePolicy().hasHeightForWidth())
         self.status.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
+        font = QFont()
         font.setPointSize(10)
         font.setWeight(75)
         font.setBold(True)
         self.status.setFont(font)
-        self.status.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.status.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.gridLayout.addWidget(self.status, 0, 0, 1, 1)   
-        self.status1 = QtGui.QLabel(self.centralWidget)
+        self.status1 = QLabel(self.centralWidget)
         self.status1.setSizePolicy(sizePolicy)
         self.status1.setFont(font)
         self.status1.setText(str(date) + "\t\t$" + formatMoney(money))
-        self.status1.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.status1.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         self.gridLayout.addWidget(self.status1, 0, 0, 1, 1)   
   
 
 
     def setupSpace(self):
         #Space between help Button and flag view
-        spacerItem = QtGui.QSpacerItem(20, 10, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.MinimumExpanding)
+        spacerItem = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
         self.gridLayout.addItem(spacerItem, 2, 1, 1, 1)
         #Space between flag view and next target Button
-        spacerItem1 = QtGui.QSpacerItem(20, 10, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.MinimumExpanding)
+        spacerItem1 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
         self.gridLayout.addItem(spacerItem1, 4, 1, 1, 1)
         #Space between retreat Button and targetted unit view
-        spacerItem2 = QtGui.QSpacerItem(20, 10, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
+        spacerItem2 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.gridLayout.addItem(spacerItem2, 8, 1, 1, 1)
         #Space between current unit view and auto Button
-        spacerItem3 = QtGui.QSpacerItem(20, 10, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.MinimumExpanding)
+        spacerItem3 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
         self.gridLayout.addItem(spacerItem3, 11, 1, 1, 1)
 
         
     def setupNextTargetButton(self):
         self.pushButton_NextTarget = CustomButton(self.centralWidget)
         self.pushButton_NextTarget.setStatusText("Next Target",self.status)
-        sizePolicy= QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy= QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_NextTarget.sizePolicy().hasHeightForWidth())
         self.pushButton_NextTarget.setSizePolicy(sizePolicy)
-        self.pushButton_NextTarget.setMinimumSize(QtCore.QSize(45, 45))
-        self.pushButton_NextTarget.setMaximumSize(QtCore.QSize(45, 45))
+        self.pushButton_NextTarget.setMinimumSize(QSize(45, 45))
+        self.pushButton_NextTarget.setMaximumSize(QSize(45, 45))
         self.pushButton_NextTarget.setText("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(c.Graphics_Target), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon = QIcon()
+        icon.addPixmap(QPixmap(c.Graphics_Target), QIcon.Normal, QIcon.Off)
         self.pushButton_NextTarget.setIcon(icon)
-        self.pushButton_NextTarget.setIconSize(QtCore.QSize(40, 40))
-        self.gridLayout.addWidget(self.pushButton_NextTarget, 5, 1, 1, 1,QtCore.Qt.AlignCenter)
+        self.pushButton_NextTarget.setIconSize(QSize(40, 40))
+        self.gridLayout.addWidget(self.pushButton_NextTarget, 5, 1, 1, 1,Qt.AlignCenter)
       
       
     def setupEndUnitButton(self):
         self.pushButton_endUnitTurn = CustomButton(self.centralWidget)
         self.pushButton_endUnitTurn.setStatusText("End Unit's Turn",self.status)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_endUnitTurn.sizePolicy().hasHeightForWidth())
         self.pushButton_endUnitTurn.setSizePolicy(sizePolicy)
-        self.pushButton_endUnitTurn.setMinimumSize(QtCore.QSize(45, 45))
-        self.pushButton_endUnitTurn.setMaximumSize(QtCore.QSize(45, 45))
+        self.pushButton_endUnitTurn.setMinimumSize(QSize(45, 45))
+        self.pushButton_endUnitTurn.setMaximumSize(QSize(45, 45))
         self.pushButton_endUnitTurn.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(c.Graphics_End), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1 = QIcon()
+        icon1.addPixmap(QPixmap(c.Graphics_End), QIcon.Normal, QIcon.Off)
         self.pushButton_endUnitTurn.setIcon(icon1)
-        self.pushButton_endUnitTurn.setIconSize(QtCore.QSize(40, 40))
-        self.gridLayout.addWidget(self.pushButton_endUnitTurn, 6, 1, 1, 1,QtCore.Qt.AlignCenter)
+        self.pushButton_endUnitTurn.setIconSize(QSize(40, 40))
+        self.gridLayout.addWidget(self.pushButton_endUnitTurn, 6, 1, 1, 1,Qt.AlignCenter)
       
       
     def setupRetreatButton(self):  
         self.pushButton_retreat = CustomButton(self.centralWidget)
         self.pushButton_retreat.setStatusText("retreat All Units",self.status)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_retreat.sizePolicy().hasHeightForWidth())
         self.pushButton_retreat.setSizePolicy(sizePolicy)
-        self.pushButton_retreat.setMinimumSize(QtCore.QSize(45, 45))
-        self.pushButton_retreat.setMaximumSize(QtCore.QSize(45, 45))
+        self.pushButton_retreat.setMinimumSize(QSize(45, 45))
+        self.pushButton_retreat.setMaximumSize(QSize(45, 45))
         self.pushButton_retreat.setToolTip("")
         self.pushButton_retreat.setStatusTip("")
         self.pushButton_retreat.setWhatsThis("")
         self.pushButton_retreat.setText("")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(c.Graphics_Retreat), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2 = QIcon()
+        icon2.addPixmap(QPixmap(c.Graphics_Retreat), QIcon.Normal, QIcon.Off)
         self.pushButton_retreat.setIcon(icon2)
-        self.pushButton_retreat.setIconSize(QtCore.QSize(42, 40))
-        self.gridLayout.addWidget(self.pushButton_retreat, 7, 1, 1, 1,QtCore.Qt.AlignCenter)
+        self.pushButton_retreat.setIconSize(QSize(42, 40))
+        self.gridLayout.addWidget(self.pushButton_retreat, 7, 1, 1, 1,Qt.AlignCenter)
       
 
     def setupHelpButton(self):  
         self.pushButton_help = CustomButton(self.centralWidget)
         self.pushButton_help.setStatusText("Help on Tactical Battles",self.status)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_help.sizePolicy().hasHeightForWidth())
         self.pushButton_help.setSizePolicy(sizePolicy)
-        self.pushButton_help.setMinimumSize(QtCore.QSize(90, 90))
-        self.pushButton_help.setMaximumSize(QtCore.QSize(90, 90))
+        self.pushButton_help.setMinimumSize(QSize(90, 90))
+        self.pushButton_help.setMaximumSize(QSize(90, 90))
         self.pushButton_help.setText("")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(c.Graphics_Help), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3 = QIcon()
+        icon3.addPixmap(QPixmap(c.Graphics_Help), QIcon.Normal, QIcon.Off)
         self.pushButton_help.setIcon(icon3)
-        self.pushButton_help.setIconSize(QtCore.QSize(80, 80))
+        self.pushButton_help.setIconSize(QSize(80, 80))
         self.gridLayout.addWidget(self.pushButton_help, 0, 1, 2, 1)   
         
     
     def setupAutoButton(self):
         self.pushButton_auto = CustomButton(self.centralWidget)
         self.pushButton_auto.setStatusText("Auto-Play",self.status)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_auto.sizePolicy().hasHeightForWidth())
         self.pushButton_auto.setSizePolicy(sizePolicy)
-        self.pushButton_auto.setMinimumSize(QtCore.QSize(90, 90))
-        self.pushButton_auto.setMaximumSize(QtCore.QSize(90, 90))
+        self.pushButton_auto.setMinimumSize(QSize(90, 90))
+        self.pushButton_auto.setMaximumSize(QSize(90, 90))
         self.pushButton_auto.setText("")
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(c.Graphics_General), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4 = QIcon()
+        icon4.addPixmap(QPixmap(c.Graphics_General), QIcon.Normal, QIcon.Off)
         self.pushButton_auto.setIcon(icon4)
-        self.pushButton_auto.setIconSize(QtCore.QSize(80, 80))
+        self.pushButton_auto.setIconSize(QSize(80, 80))
         self.gridLayout.addWidget(self.pushButton_auto, 12, 1, 1, 1) 
        
         
         
     def setupTargetedUnitView(self,targetedUnit):
-        self.graphicsScene_targetedUnit= QtGui.QGraphicsScene()
-        self.graphicsScene_targetedUnit.addPixmap(self.mirorPixmap(QtGui.QPixmap(targetedUnit)).scaled(75, 75))
-        self.graphicsView_targetedUnit = QtGui.QGraphicsView(self.graphicsScene_targetedUnit)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.graphicsScene_targetedUnit= QGraphicsScene()
+        self.graphicsScene_targetedUnit.addPixmap(self.mirorPixmap(QPixmap(targetedUnit)).scaled(75, 75))
+        self.graphicsView_targetedUnit = QGraphicsView(self.graphicsScene_targetedUnit)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_targetedUnit.sizePolicy().hasHeightForWidth())
         self.graphicsView_targetedUnit.setSizePolicy(sizePolicy)
-        self.graphicsView_targetedUnit.setMinimumSize(QtCore.QSize(90, 90))
-        self.graphicsView_targetedUnit.setMaximumSize(QtCore.QSize(90, 90))
-        self.gridLayout.addWidget(self.graphicsView_targetedUnit, 9, 1, 1, 1,QtCore.Qt.AlignCenter) 
+        self.graphicsView_targetedUnit.setMinimumSize(QSize(90, 90))
+        self.graphicsView_targetedUnit.setMaximumSize(QSize(90, 90))
+        self.gridLayout.addWidget(self.graphicsView_targetedUnit, 9, 1, 1, 1,Qt.AlignCenter) 
         
     def setupCurrentUnitView(self,currentUnit):   
-        self.graphicsScene_currentUnit= QtGui.QGraphicsScene()
-        self.graphicsScene_currentUnit.addPixmap(QtGui.QPixmap(currentUnit).scaled(75, 75))
-        self.graphicsView_currentUnit = QtGui.QGraphicsView(self.graphicsScene_currentUnit)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.graphicsScene_currentUnit= QGraphicsScene()
+        self.graphicsScene_currentUnit.addPixmap(QPixmap(currentUnit).scaled(75, 75))
+        self.graphicsView_currentUnit = QGraphicsView(self.graphicsScene_currentUnit)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_currentUnit.sizePolicy().hasHeightForWidth())
         self.graphicsView_currentUnit.setSizePolicy(sizePolicy)
-        self.graphicsView_currentUnit.setMinimumSize(QtCore.QSize(90, 90))
-        self.graphicsView_currentUnit.setMaximumSize(QtCore.QSize(90, 90))
-        self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1,QtCore.Qt.AlignCenter)
+        self.graphicsView_currentUnit.setMinimumSize(QSize(90, 90))
+        self.graphicsView_currentUnit.setMaximumSize(QSize(90, 90))
+        self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1,Qt.AlignCenter)
        
        
     def mirorPixmap(self,pixmap):
-        transform = QtGui.QTransform()  
+        transform = QTransform()  
         transform.scale(-1, 1)
-        return QtGui.QPixmap(pixmap.transformed(transform))
+        return QPixmap(pixmap.transformed(transform))
         
         
     def transformflag(self,pixmap, type):
-        transform = QtGui.QTransform()
+        transform = QTransform()
         if type == 1:
             transform.scale(-1, 1)
             transform.rotate(45)
         elif type == 2 :
             transform.rotate(45)
-        pixmap = QtGui.QPixmap(pixmap.transformed(transform))
+        pixmap = QPixmap(pixmap.transformed(transform))
         return pixmap.scaled(45, 130)  
 
     def setupFlagView(self,flag_attacker,flag_defender):
-        self.graphicsScene_flag= QtGui.QGraphicsScene()
-        self.graphicsScene_flag.addPixmap(self.transformflag(QtGui.QPixmap(flag_attacker),1)).setPos(-20,0)      
-        self.graphicsScene_flag.addPixmap(self.transformflag(QtGui.QPixmap(flag_defender),2))
+        self.graphicsScene_flag= QGraphicsScene()
+        self.graphicsScene_flag.addPixmap(self.transformflag(QPixmap(flag_attacker),1)).setPos(-20,0)      
+        self.graphicsScene_flag.addPixmap(self.transformflag(QPixmap(flag_defender),2))
         
-        self.graphicsView_flag = QtGui.QGraphicsView(self.graphicsScene_flag)
-        self.graphicsView_flag.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.graphicsView_flag = QGraphicsView(self.graphicsScene_flag)
+        self.graphicsView_flag.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_flag.sizePolicy().hasHeightForWidth())       
         self.graphicsView_flag.setSizePolicy(sizePolicy)
-        self.graphicsView_flag.setMinimumSize(QtCore.QSize(90, 120))
-        self.graphicsView_flag.setMaximumSize(QtCore.QSize(90, 120))
+        self.graphicsView_flag.setMinimumSize(QSize(90, 120))
+        self.graphicsView_flag.setMaximumSize(QSize(90, 120))
         self.graphicsView_flag.setStyleSheet("border-style: none;background: transparent")
-        self.graphicsView_flag.setCacheMode(QtGui.QGraphicsView.CacheBackground)
+        self.graphicsView_flag.setCacheMode(QGraphicsView.CacheBackground)
         self.gridLayout.addWidget(self.graphicsView_flag, 3, 1, 1, 1)       
 
         
@@ -233,13 +235,13 @@ class Ui_BattleWindow(object):
     
     def setupUi(self, BattleWindow):
         BattleWindow.setWindowTitle("BattleWindow")
-        background =  QtGui.QPixmap(c.Graphics_Background)
-        palette = QtGui.QPalette()
-        palette.setBrush(QtGui.QPalette.Background, background)
-        BattleWindow.setMinimumSize(QtCore.QSize(c.Screen_Min_Size[0],c.Screen_Min_Size[1]))
+        background =  QPixmap(c.Graphics_Background)
+        palette = QPalette()
+        palette.setBrush(QPalette.Background, QBrush(background))
+        BattleWindow.setMinimumSize(QSize(c.Screen_Min_Size[0],c.Screen_Min_Size[1]))
         BattleWindow.setAutoFillBackground(True)
-        self.centralWidget = QtGui.QWidget(BattleWindow)
-        self.gridLayout = QtGui.QGridLayout(self.centralWidget)
+        self.centralWidget = QWidget(BattleWindow)
+        self.gridLayout = QGridLayout(self.centralWidget)
         self.gridLayout.setVerticalSpacing(0)
         #Label
         self.setupZoneText("Spring, 1811", 10000)
@@ -265,10 +267,10 @@ class Ui_BattleWindow(object):
         self.setupMainView()
         BattleWindow.setPalette(palette)
         BattleWindow.setCentralWidget(self.centralWidget)
-        QtCore.QMetaObject.connectSlotsByName(BattleWindow)
+        QMetaObject.connectSlotsByName(BattleWindow)
     
 
-class CustomButton(QtGui.QPushButton):
+class CustomButton(QPushButton):
     text = ""
    
 
@@ -285,7 +287,7 @@ class CustomButton(QtGui.QPushButton):
         self.label.setText("")
         super().leaveEvent(event)
 
-class ControlMainWindow(QtGui.QMainWindow):
+class ControlMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(ControlMainWindow, self).__init__(parent)
         self.ui = Ui_BattleWindow()
@@ -294,7 +296,7 @@ class ControlMainWindow(QtGui.QMainWindow):
 
  
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     mySW = ControlMainWindow()
     mySW.showMaximized()
     sys.exit(app.exec_())

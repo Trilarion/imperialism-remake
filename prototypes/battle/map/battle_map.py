@@ -17,10 +17,10 @@
 import math
 
 from enum import Enum
-from PySide import QtGui, QtCore
 from base import constants as c
-
-
+from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsSimpleTextItem
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QBrush, QPainterPath, QFont, QColor, QPen
 """
     Defines a battle.
 """
@@ -56,8 +56,8 @@ class TerrainType(Enum):
     Sand = 1
     River = 2
     
-DefaultBrushColor = QtCore.Qt.GlobalColor.darkGreen
-DefaultBrush = QtGui.QBrush(DefaultBrushColor)
+DefaultBrushColor = Qt.darkGreen
+DefaultBrush = QBrush(DefaultBrushColor)
 
 
 class Terrain:
@@ -68,16 +68,16 @@ class Terrain:
     @staticmethod
     def getTerrainBrush(int_type):
         if int_type == TerrainType.Grass:
-            return QtGui.QBrush(QtCore.Qt.GlobalColor.darkGreen)
+            return QBrush(Qt.darkGreen)
         elif int_type == TerrainType.Sand:
-            return QtGui.QBrush(QtGui.QColor(254,232,214))
+            return QBrush(QColor(254,232,214))
         elif int_type == TerrainType.River:
-            return QtGui.QBrush(QtGui.QColor(64,64,255))
+            return QBrush(QColor(64,64,255))
         else:
             return DefaultBrush;
 
 
-class BattleMap(QtCore.QObject):
+class BattleMap():
 
     def __init__(self):
         """
@@ -236,21 +236,21 @@ class BattleMap(QtCore.QObject):
 
 
 
-class BattleMapView(QtGui.QGraphicsView):
+class BattleMapView(QGraphicsView):
     """
         The big map holding the game map and everything.
     """
 
-    tile_at_focus_changed = QtCore.Signal(int, int)
+    tile_at_focus_changed = pyqtSignal(int, int)
 
     def __init__(self, battle):
         super().__init__()
-        self.scene = QtGui.QGraphicsScene()
+        self.scene = QGraphicsScene()
         self.setScene(self.scene)
-        #self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.setTransformationAnchor(QtGui.QGraphicsView.NoAnchor)
-        self.setResizeAnchor(QtGui.QGraphicsView.NoAnchor)
+        #self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setTransformationAnchor(QGraphicsView.NoAnchor)
+        self.setResizeAnchor(QGraphicsView.NoAnchor)
         self.setMouseTracking(True)
         self.current_column = -1
         self.current_row = -1
@@ -274,13 +274,13 @@ class BattleMapView(QtGui.QGraphicsView):
         # go through each position
         paths = {}
         for t in TerrainType:
-            paths[t] = QtGui.QPainterPath()
+            paths[t] = QPainterPath()
         for column in range(0, columns):
             for row in range(0, rows):
                 terrain = self.battle.terrain_at(column, row)
                 t = terrain.type
                 sx, sy = self.battle.scene_position(column, row)
-                font = QtGui.QFont()
+                font = QFont()
                 font.setPointSize(self.TitleSize/1.26)
                 font.setBold(False)
                 if self.battle[BattlePropertyKeyNames.FORTIFICATION_COLUMNS] == column:
@@ -293,18 +293,18 @@ class BattleMapView(QtGui.QGraphicsView):
         for t in paths:
             path = paths[t]
             path = path.simplified()
-            item = self.scene.addPath(path, brush=Terrain.getTerrainBrush(t), pen=QtGui.QPen(QtCore.Qt.transparent))
+            item = self.scene.addPath(path, brush=Terrain.getTerrainBrush(t), pen=QPen(Qt.transparent))
             item.setZValue(1)
 
         # fill the half tiles which are not part of the map
-        brush = QtGui.QBrush(QtCore.Qt.darkGreen)
+        brush = QBrush(Qt.darkGreen)
         for row in range(0, rows):
             if row % 2 == 0:
                 item = self.scene.addRect(columns * self.TitleSize, row * self.TitleSize, self.TitleSize / 2,
-                                          self.TitleSize, pen=QtGui.QPen(QtCore.Qt.transparent))
+                                          self.TitleSize, pen=QPen(Qt.transparent))
             else:
                 item = self.scene.addRect(0, row * self.TitleSize, self.TitleSize / 2, self.TitleSize,
-                                          pen=QtGui.QPen(QtCore.Qt.transparent))
+                                          pen=QPen(Qt.transparent))
             item.setBrush(brush)
             item.setZValue(1)
 
@@ -315,8 +315,8 @@ class BattleMapView(QtGui.QGraphicsView):
                 item = self.scene.addRect(sx * self.TitleSize, sy * self.TitleSize,  self.TitleSize,  self.TitleSize)
                 item.setZValue(1000)
                 text = '({},{})'.format(column, row)
-                item = QtGui.QGraphicsSimpleTextItem(text)
-                item.setBrush(QtGui.QBrush(QtCore.Qt.black))
+                item = QGraphicsSimpleTextItem(text)
+                item.setBrush(QBrush(Qt.black))
                 item.setPos((sx + 0.5) * self.TitleSize - item.boundingRect().width() / 2, sy * self.TitleSize)
                 item.setZValue(1001)
                 self.scene.addItem(item)

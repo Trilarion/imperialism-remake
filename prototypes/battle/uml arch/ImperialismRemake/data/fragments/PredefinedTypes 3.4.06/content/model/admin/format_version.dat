@@ -1,4 +1,0 @@
-#Repository version, DO NOT EDIT.
-#Mon Nov 02 14:35:15 CET 2015
-cmsnodes=Activity,ActivityDiagram,Actor,AnalystProject,Artifact,BpmnBehavior,BpmnProcessCollaborationDiagram,BpmnSubProcessDiagram,BusinessRule,BusinessRuleContainer,Class,ClassDiagram,CommunicationDiagram,CommunicationInteraction,Component,CompositeStructureDiagram,DataType,DeploymentDiagram,DiagramSet,Dictionary,EnumeratedPropertyType,ExternDocument,GenericAnalystContainer,GenericAnalystElement,Goal,GoalContainer,Interaction,Interface,LocalPropertyTable,MetaclassReference,ModuleComponent,Node,ObjectDiagram,OpaqueBehavior,Package,Profile,Project,PropertyContainer,PropertyTableDefinition,PropertyType,Requirement,RequirementContainer,Risk,RiskContainer,SequenceDiagram,Signal,StateMachine,StateMachineDiagram,StaticDiagram,Stereotype,Term,UseCase,UseCaseDiagram,
-repository_format=1
