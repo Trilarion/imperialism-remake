@@ -26,30 +26,9 @@ from base.hexagon import QHexagon
     Defines a battle.
 """
 
-
-
-
-class BattlePropertyKeyNames:
-    """
-        Key names for general properties of a battle map.
-    """
-
-    TITLE = ' battle.title'
-    DESCRIPTION = 'battle.description'
-    MAP_COLUMNS = 'map.columns'
-    MAP_ROWS = 'map.rows'
-    FORTIFICATION = 'fortification'
-    TILE_MAXSIZE = 'title.size.max'
-    FORTIFICATION_COLUMNS = 'fortification.columns'
-
-NEW_BATTLE_DEFAULT_PROPERTIES = {
-    BattlePropertyKeyNames.TITLE: 'Battle',
-    BattlePropertyKeyNames.MAP_COLUMNS: 20,
-    BattlePropertyKeyNames.FORTIFICATION_COLUMNS: 7,
-    BattlePropertyKeyNames.MAP_ROWS: 20
-
-}
-
+DEFAULT_DIAMETER = 20
+DEFAULT_FORTIFICATION_DIAMETER = 7
+SCROLL_BAR_HEIGHT = 20
 
 
 class TerrainType(Enum):
@@ -80,87 +59,23 @@ class Terrain:
 
 class BattleMap():
 
-    def __init__(self):
+    def __init__(self, diameter = DEFAULT_DIAMETER, fortification_diameter = DEFAULT_FORTIFICATION_DIAMETER):
         """
             Start with a clean state.
         """
-        super().__init__()
-        self.reset()
-        self.create_map(NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_COLUMNS],NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS],NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.FORTIFICATION_COLUMNS])
+        self.diameter = diameter
+        self.number_tiles = diameter * diameter
+        self.fortification_diameter = fortification_diameter
 
-    # noinspection PyAttributeOutsideInit
-    def reset(self):
-        """
-            Just empty
-        """
-        self._properties = {BattlePropertyKeyNames.FORTIFICATION: []}
-        self._map = {}
-
-    def create_map(self, columns, rows, fortification_columns):
-        """
-            Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
-        """
-        self._properties[BattlePropertyKeyNames.MAP_COLUMNS] = columns
-        self._properties[BattlePropertyKeyNames.MAP_ROWS] = rows
-        self._properties[BattlePropertyKeyNames.FORTIFICATION_COLUMNS] = fortification_columns
-        number_tiles = columns * rows
-        self._map = [Terrain()] * number_tiles
-        for i in range (0, self._properties[BattlePropertyKeyNames.MAP_ROWS]):
-            self._map[i+self._properties[BattlePropertyKeyNames.FORTIFICATION_COLUMNS]].fortication=True
-        
-
-    def add_fortification(self, column, row):
-        self._map[self.map_index(column, row)].fortication = True
-
-    def set_terrain_at(self, column, row, terrain):
-        """
-            Sets the terrain at a given position.
-        """
-        self._map[self.map_index(column, row)] = terrain
-
-    def terrain_at(self, column, row):
-        """
-            Returns the terrain at a given position.
-        """
-        return self._map[self.map_index(column, row)]
-
-      
-    def map_position(self, x, y):
-        """
-            Converts a scene position to a map position (or return (-1,-1) if
-        """
-        column = math.floor(x - (y % 2) / 2)
-        row = math.floor(y)
-        if row < 0 or row >= self._properties[BattlePropertyKeyNames.MAP_ROWS] or column < 0\
-                or column >= self._properties[BattlePropertyKeyNames.MAP_COLUMNS]:
-            return -1, -1
-        return column, row
+    def tileSize(self,viewHeight):
+        return (viewHeight - SCROLL_BAR_HEIGHT)/ ( (self.diameter - 1 ) * 3 / 4 + 1)
 
     @staticmethod
     def scene_position(column, row):
         """
             Converts a map position to a scene position
         """
-        # TODO move to client side, has nothing to do with server (or has it?)
         return math.sqrt(3)/2 * (column + ( (row + 1) % 2) /2), row * 3 / 4
-
-
-    
-
-    def __setitem__(self, key, value):
-        """
-            Given a key and a value, sets a battle property.
-        """
-        self._properties[key] = value
-
-    def __getitem__(self, key):
-        """
-            Given a key, returns a battle property. One can only obtain properties that have been set before.
-        """
-        if key in self._properties:
-            return self._properties[key]
-        else:
-            raise RuntimeError('Unknown property {}.'.format(key))
 
 
 
@@ -189,9 +104,9 @@ class BattleMapView(QGraphicsView):
             When a battle is loaded new we need to draw the whole map new.
         """
         self.scene.clear()
-        self.TitleSize = (self.height() - 20)/ ( (NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS] - 1 ) * 3 / 4 + 1)
-        columns = self.battle[BattlePropertyKeyNames.MAP_COLUMNS]
-        rows = self.battle[BattlePropertyKeyNames.MAP_ROWS]
+        self.TitleSize = self.battle.tileSize(self.height())
+        columns = self.battle.diameter
+        rows = self.battle.diameter
 
         width = (columns + 0.5) * self.TitleSize
         height = rows * self.TitleSize 
@@ -205,7 +120,7 @@ class BattleMapView(QGraphicsView):
         center_x, center_y = size_main/2 +  self.TitleSize/2, size_main/2 -  3 * self.TitleSize/4
         main_hexa = QHexagon(center_x, center_y,  size_main,0)
         # draw the fortification hexagon
-        size_fort = math.sqrt(3)/2 * (self.battle[BattlePropertyKeyNames.FORTIFICATION_COLUMNS] - 0.5) * self.TitleSize 
+        size_fort = math.sqrt(3)/2 * (self.battle.fortification_diameter - 0.5) * self.TitleSize 
         center_x, center_y = size_main/2 +  self.TitleSize/2, size_main/2 - self.TitleSize/4
         fort_hexa = QHexagon(center_x, center_y,  size_fort,0)
         self.scene.addPolygon(fort_hexa)
@@ -230,11 +145,12 @@ class BattleMapView(QGraphicsView):
     def resizeEvent(self, evt=None):
         self.redraw_map()
 
+    #TODO optimize ....
     def mousePressEvent(self, event):
         position = QPointF(event.pos())
 
-        columns = self.battle[BattlePropertyKeyNames.MAP_COLUMNS]
-        rows = self.battle[BattlePropertyKeyNames.MAP_ROWS]
+        columns = self.battle.diameter
+        rows = self.battle.diameter
 
         # draw the main hexagon
         sx, sy = self.battle.scene_position(columns/2, rows/2)        
