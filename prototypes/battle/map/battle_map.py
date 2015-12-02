@@ -20,7 +20,7 @@ from enum import Enum
 from base import constants as c
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsSimpleTextItem
 from PyQt5.QtCore import Qt, pyqtSignal, QPointF
-from PyQt5.QtGui import QBrush, QPainterPath, QFont, QColor, QPen
+from PyQt5.QtGui import QBrush, QPainterPath, QFont, QColor, QPen, QCursor
 from base.hexagon import QHexagon
 """
     Defines a battle.
@@ -44,9 +44,9 @@ class BattlePropertyKeyNames:
 
 NEW_BATTLE_DEFAULT_PROPERTIES = {
     BattlePropertyKeyNames.TITLE: 'Battle',
-    BattlePropertyKeyNames.MAP_COLUMNS: 16,
-    BattlePropertyKeyNames.FORTIFICATION_COLUMNS: 6,
-    BattlePropertyKeyNames.MAP_ROWS: 16
+    BattlePropertyKeyNames.MAP_COLUMNS: 20,
+    BattlePropertyKeyNames.FORTIFICATION_COLUMNS: 7,
+    BattlePropertyKeyNames.MAP_ROWS: 20
 
 }
 
@@ -206,8 +206,9 @@ class BattleMapView(QGraphicsView):
         main_hexa = QHexagon(center_x, center_y,  size_main,0)
         # draw the fortification hexagon
         size_fort = math.sqrt(3)/2 * (self.battle[BattlePropertyKeyNames.FORTIFICATION_COLUMNS] - 0.5) * self.TitleSize 
-        center_x, center_y = size_main/2 +  self.TitleSize/2, size_main/2 -  3 * self.TitleSize/4
+        center_x, center_y = size_main/2 +  self.TitleSize/2, size_main/2 - self.TitleSize/4
         fort_hexa = QHexagon(center_x, center_y,  size_fort,0)
+        self.scene.addPolygon(fort_hexa)
         # draw the grid
         for row in range(0, rows):
             for column in range(0, columns):
@@ -228,4 +229,30 @@ class BattleMapView(QGraphicsView):
 
     def resizeEvent(self, evt=None):
         self.redraw_map()
+
+    def mousePressEvent(self, event):
+        position = QPointF(event.pos())
+
+        columns = self.battle[BattlePropertyKeyNames.MAP_COLUMNS]
+        rows = self.battle[BattlePropertyKeyNames.MAP_ROWS]
+
+        # draw the main hexagon
+        sx, sy = self.battle.scene_position(columns/2, rows/2)        
+        size_main = math.sqrt(3)/2 * (rows - 1) * self.TitleSize 
+        center_x, center_y = size_main/2 +  self.TitleSize/2, size_main/2 -  3 * self.TitleSize/4
+        main_hexa = QHexagon(center_x, center_y,  size_main,0)
+
+        # go each position of the grid
+        for row in range(0, rows):
+            for column in range(0, columns):
+                sx, sy = self.battle.scene_position(column, row)
+                center_x, center_y = (sx + 0.5) * self.TitleSize, (sy + 0.5 ) * self.TitleSize
+                hexa = QHexagon(center_x, center_y,  self.TitleSize,30)
+                if hexa.intersected(main_hexa):
+                    if hexa.containsPoint(position,Qt.OddEvenFill):
+                        print("pressed here: " + str(column) + ", " + str(row))
+                        self.update()
+                        return
+        print("outside combat zone")
+        self.update()
 
