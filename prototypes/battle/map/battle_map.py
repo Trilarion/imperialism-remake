@@ -19,9 +19,9 @@ import math
 from enum import Enum
 from base import constants as c
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsSimpleTextItem
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QPointF
 from PyQt5.QtGui import QBrush, QPainterPath, QFont, QColor, QPen
-from base import drawing
+from base.hexagon import QHexagon
 """
     Defines a battle.
 """
@@ -45,7 +45,7 @@ class BattlePropertyKeyNames:
 NEW_BATTLE_DEFAULT_PROPERTIES = {
     BattlePropertyKeyNames.TITLE: 'Battle',
     BattlePropertyKeyNames.MAP_COLUMNS: 16,
-    BattlePropertyKeyNames.FORTIFICATION_COLUMNS: 29,
+    BattlePropertyKeyNames.FORTIFICATION_COLUMNS: 6,
     BattlePropertyKeyNames.MAP_ROWS: 16
 
 }
@@ -124,6 +124,7 @@ class BattleMap():
         """
         return self._map[self.map_index(column, row)]
 
+      
     def map_position(self, x, y):
         """
             Converts a scene position to a map position (or return (-1,-1) if
@@ -141,84 +142,10 @@ class BattleMap():
             Converts a map position to a scene position
         """
         # TODO move to client side, has nothing to do with server (or has it?)
-        return math.sqrt(3)/2 * (column + (row % 2) /2), row * 3 / 4
+        return math.sqrt(3)/2 * (column + ( (row + 1) % 2) /2), row * 3 / 4
 
-    def map_index(self, column, row):
-        """
-            Calculates the index in the linear map for a given 2D position (first row, then column)?
-        """
-        index = row * self._properties[BattlePropertyKeyNames.MAP_COLUMNS] + column
-        return index
 
-    def get_neighbor_position(self, column, row, direction):
-        """
-            Given a positon (column, row) and a direction (c.TileDirections) return the position of the next neighbor
-            tile in that direction given our staggered tile layout where the second and all other odd rows are shifted
-            half a tile to the right. Returns None if we would be outside of the map area.
-        """
-        if direction is c.TileDirections.West:
-            # west
-            if column > 0:
-                return [column - 1, row]
-            else:
-                return None
-        elif direction is c.TileDirections.NorthWest:
-            # north-west
-            if row > 0:
-                if row % 2 == 0:
-                    # even rows (0, 2, 4, ..)
-                    return [column - 1, row - 1]
-                else:
-                    # odd rows (1, 3, 5, ..)
-                    return [column, row - 1]
-            else:
-                return None
-        elif direction is c.TileDirections.NorthEast:
-            # north-east
-            if row > 0:
-                if row % 2 == 0:
-                    # even rows (0, 2, 4, ..)
-                    return [column, row - 1]
-                else:
-                    # odd rows (1, 3, 5, ..)
-                    return [column + 1, row - 1]
-            else:
-                return None
-        elif direction is c.TileDirections.East:
-            # east
-            if column < self._properties[BattlePropertyKeyNames.MAP_COLUMNS] - 1:
-                return [column + 1, row]
-            else:
-                return None
-        elif direction is c.TileDirections.SouthEast:
-            # south-east
-            if row < self._properties[BattlePropertyKeyNames.MAP_ROWS] - 1:
-                if row % 2 == 0:
-                    return [column, row + 1]
-                else:
-                    return [column + 1, row + 1]
-            else:
-                return None
-        elif direction is c.TileDirections.SouthWest:
-            # south-west
-            if row < self._properties[BattlePropertyKeyNames.MAP_ROWS] - 1:
-                if row % 2 == 0:
-                    # even rows (0, 2, 4, ..)
-                    return [column - 1, row + 1]
-                else:
-                    # odd rows (1, 3, 5, ..)
-                    return [column, row + 1]
-            else:
-                return None
-
-    def get_neighbored_tiles(self, column, row):
-        """
-            For all directions, get all neighbored tiles.
-        """
-        tiles = []
-        for direction in c.TileDirections:
-            tiles.append(self.get_neighbor_position(column, row, direction))
-        return tiles
+    
 
     def __setitem__(self, key, value):
         """
@@ -272,21 +199,32 @@ class BattleMapView(QGraphicsView):
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
 
-
-                
-                
-        # draw the grid and the coordinates
+        # draw the main hexagon
+        sx, sy = self.battle.scene_position(columns/2, rows/2)        
+        size_main = math.sqrt(3)/2 * (rows - 1) * self.TitleSize 
+        center_x, center_y = size_main/2 +  self.TitleSize/2, size_main/2 -  3 * self.TitleSize/4
+        main_hexa = QHexagon(center_x, center_y,  size_main,0)
+        # draw the fortification hexagon
+        size_fort = math.sqrt(3)/2 * (self.battle[BattlePropertyKeyNames.FORTIFICATION_COLUMNS] - 0.5) * self.TitleSize 
+        center_x, center_y = size_main/2 +  self.TitleSize/2, size_main/2 -  3 * self.TitleSize/4
+        fort_hexa = QHexagon(center_x, center_y,  size_fort,0)
+        # draw the grid
         for row in range(0, rows):
             for column in range(0, columns):
                 sx, sy = self.battle.scene_position(column, row)
-                item = self.scene.addPolygon(drawing.hexagon((sx + 0.5) * self.TitleSize, (sy + 0.5 ) * self.TitleSize,  self.TitleSize/2))
-                item.setZValue(1000)
-                text = '({},{})'.format(column, row)
-                item = QGraphicsSimpleTextItem(text)
-                item.setBrush(QBrush(Qt.black))
-                item.setPos((sx + 0.5) * self.TitleSize - item.boundingRect().width() / 2, (sy + 0.5) * self.TitleSize)
-                item.setZValue(1001)
-                self.scene.addItem(item)
+                center_x, center_y = (sx + 0.5) * self.TitleSize, (sy + 0.5 ) * self.TitleSize
+                hexa = QHexagon(center_x, center_y,  self.TitleSize,30)
+                if hexa.intersected(main_hexa):
+                    item = self.scene.addPolygon(hexa)
+                    if hexa.intersected(fort_hexa):
+                        item.setBrush(QBrush(Qt.red))
+                    item.setZValue(1000)
+                    text = '({},{})'.format(column, row)
+                    item = QGraphicsSimpleTextItem(text)
+                    item.setBrush(QBrush(Qt.black))
+                    item.setPos((sx + 0.5) * self.TitleSize - item.boundingRect().width() / 2, (sy + 0.5) * self.TitleSize)
+                    item.setZValue(1001)
+                    self.scene.addItem(item)
 
     def resizeEvent(self, evt=None):
         self.redraw_map()
