@@ -21,6 +21,7 @@ from base import constants as c
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsSimpleTextItem
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QBrush, QPainterPath, QFont, QColor, QPen
+from base import drawing
 """
     Defines a battle.
 """
@@ -43,9 +44,9 @@ class BattlePropertyKeyNames:
 
 NEW_BATTLE_DEFAULT_PROPERTIES = {
     BattlePropertyKeyNames.TITLE: 'Battle',
-    BattlePropertyKeyNames.MAP_COLUMNS: 35,
+    BattlePropertyKeyNames.MAP_COLUMNS: 16,
     BattlePropertyKeyNames.FORTIFICATION_COLUMNS: 29,
-    BattlePropertyKeyNames.MAP_ROWS: 17
+    BattlePropertyKeyNames.MAP_ROWS: 16
 
 }
 
@@ -140,7 +141,7 @@ class BattleMap():
             Converts a map position to a scene position
         """
         # TODO move to client side, has nothing to do with server (or has it?)
-        return column + (row % 2) / 2, row
+        return math.sqrt(3)/2 * (column + (row % 2) /2), row * 3 / 4
 
     def map_index(self, column, row):
         """
@@ -261,63 +262,29 @@ class BattleMapView(QGraphicsView):
             When a battle is loaded new we need to draw the whole map new.
         """
         self.scene.clear()
-        self.TitleSize = (self.height()-18)/NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS]
+        self.TitleSize = (self.height() - 20)/ ( (NEW_BATTLE_DEFAULT_PROPERTIES[BattlePropertyKeyNames.MAP_ROWS] - 1 ) * 3 / 4 + 1)
         columns = self.battle[BattlePropertyKeyNames.MAP_COLUMNS]
         rows = self.battle[BattlePropertyKeyNames.MAP_ROWS]
 
         width = (columns + 0.5) * self.TitleSize
-        height = rows * self.TitleSize
+        height = rows * self.TitleSize 
         self.scene.setSceneRect(0, 0, width, height)
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
 
-        # go through each position
-        paths = {}
-        for t in TerrainType:
-            paths[t] = QPainterPath()
-        for column in range(0, columns):
-            for row in range(0, rows):
-                terrain = self.battle.terrain_at(column, row)
-                t = terrain.type
-                sx, sy = self.battle.scene_position(column, row)
-                font = QFont()
-                font.setPointSize(self.TitleSize/1.26)
-                font.setBold(False)
-                if self.battle[BattlePropertyKeyNames.FORTIFICATION_COLUMNS] == column:
-                    if row % 2 == 0:
-                        paths[t].addText(sx * self.TitleSize + self.TitleSize/2, sy * self.TitleSize + self.TitleSize/1.26,font, "\\")
-                    else:
-                        paths[t].addText(sx * self.TitleSize + self.TitleSize/8, sy * self.TitleSize + self.TitleSize/1.26,font, "/")
+
                 
-                paths[t].addRect(sx * self.TitleSize, sy * self.TitleSize, self.TitleSize, self.TitleSize)
-        for t in paths:
-            path = paths[t]
-            path = path.simplified()
-            item = self.scene.addPath(path, brush=Terrain.getTerrainBrush(t), pen=QPen(Qt.transparent))
-            item.setZValue(1)
-
-        # fill the half tiles which are not part of the map
-        brush = QBrush(Qt.darkGreen)
-        for row in range(0, rows):
-            if row % 2 == 0:
-                item = self.scene.addRect(columns * self.TitleSize, row * self.TitleSize, self.TitleSize / 2,
-                                          self.TitleSize, pen=QPen(Qt.transparent))
-            else:
-                item = self.scene.addRect(0, row * self.TitleSize, self.TitleSize / 2, self.TitleSize,
-                                          pen=QPen(Qt.transparent))
-            item.setBrush(brush)
-            item.setZValue(1)
-
+                
         # draw the grid and the coordinates
-        for column in range(0, columns):
-            for row in range(0, rows):
+        for row in range(0, rows):
+            for column in range(0, columns):
                 sx, sy = self.battle.scene_position(column, row)
-                item = self.scene.addRect(sx * self.TitleSize, sy * self.TitleSize,  self.TitleSize,  self.TitleSize)
+                item = self.scene.addPolygon(drawing.hexagon((sx + 0.5) * self.TitleSize, (sy + 0.5 ) * self.TitleSize,  self.TitleSize/2))
                 item.setZValue(1000)
                 text = '({},{})'.format(column, row)
                 item = QGraphicsSimpleTextItem(text)
                 item.setBrush(QBrush(Qt.black))
-                item.setPos((sx + 0.5) * self.TitleSize - item.boundingRect().width() / 2, sy * self.TitleSize)
+                item.setPos((sx + 0.5) * self.TitleSize - item.boundingRect().width() / 2, (sy + 0.5) * self.TitleSize)
                 item.setZValue(1001)
                 self.scene.addItem(item)
 
