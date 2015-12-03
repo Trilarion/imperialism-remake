@@ -196,23 +196,11 @@ class Ui_BattleWindow(object):
         transform = QTransform()  
         transform.scale(-1, 1)
         return QPixmap(pixmap.transformed(transform))
-        
-        
-    def transformflag(self,pixmap, type):
-        transform = QTransform()
-        if type == 1:
-            transform.scale(-1, 1)
-            transform.rotate(45)
-        elif type == 2 :
-            transform.rotate(45)
-        pixmap = QPixmap(pixmap.transformed(transform))
-        return pixmap.scaled(45, 130)  
 
-    def setupFlagView(self,flag_attacker,flag_defender):
+    def setupFlagView(self,flag_attacker):
         self.graphicsScene_flag= QGraphicsScene()
-        self.graphicsScene_flag.addPixmap(self.transformflag(QPixmap(flag_attacker),1)).setPos(-20,0)      
-        self.graphicsScene_flag.addPixmap(self.transformflag(QPixmap(flag_defender),2))
-        
+        img = QPixmap(flag_attacker).scaled(90,120)
+        self.graphicsScene_flag.addPixmap(img)         
         self.graphicsView_flag = QGraphicsView(self.graphicsScene_flag)
         self.graphicsView_flag.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -262,7 +250,7 @@ class Ui_BattleWindow(object):
         #Current Unit View
         self.setupCurrentUnitView(random.choice(c.Graphics_Unit_list))
         #Flag view
-        self.setupFlagView(random.choice(c.Graphics_Flag_list),random.choice(c.Graphics_Flag_list))
+        self.setupFlagView(random.choice(c.Graphics_Coat_of_arms_list))
         #Main view
         self.setupMainView()
         BattleWindow.setPalette(palette)

@@ -134,6 +134,8 @@ class BattleMapView(QGraphicsView):
                     item = self.scene.addPolygon(hexa)
                     if hexa.intersected(fort_hexa):
                         item.setBrush(QBrush(Qt.red))
+                    else:
+                        item.setBrush(QBrush(Qt.green))
                     item.setZValue(1000)
                     text = '({},{})'.format(column, row)
                     item = QGraphicsSimpleTextItem(text)

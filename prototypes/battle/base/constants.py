@@ -50,6 +50,7 @@ Graphics_Folder = extend(Artwork_Folder, 'graphics')
 Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 Graphics_Map_Folder = extend(Graphics_Folder, 'map')
 Graphics_Flag_Folder = extend(Graphics_Folder, 'flag')
+Graphics_Coat_Of_Map_Folder = extend(Graphics_Folder, 'coat_of_arms')
 Graphics_Unit_Folder = extend(Graphics_Folder, 'unit')
 
 #UI file
@@ -61,61 +62,61 @@ Graphics_Retreat = extend(Graphics_UI_Folder,'retreat.png')
 Graphics_Target = extend(Graphics_UI_Folder,'target.png')
 
 #Flag file
-Graphics_Flag0 = extend(Graphics_Flag_Folder,'flag0.png')
-Graphics_Flag1 = extend(Graphics_Flag_Folder,'flag1.png')
-Graphics_Flag2 = extend(Graphics_Flag_Folder,'flag2.png')
-Graphics_Flag3 = extend(Graphics_Flag_Folder,'flag3.png')
-Graphics_Flag4 = extend(Graphics_Flag_Folder,'flag4.png')
-Graphics_Flag5 = extend(Graphics_Flag_Folder,'flag5.png')
-Graphics_Flag6 = extend(Graphics_Flag_Folder,'flag6.png')
-Graphics_Flag7 = extend(Graphics_Flag_Folder,'flag7.png')
-Graphics_Flag8 = extend(Graphics_Flag_Folder,'flag8.png')
-Graphics_Flag9 = extend(Graphics_Flag_Folder,'flag9.png')
-Graphics_Flag10 = extend(Graphics_Flag_Folder,'flag10.png')
-Graphics_Flag11 = extend(Graphics_Flag_Folder,'flag11.png')
-Graphics_Flag_list = [Graphics_Flag0,
-    Graphics_Flag1,
-    Graphics_Flag2,
-    Graphics_Flag3,
-    Graphics_Flag4,
-    Graphics_Flag5,
-    Graphics_Flag6,
-    Graphics_Flag7,
-    Graphics_Flag8,
-    Graphics_Flag9,
-    Graphics_Flag10,
-    Graphics_Flag11,
+Flag_of_Algeria = extend(Graphics_Flag_Folder,'Flag_of_Algeria.svg')
+Flag_of_Bavaria = extend(Graphics_Flag_Folder,'Flag_of_Bavaria.svg')
+Flag_of_Denmark = extend(Graphics_Flag_Folder,'Flag_of_Denmark.svg')
+Flag_of_Egypt = extend(Graphics_Flag_Folder,'Flag_of_Egypt.svg')
+Flag_of_France = extend(Graphics_Flag_Folder,'Flag_of_France.svg')
+Flag_of_Hanover = extend(Graphics_Flag_Folder,'Flag_of_Hanover.svg')
+Flag_of_Russia = extend(Graphics_Flag_Folder,'Flag_of_Russia.svg')
+Flag_of_Spain = extend(Graphics_Flag_Folder,'Flag_of_Spain.svg')
+Flag_of_Sweden = extend(Graphics_Flag_Folder,'Flag_of_Sweden.svg')
+Flag_of_Switzerland = extend(Graphics_Flag_Folder,'Flag_of_Switzerland.svg')
+Flag_of_the_Kingdom_of_Sardinia = extend(Graphics_Flag_Folder,'Flag_of_the_Kingdom_of_Sardinia.svg')
+Flag_of_the_Kingdom_of_the_Two_Sicilies = extend(Graphics_Flag_Folder,'Flag_of_the_Kingdom_of_the_Two_Sicilies.svg')
+Flag_of_the_Netherlands = extend(Graphics_Flag_Folder,'Flag_of_the_Netherlands.svg')
+Flag_of_the_Papal_States = extend(Graphics_Flag_Folder,'Flag_of_the_Papal_States.svg')
+Flag_of_the_United_Kingdom = extend(Graphics_Flag_Folder,'Flag_of_the_United_Kingdom.svg')
+Flag_of_Portugal = extend(Graphics_Flag_Folder,'Flag_of_Portugal.svg')
+Flag_of_Ottoman = extend(Graphics_Flag_Folder,'Flag_of_Ottoman.svg')
+Graphics_Flag_list = [
+    Flag_of_Algeria,
+    Flag_of_Bavaria,
+    Flag_of_Denmark,
+    Flag_of_Egypt,
+    Flag_of_France,
+    Flag_of_Hanover,
+    Flag_of_Russia,
+    Flag_of_Spain,
+    Flag_of_Sweden,
+    Flag_of_Switzerland,
+    Flag_of_the_Kingdom_of_Sardinia,
+    Flag_of_the_Kingdom_of_the_Two_Sicilies,
+    Flag_of_the_Netherlands,
+    Flag_of_the_Papal_States,
+    Flag_of_the_United_Kingdom,
+    Flag_of_Portugal,
+    Flag_of_Ottoman
+]
+#Coat of Map
+Coat_of_arms_of_France = extend(Graphics_Coat_Of_Map_Folder,'Coat_of_arms_of_France.svg')
+Coat_of_arms_of_Italy = extend(Graphics_Coat_Of_Map_Folder,'Coat_of_arms_of_Italy.svg')
+Coat_of_arms_of_Russian_Empire = extend(Graphics_Coat_Of_Map_Folder,'Coat_of_arms_of_Russian_Empire.svg')
+Coat_of_arms_ottoman = extend(Graphics_Coat_Of_Map_Folder,'Coat_of_arms_ottoman.svg')
+Graphics_Coat_of_arms_list = [
+    Coat_of_arms_of_France,
+    Coat_of_arms_of_Italy,
+    Coat_of_arms_of_Russian_Empire,
+    Coat_of_arms_ottoman,
 ]
 
 #Unit File
-Graphics_Unit_0_0 = extend(Graphics_Unit_Folder,'unit0_0.png')
-Graphics_Unit_0_1 = extend(Graphics_Unit_Folder,'unit0_1.png')
-Graphics_Unit_1_0 = extend(Graphics_Unit_Folder,'unit1_0.png')
-Graphics_Unit_1_1 = extend(Graphics_Unit_Folder,'unit1_1.png')
-Graphics_Unit_2_0 = extend(Graphics_Unit_Folder,'unit2_0.png')
-Graphics_Unit_2_1 = extend(Graphics_Unit_Folder,'unit2_1.png')
-Graphics_Unit_3_0 = extend(Graphics_Unit_Folder,'unit3_0.png')
-Graphics_Unit_3_1 = extend(Graphics_Unit_Folder,'unit3_1.png')
-Graphics_Unit_4_0 = extend(Graphics_Unit_Folder,'unit4_0.png')
-Graphics_Unit_4_1 = extend(Graphics_Unit_Folder,'unit4_1.png')
-Graphics_Unit_5_0 = extend(Graphics_Unit_Folder,'unit5_0.png')
-Graphics_Unit_5_1 = extend(Graphics_Unit_Folder,'unit5_1.png')
-Graphics_Unit_6_0 = extend(Graphics_Unit_Folder,'unit6_0.png')
-Graphics_Unit_6_1 = extend(Graphics_Unit_Folder,'unit6_1.png')
-Graphics_Unit_7_0 = extend(Graphics_Unit_Folder,'unit7_0.png')
-Graphics_Unit_7_1 = extend(Graphics_Unit_Folder,'unit7_1.png')
-Graphics_Unit_8_0 = extend(Graphics_Unit_Folder,'unit8_0.png')
-Graphics_Unit_8_1 = extend(Graphics_Unit_Folder,'unit8_1.png')
+infantry_shoot = extend(Graphics_Unit_Folder,'infantry.shoot.png')
+infantry_stand = extend(Graphics_Unit_Folder,'infantry.stand.png')
+infantry_charge = extend(Graphics_Unit_Folder,'infantry.charge.png')
+
 Graphics_Unit_list = [
-	Graphics_Unit_0_0, Graphics_Unit_0_1, 
-    Graphics_Unit_1_0, Graphics_Unit_1_1, 
-    Graphics_Unit_2_0, Graphics_Unit_2_1, 
-    Graphics_Unit_3_0, Graphics_Unit_3_1, 
-    Graphics_Unit_4_0, Graphics_Unit_4_1, 
-    Graphics_Unit_5_0, Graphics_Unit_5_1, 
-    Graphics_Unit_6_0, Graphics_Unit_6_1, 
-    Graphics_Unit_7_0, Graphics_Unit_7_1, 
-    Graphics_Unit_8_0, Graphics_Unit_8_1
+	infantry_shoot, infantry_stand, infantry_charge
 ]
 
 
