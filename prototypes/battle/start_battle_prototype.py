@@ -16,7 +16,7 @@
 
 import sys, math, random, map.battle_map
 from base import constants as c
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow, QGridLayout, QLabel, QSizePolicy, QSpacerItem, QSizePolicy,  QGraphicsScene, QGraphicsView
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow, QGridLayout, QLabel, QSizePolicy, QSpacerItem, QSizePolicy,  QGraphicsScene, QGraphicsRectItem, QGraphicsView
 from PyQt5.QtGui import QPixmap, QPalette, QBrush, QFont, QIcon,  QTransform
 from PyQt5.QtCore import QSize, Qt, QMetaObject
 
@@ -136,13 +136,13 @@ class Ui_BattleWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.pushButton_help.sizePolicy().hasHeightForWidth())
         self.pushButton_help.setSizePolicy(sizePolicy)
-        self.pushButton_help.setMinimumSize(QSize(90, 90))
-        self.pushButton_help.setMaximumSize(QSize(90, 90))
+        self.pushButton_help.setMinimumSize(QSize(80, 80))
+        self.pushButton_help.setMaximumSize(QSize(80, 80))
         self.pushButton_help.setText("")
         icon3 = QIcon()
         icon3.addPixmap(QPixmap(c.Graphics_Help), QIcon.Normal, QIcon.Off)
         self.pushButton_help.setIcon(icon3)
-        self.pushButton_help.setIconSize(QSize(80, 80))
+        self.pushButton_help.setIconSize(QSize(75, 75))
         self.gridLayout.addWidget(self.pushButton_help, 0, 1, 2, 1)   
         
     
@@ -163,32 +163,43 @@ class Ui_BattleWindow(object):
         self.pushButton_auto.setIconSize(QSize(80, 80))
         self.gridLayout.addWidget(self.pushButton_auto, 12, 1, 1, 1) 
        
-        
+    def addUnit(self, scene, size, unitPixmapPath, flagPixmapPath, miror):
+        unitPixmap = QPixmap(unitPixmapPath).scaled(size * 90/100, size * 90/100)
+        if miror:
+            unitPixmap = self.mirorPixmap(unitPixmap)
+        scene.addPixmap(unitPixmap)
+        item = scene.addPixmap(self.mirorPixmap(QPixmap(flagPixmapPath)).scaled(size * 23/100, 13/100 * size))
+        item.setPos(0,80/100 * size)
+        item1 = QGraphicsRectItem(0,0,size * 60 / 100,5)
+        item1.setBrush(QBrush(Qt.green))
+        item1.setPos(size * 25/100,81/100 * size)
+        scene.addItem(item1)
         
     def setupTargetedUnitView(self,targetedUnit):
+    
         self.graphicsScene_targetedUnit= QGraphicsScene()
-        self.graphicsScene_targetedUnit.addPixmap(self.mirorPixmap(QPixmap(targetedUnit)).scaled(75, 75))
+        self.addUnit(self.graphicsScene_targetedUnit, 60, targetedUnit, c.Flag_of_France, True)
         self.graphicsView_targetedUnit = QGraphicsView(self.graphicsScene_targetedUnit)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_targetedUnit.sizePolicy().hasHeightForWidth())
         self.graphicsView_targetedUnit.setSizePolicy(sizePolicy)
-        self.graphicsView_targetedUnit.setMinimumSize(QSize(90, 90))
-        self.graphicsView_targetedUnit.setMaximumSize(QSize(90, 90))
+        self.graphicsView_targetedUnit.setMinimumSize(QSize(60, 60))
+        self.graphicsView_targetedUnit.setMaximumSize(QSize(60, 60))
         self.gridLayout.addWidget(self.graphicsView_targetedUnit, 9, 1, 1, 1,Qt.AlignCenter) 
         
     def setupCurrentUnitView(self,currentUnit):   
         self.graphicsScene_currentUnit= QGraphicsScene()
-        self.graphicsScene_currentUnit.addPixmap(QPixmap(currentUnit).scaled(75, 75))
+        self.addUnit(self.graphicsScene_currentUnit, 60, currentUnit, c.Flag_of_Spain, False)
         self.graphicsView_currentUnit = QGraphicsView(self.graphicsScene_currentUnit)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsView_currentUnit.sizePolicy().hasHeightForWidth())
         self.graphicsView_currentUnit.setSizePolicy(sizePolicy)
-        self.graphicsView_currentUnit.setMinimumSize(QSize(90, 90))
-        self.graphicsView_currentUnit.setMaximumSize(QSize(90, 90))
+        self.graphicsView_currentUnit.setMinimumSize(QSize(60, 60))
+        self.graphicsView_currentUnit.setMaximumSize(QSize(60, 60))
         self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1,Qt.AlignCenter)
        
        
@@ -197,22 +208,22 @@ class Ui_BattleWindow(object):
         transform.scale(-1, 1)
         return QPixmap(pixmap.transformed(transform))
 
-    def setupFlagView(self,flag_attacker):
-        self.graphicsScene_flag= QGraphicsScene()
-        img = QPixmap(flag_attacker).scaled(90,120)
-        self.graphicsScene_flag.addPixmap(img)         
-        self.graphicsView_flag = QGraphicsView(self.graphicsScene_flag)
-        self.graphicsView_flag.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    def setupCoatOfArmView(self,coatOfArm_attacker):
+        self.graphicsScene_coatOfArm= QGraphicsScene()
+        img = QPixmap(coatOfArm_attacker).scaled(90,120)
+        self.graphicsScene_coatOfArm.addPixmap(img)         
+        self.graphicsView_coatOfArm = QGraphicsView(self.graphicsScene_coatOfArm)
+        self.graphicsView_coatOfArm.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graphicsView_flag.sizePolicy().hasHeightForWidth())       
-        self.graphicsView_flag.setSizePolicy(sizePolicy)
-        self.graphicsView_flag.setMinimumSize(QSize(90, 120))
-        self.graphicsView_flag.setMaximumSize(QSize(90, 120))
-        self.graphicsView_flag.setStyleSheet("border-style: none;background: transparent")
-        self.graphicsView_flag.setCacheMode(QGraphicsView.CacheBackground)
-        self.gridLayout.addWidget(self.graphicsView_flag, 3, 1, 1, 1)       
+        sizePolicy.setHeightForWidth(self.graphicsView_coatOfArm.sizePolicy().hasHeightForWidth())       
+        self.graphicsView_coatOfArm.setSizePolicy(sizePolicy)
+        self.graphicsView_coatOfArm.setMinimumSize(QSize(90, 120))
+        self.graphicsView_coatOfArm.setMaximumSize(QSize(90, 120))
+        self.graphicsView_coatOfArm.setStyleSheet("border-style: none;background: transparent")
+        self.graphicsView_coatOfArm.setCacheMode(QGraphicsView.CacheBackground)
+        self.gridLayout.addWidget(self.graphicsView_coatOfArm, 3, 1, 1, 1)       
 
         
     def setupMainView(self):
@@ -249,8 +260,8 @@ class Ui_BattleWindow(object):
         self.setupTargetedUnitView(random.choice(c.Graphics_Unit_list))
         #Current Unit View
         self.setupCurrentUnitView(random.choice(c.Graphics_Unit_list))
-        #Flag view
-        self.setupFlagView(random.choice(c.Graphics_Coat_of_arms_list))
+        #Coat of Arm view
+        self.setupCoatOfArmView(random.choice(c.Graphics_Coat_of_arms_list))
         #Main view
         self.setupMainView()
         BattleWindow.setPalette(palette)

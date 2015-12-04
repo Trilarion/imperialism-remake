@@ -19,7 +19,7 @@ import math
 from enum import Enum
 from base import constants as c
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsSimpleTextItem
-from PyQt5.QtCore import Qt, pyqtSignal, QPointF
+from PyQt5.QtCore import Qt, pyqtSignal, QPointF, QMargins
 from PyQt5.QtGui import QBrush, QPainterPath, QFont, QColor, QPen, QCursor
 from base.hexagon import QHexagon
 """
@@ -28,7 +28,6 @@ from base.hexagon import QHexagon
 
 DEFAULT_DIAMETER = 20
 DEFAULT_FORTIFICATION_DIAMETER = 7
-SCROLL_BAR_HEIGHT = 20
 
 
 class TerrainType(Enum):
@@ -67,15 +66,15 @@ class BattleMap():
         self.number_tiles = diameter * diameter
         self.fortification_diameter = fortification_diameter
 
-    def tileSize(self,viewHeight):
-        return (viewHeight - SCROLL_BAR_HEIGHT)/ ( (self.diameter - 1 ) * 3 / 4 + 1)
+    def tileSize(self,viewHeight, viewWidth):
+        return min((viewHeight - 5)/ ( (self.diameter - 1 ) * 3 / 4 + 1), (viewWidth - 1.5)/ ( (self.diameter - 1 ) * math.sqrt(3) / 2 + 1))
 
     @staticmethod
     def scene_position(column, row):
         """
             Converts a map position to a scene position
         """
-        return math.sqrt(3)/2 * (column + ( (row + 1) % 2) /2), row * 3 / 4
+        return math.sqrt(3)/2 * (column + ( (row + 1) % 2) /2) , row * 3 / 4
 
 
 
@@ -88,9 +87,8 @@ class BattleMapView(QGraphicsView):
 
     def __init__(self, battle):
         super().__init__()
-        self.scene = QGraphicsScene()
-        self.setScene(self.scene)
-        #self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setTransformationAnchor(QGraphicsView.NoAnchor)
         self.setResizeAnchor(QGraphicsView.NoAnchor)
@@ -103,14 +101,14 @@ class BattleMapView(QGraphicsView):
         """
             When a battle is loaded new we need to draw the whole map new.
         """
-        self.scene.clear()
-        self.TitleSize = self.battle.tileSize(self.height())
+        self.scene = QGraphicsScene()
+        self.setScene(self.scene)
+        self.TitleSize = self.battle.tileSize(self.height(),self.width())
         columns = self.battle.diameter
         rows = self.battle.diameter
 
         width = (columns + 0.5) * self.TitleSize
         height = rows * self.TitleSize 
-        self.scene.setSceneRect(0, 0, width, height)
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
 
@@ -146,23 +144,21 @@ class BattleMapView(QGraphicsView):
 
     def resizeEvent(self, evt=None):
         self.redraw_map()
+        
 
-    #TODO optimize ....
     def mousePressEvent(self, event):
         position = QPointF(event.pos())
-
-        columns = self.battle.diameter
-        rows = self.battle.diameter
-
+        columns = round(position.x()/(self.TitleSize * math.sqrt(3)/2))
+        rows = round(position.y()/(self.TitleSize * 3 / 4))
         # draw the main hexagon
-        sx, sy = self.battle.scene_position(columns/2, rows/2)        
-        size_main = math.sqrt(3)/2 * (rows - 1) * self.TitleSize 
+        sx, sy = self.battle.scene_position(self.battle.diameter/2, self.battle.diameter/2)        
+        size_main = math.sqrt(3)/2 * (self.battle.diameter - 1) * self.TitleSize 
         center_x, center_y = size_main/2 +  self.TitleSize/2, size_main/2 -  3 * self.TitleSize/4
         main_hexa = QHexagon(center_x, center_y,  size_main,0)
 
-        # go each position of the grid
-        for row in range(0, rows):
-            for column in range(0, columns):
+        # go each possible position of the grid
+        for row in range(rows-1, rows+1):
+            for column in range(columns-1, columns+1):
                 sx, sy = self.battle.scene_position(column, row)
                 center_x, center_y = (sx + 0.5) * self.TitleSize, (sy + 0.5 ) * self.TitleSize
                 hexa = QHexagon(center_x, center_y,  self.TitleSize,30)
