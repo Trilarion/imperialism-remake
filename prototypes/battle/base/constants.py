@@ -16,8 +16,6 @@
 
 import os
 from enum import unique
-from PySide import QtGui, QtCore
-
 
 """
     Game specific path locations for artwork, music, ...
