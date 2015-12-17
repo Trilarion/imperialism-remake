@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Imperialism remake
 # Copyright (C) 2015 Spitaels <spitaelsantoine@gmail.com>
 #
