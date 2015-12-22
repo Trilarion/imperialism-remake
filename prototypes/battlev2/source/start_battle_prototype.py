@@ -14,3 +14,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+import sys
+from battle.LandBattleView import LandBattleView
+from PyQt5.QtWidgets import QApplication, QMainWindow
+
+class MainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+        self.ui = LandBattleView()
+        self.ui.setupUi(self)
+
+def main():
+    app = QApplication(sys.argv)
+    mySW = MainWindow()
+    mySW.showMaximized()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()

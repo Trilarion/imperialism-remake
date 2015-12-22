@@ -14,3 +14,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+from test_case import QHexagonTestCase
+import unittest
+
+def testAll():
+    suite = unittest.TestLoader().loadTestsFromTestCase(QHexagonTestCase)
+    unittest.TextTestRunner(verbosity=2).run(suite)
+    print("test")
+
+if __name__ == '__main__':
+    testAll()
