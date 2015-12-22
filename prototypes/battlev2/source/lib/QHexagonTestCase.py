@@ -7,6 +7,9 @@ import math
 
 class QHexagonTestCase(unittest.TestCase):
 
+    def test_0(self):
+        self.assertTrue(True)
+        
     def test_width0(self):
         center = QPointF(0.0, 0.0)
         hexa = QHexagon(center, 0, 0)
@@ -132,7 +135,9 @@ class QHexagonTestCase(unittest.TestCase):
             hexa = QHexagon(center, 1, 0)
             self.assertTrue(True) 
         except ValueError:
-            self.assertTrue(False)                  
+            self.assertTrue(False)                
+
+            
 # Ceci lance le test si on exécute le script
 # directement.
 if __name__ == '__main__':

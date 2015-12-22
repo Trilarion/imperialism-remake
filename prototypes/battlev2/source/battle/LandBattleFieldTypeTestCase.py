@@ -14,27 +14,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from lib import QHexagonTestCase
-from battle import LandBattleFieldTypeTestCase
+
 import unittest
 
-testmodules = [
-    'lib.QHexagonTestCase',
-    'battle.LandBattleFieldTypeTestCase'
-    ]
+class LandBattleFieldTypeTestCase(unittest.TestCase):
 
-suite = unittest.TestSuite()
-
-for t in testmodules:
-    try:
-        # If the module defines a suite() function, call it to get the suite.
-        mod = __import__(t, globals(), locals(), ['suite'])
-        suitefn = getattr(mod, 'suite')
-        suite.addTest(suitefn())
-    except (ImportError, AttributeError):
-        # else, just load all the test cases from the module.
-        suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
+    def test_0(self):
+        self.assertTrue(True)
+    
+    
 # Ceci lance le test si on exécute le script
 # directement.
 if __name__ == '__main__':
-    unittest.TextTestRunner().run(suite)
+    unittest.main()   

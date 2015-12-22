@@ -25,12 +25,9 @@ class MainWindow(QMainWindow):
         self.ui = LandBattleView()
         self.ui.setupUi(self)
 
-def main():
+
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     mySW = MainWindow()
     mySW.showMaximized()
     sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-    main()
