@@ -14,13 +14,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from test_case import QHexagonTestCase
+from lib import QHexagonTestCase
 import unittest
 
-def testAll():
-    suite = unittest.TestLoader().loadTestsFromTestCase(QHexagonTestCase)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-    print("test")
+testmodules = [
+    'lib.QHexagonTestCase'
+    ]
 
+suite = unittest.TestSuite()
+
+for t in testmodules:
+    try:
+        # If the module defines a suite() function, call it to get the suite.
+        mod = __import__(t, globals(), locals(), ['suite'])
+        suitefn = getattr(mod, 'suite')
+        suite.addTest(suitefn())
+    except (ImportError, AttributeError):
+        # else, just load all the test cases from the module.
+        suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
+# Ceci lance le test si on exécute le script
+# directement.
 if __name__ == '__main__':
-    testAll()
+    unittest.TextTestRunner().run(suite)

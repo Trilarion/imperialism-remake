@@ -18,12 +18,22 @@
 
 import os
 from enum import unique
-from PyQt5.QtGui import QTransform, QPixmap
-"""
-    Game specific path locations for artwork, music, ...
-    Only static values here.
-"""
+from PyQt5.QtWidgets import QSizePolicy
+from PyQt5.QtGui import QTransform, QPixmap, QFont
 
+def defaultSizePolicy(widget,horizontal,vertical ):
+    sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+    sizePolicy.setHorizontalStretch(0)
+    sizePolicy.setVerticalStretch(0)
+    sizePolicy.setHeightForWidth(widget.sizePolicy().hasHeightForWidth())
+    return sizePolicy
+
+def defaultFont():    
+    font = QFont()
+    font.setPointSize(10)
+    font.setWeight(75)
+    font.setBold(True)
+    return font
 
 def mirorPixmap(pixmap):
     transform = QTransform()  

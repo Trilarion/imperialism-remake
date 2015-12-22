@@ -18,40 +18,27 @@
 from base import Constants as c
 import random
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow, QGridLayout, QLabel, QSizePolicy, QSpacerItem, QSizePolicy,  QGraphicsScene, QGraphicsRectItem, QGraphicsView
-from PyQt5.QtGui import QPixmap, QPalette, QBrush, QFont, QIcon,  QTransform
+from PyQt5.QtGui import QPixmap, QPalette, QBrush, QIcon,  QTransform
 from PyQt5.QtCore import QSize, Qt, QMetaObject
 
 
 class LandBattleView(object):
         
+        
     def setupHintLabel(self):
         self.buttonHintLabel = QLabel(self.centralWidget)
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.buttonHintLabel.sizePolicy().hasHeightForWidth())
+        sizePolicy = c.defaultSizePolicy(self.buttonHintLabel, QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.buttonHintLabel.setSizePolicy(sizePolicy)
-        font = QFont()
-        font.setPointSize(10)
-        font.setWeight(75)
-        font.setBold(True)
-        self.buttonHintLabel.setFont(font)
+        self.buttonHintLabel.setFont(c.defaultFont())
         self.buttonHintLabel.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.gridLayout.addWidget(self.buttonHintLabel, 0, 0, 1, 1)      
         
         
     def setupDateLabel(self, date, money):
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.buttonHintLabel.sizePolicy().hasHeightForWidth())
-        font = QFont()
-        font.setPointSize(10)
-        font.setWeight(75)
-        font.setBold(True)
         self.dateLabel = QLabel(self.centralWidget)
+        sizePolicy = c.defaultSizePolicy(self.dateLabel, QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.dateLabel.setSizePolicy(sizePolicy)
-        self.dateLabel.setFont(font)
+        self.dateLabel.setFont(c.defaultFont())
         self.dateLabel.setText(str(date) + "\t\t$" + c.formatMoney(money))
         self.dateLabel.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         self.gridLayout.addWidget(self.dateLabel, 0, 0, 1, 1)   
@@ -76,10 +63,7 @@ class LandBattleView(object):
     def setupNextTargetButton(self):
         self.nextTargetButton = CustomButton(self.centralWidget)
         self.nextTargetButton.setbuttonHintLabelText("Next Target",self.buttonHintLabel)
-        sizePolicy= QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.nextTargetButton.sizePolicy().hasHeightForWidth())
+        sizePolicy = c.defaultSizePolicy(self.nextTargetButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.nextTargetButton.setSizePolicy(sizePolicy)
         self.nextTargetButton.setMinimumSize(QSize(45, 45))
         self.nextTargetButton.setMaximumSize(QSize(45, 45))
@@ -94,10 +78,7 @@ class LandBattleView(object):
     def setupEndUnitButton(self):
         self.endUnitTurnButton = CustomButton(self.centralWidget)
         self.endUnitTurnButton.setbuttonHintLabelText("End Unit's Turn",self.buttonHintLabel)
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.endUnitTurnButton.sizePolicy().hasHeightForWidth())
+        sizePolicy = c.defaultSizePolicy(self.endUnitTurnButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.endUnitTurnButton.setSizePolicy(sizePolicy)
         self.endUnitTurnButton.setMinimumSize(QSize(45, 45))
         self.endUnitTurnButton.setMaximumSize(QSize(45, 45))
@@ -112,10 +93,7 @@ class LandBattleView(object):
     def setupRetreatButton(self):  
         self.retreatButton = CustomButton(self.centralWidget)
         self.retreatButton.setbuttonHintLabelText("retreat All Units",self.buttonHintLabel)
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.retreatButton.sizePolicy().hasHeightForWidth())
+        sizePolicy = c.defaultSizePolicy(self.retreatButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.retreatButton.setSizePolicy(sizePolicy)
         self.retreatButton.setMinimumSize(QSize(45, 45))
         self.retreatButton.setMaximumSize(QSize(45, 45))
@@ -132,10 +110,7 @@ class LandBattleView(object):
     def setupHelpButton(self):  
         self.helpButton = CustomButton(self.centralWidget)
         self.helpButton.setbuttonHintLabelText("Help on Tactical Battles",self.buttonHintLabel)
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.helpButton.sizePolicy().hasHeightForWidth())
+        sizePolicy = c.defaultSizePolicy(self.helpButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.helpButton.setSizePolicy(sizePolicy)
         self.helpButton.setMinimumSize(QSize(80, 80))
         self.helpButton.setMaximumSize(QSize(80, 80))
@@ -150,10 +125,7 @@ class LandBattleView(object):
     def setupAutoCombatButton(self):
         self.autoCombatButton = CustomButton(self.centralWidget)
         self.autoCombatButton.setbuttonHintLabelText("Auto-Play",self.buttonHintLabel)
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.autoCombatButton.sizePolicy().hasHeightForWidth())
+        sizePolicy = c.defaultSizePolicy(self.autoCombatButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.autoCombatButton.setSizePolicy(sizePolicy)
         self.autoCombatButton.setMinimumSize(QSize(90, 90))
         self.autoCombatButton.setMaximumSize(QSize(90, 90))
@@ -180,10 +152,7 @@ class LandBattleView(object):
         self.targetedUnitGraphicsScene= QGraphicsScene()
         self.addUnit(self.targetedUnitGraphicsScene, 60, targetedUnit, c.Flag_of_France, True)
         self.graphicsView_targetedUnit = QGraphicsView(self.targetedUnitGraphicsScene)
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graphicsView_targetedUnit.sizePolicy().hasHeightForWidth())
+        sizePolicy = c.defaultSizePolicy(self.graphicsView_targetedUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_targetedUnit.setSizePolicy(sizePolicy)
         self.graphicsView_targetedUnit.setMinimumSize(QSize(60, 60))
         self.graphicsView_targetedUnit.setMaximumSize(QSize(60, 60))
@@ -193,10 +162,7 @@ class LandBattleView(object):
         self.currentUnitGraphicsScene= QGraphicsScene()
         self.addUnit(self.currentUnitGraphicsScene, 60, currentUnit, c.Flag_of_Spain, False)
         self.graphicsView_currentUnit = QGraphicsView(self.currentUnitGraphicsScene)
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graphicsView_currentUnit.sizePolicy().hasHeightForWidth())
+        sizePolicy = c.defaultSizePolicy(self.graphicsView_currentUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_currentUnit.setSizePolicy(sizePolicy)
         self.graphicsView_currentUnit.setMinimumSize(QSize(60, 60))
         self.graphicsView_currentUnit.setMaximumSize(QSize(60, 60))
@@ -209,10 +175,7 @@ class LandBattleView(object):
         self.coatOfArmGraphicsScene.addPixmap(img)         
         self.graphicsView_coatOfArm = QGraphicsView(self.coatOfArmGraphicsScene)
         self.graphicsView_coatOfArm.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graphicsView_coatOfArm.sizePolicy().hasHeightForWidth())       
+        sizePolicy = c.defaultSizePolicy(self.graphicsView_coatOfArm, QSizePolicy.Fixed, QSizePolicy.Fixed)   
         self.graphicsView_coatOfArm.setSizePolicy(sizePolicy)
         self.graphicsView_coatOfArm.setMinimumSize(QSize(90, 120))
         self.graphicsView_coatOfArm.setMaximumSize(QSize(90, 120))
