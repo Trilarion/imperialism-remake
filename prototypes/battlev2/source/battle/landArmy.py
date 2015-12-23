@@ -15,35 +15,42 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from unit.LandUnitType import LandUnitType
-from nation.nation import Nation
-
-
-class LandUnit:
-    """Class LandUnit
+class LandArmy:
+    """Class LandArmy
     """
     # Attributes:
-    unitStrength = [0, 100]  # (int)
-    experienceLevel = [1, 5]  # (int)
-    graphicCharge = None  # (QPixmap)
-    graphicShoot = None  # (QPixmap)
-    graphicStand = None  # (QPixmap)
+    retreat = None  # (boolean)
 
     # Operations
-    def increase_experience_level(self):
-        """function increase_experience_level
+    def list_dead_unit(self):
+        """function list_dead_unit
 
-        returns boolean
+        returns List<LandUnit>
         """
         raise NotImplementedError()
         return None
 
-    def draw(self, defending, scene, size):
+    def list_alive_unit(self):
+        """function list_alive_unit
+
+        returns List<LandUnit>
+        """
+        raise NotImplementedError()
+        return None
+
+    def draw(self, scene, size):
         """function draw
 
-        defending: boolean
         scene: QGraphicsScene
         size: QSize
+
+        returns
+        """
+        raise NotImplementedError()
+        return None
+
+    def play_turn(self):
+        """function play_turn
 
         returns
         """

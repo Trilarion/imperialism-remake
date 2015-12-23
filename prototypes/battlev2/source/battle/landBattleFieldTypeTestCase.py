@@ -16,11 +16,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
-from battle.LandBattleFieldType import LandBattleFieldType
+from battle.landBattleFieldType import LandBattleFieldType
 from PyQt5.QtCore import Qt
 
 
 class LandBattleFieldTypeTestCase(unittest.TestCase):
+    """Class LandBattleFieldTypeTestCase
+    """
+
     def test_init0(self):
         try:
             LandBattleFieldType("test", None, None)

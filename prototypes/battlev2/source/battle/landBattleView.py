@@ -22,19 +22,22 @@ from PyQt5.QtGui import QPixmap, QPalette, QBrush, QIcon
 from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QLabel, QSpacerItem, QSizePolicy, QGraphicsScene, \
     QGraphicsRectItem, QGraphicsView
 
-from base import Constants as Const
+from base import constants as Const
 
 
 class LandBattleView(QObject):
+    """Class LandBattleView
+    """
+
     def __init__(self, battle_window, parent=None):
         super().__init__(parent)
         self.BattleWindow = battle_window
         self.centralWidget = QWidget(self.BattleWindow)
         self.gridLayout = QGridLayout(self.centralWidget)
-        self.coatOfArmGraphicsScene = QGraphicsScene()
+        self.coatOfArmsGraphicsScene = QGraphicsScene()
         self.currentUnitGraphicsScene = QGraphicsScene()
         self.targetedUnitGraphicsScene = QGraphicsScene()
-        self.graphicsView_coatOfArm = QGraphicsView(self.coatOfArmGraphicsScene)
+        self.graphicsView_coatOfArm = QGraphicsView(self.coatOfArmsGraphicsScene)
         self.graphicsView_currentUnit = QGraphicsView(self.currentUnitGraphicsScene)
         self.graphicsView_targetedUnit = QGraphicsView(self.targetedUnitGraphicsScene)
         self.autoCombatButton = CustomButton(self.centralWidget)
@@ -169,9 +172,9 @@ class LandBattleView(QObject):
         self.graphicsView_currentUnit.setMaximumSize(QSize(60, 60))
         self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1, Qt.AlignCenter)
 
-    def setup_coat_of_arm_view(self, coat_of_arm_attacker):
+    def setup_coat_of_arms_view(self, coat_of_arm_attacker):
         img = QPixmap(coat_of_arm_attacker).scaled(90, 120)
-        self.coatOfArmGraphicsScene.addPixmap(img)
+        self.coatOfArmsGraphicsScene.addPixmap(img)
         self.graphicsView_coatOfArm.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         size_policy = Const.default_size_policy(self.graphicsView_coatOfArm, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_coatOfArm.setSizePolicy(size_policy)
@@ -216,7 +219,7 @@ class LandBattleView(QObject):
         # Current Unit View
         self.setup_current_unit_view(random.choice(Const.Graphics_Unit_list))
         # Coat of Arm view
-        self.setup_coat_of_arm_view(random.choice(Const.Graphics_Coat_of_arms_list))
+        self.setup_coat_of_arms_view(random.choice(Const.Graphics_Coat_of_arms_list))
         # Main view
         self.setup_map()
         self.BattleWindow.setPalette(palette)

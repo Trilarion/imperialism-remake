@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import sys
-from battle.LandBattleView import LandBattleView
+from battle.landBattleView import LandBattleView
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
 

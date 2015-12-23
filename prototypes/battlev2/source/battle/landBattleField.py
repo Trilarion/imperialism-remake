@@ -15,37 +15,38 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from unit.LandUnitType import LandUnitType
-from nation.nation import Nation
+from lib.hexagon import QHexagon
+from battle.landUnitInBattle import LandUnitInBattle
+from battle.landBattleFieldType import LandBattleFieldType
+from battle.landBattleMap import LandBattleMap
 
 
-class LandUnit:
-    """Class LandUnit
+class LandBattleField:
+    """Class LandBattleField
     """
     # Attributes:
-    unitStrength = [0, 100]  # (int)
-    experienceLevel = [1, 5]  # (int)
-    graphicCharge = None  # (QPixmap)
-    graphicShoot = None  # (QPixmap)
-    graphicStand = None  # (QPixmap)
+    position = None  # (QPointF)
+    gridPosition = None  # (int, int)
+    occupied = None  # (boolean)
 
     # Operations
-    def increase_experience_level(self):
-        """function increase_experience_level
-
-        returns boolean
-        """
-        raise NotImplementedError()
-        return None
-
-    def draw(self, defending, scene, size):
+    def draw(self, scene, size):
         """function draw
 
-        defending: boolean
         scene: QGraphicsScene
         size: QSize
 
         returns
+        """
+        raise NotImplementedError()
+        return None
+
+    def distance(self, field):
+        """function distance
+
+        field: LandBattleField
+
+        returns int
         """
         raise NotImplementedError()
         return None

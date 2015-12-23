@@ -3,7 +3,7 @@ import unittest
 
 from PyQt5.QtCore import QPointF
 
-from lib.QHexagon import QHexagon
+from lib.hexagon import QHexagon
 
 
 class QHexagonTestCase(unittest.TestCase):

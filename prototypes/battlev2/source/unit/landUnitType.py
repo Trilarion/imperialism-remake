@@ -14,3 +14,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+
+class LandUnitType:
+    """Class LandUnitType
+    """
+    # Attributes:
+    name = None  # (string)
+    evolutionLevel = {1, 2, 3}  # (int)
+    description = None  # (string)
+    officier = None  # (boolean)
+    attackStrength = [0, 20]  # (int)
+    range = [2, 8]  # (int)
+    speed = [2, 10]  # (int)
+    creationCost = None  # (int)
+    upkeep = None  # (int)
+
+    # Operations

@@ -14,3 +14,37 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+
+class Nation:
+    """Class Nation
+    """
+    # Attributes:
+    name = None  # (string)
+    computer = None  # (boolean)
+    coatOfArms = None  # (QPixmap)
+    flag = None  # (QPixmap)
+
+    # Operations
+    def draw_flag(self, scene, size):
+        """function draw_flag
+
+        scene: QGraphicsScene
+        size: QSize
+
+        returns
+        """
+        raise NotImplementedError()
+        return None
+
+    def draw_coat_of_arms(self, scene, size):
+        """function draw_coat_of_arms
+
+        scene: QGraphicsScene
+        size: QSize
+
+        returns
+        """
+        raise NotImplementedError()
+        return None
+
