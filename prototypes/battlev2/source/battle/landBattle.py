@@ -17,73 +17,98 @@
 
 from battle.landBattleMap import LandBattleMap
 from battle.landArmy import LandArmy
-from unit.LandUnit import LandUnit
+from battle.landUnitInBattle import LandUnitInBattle
 
 
 class LandBattle:
     """Class LandBattle
     """
-    # Attributes:
-    autoCombat = None  # (boolean)
-    turn = None  # (int)
-    currentUnit = None  # (LandUnit)
-    targettedUnit = None  # (LandUnit)
+
+    # Constructor:
+    def __init__(self, auto_combat, turn, current_unit, targetted_unit, map_battle, defender, attacker):
+        """
+
+        :param auto_combat: bool
+        :param turn: int > 0
+        :param current_unit: LandUnitInBattle
+        :param targetted_unit: LandUnitInBattle
+        :param map_battle: LandBattleMap
+        :param defender: LandArmy
+        :param attacker: LandArmy
+        :return:
+        """
+        if not isinstance(auto_combat, bool):
+            raise ValueError('auto_combat must be a boolean')
+        if not isinstance(turn, int) or turn < 0:
+            raise ValueError('turn must be an int>0')
+        if not isinstance(current_unit, LandUnitInBattle) or current_unit is None:
+            raise ValueError('current_unit must be a not null pixmap')
+        if not isinstance(targetted_unit, LandUnitInBattle) or targetted_unit is None:
+            raise ValueError('targetted_unit must be a not null pixmap')
+        if not isinstance(map, LandBattleMap) or map is None:
+            raise ValueError('map must be a not null LandBattleMap')
+        if not isinstance(defender, LandArmy) or defender is None:
+            raise ValueError('defender must be a not null LandArmy')
+        if not isinstance(attacker, LandArmy) or map is None:
+            raise ValueError('attacker must be a not null LandArmy')
+        self.autoCombat = auto_combat
+        self.turn = turn
+        self.currentUnit = current_unit
+        self.targettedUnit = targetted_unit
+        self.map = map_battle
+        self.defender = defender
+        self.attacker = attacker
 
     # Operations
     def draw_current_unit(self, scene, size):
         """function draw_current_unit
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
         returns
         """
         raise NotImplementedError()
-        return None
 
     def draw_targetted_unit(self, scene, size):
         """function draw_targetted_unit
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
         returns
         """
         raise NotImplementedError()
-        return None
 
     def draw_battle_map(self, scene, size):
         """function draw_battle_map
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
         returns
         """
         raise NotImplementedError()
-        return None
 
     def draw_defender(self, scene, size):
         """function draw_defender
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
         returns
         """
         raise NotImplementedError()
-        return None
 
     def draw_attacker(self, scene, size):
         """function draw_attacker
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
         returns
         """
         raise NotImplementedError()
-        return None
 
     def play_turn(self):
         """function play_turn
@@ -91,4 +116,3 @@ class LandBattle:
         returns
         """
         raise NotImplementedError()
-        return None

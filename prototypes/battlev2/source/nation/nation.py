@@ -15,36 +15,52 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from PyQt5.QtGui import QPixmap
+
 
 class Nation:
     """Class Nation
     """
-    # Attributes:
-    name = None  # (string)
-    computer = None  # (boolean)
-    coatOfArms = None  # (QPixmap)
-    flag = None  # (QPixmap)
+
+    # Constructor:
+    def __init__(self, name, computer, coat_of_arms, flag):
+        """function __init__
+
+        :param name: str (not empty)
+        :param computer: bool
+        :param coat_of_arms: QPixmap (not null)
+        :param flag: QPixmap (not null)
+        """
+        if not isinstance(name, str) or name == '':
+            raise ValueError('name must be a non empty string')
+        if not isinstance(computer, bool):
+            raise ValueError('computer must be a boolean')
+        if not isinstance(coat_of_arms, QPixmap) or coat_of_arms is None:
+            raise ValueError('coatOfArms must be a not null pixmap')
+        if not isinstance(flag, QPixmap) or flag is None:
+            raise ValueError('flag must be a not null pixmap')
+        self.name = name
+        self.computer = computer
+        self.coatOfArms = coat_of_arms
+        self.flag = flag
 
     # Operations
     def draw_flag(self, scene, size):
         """function draw_flag
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
-        returns
+        no return
         """
         raise NotImplementedError()
-        return None
 
     def draw_coat_of_arms(self, scene, size):
         """function draw_coat_of_arms
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
-        returns
+        no return
         """
         raise NotImplementedError()
-        return None
-

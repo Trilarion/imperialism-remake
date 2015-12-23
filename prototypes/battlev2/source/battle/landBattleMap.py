@@ -15,58 +15,78 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from lib.hexagon import QHexagon
+from battle.landBattleField import LandBattleField
 
 
 class LandBattleMap:
     """Class LandBattleMap
     """
-    # Attributes:
-    diameter = None  # (int)
-    sizeTile = None  # (int)
-    cityDiameter = None  # (int)
+
+    # Constructor:
+    def __init__(self, diameter, size_tile, city_diameter, fields):
+        """
+        function __init__
+        :param diameter:int >0
+        :param size_tile: float >0
+        :param city_diameter:int >0
+        :param fields: List<LandBattleField>
+        :return:
+        """
+        if not isinstance(diameter, int) or diameter < 0:
+            raise ValueError('diameter must be a int>0')
+        if not isinstance(city_diameter, int) or city_diameter < 0:
+            raise ValueError('cityDiameter must be a int>0')
+        if city_diameter >= diameter:
+            raise ValueError('city_diameter must be inferior to diameter')
+        try:
+            if size_tile < 0:
+                raise ValueError('size_tile must be superior to 0')
+        except TypeError:
+            raise ValueError('size_tile type must be an unorderable type')
+        if all(isinstance(f, LandBattleField) for f in fields):
+            raise ValueError('fields must be a list of LandBattleField')
+        self.diameter = diameter
+        self.sizeTile = size_tile
+        self.cityDiameter = city_diameter
+        self.fields = fields
 
     # Operations
     def draw(self, scene, size):
         """function draw
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
         returns
         """
         raise NotImplementedError()
-        return None
 
     def resize(self, size):
         """function resize
 
-        size: int, int
+        :param size: int, int
 
         returns
         """
         raise NotImplementedError()
-        return None
 
     def position_to_grid_position(self, position):
         """function position_to_grid_position
 
-        position: int, int
+        :param position: int, int
 
         returns int, int
         """
         raise NotImplementedError()
-        return None
 
     def grid_position_to_position(self, gridposition):
         """function grid_position_to_position
 
-        gridposition: int, int
+        :param gridposition: int, int
 
         returns int, int
         """
         raise NotImplementedError()
-        return None
 
     def map_hexagon(self):
         """function map_hexagon
@@ -74,7 +94,6 @@ class LandBattleMap:
         returns QHexagon
         """
         raise NotImplementedError()
-        return None
 
     def city_hexagon(self):
         """function city_hexagon
@@ -82,7 +101,6 @@ class LandBattleMap:
         returns QHexagon
         """
         raise NotImplementedError()
-        return None
 
     def inside_map_hexagon(self):
         """function inside_map_hexagon
@@ -90,7 +108,6 @@ class LandBattleMap:
         returns boolean
         """
         raise NotImplementedError()
-        return None
 
     def inside_city(self):
         """function inside_city
@@ -98,4 +115,3 @@ class LandBattleMap:
         returns boolean
         """
         raise NotImplementedError()
-        return None

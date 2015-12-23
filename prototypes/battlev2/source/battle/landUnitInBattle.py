@@ -15,68 +15,89 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from battle.landBattleField import LandBattleField
-from unit.LandUnit import LandUnit
+from unit.landUnit import LandUnit
 
 
 class LandUnitInBattle(LandUnit):
     """Class LandUnitInBattle
     """
-    # Attributes:
-    dead = None  # (boolean)
-    status = {Charge, Shoot, Stand}  # (enum)
-    retreat = None  # (boolean)
-    morale = [0, 100]  # (int)
-    moveUsed = None  # (int)
-    hasShoot = None  # (boolean)
+
+    # Constructor:
+    def __init__(self, dead, status, retreat, moral, unit_strength, experience_level, graphic_charge, graphic_shoot,
+                 graphic_stand, unit_type, nation):
+        """function __init__
+        :param dead
+        :param status
+        :param retreat
+        :param moral
+        :param unit_strength: int range(0,100)
+        :param experience_level: int range(1,5)
+        :param graphic_charge; QPixmap
+        :param graphic_shoot: QPixmap
+        :param graphic_stand: QPixmap
+        :param unit_type: LandUnitType
+        :param nation: Nation
+        """
+        super().__init__(unit_strength, experience_level, graphic_charge, graphic_shoot, graphic_stand, unit_type,
+                         nation)
+        if not isinstance(dead, bool):
+            raise ValueError('dead must be a boolean')
+        if not isinstance(retreat, bool):
+            raise ValueError('retreat must be a boolean')
+        if not isinstance(status, str) or (status != 'Charge' and status != 'Shoot' and status != 'Stand'):
+            raise ValueError('status must be a str in {\'Charge\', \'Shoot\', \'Stand\'}')
+        if not isinstance(moral, int) or moral not in range(0, 100):
+            raise ValueError('status must be a str in {\'Charge\', \'Shoot\', \'Stand\'}')
+        self.dead = dead
+        self.status = status
+        self.retreat = retreat
+        self.moral = moral  # [0, 100]  # (int)
+        self.moveUsed = 0
+        self.hasShoot = False
 
     # Operations
     def can_shoot(self, unit):
         """function can_shoot
 
-        unit: LandUnit
+        :param unit: LandUnit
 
         returns boolean
         """
         raise NotImplementedError()
-        return None
 
     def shoot(self, unit):
         """function shoot
 
-        unit: LandUnit
+        :param unit: LandUnit
 
         returns boolean
         """
         raise NotImplementedError()
-        return None
 
     def can_move_to(self, field):
         """function can_move_to
 
-        field: LandBattleField
+        :param field: LandBattleField
 
         returns boolean
         """
         raise NotImplementedError()
-        return None
 
     def move_to(self, field):
         """function move_to
 
-        field: LandBattleField
+        :param field: LandBattleField
 
         returns boolean
         """
         raise NotImplementedError()
-        return None
 
     def increase_moral(self):
         """function increase_moral
 
         returns boolean
         """
-        return None  # should raise NotImplementedError()
+        raise NotImplementedError()
 
     def play_turn(self):
         """function play_turn
@@ -84,7 +105,6 @@ class LandUnitInBattle(LandUnit):
         returns
         """
         raise NotImplementedError()
-        return None
 
     def __str__(self):
         """function __str__
@@ -92,15 +112,13 @@ class LandUnitInBattle(LandUnit):
         returns string
         """
         raise NotImplementedError()
-        return None
 
     def print_to_text_edit(self, font, text_edit):
         """function print_to_text_edit
 
-        font: QFont
-        textEdit: QTextEdit
+        :param font: QFont
+        :param text_edit: QTextEdit
 
         returns
         """
         raise NotImplementedError()
-        return None

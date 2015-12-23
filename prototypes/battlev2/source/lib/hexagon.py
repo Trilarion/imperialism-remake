@@ -49,6 +49,12 @@ class QHexagon(QPolygonF):
     """
 
     def __init__(self, center, size, rotation):
+        """function __init__
+
+        :param center: QPointF
+        :param size: int>0
+        :param rotation; int 0 or 30
+        """
         # check center QPointF
         if not isinstance(center, QPointF):
             raise ValueError('center must be a QPointF instance')

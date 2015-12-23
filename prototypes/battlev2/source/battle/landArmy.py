@@ -15,11 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from battle.landUnitInBattle import LandUnitInBattle
+
+
 class LandArmy:
     """Class LandArmy
     """
-    # Attributes:
-    retreat = None  # (boolean)
+    # Constructor
+    def __init__(self, retreat,land_units):
+        """function __init__
+
+        :param retreat: bool
+        :param land_units: LandUnitInBattle
+        """
+        if not isinstance(retreat, bool):
+            raise ValueError('retreat must be a boolean')
+        if not isinstance(land_units, LandUnitInBattle) or land_units is None:
+            raise ValueError('land_units must be a not null LandUnitInBattle instance')
+        self.retreat = retreat
+        self.landUnits = land_units
 
     # Operations
     def list_dead_unit(self):
@@ -28,7 +42,6 @@ class LandArmy:
         returns List<LandUnit>
         """
         raise NotImplementedError()
-        return None
 
     def list_alive_unit(self):
         """function list_alive_unit
@@ -36,18 +49,16 @@ class LandArmy:
         returns List<LandUnit>
         """
         raise NotImplementedError()
-        return None
 
     def draw(self, scene, size):
         """function draw
 
-        scene: QGraphicsScene
-        size: QSize
+        :param scene: QGraphicsScene
+        :param size: QSize
 
         returns
         """
         raise NotImplementedError()
-        return None
 
     def play_turn(self):
         """function play_turn
@@ -55,4 +66,3 @@ class LandArmy:
         returns
         """
         raise NotImplementedError()
-        return None
