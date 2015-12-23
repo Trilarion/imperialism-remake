@@ -14,14 +14,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from lib import QHexagonTestCase
-from battle import LandBattleFieldTypeTestCase
 import unittest
 
 testmodules = [
     'lib.QHexagonTestCase',
     'battle.LandBattleFieldTypeTestCase'
-    ]
+]
 
 suite = unittest.TestSuite()
 

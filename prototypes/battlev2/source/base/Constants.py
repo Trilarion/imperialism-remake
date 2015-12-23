@@ -17,43 +17,48 @@
 
 
 import os
-from enum import unique
-from PyQt5.QtWidgets import QSizePolicy
+
 from PyQt5.QtGui import QTransform, QPixmap, QFont
+from PyQt5.QtWidgets import QSizePolicy
 
-def defaultSizePolicy(widget,horizontal,vertical ):
-    sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-    sizePolicy.setHorizontalStretch(0)
-    sizePolicy.setVerticalStretch(0)
-    sizePolicy.setHeightForWidth(widget.sizePolicy().hasHeightForWidth())
-    return sizePolicy
 
-def defaultFont():    
+def default_size_policy(widget, horizontal, vertical):
+    size_policy = QSizePolicy(horizontal, vertical)
+    size_policy.setHorizontalStretch(0)
+    size_policy.setVerticalStretch(0)
+    size_policy.setHeightForWidth(widget.sizePolicy().hasHeightForWidth())
+    return size_policy
+
+
+def default_font():
     font = QFont()
     font.setPointSize(10)
     font.setWeight(75)
     font.setBold(True)
     return font
 
-def mirorPixmap(pixmap):
-    transform = QTransform()  
+
+def miror_pixmap(pixmap):
+    transform = QTransform()
     transform.scale(-1, 1)
     return QPixmap(pixmap.transformed(transform))
-        
-def formatMoney(money):
+
+
+def format_money(money):
     str_init = str(money)
     retval = ""
-    for i in range(0,len(str_init)):
+    for i in range(0, len(str_init)):
         if (len(str_init) - i) % 3 == 0 and i != 0:
             retval += ","
         retval += str_init[i]
-    return retval;
-    
-    
+    return retval
+
+
 def extend(path, *parts):
     """
         Uses os.path.join to join parts of a path. Also checks for existence and raises an error
         if the path is not existing.
+        :param path:
     """
     extended = os.path.join(path, *parts)
     if not os.path.exists(extended):
@@ -61,7 +66,8 @@ def extend(path, *parts):
     if Debug_Mode:
         Used_Resources.add(extended)
     return extended
-    
+
+
 # debug mode and helpers
 Debug_Mode = False
 Used_Resources = set()
@@ -78,32 +84,32 @@ Graphics_Flag_Folder = extend(Graphics_Folder, 'flag')
 Graphics_Coat_Of_Map_Folder = extend(Graphics_Folder, 'coat_of_arms')
 Graphics_Unit_Folder = extend(Graphics_Folder, 'unit')
 
-#UI file
-Graphics_Background = extend(Graphics_UI_Folder,'background.jpg')
-Graphics_End = extend(Graphics_UI_Folder,'end.png')
-Graphics_General = extend(Graphics_UI_Folder,'general.png')
-Graphics_Help = extend(Graphics_UI_Folder,'help.png')
-Graphics_Retreat = extend(Graphics_UI_Folder,'retreat.png')
-Graphics_Target = extend(Graphics_UI_Folder,'target.png')
+# UI file
+Graphics_Background = extend(Graphics_UI_Folder, 'background.jpg')
+Graphics_End = extend(Graphics_UI_Folder, 'end.png')
+Graphics_General = extend(Graphics_UI_Folder, 'general.png')
+Graphics_Help = extend(Graphics_UI_Folder, 'help.png')
+Graphics_Retreat = extend(Graphics_UI_Folder, 'retreat.png')
+Graphics_Target = extend(Graphics_UI_Folder, 'target.png')
 
-#Flag file
-Flag_of_Algeria = extend(Graphics_Flag_Folder,'Flag_of_Algeria.svg')
-Flag_of_Bavaria = extend(Graphics_Flag_Folder,'Flag_of_Bavaria.svg')
-Flag_of_Denmark = extend(Graphics_Flag_Folder,'Flag_of_Denmark.svg')
-Flag_of_Egypt = extend(Graphics_Flag_Folder,'Flag_of_Egypt.svg')
-Flag_of_France = extend(Graphics_Flag_Folder,'Flag_of_France.svg')
-Flag_of_Hanover = extend(Graphics_Flag_Folder,'Flag_of_Hanover.svg')
-Flag_of_Russia = extend(Graphics_Flag_Folder,'Flag_of_Russia.svg')
-Flag_of_Spain = extend(Graphics_Flag_Folder,'Flag_of_Spain.svg')
-Flag_of_Sweden = extend(Graphics_Flag_Folder,'Flag_of_Sweden.svg')
-Flag_of_Switzerland = extend(Graphics_Flag_Folder,'Flag_of_Switzerland.svg')
-Flag_of_the_Kingdom_of_Sardinia = extend(Graphics_Flag_Folder,'Flag_of_the_Kingdom_of_Sardinia.svg')
-Flag_of_the_Kingdom_of_the_Two_Sicilies = extend(Graphics_Flag_Folder,'Flag_of_the_Kingdom_of_the_Two_Sicilies.svg')
-Flag_of_the_Netherlands = extend(Graphics_Flag_Folder,'Flag_of_the_Netherlands.svg')
-Flag_of_the_Papal_States = extend(Graphics_Flag_Folder,'Flag_of_the_Papal_States.svg')
-Flag_of_the_United_Kingdom = extend(Graphics_Flag_Folder,'Flag_of_the_United_Kingdom.svg')
-Flag_of_Portugal = extend(Graphics_Flag_Folder,'Flag_of_Portugal.svg')
-Flag_of_Ottoman = extend(Graphics_Flag_Folder,'Flag_of_Ottoman.svg')
+# Flag file
+Flag_of_Algeria = extend(Graphics_Flag_Folder, 'Flag_of_Algeria.svg')
+Flag_of_Bavaria = extend(Graphics_Flag_Folder, 'Flag_of_Bavaria.svg')
+Flag_of_Denmark = extend(Graphics_Flag_Folder, 'Flag_of_Denmark.svg')
+Flag_of_Egypt = extend(Graphics_Flag_Folder, 'Flag_of_Egypt.svg')
+Flag_of_France = extend(Graphics_Flag_Folder, 'Flag_of_France.svg')
+Flag_of_Hanover = extend(Graphics_Flag_Folder, 'Flag_of_Hanover.svg')
+Flag_of_Russia = extend(Graphics_Flag_Folder, 'Flag_of_Russia.svg')
+Flag_of_Spain = extend(Graphics_Flag_Folder, 'Flag_of_Spain.svg')
+Flag_of_Sweden = extend(Graphics_Flag_Folder, 'Flag_of_Sweden.svg')
+Flag_of_Switzerland = extend(Graphics_Flag_Folder, 'Flag_of_Switzerland.svg')
+Flag_of_the_Kingdom_of_Sardinia = extend(Graphics_Flag_Folder, 'Flag_of_the_Kingdom_of_Sardinia.svg')
+Flag_of_the_Kingdom_of_the_Two_Sicilies = extend(Graphics_Flag_Folder, 'Flag_of_the_Kingdom_of_the_Two_Sicilies.svg')
+Flag_of_the_Netherlands = extend(Graphics_Flag_Folder, 'Flag_of_the_Netherlands.svg')
+Flag_of_the_Papal_States = extend(Graphics_Flag_Folder, 'Flag_of_the_Papal_States.svg')
+Flag_of_the_United_Kingdom = extend(Graphics_Flag_Folder, 'Flag_of_the_United_Kingdom.svg')
+Flag_of_Portugal = extend(Graphics_Flag_Folder, 'Flag_of_Portugal.svg')
+Flag_of_Ottoman = extend(Graphics_Flag_Folder, 'Flag_of_Ottoman.svg')
 Graphics_Flag_list = [
     Flag_of_Algeria,
     Flag_of_Bavaria,
@@ -123,11 +129,11 @@ Graphics_Flag_list = [
     Flag_of_Portugal,
     Flag_of_Ottoman
 ]
-#Coat of Map
-Coat_of_arms_of_France = extend(Graphics_Coat_Of_Map_Folder,'Coat_of_arms_of_France.svg')
-Coat_of_arms_of_Italy = extend(Graphics_Coat_Of_Map_Folder,'Coat_of_arms_of_Italy.svg')
-Coat_of_arms_of_Russian_Empire = extend(Graphics_Coat_Of_Map_Folder,'Coat_of_arms_of_Russian_Empire.svg')
-Coat_of_arms_ottoman = extend(Graphics_Coat_Of_Map_Folder,'Coat_of_arms_ottoman.svg')
+# Coat of Map
+Coat_of_arms_of_France = extend(Graphics_Coat_Of_Map_Folder, 'Coat_of_arms_of_France.svg')
+Coat_of_arms_of_Italy = extend(Graphics_Coat_Of_Map_Folder, 'Coat_of_arms_of_Italy.svg')
+Coat_of_arms_of_Russian_Empire = extend(Graphics_Coat_Of_Map_Folder, 'Coat_of_arms_of_Russian_Empire.svg')
+Coat_of_arms_ottoman = extend(Graphics_Coat_Of_Map_Folder, 'Coat_of_arms_ottoman.svg')
 Graphics_Coat_of_arms_list = [
     Coat_of_arms_of_France,
     Coat_of_arms_of_Italy,
@@ -135,16 +141,14 @@ Graphics_Coat_of_arms_list = [
     Coat_of_arms_ottoman,
 ]
 
-#Unit File
-infantry_shoot = extend(Graphics_Unit_Folder,'infantry.shoot.png')
-infantry_stand = extend(Graphics_Unit_Folder,'infantry.stand.png')
-infantry_charge = extend(Graphics_Unit_Folder,'infantry.charge.png')
+# Unit File
+infantry_shoot = extend(Graphics_Unit_Folder, 'infantry.shoot.png')
+infantry_stand = extend(Graphics_Unit_Folder, 'infantry.stand.png')
+infantry_charge = extend(Graphics_Unit_Folder, 'infantry.charge.png')
 
 Graphics_Unit_list = [
-	infantry_shoot, infantry_stand, infantry_charge
+    infantry_shoot, infantry_stand, infantry_charge
 ]
-
 
 # minimal screen resolution
 Screen_Min_Size = (800, 600)
-
