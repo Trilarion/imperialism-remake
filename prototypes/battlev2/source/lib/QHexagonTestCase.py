@@ -137,7 +137,31 @@ class QHexagonTestCase(unittest.TestCase):
         except ValueError:
             self.assertTrue(False)                
 
-            
+    def test_eq0(self):
+        center = QPointF(1.0, 5.0)
+        hexa = QHexagon(center, 1, 0)
+        hexa2 = QHexagon(center, 1, 0)
+        self.assertTrue(hexa==hexa2) 
+
+    def test_eq1(self):
+        center = QPointF(1.0, 5.0)
+        hexa = QHexagon(center, 1, 0)
+        hexa2 = QHexagon(center, 2, 0)
+        self.assertFalse(hexa==hexa2)         
+ 
+    def test_eq2(self):
+        center = QPointF(1.0, 5.0)
+        center2 = QPointF(2.0, 5.0)
+        hexa = QHexagon(center, 1, 0)
+        hexa2 = QHexagon(center2, 1, 0)
+        self.assertFalse(hexa==hexa2) 
+ 
+    def test_eq3(self):
+        center = QPointF(1.0, 5.0)
+        hexa = QHexagon(center, 1, 30)
+        hexa2 = QHexagon(center, 1, 0)
+        self.assertFalse(hexa==hexa2)  
+ 
 # Ceci lance le test si on exécute le script
 # directement.
 if __name__ == '__main__':

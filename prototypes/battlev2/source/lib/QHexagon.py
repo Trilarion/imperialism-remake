@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QPolygonF
+from PyQt5.QtGui import QPolygonF, QPixmap, QColor
 import math   
 
 
@@ -93,9 +93,23 @@ class QHexagon(QPolygonF):
         
         returns 
         '''
-        #TODO implement texture pixmap...
-        if not isinstance(color,QColor) and color != None:
-            raise ValueError('color must be a QColor instance or None')
+        if not isinstance(scene,QGraphicsScene) or scene == None:
+            raise ValueError('texture must be a non null QGraphicsScene instance') 
+        if not isinstance(texture,QPixmap) and texture != None:
+            raise ValueError('texture must be a QPixmap instance or None') 
+        if color == None and texture == None:
+            raise ValueError('texture or color must be specified') 
         item = scene.addPolygon(self)
         if color!=None:
             item.setBrush(QBrush(color))
+
+            
+    def __eq__(self, other):
+        if isinstance(other, QHexagon):
+            return ( self.size == other.size
+                and self.center.x() == other.center.x()
+                and self.center.y() == other.center.y()
+                and self.rotation == other.rotation)
+        else:
+            return False
+            

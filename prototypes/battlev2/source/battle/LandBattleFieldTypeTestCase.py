@@ -16,13 +16,40 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import unittest
+from battle.LandBattleFieldType import LandBattleFieldType
+from PyQt5.QtCore import Qt
 
 class LandBattleFieldTypeTestCase(unittest.TestCase):
 
-    def test_0(self):
-        self.assertTrue(True)
-    
-    
+    def test_init0(self):
+        try:
+            type =  LandBattleFieldType("test", None, None)
+            self.assertTrue(False)
+        except ValueError:
+            self.assertTrue(True)
+            
+    def test_init1(self):
+        try: 
+            type =  LandBattleFieldType("test", Qt.red, None)
+            self.assertTrue(True)  
+        except ValueError:
+            self.assertTrue(False)            
+
+    def test_init2(self):
+        try: 
+            type =  LandBattleFieldType("test", None, 1)
+            self.assertTrue(False)  
+        except ValueError:
+            self.assertTrue(True)            
+
+    def test_init3(self):
+        try: 
+            type =  LandBattleFieldType("", Qt.red, None)
+            self.assertTrue(False)  
+        except ValueError:
+            self.assertTrue(True)       
+
+            
 # Ceci lance le test si on exécute le script
 # directement.
 if __name__ == '__main__':
