@@ -23,6 +23,8 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QLabel, QSpacerIt
     QGraphicsRectItem, QGraphicsView
 
 from base import constants
+from battle.landArmy import LandArmy
+from battle.landBattle import LandBattle
 
 
 class LandBattleView(QObject):
@@ -37,9 +39,11 @@ class LandBattleView(QObject):
         self.coatOfArmsGraphicsScene = QGraphicsScene()
         self.currentUnitGraphicsScene = QGraphicsScene()
         self.targetedUnitGraphicsScene = QGraphicsScene()
+        self.mainScene = QGraphicsScene()
         self.graphicsView_coatOfArm = QGraphicsView(self.coatOfArmsGraphicsScene)
         self.graphicsView_currentUnit = QGraphicsView(self.currentUnitGraphicsScene)
         self.graphicsView_targetedUnit = QGraphicsView(self.targetedUnitGraphicsScene)
+        self.graphicsView_main = QGraphicsView(self.mainScene)
         self.autoCombatButton = CustomButton(self.centralWidget)
         self.helpButton = CustomButton(self.centralWidget)
         self.retreatButton = CustomButton(self.centralWidget)
@@ -47,6 +51,13 @@ class LandBattleView(QObject):
         self.nextTargetButton = CustomButton(self.centralWidget)
         self.dateLabel = QLabel(self.centralWidget)
         self.buttonHintLabel = QLabel(self.centralWidget)
+        self.gridLayout.addWidget(self.graphicsView_main, 1, 0, 12, 1)
+        defender = LandArmy(False, None)
+        attacker = LandArmy(False, None)
+        diameter = 20
+        city_diameter = 5
+        self.landBattle = LandBattle(battle_window.width(), battle_window.height(), diameter, city_diameter, False, 0,
+                                     None, None, defender, attacker)
 
     def setup_hint_label(self):
         size_policy = constants.default_size_policy(self.buttonHintLabel, QSizePolicy.Preferred, QSizePolicy.Fixed)
@@ -158,6 +169,8 @@ class LandBattleView(QObject):
         scene.addItem(item1)
 
     def setup_targeted_unit_view(self, targeted_unit):
+        # TODO setup_targeted_unit_view
+        print("TODO setup_targeted_unit_view (landBattleView.py)")
         self.add_unit(self.targetedUnitGraphicsScene, 60, targeted_unit, constants.Flag_of_France, True)
         size_policy = constants.default_size_policy(self.graphicsView_targetedUnit, QSizePolicy.Fixed,
                                                     QSizePolicy.Fixed)
@@ -167,6 +180,8 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_targetedUnit, 9, 1, 1, 1, Qt.AlignCenter)
 
     def setup_current_unit_view(self, current_unit):
+        # TODO setup_current_unit_view
+        print("TODO setup_current_unit_view (landBattleView.py)")
         self.add_unit(self.currentUnitGraphicsScene, 60, current_unit, constants.Flag_of_Spain, False)
         size_policy = constants.default_size_policy(self.graphicsView_currentUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_currentUnit.setSizePolicy(size_policy)
@@ -187,7 +202,9 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_coatOfArm, 3, 1, 1, 1)
 
     def setup_map(self):
-        print("TODO... setupMap")
+        # TODO setup_map
+        print("TODO setupMap (landBattleView.py)")
+        self.landBattle.draw_battle_map(self.mainScene)
         # bmap = map.battle_map.BattleMap()
         # self.graphicsView = map.battle_map.BattleMapView(bmap)
         # self.gridLayout.addWidget(self.graphicsView, 1, 0, 12, 1)

@@ -15,25 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from battle.landUnitInBattle import LandUnitInBattle
-
 
 class LandArmy:
     """Class LandArmy
     """
+
     # Constructor
-    def __init__(self, retreat,land_units):
+    def __init__(self, retreat, land_units):
         """function __init__
 
         :param retreat: bool
-        :param land_units: LandUnitInBattle
+        :param land_units: List<LandUnitInBattle>
         """
         if not isinstance(retreat, bool):
             raise ValueError('retreat must be a boolean')
-        if not isinstance(land_units, LandUnitInBattle) or land_units is None:
-            raise ValueError('land_units must be a not null LandUnitInBattle instance')
+        # TODO list LandUnitInBattle
+        print("TODO list LandUnitInBattle (landArmy.py)")
+        # if not isinstance(land_units, LandUnitInBattle) or land_units is None:
+        #    raise ValueError('land_units must be a not null LandUnitInBattle instance')
         self.retreat = retreat
-        self.landUnits = land_units
+        # self.landUnits = land_units
 
     # Operations
     def list_dead_unit(self):

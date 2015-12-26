@@ -71,8 +71,8 @@ class QHexagon(QPolygonF):
         self.size = size
         self.rotation = rotation
         self.corners = []
-        for i in range(0, 5):
-            self.corners.append(hex_corner(center, size, i, rotation))
+        for i in range(0, 6):
+            self.corners.append(hex_corner(center, self.size, i, rotation))
         # init QPolygonF
         super(self.__class__, self).__init__(self.corners)
 

@@ -17,26 +17,33 @@
 
 from lib.hexagon import QHexagon
 from battle.landBattleFieldType import LandBattleFieldType
-from PyQt5.QtCore import QPointF
-
+from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsSimpleTextItem
+from PyQt5.QtGui import QBrush
 
 class LandBattleField:
     """Class LandBattleField
     """
 
     # Constructor:
-    def __init__(self, position, grid_position, occupied, field_type, hexa):
+    def __init__(self, enable,position, sx, sy, occupied, field_type, hexa):
         """
         function __init__
-        :param position: QPointF
-        :param grid_position: (int, int)
+        :param : QPointF
+        :param sx: int
+        :param sy: int
         :param occupied: bool
         :param field_type:LandBattleFieldType
         :param hexa: QHexagon
+        :param enable: bool
         :return:
         """
-        if not isinstance(grid_position, (int, int)) or grid_position is None:
-            raise ValueError('grid_position must be a (int,int)')
+        if not isinstance(enable, bool):
+            raise ValueError('enable must be a boolean')
+        if not isinstance(sx,int) or sx<0:
+            raise ValueError('sx must be a int>0')
+        if not isinstance(sy,int) or sy<0:
+            raise ValueError('sy must be a int>0')
         if not isinstance(occupied, bool):
             raise ValueError('occupied must be a boolean')
         if not isinstance(position, QPointF) or position is None:
@@ -46,21 +53,30 @@ class LandBattleField:
         if not isinstance(hexa, QHexagon) or hexa is None:
             raise ValueError('hexa must be a not null QHexagon')
         self.position = position
-        self.gridPosition = grid_position  # (int, int)
-        self.occupied = occupied  # (boolean)
+        self.sx = sx
+        self.sy = sy
+        self.occupied = occupied
         self.fieldType = field_type
         self.hexa = hexa
+        self.enable = enable
 
     # Operations
-    def draw(self, scene, size):
+    def draw(self, scene):
         """function draw
 
         :param scene: QGraphicsScene
-        :param size: QSize
 
-        returns
+        no return
         """
-        raise NotImplementedError()
+        if self.enable:
+            self.hexa.draw(scene,self.fieldType.color,self.fieldType.texture)
+            text = '({},{})'.format(self.sx, self.sy)
+            item = QGraphicsSimpleTextItem(text)
+            item.setBrush(QBrush(Qt.black))
+            item.setPos(self.position.x() - self.hexa.size,self.position.y() - self.hexa.size/2)
+            item.setZValue(1001)
+            scene.addItem(item)
+
 
     def distance(self, field):
         """function distance
