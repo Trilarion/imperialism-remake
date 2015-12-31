@@ -20,7 +20,19 @@ class LandUnitType:
     """Class LandUnitType
     """
 
+
+
+
     # Construtor
+    def __init__(self,ini_file,section):
+        """function __init__
+
+        :param ini_file:str path to ini file
+        :param section; section of the ini file
+        :return:
+        """
+        # TODO
+
     def __init__(self, name, evolution_level, description, officier, attack_strength, fire_range, speed, creation_cost,
                  upkeep):
         """function __init__
