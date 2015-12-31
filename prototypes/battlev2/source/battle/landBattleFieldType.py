@@ -32,3 +32,9 @@ class LandBattleFieldType:
         self.name = name
         self.color = color
         self.texture = texture
+
+
+
+
+
+

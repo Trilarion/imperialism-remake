@@ -150,8 +150,10 @@ class LandBattleMap:
     def scene_position(column, row):
         """
             Converts a map position to a scene position
+            :param column; int
+            :param row: int
         """
-        return (math.sqrt(3)/2 * (column + ( (row + 1) % 2) /2) , row * 3 / 4)
+        return math.sqrt(3) / 2 * (column + ((row + 1) % 2) / 2) , row * 3 / 4
 
 
     def create_fields(self):

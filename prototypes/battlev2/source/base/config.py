@@ -21,82 +21,137 @@ import sys
 from unit.landUnitType import LandUnitType
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication
+from base.theme import Theme
 
 CONFIG_FILE = 'config.ini'
 DEFAULT_FULLSCREEN = 'yes'
 DEFAULT_THEME = 'theme0'
+DEFAULT_LANG = 'en'
 DEFAULT_RESOLUTION = 'maximize'
+
+MANDATORY_UNIT_OPTION = ['name', 'description', 'officier', 'level', 'attack', 'range', 'speed', 'creationcost',
+                         'upkeep', 'pixmap.charge', 'pixmap.shoot', 'pixmap.stand']
+MANDATORY_CONFIG_OPTION = ['fullscreen', 'resolution', 'theme', 'lang']
+MANDATORY_PATH_OPTION = ['data', 'lang_config_file', 'unit_config_file']
+MANDATORY_BATTLE_OPTION = []
+MANDATORY_THEME_OPTION = ['name', 'description', 'coat_of_arms_graphics', 'flag_graphics', 'map_graphics',
+                          'ui_graphics', 'unit_graphics']
 
 
 class Config:
     def __init__(self):
+        self.error_msg = ''
+        self.data_folder = 'error'
         self.config = configparser.ConfigParser()
         self.config.read_file(open(CONFIG_FILE))
-        self.error_msg = ''
+        self.check_options('config', MANDATORY_CONFIG_OPTION, CONFIG_FILE)
+        self.check_options('path', MANDATORY_PATH_OPTION, CONFIG_FILE)
+        self.check_options('battle', MANDATORY_BATTLE_OPTION, CONFIG_FILE)
+
+        #
+        # Config Option
+        #
+
         # fullscreen option
         self.fullscreen = self.get_config('config', 'fullscreen', DEFAULT_FULLSCREEN, ['yes', 'no'])
         # resolution
         # TODO get list supported  resolution...
-        self.resolution = self.get_config('config', 'maximize', DEFAULT_RESOLUTION, ['maximize'])
+        self.resolution = self.get_config('config', 'resolution', DEFAULT_RESOLUTION, ['maximize'])
+        # theme
+        self.name_theme_selected = self.get_config('config', 'theme', DEFAULT_THEME, [])
+        # lang
+        self.lang_selected = self.get_config('config', 'lang', DEFAULT_LANG, [])
+
+        #
+        # Path config
+        #
+
         # path file
-        self.data = self.get_config('path', 'data', '', [])
-        if not os.path.isdir(self.data):
-            self.error_msg += 'data folder ' + self.data + ' doesn\'t exist\n'
-            self.data = 'error'
-        # theme config file
-        self.theme_config_file = self.get_config('path', 'theme_config_file', '', []).replace('$data', self.data)
-        if not os.path.exists(self.theme_config_file):
-            self.error_msg += 'theme config file ' + self.theme_config_file + ' doesn\'t exist\n'
-            self.theme_config_file = 'error'
+        self.data_folder = self.get_config('path', 'data', '', [])
+        # TODO remove / at the end of data path
+        if not os.path.isdir(self.data_folder):
+            self.error_msg += 'data folder ' + self.data_folder + ' doesn\'t exist\n'
+            self.data_folder = 'error'
         # lang config file
-        self.lang_config_file = self.get_config('path', 'lang_config_file', '', []).replace('$data', self.data)
+        self.lang_config_file = self.get_config('path', 'lang_config_file', '', [])
         if not os.path.exists(self.lang_config_file):
             self.error_msg += 'lang config file ' + self.lang_config_file + ' doesn\'t exist\n'
             self.lang_config_file = 'error'
         # unit config file
-        self.unit_config_file = self.get_config('path', 'unit_config_file', '', []).replace('$data', self.data)
+        self.unit_config_file = self.get_config('path', 'unit_config_file', '', [])
         if not os.path.exists(self.unit_config_file):
             self.error_msg += 'unit config file ' + self.unit_config_file + ' doesn\'t exist\n'
             self.unit_config_file = 'error'
-        # battle config file
-        self.battle_config_file = self.get_config('path', 'battle_config_file', '', []).replace('$data', self.data)
-        if not os.path.exists(self.battle_config_file):
-            self.error_msg += 'battle config file ' + self.battle_config_file + ' doesn\'t exist\n'
-            self.battle_config_file = 'error'
 
-        # TODO read from theme.ini
-        self.unit_data_folder='../data/artwork/graphics/unit'
-
-        self.list_unit_type = []
-        if self.unit_config_file != 'error':
-            self.config = configparser.ConfigParser()
-            self.config.read_file(open(self.unit_config_file))
-            for unit_type in self.config.sections():
-                if unit_type.startswith('unit'):
+        #
+        # Theme Config
+        #
+        self.unit_data_folder = 'error'
+        self.available_theme = []
+        self.theme_selected = None
+        for section in self.config.sections():
+            if section.startswith('theme'):
+                if self.check_options(section, MANDATORY_THEME_OPTION, CONFIG_FILE):
+                    name = self.get_config(section, 'name', '', [])
+                    description = self.get_config(section, 'description', '', [])
+                    coat_of_arms_graphics = self.get_config(section, 'coat_of_arms_graphics', '', [])
+                    flag_graphics = self.get_config(section, 'flag_graphics', '', [])
+                    map_graphics = self.get_config(section, 'map_graphics', '', [])
+                    ui_graphics = self.get_config(section, 'ui_graphics', '', [])
+                    unit_graphics = self.get_config(section, 'unit_graphics', '', [])
                     try:
-                        previous_error = self.error_msg
-                        name = self.get_config(unit_type, 'name', '', [])
-                        evolution_level = int(self.get_config(unit_type, 'level', '', []))
-                        description = self.get_config(unit_type, 'description', '', [])
-                        officier = bool(self.get_config(unit_type, 'officier', '', []))
-                        attack_strength = int(self.get_config(unit_type, 'attack', '', []))
-                        fire_range = int(self.get_config(unit_type, 'range', '', []))
-                        speed = int(self.get_config(unit_type, 'speed', '', []))
-                        creation_cost = float(self.get_config(unit_type, 'creationcost', '', []))
-                        upkeep = float(self.get_config(unit_type, 'upkeep', '', []))
-                        graphic_charge = QPixmap(self.unit_data_folder + '/' + self.get_config(unit_type, 'pixmap.charge', '', []))
-                        graphic_shoot = QPixmap(self.unit_data_folder + '/' + self.get_config(unit_type, 'pixmap.shoot', '', []))
-                        graphic_stand = QPixmap(self.unit_data_folder + '/' + self.get_config(unit_type, 'pixmap.stand', '', []))
-                        unit_type = LandUnitType(name, evolution_level, description, officier, attack_strength,
-                                                 fire_range, speed, creation_cost, upkeep, graphic_charge,
-                                                 graphic_shoot, graphic_stand)
-                        if previous_error == self.error_msg:
-                            self.list_unit_type.append(unit_type)
+                        theme = Theme(name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
+                                      ui_graphics,
+                                      unit_graphics)
+                        self.available_theme.append(theme)
+
+                        if name == self.name_theme_selected:
+                            self.theme_selected = theme
                     except ValueError as e:
                         self.error_msg += str(e) + '\n'
-                        # theme
-                        # list_themes = []
-                        # for section in self.config.sections():
+        if self.theme_selected is None:
+            self.error_msg = 'Theme: ' + str(self.name_theme_selected) + ' not found\n'
+        #
+        # Unit config
+        #
+        self.list_unit_type = []
+        print('here ' + self.unit_config_file + ' ' + str(self.theme_selected))
+        if self.unit_config_file != 'error' and self.theme_selected is not None:
+
+            self.config = configparser.ConfigParser()
+            self.config.read_file(open(self.unit_config_file))
+            for section in self.config.sections():
+                if self.check_options(section, MANDATORY_UNIT_OPTION, self.unit_config_file):
+                    try:
+                        previous_error = self.error_msg
+                        name = self.get_config(section, 'name', '', [])
+                        evolution_level = int(self.get_config(section, 'level', '', []))
+                        description = self.get_config(section, 'description', '', [])
+                        officier = bool(self.get_config(section, 'officier', '', []))
+                        attack_strength = int(self.get_config(section, 'attack', '', []))
+                        fire_range = int(self.get_config(section, 'range', '', []))
+                        speed = int(self.get_config(section, 'speed', '', []))
+                        creation_cost = float(self.get_config(section, 'creationcost', '', []))
+                        upkeep = float(self.get_config(section, 'upkeep', '', []))
+                        graphic_charge = QPixmap(
+                            self.theme_selected.unit_graphics + '/' + self.get_config(section, 'pixmap.charge', '',
+                                                                                          []))
+                        graphic_shoot = QPixmap(
+                                self.theme_selected.unit_graphics + '/' + self.get_config(section, 'pixmap.shoot', '',
+                                                                                          []))
+                        graphic_stand = QPixmap(
+                                self.theme_selected.unit_graphics + '/' + self.get_config(section, 'pixmap.stand', '',
+                                                                                          []))
+                        section = LandUnitType(name, evolution_level, description, officier, attack_strength,
+                                               fire_range, speed, creation_cost, upkeep, graphic_charge,
+                                               graphic_shoot, graphic_stand)
+                        if previous_error == self.error_msg:
+                            self.list_unit_type.append(section)
+                    except ValueError as e:
+                        self.error_msg += str(e) + '\n'
+
+
+
                         #    if section.startswith('theme'):
                         #        list_themes.append(section)
                         # TODO
@@ -107,11 +162,34 @@ class Config:
                         # if self.error_msg != '':
                         #    raise Exception('')
 
+    def check_options(self, section, list_option, filename):
+        retval = True
+        for option in list_option:
+            if not self.config.has_option(section, option):
+                retval = False
+                self.error_msg += 'In config file:' + str(
+                        filename) + ' missing option ' + option + ' in section ' + section + '\n'
+        for option in self.config.options(section):
+            if option not in list_option:
+                retval = False
+                self.error_msg += 'In config file:' + str(
+                        filename) + ' unknown option ' + option + ' in section ' + section + '\n'
+        return retval
+
     def fullscreen(self):
-        return self.fullscreen == 'yes'
+        return self.fullscreen.lower() == 'yes'
 
     def maximize(self):
-        return self.resolution == 'maximize'
+        return self.resolution.lower() == 'maximize'
+
+    def get_unit_type_list(self):
+        return self.list_unit_type
+
+    def parsing_error(self):
+        return self.error_msg == ''
+
+    def get_error_msg(self):
+        return self.error_msg
 
     def get_config(self, section, option, default, expected_value):
         try:
@@ -119,7 +197,9 @@ class Config:
             if len(expected_value) != 0 and retval.lower() not in expected_value:
                 self.error_msg += 'Error : Bad value option ' + str(option) + ' expected ' + str(expected_value) + '\n'
             else:
-                return retval.lower()
+                if self.data_folder != 'error':
+                    retval = retval.replace('$data', self.data_folder)
+                return retval
         except configparser.NoOptionError:
             self.error_msg += 'Error : Missing mandatory option ' + str(option) + '\n'
 
@@ -132,12 +212,16 @@ class Config:
         retval += str(self.error_msg)
         retval += 'Config : \n'
         retval += 'Resolution:' + str(self.resolution) + '\n'
-        retval += 'data folder:' + str(self.data) + '\n'
-        retval += 'theme config file:' + str(self.theme_config_file) + '\n'
+        retval += 'data folder:' + str(self.data_folder) + '\n'
         retval += 'lang config file:' + str(self.lang_config_file) + '\n'
         retval += 'unit config file:' + str(self.unit_config_file) + '\n'
-        retval += 'battle config file:' + str(self.battle_config_file) + '\n'
-        retval += 'unit type:' + str(self.list_unit_type) + '\n'
+        retval += 'unit type:\n'
+        for utype in self.list_unit_type:
+            retval += '\t-' + str(utype) + '\n'
+        retval += 'theme:\n'
+        for theme in self.available_theme:
+            retval += '\t-' + str(theme) + '\n'
+
         return retval
 
 

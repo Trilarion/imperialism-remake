@@ -23,8 +23,7 @@ class LandUnitInBattle(LandUnit):
     """
 
     # Constructor:
-    def __init__(self, dead, status, retreat, moral, unit_strength, experience_level, graphic_charge, graphic_shoot,
-                 graphic_stand, unit_type, nation):
+    def __init__(self, dead, status, retreat, moral, unit_strength, experience_level, unit_type, nation):
         """function __init__
         :param dead
         :param status
@@ -32,13 +31,10 @@ class LandUnitInBattle(LandUnit):
         :param moral
         :param unit_strength: int range(0,100)
         :param experience_level: int range(1,5)
-        :param graphic_charge; QPixmap
-        :param graphic_shoot: QPixmap
-        :param graphic_stand: QPixmap
         :param unit_type: LandUnitType
         :param nation: Nation
         """
-        super().__init__(unit_strength, experience_level, graphic_charge, graphic_shoot, graphic_stand, unit_type,
+        super().__init__(unit_strength, experience_level, unit_type,
                          nation)
         if not isinstance(dead, bool):
             raise ValueError('dead must be a boolean')

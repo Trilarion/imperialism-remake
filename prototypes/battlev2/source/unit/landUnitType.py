@@ -18,13 +18,14 @@
 
 from PyQt5.QtGui import QPixmap
 
+
 class LandUnitType:
     """Class LandUnitType
     """
 
     # Construtor
     def __init__(self, name, evolution_level, description, officier, attack_strength, fire_range, speed, creation_cost,
-                 upkeep,graphic_charge,graphic_shoot,graphic_stand):
+                 upkeep, graphic_charge, graphic_shoot, graphic_stand):
         """function __init__
 
         :param name: str (not empty)
@@ -54,14 +55,14 @@ class LandUnitType:
             raise ValueError('description must be a non empty string')
         if not isinstance(officier, bool):
             raise ValueError('officier must be a boolean')
-        if not isinstance(attack_strength, int) or attack_strength not in range(0, 20):
+        if not isinstance(attack_strength, int) or attack_strength not in range(0, 21):
             raise ValueError('attack_strength must be an int in range(0,20)')
-        if not isinstance(fire_range, int) or fire_range not in range(2, 8):
+        if (not isinstance(fire_range, int) or fire_range not in range(2, 9)) and not officier:
             raise ValueError('fire_range must be an int in range(2,8)')
-        if not isinstance(speed, int) or speed not in range(2, 10):
+        if not isinstance(speed, int) or speed not in range(2, 11):
             raise ValueError('speed must be an int in range(2,10)')
         if not isinstance(creation_cost, float) or creation_cost < 0:
-            raise ValueError('creation_cost must be an float>0 '+ str(creation_cost))
+            raise ValueError('creation_cost must be an float>0 ' + str(creation_cost))
         if not isinstance(upkeep, float) or upkeep < 0:
             raise ValueError('upkeep must be an float>0')
         self.name = name
@@ -77,8 +78,14 @@ class LandUnitType:
         self.graphicShoot = graphic_shoot
         self.graphicStand = graphic_stand
 
-
     # Operations
+    def __str__(self):
+        retval = 'name:' + self.name + ',evolutionLevel:' + str(
+            self.evolutionLevel) + ',description:' + self.description + ',officier:' + str(
+            self.officier) + ',attack: ' + str(self.attackStrength) + ',range:' + str(self.fireRange) + ',speed:' + str(
+            self.speed) + ',creationCost:' + str(self.creationCost) + ',upkeep:' + str(self.upkeep)
+        return retval
+
     def to_html_table_row(self):
         """function to_html_table_row
 

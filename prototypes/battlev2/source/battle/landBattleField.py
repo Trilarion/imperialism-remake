@@ -15,11 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from lib.hexagon import QHexagon
-from battle.landBattleFieldType import LandBattleFieldType
 from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene, QGraphicsSimpleTextItem
 from PyQt5.QtGui import QBrush
+from PyQt5.QtWidgets import QGraphicsSimpleTextItem
+
+from battle.landBattleFieldType import LandBattleFieldType
+from lib.hexagon import QHexagon
+
 
 class LandBattleField:
     """Class LandBattleField
