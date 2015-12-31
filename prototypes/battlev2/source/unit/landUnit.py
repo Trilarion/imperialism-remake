@@ -17,7 +17,6 @@
 
 from unit.landUnitType import LandUnitType
 from nation.nation import Nation
-from PyQt5.QtGui import QPixmap
 
 
 class LandUnit:
@@ -25,14 +24,11 @@ class LandUnit:
     """
 
     # Constructor:
-    def __init__(self,unit_strength,experience_level,graphic_charge,graphic_shoot,graphic_stand,unit_type,nation):
+    def __init__(self,unit_strength,experience_level,unit_type,nation):
         """function __init__
 
         :param unit_strength: int range(0,100)
         :param experience_level: int range(1,5)
-        :param graphic_charge; QPixmap
-        :param graphic_shoot: QPixmap
-        :param graphic_stand: QPixmap
         :param unit_type: LandUnitType
         :param nation: Nation
         """
@@ -40,22 +36,12 @@ class LandUnit:
             raise ValueError('unit_strength must be an int in range(0,100)')
         if not isinstance(experience_level, int) or experience_level not in range(1, 5):
             raise ValueError('experience_level must be an int in range(1,5)')
-
-        if not isinstance(graphic_charge, QPixmap) or graphic_charge is None:
-            raise ValueError('graphic_charge must be a QPixmap instance and not null')
-        if not isinstance(graphic_shoot, QPixmap) or graphic_shoot is None:
-            raise ValueError('graphic_shoot must be a QPixmap instance and not null')
-        if not isinstance(graphic_stand, QPixmap) or graphic_stand is None:
-            raise ValueError('graphic_stand must be a QPixmap instance and not null')
         if not isinstance(unit_type, LandUnitType) or unit_type is None:
             raise ValueError('unit_type must be a LandUnitType instance and not null')
         if not isinstance(nation, Nation) or nation is None:
             raise ValueError('nation must be a Nation instance and not null')
         self.unitStrength = unit_strength
         self.experienceLevel = experience_level
-        self.graphicCharge = graphic_charge
-        self.graphicShoot = graphic_shoot
-        self.graphicStand = graphic_stand
         self.unitType = unit_type
         self.nation = nation
 
@@ -76,4 +62,4 @@ class LandUnit:
 
         no return
         """
-        raise NotImplementedError()
+        self.unitType.draw(defending, scene, size)
