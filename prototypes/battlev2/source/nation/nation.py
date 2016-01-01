@@ -35,9 +35,9 @@ class Nation:
             raise ValueError('name must be a non empty string')
         if not isinstance(computer, bool):
             raise ValueError('computer must be a boolean')
-        if not isinstance(coat_of_arms, QPixmap) or coat_of_arms is None:
+        if not isinstance(coat_of_arms, QPixmap) or coat_of_arms is None or coat_of_arms.isNull():
             raise ValueError('coatOfArms must be a not null pixmap')
-        if not isinstance(flag, QPixmap) or flag is None:
+        if not isinstance(flag, QPixmap) or flag is None or flag.isNull():
             raise ValueError('flag must be a not null pixmap')
         self.name = name
         self.computer = computer
@@ -64,3 +64,6 @@ class Nation:
         no return
         """
         raise NotImplementedError()
+
+    def __str__(self):
+        return self.name

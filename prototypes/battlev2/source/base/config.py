@@ -22,6 +22,8 @@ from unit.landUnitType import LandUnitType
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication
 from base.theme import Theme
+from base.lang import Lang
+from nation.nation import Nation
 
 CONFIG_FILE = 'config.ini'
 DEFAULT_FULLSCREEN = 'yes'
@@ -32,11 +34,12 @@ DEFAULT_RESOLUTION = 'maximize'
 MANDATORY_UNIT_OPTION = ['name', 'description', 'officier', 'level', 'attack', 'range', 'speed', 'creationcost',
                          'upkeep', 'pixmap.charge', 'pixmap.shoot', 'pixmap.stand']
 MANDATORY_CONFIG_OPTION = ['fullscreen', 'resolution', 'theme', 'lang']
-MANDATORY_PATH_OPTION = ['data', 'lang_config_file', 'unit_config_file']
+MANDATORY_PATH_OPTION = ['data', 'lang_config_file', 'unit_config_file', 'nation_config_file']
 MANDATORY_BATTLE_OPTION = []
 MANDATORY_THEME_OPTION = ['name', 'description', 'coat_of_arms_graphics', 'flag_graphics', 'map_graphics',
-                          'ui_graphics', 'unit_graphics']
-
+                          'unit_graphics', 'background', 'end_button','autocombat_button', 'help_button',
+                          'retreat_button', 'target_button']
+MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 class Config:
     def __init__(self):
@@ -60,15 +63,14 @@ class Config:
         # theme
         self.name_theme_selected = self.get_config('config', 'theme', DEFAULT_THEME, [])
         # lang
-        self.lang_selected = self.get_config('config', 'lang', DEFAULT_LANG, [])
+        self.name_lang_selected = self.get_config('config', 'lang', DEFAULT_LANG, [])
 
         #
         # Path config
         #
 
-        # path file
+        # data path folder
         self.data_folder = self.get_config('path', 'data', '', [])
-        # TODO remove / at the end of data path
         if not os.path.isdir(self.data_folder):
             self.error_msg += 'data folder ' + self.data_folder + ' doesn\'t exist\n'
             self.data_folder = 'error'
@@ -82,7 +84,11 @@ class Config:
         if not os.path.exists(self.unit_config_file):
             self.error_msg += 'unit config file ' + self.unit_config_file + ' doesn\'t exist\n'
             self.unit_config_file = 'error'
-
+        # nation config file
+        self.nation_config_file = self.get_config('path', 'nation_config_file', '', [])
+        if not os.path.exists(self.nation_config_file):
+            self.error_msg += 'nation config file ' + self.nation_config_file + ' doesn\'t exist\n'
+            self.nation_config_file = 'error'
         #
         # Theme Config
         #
@@ -97,12 +103,17 @@ class Config:
                     coat_of_arms_graphics = self.get_config(section, 'coat_of_arms_graphics', '', [])
                     flag_graphics = self.get_config(section, 'flag_graphics', '', [])
                     map_graphics = self.get_config(section, 'map_graphics', '', [])
-                    ui_graphics = self.get_config(section, 'ui_graphics', '', [])
                     unit_graphics = self.get_config(section, 'unit_graphics', '', [])
+                    background = self.get_config(section, 'background', '', [])
+                    end_button = self.get_config(section, 'end_button', '', [])
+                    autocombat_button = self.get_config(section, 'autocombat_button', '', [])
+                    help_button = self.get_config(section, 'help_button', '', [])
+                    retreat_button = self.get_config(section, 'retreat_button', '', [])
+                    target_button = self.get_config(section, 'target_button', '', [])
                     try:
                         theme = Theme(name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
-                                      ui_graphics,
-                                      unit_graphics)
+                                unit_graphics,background,end_button,autocombat_button, help_button,
+                                retreat_button, target_button)
                         self.available_theme.append(theme)
 
                         if name == self.name_theme_selected:
@@ -110,13 +121,14 @@ class Config:
                     except ValueError as e:
                         self.error_msg += str(e) + '\n'
         if self.theme_selected is None:
-            self.error_msg = 'Theme: ' + str(self.name_theme_selected) + ' not found\n'
+            self.error_msg += 'Theme: ' + str(self.name_theme_selected) + ' not found\n'
+        if len(self.available_theme) == 0:
+            self.error_msg += 'No Theme available\n'
         #
         # Unit config
         #
         self.list_unit_type = []
-        print('here ' + self.unit_config_file + ' ' + str(self.theme_selected))
-        if self.unit_config_file != 'error' and self.theme_selected is not None:
+        if self.unit_config_file != 'error':
 
             self.config = configparser.ConfigParser()
             self.config.read_file(open(self.unit_config_file))
@@ -150,63 +162,61 @@ class Config:
                     except ValueError as e:
                         self.error_msg += str(e) + '\n'
 
+        #
+        # lang config
+        #
+        self.lang_selected = 'error'
+        self.available_lang = []
+        if self.lang_config_file != 'error':
+            self.config = configparser.ConfigParser()
+            self.config.read_file(open(self.lang_config_file))
+            for section in self.config.sections():
+                try:
+                    name = self.get_config(section, 'name', '', [])
+                    description = self.get_config(section, 'description', '', [])
+                    lang = Lang(name,description)
+                    for option in self.config.options(section):
+                        lang.add_string(option, self.get_config(section, option, '', []))
+                    if name == self.name_lang_selected:
+                        self.lang_selected = lang
+                    self.available_lang.append(lang)
+                except ValueError as e:
+                    self.error_msg += str(e) + '\n'
+        if self.lang_selected is None:
+            self.error_msg += 'Lang: ' + str(self.lang_selected) + ' not found\n'
+        if len(self.available_lang) == 0:
+            self.error_msg += 'No Lang available\n'
+
+        #
+        # nation config
+        #
+        self.available_nation = []
+        if self.nation_config_file != 'error':
+            self.config = configparser.ConfigParser()
+            self.config.read_file(open(self.nation_config_file))
+            for section in self.config.sections():
+                try:
+                    name = self.get_config(section, 'name', '', [])
+                    flag = QPixmap(self.theme_selected.flag_graphics + '/' + self.get_config(section, 'flag', '',[]))
+                    coat_of_arms = QPixmap(self.theme_selected.coat_of_arms_graphics + '/' + self.get_config(section, 'coat_of_arms', '',[]))
+
+                    nation = Nation(name,False,flag,coat_of_arms)
+                    for option in self.config.options(section):
+                        lang.add_string(option, self.get_config(section, option, '', []))
+                    if name == self.name_lang_selected:
+                        self.lang_seleted = lang
+                    self.available_nation.append(nation)
+                except ValueError as e:
+                    self.error_msg += str(e) + '\n'
+        if len(self.available_nation) == 0:
+            self.error_msg += 'No Nation available\n'
 
 
-                        #    if section.startswith('theme'):
-                        #        list_themes.append(section)
-                        # TODO
-                        # list_themes.size == 0 => error
-                        # list_themes.size == 1 => DEFAULT_THEME = elem
-                        # list_themes.size and DEFAULT_THEME not in => DEFAULT_THEME.elem 0
-                        # self.theme = self.get_config('config', 'theme', DEFAULT_THEME, list_themes)
-                        # if self.error_msg != '':
-                        #    raise Exception('')
 
-    def check_options(self, section, list_option, filename):
-        retval = True
-        for option in list_option:
-            if not self.config.has_option(section, option):
-                retval = False
-                self.error_msg += 'In config file:' + str(
-                        filename) + ' missing option ' + option + ' in section ' + section + '\n'
-        for option in self.config.options(section):
-            if option not in list_option:
-                retval = False
-                self.error_msg += 'In config file:' + str(
-                        filename) + ' unknown option ' + option + ' in section ' + section + '\n'
-        return retval
 
-    def fullscreen(self):
-        return self.fullscreen.lower() == 'yes'
-
-    def maximize(self):
-        return self.resolution.lower() == 'maximize'
-
-    def get_unit_type_list(self):
-        return self.list_unit_type
-
-    def parsing_error(self):
-        return self.error_msg == ''
-
-    def get_error_msg(self):
-        return self.error_msg
-
-    def get_config(self, section, option, default, expected_value):
-        try:
-            retval = self.config.get(section, option)
-            if len(expected_value) != 0 and retval.lower() not in expected_value:
-                self.error_msg += 'Error : Bad value option ' + str(option) + ' expected ' + str(expected_value) + '\n'
-            else:
-                if self.data_folder != 'error':
-                    retval = retval.replace('$data', self.data_folder)
-                return retval
-        except configparser.NoOptionError:
-            self.error_msg += 'Error : Missing mandatory option ' + str(option) + '\n'
-
-        except configparser.NoSectionError:
-            self.error_msg += 'Error : Missing mandatory section ' + str(section) + '\n'
-        return default
-
+    #
+    # Overwrite class method
+    #
     def __str__(self):
         retval = 'Error : \n'
         retval += str(self.error_msg)
@@ -221,8 +231,89 @@ class Config:
         retval += 'theme:\n'
         for theme in self.available_theme:
             retval += '\t-' + str(theme) + '\n'
-
+        retval += 'nation:\n'
+        for nation in self.available_nation:
+            retval += '\t-' + str(nation) + '\n'
         return retval
+
+
+    #
+    # Operation to simplify config parsing
+    #
+    def get_config(self, section, option, default, expected_value):
+        try:
+            retval = self.config.get(section, option)
+            if len(expected_value) != 0 and retval.lower() not in expected_value:
+                self.error_msg += 'Error : Bad value option ' + str(option) + ' expected ' + str(expected_value) + '\n'
+            else:
+                if self.data_folder != 'error':
+                    retval = retval.replace('$data', self.data_folder)
+                return retval.replace('//','/')
+        except configparser.NoOptionError:
+            self.error_msg += 'Error : Missing mandatory option ' + str(option) + '\n'
+
+        except configparser.NoSectionError:
+            self.error_msg += 'Error : Missing mandatory section ' + str(section) + '\n'
+        return default
+
+    def check_options(self, section, list_option, filename):
+        retval = True
+        for option in list_option:
+            if not self.config.has_option(section, option):
+                retval = False
+                self.error_msg += 'In ' + str(
+                        filename) + ' missing option ' + option + ' in section ' + section + '\n'
+        for option in self.config.options(section):
+            if option not in list_option:
+                retval = False
+                self.error_msg += 'In ' + str(
+                        filename) + ' unknown option ' + option + ' in section ' + section + '\n'
+        return retval
+
+
+    #
+    # Configuration getter
+    #
+    def fullscreen(self):
+        return self.fullscreen.lower() == 'yes'
+
+    def maximize(self):
+        return self.resolution.lower() == 'maximize'
+
+    def get_unit_type_list(self):
+        return self.list_unit_type
+
+    def get_unit_pixmap(self, file_name):
+        """
+        function get_unit_pixmap
+        :param file_name: filename of the unit image
+        :return: the QPixmap corresponding
+        """
+        return self.theme_selected.get_unit_pixmap(file_name)
+
+
+    def get_map_pixmap(self, file_name):
+        """
+        function get_map_pixmap
+        :param file_name: filename of the map image
+        :return: the QPixmap corresponding
+        """
+        return self.theme_selected.get_map_pixmap(file_name)
+
+
+    def get_flag_pixmap(self, file_name):
+        """
+        function get_flag_pixmap
+        :param file_name: filename of the flag image
+        :return: the QPixmap corresponding
+        """
+        return self.theme_selected.get_flag_pixmap(file_name)
+
+    def get_string(self, key):
+        if not isinstance(key, str) or key == '':
+            raise ValueError('key must be a non empty string')
+        return self.name_lang_selected.get(key, '')
+
 
 
 if __name__ == '__main__':

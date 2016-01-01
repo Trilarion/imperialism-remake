@@ -19,13 +19,13 @@ import random
 
 from PyQt5.QtCore import QSize, Qt, QObject
 from PyQt5.QtGui import QPixmap, QPalette, QBrush, QIcon
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QLabel, QSpacerItem, QSizePolicy, QGraphicsScene, \
+from PyQt5.QtWidgets import QMessageBox, QWidget, QPushButton, QGridLayout, QLabel, QSpacerItem, QSizePolicy, QGraphicsScene, \
     QGraphicsRectItem, QGraphicsView
 
 from base import constants
 from battle.landArmy import LandArmy
 from battle.landBattle import LandBattle
-
+from base.config import Config
 
 class LandBattleView(QObject):
     """Class LandBattleView
@@ -33,6 +33,12 @@ class LandBattleView(QObject):
 
     def __init__(self, battle_window, parent=None):
         super().__init__(parent)
+        self.config = Config()
+        if self.config.error_msg != '':
+            QMessageBox.about(battle_window, 'Configuration Error', self.config.error_msg)
+            exit(-1)
+        print('TODO remove this : \n' + str(self.config))
+        print(self.config.error_msg)
         self.BattleWindow = battle_window
         self.centralWidget = QWidget(self.BattleWindow)
         self.gridLayout = QGridLayout(self.centralWidget)
@@ -96,7 +102,7 @@ class LandBattleView(QObject):
         self.nextTargetButton.setMaximumSize(QSize(45, 45))
         self.nextTargetButton.setText("")
         icon = QIcon()
-        icon.addPixmap(QPixmap(constants.Graphics_Target), QIcon.Normal, QIcon.Off)
+        icon.addPixmap(QPixmap(self.config.theme_selected.get_target_button_pixmap()), QIcon.Normal, QIcon.Off)
         self.nextTargetButton.setIcon(icon)
         self.nextTargetButton.setIconSize(QSize(40, 40))
         self.gridLayout.addWidget(self.nextTargetButton, 5, 1, 1, 1, Qt.AlignCenter)
@@ -109,7 +115,7 @@ class LandBattleView(QObject):
         self.endUnitTurnButton.setMaximumSize(QSize(45, 45))
         self.endUnitTurnButton.setText("")
         icon1 = QIcon()
-        icon1.addPixmap(QPixmap(constants.Graphics_End), QIcon.Normal, QIcon.Off)
+        icon1.addPixmap(self.config.theme_selected.get_end_button_pixmap(), QIcon.Normal, QIcon.Off)
         self.endUnitTurnButton.setIcon(icon1)
         self.endUnitTurnButton.setIconSize(QSize(40, 40))
         self.gridLayout.addWidget(self.endUnitTurnButton, 6, 1, 1, 1, Qt.AlignCenter)
@@ -124,7 +130,7 @@ class LandBattleView(QObject):
         self.retreatButton.setWhatsThis("")
         self.retreatButton.setText("")
         icon2 = QIcon()
-        icon2.addPixmap(QPixmap(constants.Graphics_Retreat), QIcon.Normal, QIcon.Off)
+        icon2.addPixmap(QPixmap(self.config.theme_selected.get_retreat_button_pixmap()), QIcon.Normal, QIcon.Off)
         self.retreatButton.setIcon(icon2)
         self.retreatButton.setIconSize(QSize(42, 40))
         self.gridLayout.addWidget(self.retreatButton, 7, 1, 1, 1, Qt.AlignCenter)
@@ -137,7 +143,7 @@ class LandBattleView(QObject):
         self.helpButton.setMaximumSize(QSize(80, 80))
         self.helpButton.setText("")
         icon3 = QIcon()
-        icon3.addPixmap(QPixmap(constants.Graphics_Help), QIcon.Normal, QIcon.Off)
+        icon3.addPixmap(QPixmap(self.config.theme_selected.get_help_button_pixmap()), QIcon.Normal, QIcon.Off)
         self.helpButton.setIcon(icon3)
         self.helpButton.setIconSize(QSize(75, 75))
         self.gridLayout.addWidget(self.helpButton, 0, 1, 2, 1)
@@ -150,7 +156,7 @@ class LandBattleView(QObject):
         self.autoCombatButton.setMaximumSize(QSize(90, 90))
         self.autoCombatButton.setText("")
         icon4 = QIcon()
-        icon4.addPixmap(QPixmap(constants.Graphics_General), QIcon.Normal, QIcon.Off)
+        icon4.addPixmap(QPixmap(self.config.theme_selected.get_autocombat_button_pixmap()), QIcon.Normal, QIcon.Off)
         self.autoCombatButton.setIcon(icon4)
         self.autoCombatButton.setIconSize(QSize(80, 80))
         self.gridLayout.addWidget(self.autoCombatButton, 12, 1, 1, 1)
@@ -212,7 +218,7 @@ class LandBattleView(QObject):
 
     def setup_ui(self):
         self.BattleWindow.setWindowTitle("BattleWindow")
-        background = QPixmap(constants.Graphics_Background)
+        background = self.config.theme_selected.get_background_pixmap()
         palette = QPalette()
         palette.setBrush(QPalette.Background, QBrush(background))
         self.BattleWindow.setMinimumSize(QSize(constants.Screen_Min_Size[0], constants.Screen_Min_Size[1]))

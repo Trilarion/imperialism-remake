@@ -78,19 +78,11 @@ Artwork_Folder = extend(Data_Folder, 'artwork')
 
 # graphics related folders
 Graphics_Folder = extend(Artwork_Folder, 'graphics')
-Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 Graphics_Map_Folder = extend(Graphics_Folder, 'map')
 Graphics_Flag_Folder = extend(Graphics_Folder, 'flag')
 Graphics_Coat_Of_Map_Folder = extend(Graphics_Folder, 'coat_of_arms')
 Graphics_Unit_Folder = extend(Graphics_Folder, 'unit')
 
-# UI file
-Graphics_Background = extend(Graphics_UI_Folder, 'background.jpg')
-Graphics_End = extend(Graphics_UI_Folder, 'end.png')
-Graphics_General = extend(Graphics_UI_Folder, 'general.png')
-Graphics_Help = extend(Graphics_UI_Folder, 'help.png')
-Graphics_Retreat = extend(Graphics_UI_Folder, 'retreat.png')
-Graphics_Target = extend(Graphics_UI_Folder, 'target.png')
 
 # Flag file
 Flag_of_Algeria = extend(Graphics_Flag_Folder, 'Flag_of_Algeria.svg')
