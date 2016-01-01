@@ -16,19 +16,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import sys
-from battle.landBattleView import LandBattleView
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from battle.landBattleView import LandBattleView, MainBattleWindows
+from PyQt5.QtWidgets import QApplication
 
 
-class MainWindow(QMainWindow):
-    def __init__(self, parent=None):
-        super(MainWindow, self).__init__(parent)
-        self.ui = LandBattleView(self, None)
-        self.ui.setup_ui()
+
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    mySW = MainWindow()
+    mySW = MainBattleWindows()
     mySW.showMaximized()
     sys.exit(app.exec_())

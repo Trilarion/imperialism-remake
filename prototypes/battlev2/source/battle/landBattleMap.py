@@ -20,6 +20,7 @@ from lib.hexagon import QHexagon
 from PyQt5.QtCore import QPointF
 from battle.landBattleFieldType import LandBattleFieldType
 from PyQt5.QtCore import Qt
+from base.config import Config
 import math
 
 class LandBattleMap:
@@ -31,33 +32,31 @@ class LandBattleMap:
     """
 
     # Constructor:
-    def __init__(self, size_screen_width, size_screen_heigth, diameter, city_diameter):
+    def __init__(self, config, size_screen_width, size_screen_heigth):
         """
         function __init__
+        :param config: Config
         :param size_screen_width: int
         :param size_screen_heigth: int
-        :param diameter:int >0
-        :param city_diameter:int >0
         :return:
         """
+        if not isinstance(config, Config) and config.error_msg != '':
+            raise ValueError('size_screen_width must be a int instance')
         if not isinstance(size_screen_width, int):
             raise ValueError('size_screen_width must be a int instance')
         if not isinstance(size_screen_heigth, int):
             raise ValueError('size_screen_heigth must be a int instance')
-        if not isinstance(diameter, int) or diameter < 0:
-            raise ValueError('diameter must be a int>0')
-        if not isinstance(city_diameter, int) or city_diameter < 0:
-            raise ValueError('cityDiameter must be a int>0')
-        if city_diameter >= diameter:
-            raise ValueError('city_diameter must be inferior to diameter')
-        self.diameter = diameter
+        self.config = config
         self.sizeScreenWidth = size_screen_width
-        self.sizeScreenHeigth = size_screen_heigth
-        self.cityDiameter = city_diameter
-        # TODO create fields
-        print("TODO create fields (landBattleMap")
+        self.sizeScreenHeight = size_screen_heigth
+        self.diameter = self.config.diameter_battlemap
+        self.cityDiameter = self.config.diameter_battlecity
         self.fields = []
         self.create_fields()
+
+    def resizeEvent(self, evt=None):
+        print('TODO landBattleMap resize')
+
 
     # Operations
     def get_size_tile(self):
@@ -65,8 +64,8 @@ class LandBattleMap:
 
         returns
         """
-        return min(self.sizeScreenWidth / (self.diameter * math.sqrt(3) / 2), self.sizeScreenHeigth / (self.diameter * 3 / 4))
-        #return min((self.sizeScreenHeigth - 5)/ ( (self.diameter - 1 ) * 3 / 4 + 1), (self.sizeScreenWidth - 1.5)/ ( (self.diameter - 1 ) * math.sqrt(3) / 2 +1))
+        return min((self.sizeScreenHeight - 5)/ ( (self.diameter - 1 ) * 3 / 4 + 1), (self.sizeScreenWidth - 1.5)/ ( (self.diameter - 1 ) * math.sqrt(3) / 2 + 1))/2
+        #return min(self.sizeScreenWidth / (self.diameter * math.sqrt(3) / 2), self.sizeScreenHeight / (self.diameter * 3 / 4))
 
 
     def get_center_screen(self):
@@ -74,7 +73,7 @@ class LandBattleMap:
 
         returns QPointF
         """
-        return QPointF(self.sizeScreenWidth / 2, self.sizeScreenHeigth / 2)
+        return QPointF(self.sizeScreenWidth / 2, self.sizeScreenHeight / 2)
 
     def draw(self, scene):
         """function draw
@@ -83,10 +82,12 @@ class LandBattleMap:
 
         no return
         """
+        self.sizeScreenWidth = scene.width()
+        self.sizeScreenHeight = scene.height()
+        self.fields = []
+        self.create_fields()
         for field in self.fields:
             field.draw(scene)
-            #if field.enable:
-            #    return
 
 
     def position_to_grid_position(self, position):
@@ -131,7 +132,7 @@ class LandBattleMap:
         if self.map_hexagon().intersected(hexa):
             return True
         else:
-            return False
+            return True
 
     def inside_city(self, hexa):
         """function inside_city: return true if hexe is inside the city hexagon

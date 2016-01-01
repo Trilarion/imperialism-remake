@@ -18,6 +18,7 @@
 from battle.landArmy import LandArmy
 from battle.landBattleMap import LandBattleMap
 from battle.landUnitInBattle import LandUnitInBattle
+from base.config import Config
 
 
 class LandBattle:
@@ -25,13 +26,13 @@ class LandBattle:
     """
 
     # Constructor:
-    def __init__(self, size_screen_width, size_screen_heigth, diameter, city_diameter, auto_combat, turn, current_unit,
+    def __init__(self, config, size_screen_width, size_screen_heigth, auto_combat, turn, current_unit,
                  targetted_unit, defender,attacker):
         """
+        constructor
+        :param config: Config
         :param size_screen_width: int
         :param size_screen_heigth: int
-        :param diameter:int >0
-        :param city_diameter:int >0
         :param auto_combat: bool
         :param turn: int > 0
         :param current_unit: LandUnitInBattle
@@ -40,6 +41,8 @@ class LandBattle:
         :param attacker: LandArmy
         :return:
         """
+        if not isinstance(config, Config) and config.error_msg != '':
+            raise ValueError('size_screen_width must be a int instance')
         if not isinstance(size_screen_width, int):
             raise ValueError('size_screen_width must be a int instance')
         if not isinstance(size_screen_heigth, int):
@@ -56,17 +59,12 @@ class LandBattle:
             raise ValueError('defender must be a not null LandArmy')
         if not isinstance(attacker, LandArmy) or attacker is None:
             raise ValueError('attacker must be a not null LandArmy')
-        if not isinstance(diameter, int) or diameter < 0:
-            raise ValueError('diameter must be a int>0')
-        if not isinstance(city_diameter, int) or city_diameter < 0:
-            raise ValueError('cityDiameter must be a int>0')
-        if city_diameter >= diameter:
-            raise ValueError('city_diameter must be inferior to diameter')
         self.autoCombat = auto_combat
         self.turn = turn
         self.currentUnit = current_unit
         self.targettedUnit = targetted_unit
-        self.map = LandBattleMap(size_screen_width, size_screen_heigth, diameter, city_diameter)
+        self.config = config
+        self.map = LandBattleMap(self.config, size_screen_width, size_screen_heigth)
         self.defender = defender
         self.attacker = attacker
 
@@ -90,6 +88,13 @@ class LandBattle:
         returns
         """
         raise NotImplementedError()
+
+
+    def resizeEvent(self, evt=None):
+        print('TODO landBattle resize')
+        self.map.resizeEvent(evt)
+
+
 
     def draw_battle_map(self, scene):
         """function draw_battle_map

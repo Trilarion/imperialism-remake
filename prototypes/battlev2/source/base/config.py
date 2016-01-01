@@ -30,12 +30,14 @@ DEFAULT_FULLSCREEN = 'yes'
 DEFAULT_THEME = 'theme0'
 DEFAULT_LANG = 'en'
 DEFAULT_RESOLUTION = 'maximize'
+DEFAULT_DIAMETER_MAP = '20'
+DEFAULT_DIAMETER_CITY = '5'
 
 MANDATORY_UNIT_OPTION = ['name', 'description', 'officier', 'level', 'attack', 'range', 'speed', 'creationcost',
                          'upkeep', 'pixmap.charge', 'pixmap.shoot', 'pixmap.stand']
 MANDATORY_CONFIG_OPTION = ['fullscreen', 'resolution', 'theme', 'lang']
 MANDATORY_PATH_OPTION = ['data', 'lang_config_file', 'unit_config_file', 'nation_config_file']
-MANDATORY_BATTLE_OPTION = []
+MANDATORY_BATTLE_OPTION = ['diameter_battlemap', 'diameter_battlecity']
 MANDATORY_THEME_OPTION = ['name', 'description', 'coat_of_arms_graphics', 'flag_graphics', 'map_graphics',
                           'unit_graphics', 'background', 'end_button','autocombat_button', 'help_button',
                           'retreat_button', 'target_button']
@@ -65,6 +67,21 @@ class Config:
         # lang
         self.name_lang_selected = self.get_config('config', 'lang', DEFAULT_LANG, [])
 
+        #
+        # Battle option
+        #
+        try:
+            self.diameter_battlemap = int(self.get_config('battle', 'diameter_battlemap', DEFAULT_DIAMETER_MAP, []))
+            if self.diameter_battlemap<=0:
+                self.error_msg += 'diameter_battlemap must be a int>0'
+        except:
+            self.error_msg += 'diameter_battlemap must be a int'
+        try:
+            self.diameter_battlecity = int(self.get_config('battle', 'diameter_battlecity', DEFAULT_DIAMETER_CITY, []))
+            if self.diameter_battlecity<=0:
+                self.error_msg += 'diameter_battlecity must be a int>0'
+        except:
+            self.error_msg += 'diameter_battlecity must be a int'
         #
         # Path config
         #
@@ -312,7 +329,7 @@ class Config:
     def get_string(self, key):
         if not isinstance(key, str) or key == '':
             raise ValueError('key must be a non empty string')
-        return self.name_lang_selected.get(key, '')
+        return self.lang_selected.get_string(key)
 
 
 

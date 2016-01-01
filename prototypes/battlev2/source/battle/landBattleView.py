@@ -17,15 +17,25 @@
 
 import random
 
-from PyQt5.QtCore import QSize, Qt, QObject
+from PyQt5.QtCore import QSize, Qt, QObject, QMetaObject
 from PyQt5.QtGui import QPixmap, QPalette, QBrush, QIcon
 from PyQt5.QtWidgets import QMessageBox, QWidget, QPushButton, QGridLayout, QLabel, QSpacerItem, QSizePolicy, QGraphicsScene, \
-    QGraphicsRectItem, QGraphicsView
+    QGraphicsRectItem, QGraphicsView, QMainWindow
 
 from base import constants
 from battle.landArmy import LandArmy
 from battle.landBattle import LandBattle
 from base.config import Config
+
+class MainBattleWindows(QMainWindow):
+    def __init__(self, parent=None):
+        super(MainBattleWindows, self).__init__(parent)
+        self.ui = LandBattleView(self, None)
+        self.ui.setup_ui()
+
+    def resizeEvent(self, evt=None):
+        self.ui.resizeEvent(evt)
+
 
 class LandBattleView(QObject):
     """Class LandBattleView
@@ -37,8 +47,6 @@ class LandBattleView(QObject):
         if self.config.error_msg != '':
             QMessageBox.about(battle_window, 'Configuration Error', self.config.error_msg)
             exit(-1)
-        print('TODO remove this : \n' + str(self.config))
-        print(self.config.error_msg)
         self.BattleWindow = battle_window
         self.centralWidget = QWidget(self.BattleWindow)
         self.gridLayout = QGridLayout(self.centralWidget)
@@ -50,6 +58,7 @@ class LandBattleView(QObject):
         self.graphicsView_currentUnit = QGraphicsView(self.currentUnitGraphicsScene)
         self.graphicsView_targetedUnit = QGraphicsView(self.targetedUnitGraphicsScene)
         self.graphicsView_main = QGraphicsView(self.mainScene)
+        print('size graphics view ' + str(self.graphicsView_main.width()) +',' + str(self.graphicsView_main.height()))
         self.autoCombatButton = CustomButton(self.centralWidget)
         self.helpButton = CustomButton(self.centralWidget)
         self.retreatButton = CustomButton(self.centralWidget)
@@ -60,9 +69,7 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_main, 1, 0, 12, 1)
         defender = LandArmy(False, None)
         attacker = LandArmy(False, None)
-        diameter = 20
-        city_diameter = 5
-        self.landBattle = LandBattle(battle_window.width(), battle_window.height(), diameter, city_diameter, False, 0,
+        self.landBattle = LandBattle(self.config, self.graphicsView_main.width(), self.graphicsView_main.height(), False, 0,
                                      None, None, defender, attacker)
 
     def setup_hint_label(self):
@@ -95,7 +102,7 @@ class LandBattleView(QObject):
         self.gridLayout.addItem(spacer_item3, 11, 1, 1, 1)
 
     def setup_next_target_button(self):
-        self.nextTargetButton.setbutton_hint_label_text("Next Target", self.buttonHintLabel)
+        self.nextTargetButton.setbutton_hint_label_text(self.config.get_string('next.target.label'), self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.nextTargetButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.nextTargetButton.setSizePolicy(size_policy)
         self.nextTargetButton.setMinimumSize(QSize(45, 45))
@@ -108,7 +115,7 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.nextTargetButton, 5, 1, 1, 1, Qt.AlignCenter)
 
     def setup_end_unit_button(self):
-        self.endUnitTurnButton.setbutton_hint_label_text("End Unit's Turn", self.buttonHintLabel)
+        self.endUnitTurnButton.setbutton_hint_label_text(self.config.get_string('end.unit.label'), self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.endUnitTurnButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.endUnitTurnButton.setSizePolicy(size_policy)
         self.endUnitTurnButton.setMinimumSize(QSize(45, 45))
@@ -121,7 +128,7 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.endUnitTurnButton, 6, 1, 1, 1, Qt.AlignCenter)
 
     def setup_retreat_button(self):
-        self.retreatButton.setbutton_hint_label_text("retreat All Units", self.buttonHintLabel)
+        self.retreatButton.setbutton_hint_label_text(self.config.get_string('retreat.all.label'), self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.retreatButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.retreatButton.setSizePolicy(size_policy)
         self.retreatButton.setMinimumSize(QSize(45, 45))
@@ -136,7 +143,7 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.retreatButton, 7, 1, 1, 1, Qt.AlignCenter)
 
     def setup_help_button(self):
-        self.helpButton.setbutton_hint_label_text("Help on Tactical Battles", self.buttonHintLabel)
+        self.helpButton.setbutton_hint_label_text(self.config.get_string('help.tacticalbattle.label'), self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.helpButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.helpButton.setSizePolicy(size_policy)
         self.helpButton.setMinimumSize(QSize(80, 80))
@@ -149,7 +156,7 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.helpButton, 0, 1, 2, 1)
 
     def setup_auto_combat_button(self):
-        self.autoCombatButton.setbutton_hint_label_text("Auto-Play", self.buttonHintLabel)
+        self.autoCombatButton.setbutton_hint_label_text(self.config.get_string('auto.play.label'), self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.autoCombatButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.autoCombatButton.setSizePolicy(size_policy)
         self.autoCombatButton.setMinimumSize(QSize(90, 90))
@@ -187,6 +194,7 @@ class LandBattleView(QObject):
 
     def setup_current_unit_view(self, current_unit):
         # TODO setup_current_unit_view
+
         print("TODO setup_current_unit_view (landBattleView.py)")
         self.add_unit(self.currentUnitGraphicsScene, 60, current_unit, constants.Flag_of_Spain, False)
         size_policy = constants.default_size_policy(self.graphicsView_currentUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -208,16 +216,17 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_coatOfArm, 3, 1, 1, 1)
 
     def setup_map(self):
-        # TODO setup_map
-        print("TODO setupMap (landBattleView.py)")
+        self.mainScene = QGraphicsScene()
+        self.graphicsView_main.setScene(self.mainScene)
+        self.mainScene.addRect(0,0,self.graphicsView_main.width()-1,self.graphicsView_main.height()-1)
+        print('Scene width:' + str(self.mainScene.width()) +' heigh:' + str(self.mainScene.height()))
+        print('graphics width:' + str(self.graphicsView_main.width()) +' height:' + str(self.graphicsView_main.height()))
         self.landBattle.draw_battle_map(self.mainScene)
-        # bmap = map.battle_map.BattleMap()
-        # self.graphicsView = map.battle_map.BattleMapView(bmap)
-        # self.gridLayout.addWidget(self.graphicsView, 1, 0, 12, 1)
-        # self.graphicsView.redraw_map()
+        print('Scene after width:' + str(self.mainScene.width()) +' heigh:' + str(self.mainScene.height()))
+
 
     def setup_ui(self):
-        self.BattleWindow.setWindowTitle("BattleWindow")
+        self.BattleWindow.setWindowTitle(self.config.get_string('battle.window.title'))
         background = self.config.theme_selected.get_background_pixmap()
         palette = QPalette()
         palette.setBrush(QPalette.Background, QBrush(background))
@@ -249,7 +258,11 @@ class LandBattleView(QObject):
         self.setup_map()
         self.BattleWindow.setPalette(palette)
         self.BattleWindow.setCentralWidget(self.centralWidget)
+        QMetaObject.connectSlotsByName(self.BattleWindow)
 
+    def resizeEvent(self, evt=None):
+        print('TODO landBattleView resize')
+        self.setup_map()
 
 class CustomButton(QPushButton):
     text = ""
