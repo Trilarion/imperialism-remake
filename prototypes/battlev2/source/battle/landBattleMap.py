@@ -53,6 +53,7 @@ class LandBattleMap:
         self.cityDiameter = self.config.diameter_battlecity
         self.fields = []
         self.create_fields()
+        
 
     def resizeEvent(self, evt=None):
         print('TODO landBattleMap resize')
@@ -64,8 +65,7 @@ class LandBattleMap:
 
         returns
         """
-        return min((self.sizeScreenHeight - 5)/ ( (self.diameter - 1 ) * 3 / 4 + 1), (self.sizeScreenWidth - 1.5)/ ( (self.diameter - 1 ) * math.sqrt(3) / 2 + 1))/2
-        #return min(self.sizeScreenWidth / (self.diameter * math.sqrt(3) / 2), self.sizeScreenHeight / (self.diameter * 3 / 4))
+        return min((self.sizeScreenHeight)/ ( (self.diameter - 1 ) * 3 / 4 + 1), (self.sizeScreenWidth)/ ( (self.diameter - 1 ) * math.sqrt(3) / 2 + 1)) * 0.5
 
 
     def get_center_screen(self):
@@ -73,7 +73,11 @@ class LandBattleMap:
 
         returns QPointF
         """
-        return QPointF(self.sizeScreenWidth / 2, self.sizeScreenHeight / 2)
+        column = round((self.diameter-1) /2)
+        row = round((self.diameter-1) /2)
+        posx, posy = LandBattleMap.scene_position(column, row)
+        center = QPointF((posx + 0.5) * self.get_size_tile()*2, (posy + 0.5) * self.get_size_tile()*2) 
+        return center
 
     def draw(self, scene):
         """function draw
@@ -88,7 +92,6 @@ class LandBattleMap:
         self.create_fields()
         for field in self.fields:
             field.draw(scene)
-
 
     def position_to_grid_position(self, position):
         """function position_to_grid_position
@@ -113,14 +116,14 @@ class LandBattleMap:
 
         returns QHexagon
         """
-        return QHexagon(self.get_center_screen(), self.get_size_tile() * self.diameter,LandBattleMap.ROTATION_CITY_AND_MAP)
+        return QHexagon(self.get_center_screen(), math.sqrt(3)/2 * self.get_size_tile() * (self.diameter -1),LandBattleMap.ROTATION_CITY_AND_MAP)
 
     def city_hexagon(self):
         """function city_hexagon
 
         returns QHexagon
         """
-        return QHexagon(self.get_center_screen(), self.get_size_tile() * self.cityDiameter,LandBattleMap.ROTATION_CITY_AND_MAP)
+        return QHexagon(self.get_center_screen(),  0.90 * math.sqrt(3)/2 * self.get_size_tile() * (self.cityDiameter - 1),LandBattleMap.ROTATION_CITY_AND_MAP)
 
     def inside_map_hexagon(self, hexa):
         """function inside_map_hexagon: return true if hexa is inside the main hexagon
@@ -129,10 +132,10 @@ class LandBattleMap:
         """
         if not isinstance(hexa, QHexagon):
             raise ValueError('hexa must be a QHexagon instance')
-        if self.map_hexagon().intersected(hexa):
+        if hexa.intersected(self.map_hexagon()):
             return True
         else:
-            return True
+            return False
 
     def inside_city(self, hexa):
         """function inside_city: return true if hexe is inside the city hexagon
@@ -141,7 +144,7 @@ class LandBattleMap:
         """
         if not isinstance(hexa, QHexagon):
             raise ValueError('hexa must be a QHexagon instance')
-        if self.city_hexagon().intersected(hexa):
+        if hexa.intersected(self.city_hexagon()):
             return True
         else:
             return False
@@ -161,7 +164,7 @@ class LandBattleMap:
         """function create_fields: create the fields list
 
         no return
-        """
+        """                   
         for column in range(0, self.diameter):
             for row in range(0, self.diameter):
                 posx, posy = LandBattleMap.scene_position(column, row)
@@ -174,3 +177,4 @@ class LandBattleMap:
                     field_type = LandBattleMap.DEFAULT_FIELD_TYPE
                 fields = LandBattleField(enable, hexa.center, column, row, False, field_type, hexa)
                 self.fields.append(fields)
+

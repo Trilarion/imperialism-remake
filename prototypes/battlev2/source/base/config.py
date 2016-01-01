@@ -74,12 +74,16 @@ class Config:
             self.diameter_battlemap = int(self.get_config('battle', 'diameter_battlemap', DEFAULT_DIAMETER_MAP, []))
             if self.diameter_battlemap<=0:
                 self.error_msg += 'diameter_battlemap must be a int>0'
+            if self.diameter_battlemap %2 == 0:
+                self.error_msg += 'diameter_battlemap must be a odd number'
         except:
             self.error_msg += 'diameter_battlemap must be a int'
         try:
             self.diameter_battlecity = int(self.get_config('battle', 'diameter_battlecity', DEFAULT_DIAMETER_CITY, []))
             if self.diameter_battlecity<=0:
                 self.error_msg += 'diameter_battlecity must be a int>0'
+            if self.diameter_battlecity %2 == 0:
+                self.error_msg += 'diameter_battlecity must be a odd number'    
         except:
             self.error_msg += 'diameter_battlecity must be a int'
         #

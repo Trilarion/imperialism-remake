@@ -26,6 +26,7 @@ from base import constants
 from battle.landArmy import LandArmy
 from battle.landBattle import LandBattle
 from base.config import Config
+import math
 
 class MainBattleWindows(QMainWindow):
     def __init__(self, parent=None):
@@ -218,12 +219,15 @@ class LandBattleView(QObject):
     def setup_map(self):
         self.mainScene = QGraphicsScene()
         self.graphicsView_main.setScene(self.mainScene)
-        self.mainScene.addRect(0,0,self.graphicsView_main.width()-1,self.graphicsView_main.height()-1)
-        print('Scene width:' + str(self.mainScene.width()) +' heigh:' + str(self.mainScene.height()))
-        print('graphics width:' + str(self.graphicsView_main.width()) +' height:' + str(self.graphicsView_main.height()))
+        
+        width = 2 * self.graphicsView_main.height() / math.sqrt(3)
+        height = self.graphicsView_main.height()
+        if width > self.graphicsView_main.width():
+            width = self.graphicsView_main.width()
+            height =  self.graphicsView_main.width() * math.sqrt(3)/2
+        item = self.mainScene.addRect(0,0,width-15,height-15)
+        item.hide()
         self.landBattle.draw_battle_map(self.mainScene)
-        print('Scene after width:' + str(self.mainScene.width()) +' heigh:' + str(self.mainScene.height()))
-
 
     def setup_ui(self):
         self.BattleWindow.setWindowTitle(self.config.get_string('battle.window.title'))

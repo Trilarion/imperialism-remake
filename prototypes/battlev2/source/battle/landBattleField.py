@@ -75,7 +75,7 @@ class LandBattleField:
             text = '({},{})'.format(self.sx, self.sy)
             item = QGraphicsSimpleTextItem(text)
             item.setBrush(QBrush(Qt.black))
-            item.setPos(self.position.x() - self.hexa.size,self.position.y() - self.hexa.size/2)
+            item.setPos(self.position.x() - self.hexa.size/2,self.position.y() - self.hexa.size/2)
             item.setZValue(1001)
             scene.addItem(item)
 
