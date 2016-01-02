@@ -175,11 +175,11 @@ class Config:
                                                 self.get_config(section, 'pixmap.shoot', '', []))
                         graphic_stand = QPixmap(self.theme_selected.unit_graphics + '/' +
                                                 self.get_config(section, 'pixmap.stand', '', []))
-                        section = LandUnitType(name, evolution_level, description, officier, attack_strength,
+                        unit_type = LandUnitType(name, evolution_level, description, officier, attack_strength,
                                                fire_range, speed, creation_cost, upkeep, graphic_charge,
                                                graphic_shoot, graphic_stand)
                         if previous_error == self.error_msg:
-                            self.list_unit_type.append(section)
+                            self.list_unit_type.append(unit_type)
                     except ValueError as e:
                         self.error_msg += str(e) + '\n'
 
@@ -298,9 +298,6 @@ class Config:
 
     def maximize(self):
         return self.resolution.lower() == 'maximize'
-
-    def get_unit_type_list(self):
-        return self.list_unit_type
 
     def get_unit_pixmap(self, file_name):
         """
