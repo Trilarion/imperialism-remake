@@ -15,18 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import math
 import random
 
-from PyQt5.QtCore import QSize, Qt, QObject, QMetaObject
+from PyQt5.QtCore import QSize, Qt, QObject, QMetaObject, QPointF
 from PyQt5.QtGui import QPixmap, QPalette, QBrush, QIcon
-from PyQt5.QtWidgets import QMessageBox, QWidget, QPushButton, QGridLayout, QLabel, QSpacerItem, QSizePolicy, QGraphicsScene, \
-    QGraphicsRectItem, QGraphicsView, QMainWindow
+from PyQt5.QtWidgets import QMessageBox, QWidget, QPushButton, QGridLayout, QLabel, QSpacerItem, QSizePolicy, \
+    QGraphicsScene, QGraphicsRectItem, QGraphicsView, QMainWindow
 
 from base import constants
+from base.config import Config
 from battle.landArmy import LandArmy
 from battle.landBattle import LandBattle
-from base.config import Config
-import math
+
 
 class MainBattleWindows(QMainWindow):
     def __init__(self, parent=None):
@@ -38,6 +39,25 @@ class MainBattleWindows(QMainWindow):
         self.ui.resizeEvent(evt)
 
 
+class mainQGraphicsScene(QGraphicsScene):
+    def __init__(self):
+        self.landBattle = None
+        super(mainQGraphicsScene, self).__init__()
+
+    def mousePressEvent(self, event):
+        position = QPointF(event.scenePos())
+        if self.landBattle != None:
+            x,y = self.landBattle.map.position_to_grid_position(position)
+            if x >= 0 and y >= 0:
+                print('TODO mouse click on grid ' + str(x) + ';' + str(y))
+            #if ev.button() == Qt.LeftButton:
+            #    item = QtGui.QGraphicsTextItem("CLICK")
+            #    item.setPos(ev.scenePos())
+            #    self.addItem(item)
+    def setLandBattle(self, landBattle):
+        self.landBattle = landBattle
+
+
 class LandBattleView(QObject):
     """Class LandBattleView
     """
@@ -46,7 +66,7 @@ class LandBattleView(QObject):
         super().__init__(parent)
         self.config = Config()
         if self.config.error_msg != '':
-            QMessageBox.about(battle_window, 'Configuration Error', self.config.error_msg)
+            QMessageBox.critical(battle_window, 'Configuration Error', self.config.error_msg)
             exit(-1)
         self.BattleWindow = battle_window
         self.centralWidget = QWidget(self.BattleWindow)
@@ -54,12 +74,11 @@ class LandBattleView(QObject):
         self.coatOfArmsGraphicsScene = QGraphicsScene()
         self.currentUnitGraphicsScene = QGraphicsScene()
         self.targetedUnitGraphicsScene = QGraphicsScene()
-        self.mainScene = QGraphicsScene()
+        self.mainScene = mainQGraphicsScene()
         self.graphicsView_coatOfArm = QGraphicsView(self.coatOfArmsGraphicsScene)
         self.graphicsView_currentUnit = QGraphicsView(self.currentUnitGraphicsScene)
         self.graphicsView_targetedUnit = QGraphicsView(self.targetedUnitGraphicsScene)
         self.graphicsView_main = QGraphicsView(self.mainScene)
-        print('size graphics view ' + str(self.graphicsView_main.width()) +',' + str(self.graphicsView_main.height()))
         self.autoCombatButton = CustomButton(self.centralWidget)
         self.helpButton = CustomButton(self.centralWidget)
         self.retreatButton = CustomButton(self.centralWidget)
@@ -70,8 +89,8 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_main, 1, 0, 12, 1)
         defender = LandArmy(False, None)
         attacker = LandArmy(False, None)
-        self.landBattle = LandBattle(self.config, self.graphicsView_main.width(), self.graphicsView_main.height(), False, 0,
-                                     None, None, defender, attacker)
+        self.landBattle = LandBattle(self.config,False, 0,None, None, defender, attacker)
+        self.mainScene.setLandBattle(self.landBattle)
 
     def setup_hint_label(self):
         size_policy = constants.default_size_policy(self.buttonHintLabel, QSizePolicy.Preferred, QSizePolicy.Fixed)
@@ -103,7 +122,8 @@ class LandBattleView(QObject):
         self.gridLayout.addItem(spacer_item3, 11, 1, 1, 1)
 
     def setup_next_target_button(self):
-        self.nextTargetButton.setbutton_hint_label_text(self.config.get_string('next.target.label'), self.buttonHintLabel)
+        self.nextTargetButton.setbutton_hint_label_text(self.config.get_string('next.target.label'),
+                                                        self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.nextTargetButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.nextTargetButton.setSizePolicy(size_policy)
         self.nextTargetButton.setMinimumSize(QSize(45, 45))
@@ -144,7 +164,8 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.retreatButton, 7, 1, 1, 1, Qt.AlignCenter)
 
     def setup_help_button(self):
-        self.helpButton.setbutton_hint_label_text(self.config.get_string('help.tacticalbattle.label'), self.buttonHintLabel)
+        self.helpButton.setbutton_hint_label_text(self.config.get_string('help.tacticalbattle.label'),
+                                                  self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.helpButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.helpButton.setSizePolicy(size_policy)
         self.helpButton.setMinimumSize(QSize(80, 80))
@@ -175,7 +196,7 @@ class LandBattleView(QObject):
             unit_pixmap = constants.miror_pixmap(unit_pixmap)
         scene.addPixmap(unit_pixmap)
         item = scene.addPixmap(
-            constants.miror_pixmap(QPixmap(flag_pixmap_path)).scaled(size * 23 / 100, 13 / 100 * size))
+                constants.miror_pixmap(QPixmap(flag_pixmap_path)).scaled(size * 23 / 100, 13 / 100 * size))
         item.setPos(0, 80 / 100 * size)
         item1 = QGraphicsRectItem(0, 0, size * 60 / 100, 5)
         item1.setBrush(QBrush(Qt.green))
@@ -217,15 +238,15 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_coatOfArm, 3, 1, 1, 1)
 
     def setup_map(self):
-        self.mainScene = QGraphicsScene()
+        self.mainScene = mainQGraphicsScene()
         self.graphicsView_main.setScene(self.mainScene)
-        
+        self.mainScene.setLandBattle(self.landBattle)
         width = 2 * self.graphicsView_main.height() / math.sqrt(3)
         height = self.graphicsView_main.height()
         if width > self.graphicsView_main.width():
             width = self.graphicsView_main.width()
-            height =  self.graphicsView_main.width() * math.sqrt(3)/2
-        item = self.mainScene.addRect(0,0,width-15,height-15)
+            height = self.graphicsView_main.width() * math.sqrt(3) / 2
+        item = self.mainScene.addRect(0, 0, width - 15, height - 15)
         item.hide()
         self.landBattle.draw_battle_map(self.mainScene)
 
@@ -265,8 +286,8 @@ class LandBattleView(QObject):
         QMetaObject.connectSlotsByName(self.BattleWindow)
 
     def resizeEvent(self, evt=None):
-        print('TODO landBattleView resize')
         self.setup_map()
+
 
 class CustomButton(QPushButton):
     text = ""

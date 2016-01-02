@@ -15,13 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from battle.landBattleField import LandBattleField
-from lib.hexagon import QHexagon
-from PyQt5.QtCore import QPointF
-from battle.landBattleFieldType import LandBattleFieldType
-from PyQt5.QtCore import Qt
-from base.config import Config
 import math
+
+from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import Qt
+
+from base.config import Config
+from battle.landBattleField import LandBattleField
+from battle.landBattleFieldType import LandBattleFieldType
+from lib.hexagon import QHexagon
+
 
 class LandBattleMap:
     ROTATION_FIELD = 30
@@ -32,32 +35,18 @@ class LandBattleMap:
     """
 
     # Constructor:
-    def __init__(self, config, size_screen_width, size_screen_heigth):
+    def __init__(self, config):
         """
         function __init__
         :param config: Config
-        :param size_screen_width: int
-        :param size_screen_heigth: int
         :return:
         """
         if not isinstance(config, Config) and config.error_msg != '':
             raise ValueError('size_screen_width must be a int instance')
-        if not isinstance(size_screen_width, int):
-            raise ValueError('size_screen_width must be a int instance')
-        if not isinstance(size_screen_heigth, int):
-            raise ValueError('size_screen_heigth must be a int instance')
         self.config = config
-        self.sizeScreenWidth = size_screen_width
-        self.sizeScreenHeight = size_screen_heigth
         self.diameter = self.config.diameter_battlemap
         self.cityDiameter = self.config.diameter_battlecity
         self.fields = []
-        self.create_fields()
-        
-
-    def resizeEvent(self, evt=None):
-        print('TODO landBattleMap resize')
-
 
     # Operations
     def get_size_tile(self):
@@ -65,19 +54,17 @@ class LandBattleMap:
 
         returns
         """
-        return min((self.sizeScreenHeight)/ ( (self.diameter - 1 ) * 3 / 4 + 1), (self.sizeScreenWidth)/ ( (self.diameter - 1 ) * math.sqrt(3) / 2 + 1)) * 0.5
-
+        return min(self.sizeScreenHeight / ((self.diameter - 1) * 3 / 4 + 1),
+                   self.sizeScreenWidth / ((self.diameter - 1) * math.sqrt(3) / 2 + 1)) * 0.5
 
     def get_center_screen(self):
         """function get_center_screen
 
         returns QPointF
         """
-        column = round((self.diameter-1) /2)
-        row = round((self.diameter-1) /2)
-        posx, posy = LandBattleMap.scene_position(column, row)
-        center = QPointF((posx + 0.5) * self.get_size_tile()*2, (posy + 0.5) * self.get_size_tile()*2) 
-        return center
+        column = round((self.diameter - 1) / 2)
+        row = round((self.diameter - 1) / 2)
+        return self.grid_position_to_position(column, row)
 
     def draw(self, scene):
         """function draw
@@ -93,37 +80,55 @@ class LandBattleMap:
         for field in self.fields:
             field.draw(scene)
 
+    def grid_position_to_index(self, column, row):
+        return row + column * self.diameter
+
     def position_to_grid_position(self, position):
         """function position_to_grid_position
 
-        :param position: int, int
+        :param position: QPointF
 
-        returns int, int
+        returns int, int return (column,row) corresponding to the QPointF
         """
-        raise NotImplementedError()
+        if not isinstance(position, QPointF):
+            raise ValueError('position must be a QPointF instance')
+        estimated_column = round(position.x()/(2 * self.get_size_tile()))
+        estimated_row = round(position.y()/(math.sqrt(3) * self.get_size_tile()))
+        for r in range(estimated_row - 3, estimated_row + 4):
+            for c in range(estimated_column - 3, estimated_column + 4):
+                field_index = self.grid_position_to_index(c, r)
+                if len(self.fields)>field_index and self.fields[field_index].enable and \
+                        self.fields[field_index].hexa.containsPoint(position,Qt.OddEvenFill):
+                    return c, r
+        return -1, -1
 
-    def grid_position_to_position(self, gridposition):
+    def grid_position_to_position(self, column, row):
         """function grid_position_to_position
 
         :param gridposition: int, int
 
-        returns int, int
+        returns QPointF return the QPointF corresponding to the couple (column,row)
         """
-        raise NotImplementedError()
+        posx, posy = math.sqrt(3) / 2 * (column + ((row + 1) % 2) / 2), row * 3 / 4
+        center = QPointF((posx + 0.5) * self.get_size_tile() * 2, (posy + 0.5) * self.get_size_tile() * 2)
+        return center
 
     def map_hexagon(self):
         """function map_hexagon
 
         returns QHexagon
         """
-        return QHexagon(self.get_center_screen(), math.sqrt(3)/2 * self.get_size_tile() * (self.diameter -1),LandBattleMap.ROTATION_CITY_AND_MAP)
+        return QHexagon(self.get_center_screen(), math.sqrt(3) / 2 * self.get_size_tile() * (self.diameter - 1),
+                        LandBattleMap.ROTATION_CITY_AND_MAP)
 
     def city_hexagon(self):
         """function city_hexagon
 
         returns QHexagon
         """
-        return QHexagon(self.get_center_screen(),  0.90 * math.sqrt(3)/2 * self.get_size_tile() * (self.cityDiameter - 1),LandBattleMap.ROTATION_CITY_AND_MAP)
+        return QHexagon(self.get_center_screen(),
+                        0.90 * math.sqrt(3) / 2 * self.get_size_tile() * (self.cityDiameter - 1),
+                        LandBattleMap.ROTATION_CITY_AND_MAP)
 
     def inside_map_hexagon(self, hexa):
         """function inside_map_hexagon: return true if hexa is inside the main hexagon
@@ -138,9 +143,10 @@ class LandBattleMap:
             return False
 
     def inside_city(self, hexa):
-        """function inside_city: return true if hexe is inside the city hexagon
-        :param hexa; QHexagon
-        returns boolean
+        """
+            function inside_city: return true if hexe is inside the city hexagon
+            :param hexa; QHexagon
+            returns boolean
         """
         if not isinstance(hexa, QHexagon):
             raise ValueError('hexa must be a QHexagon instance')
@@ -149,26 +155,14 @@ class LandBattleMap:
         else:
             return False
 
-
-    @staticmethod
-    def scene_position(column, row):
-        """
-            Converts a map position to a scene position
-            :param column; int
-            :param row: int
-        """
-        return math.sqrt(3) / 2 * (column + ((row + 1) % 2) / 2) , row * 3 / 4
-
-
     def create_fields(self):
         """function create_fields: create the fields list
 
         no return
-        """                   
+        """
         for column in range(0, self.diameter):
             for row in range(0, self.diameter):
-                posx, posy = LandBattleMap.scene_position(column, row)
-                center = QPointF((posx + 0.5) * self.get_size_tile()*2, (posy + 0.5) * self.get_size_tile()*2)
+                center = self.grid_position_to_position(column, row)
                 hexa = QHexagon(center, self.get_size_tile(), LandBattleMap.ROTATION_FIELD)
                 enable = self.inside_map_hexagon(hexa)
                 if self.inside_city(hexa):
@@ -177,4 +171,3 @@ class LandBattleMap:
                     field_type = LandBattleMap.DEFAULT_FIELD_TYPE
                 fields = LandBattleField(enable, hexa.center, column, row, False, field_type, hexa)
                 self.fields.append(fields)
-

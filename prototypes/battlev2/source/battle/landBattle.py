@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from base.config import Config
 from battle.landArmy import LandArmy
 from battle.landBattleMap import LandBattleMap
 from battle.landUnitInBattle import LandUnitInBattle
-from base.config import Config
 
 
 class LandBattle:
@@ -26,13 +26,11 @@ class LandBattle:
     """
 
     # Constructor:
-    def __init__(self, config, size_screen_width, size_screen_heigth, auto_combat, turn, current_unit,
-                 targetted_unit, defender,attacker):
+    def __init__(self, config, auto_combat, turn, current_unit,
+                 targetted_unit, defender, attacker):
         """
         constructor
         :param config: Config
-        :param size_screen_width: int
-        :param size_screen_heigth: int
         :param auto_combat: bool
         :param turn: int > 0
         :param current_unit: LandUnitInBattle
@@ -43,10 +41,6 @@ class LandBattle:
         """
         if not isinstance(config, Config) and config.error_msg != '':
             raise ValueError('size_screen_width must be a int instance')
-        if not isinstance(size_screen_width, int):
-            raise ValueError('size_screen_width must be a int instance')
-        if not isinstance(size_screen_heigth, int):
-            raise ValueError('size_screen_heigth must be a int instance')
         if not isinstance(auto_combat, bool):
             raise ValueError('auto_combat must be a boolean')
         if not isinstance(turn, int) or turn < 0:
@@ -64,7 +58,7 @@ class LandBattle:
         self.currentUnit = current_unit
         self.targettedUnit = targetted_unit
         self.config = config
-        self.map = LandBattleMap(self.config, size_screen_width, size_screen_heigth)
+        self.map = LandBattleMap(self.config)
         self.defender = defender
         self.attacker = attacker
 
@@ -88,13 +82,6 @@ class LandBattle:
         returns
         """
         raise NotImplementedError()
-
-
-    def resizeEvent(self, evt=None):
-        print('TODO landBattle resize')
-        self.map.resizeEvent(evt)
-
-
 
     def draw_battle_map(self, scene):
         """function draw_battle_map

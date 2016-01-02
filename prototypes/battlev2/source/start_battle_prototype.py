@@ -16,12 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import sys
-from battle.landBattleView import LandBattleView, MainBattleWindows
+
 from PyQt5.QtWidgets import QApplication
 
-
-
-
+from battle.landBattleView import MainBattleWindows
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

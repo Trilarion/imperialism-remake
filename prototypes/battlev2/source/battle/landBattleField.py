@@ -28,7 +28,7 @@ class LandBattleField:
     """
 
     # Constructor:
-    def __init__(self, enable,position, sx, sy, occupied, field_type, hexa):
+    def __init__(self, enable, position, sx, sy, occupied, field_type, hexa):
         """
         function __init__
         :param : QPointF
@@ -42,9 +42,9 @@ class LandBattleField:
         """
         if not isinstance(enable, bool):
             raise ValueError('enable must be a boolean')
-        if not isinstance(sx,int) or sx<0:
+        if not isinstance(sx, int) or sx < 0:
             raise ValueError('sx must be a int>0')
-        if not isinstance(sy,int) or sy<0:
+        if not isinstance(sy, int) or sy < 0:
             raise ValueError('sy must be a int>0')
         if not isinstance(occupied, bool):
             raise ValueError('occupied must be a boolean')
@@ -71,14 +71,13 @@ class LandBattleField:
         no return
         """
         if self.enable:
-            self.hexa.draw(scene,self.fieldType.color,self.fieldType.texture)
+            self.hexa.draw(scene, self.fieldType.color, self.fieldType.texture)
             text = '({},{})'.format(self.sx, self.sy)
             item = QGraphicsSimpleTextItem(text)
             item.setBrush(QBrush(Qt.black))
-            item.setPos(self.position.x() - self.hexa.size/2,self.position.y() - self.hexa.size/2)
+            item.setPos(self.position.x() - self.hexa.size / 2, self.position.y() - self.hexa.size / 2)
             item.setZValue(1001)
             scene.addItem(item)
-
 
     def distance(self, field):
         """function distance

@@ -17,8 +17,8 @@
 import unittest
 
 testmodules = [
-    'lib.QHexagonTestCase',
-    'battle.LandBattleFieldTypeTestCase'
+    'lib.hexagonTestCase',
+    'battle.landBattleFieldTypeTestCase'
 ]
 
 suite = unittest.TestSuite()

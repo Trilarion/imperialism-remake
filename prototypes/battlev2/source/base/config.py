@@ -18,12 +18,14 @@
 import configparser
 import os
 import sys
-from unit.landUnitType import LandUnitType
+
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication
-from base.theme import Theme
+
 from base.lang import Lang
+from base.theme import Theme
 from nation.nation import Nation
+from unit.landUnitType import LandUnitType
 
 CONFIG_FILE = 'config.ini'
 DEFAULT_FULLSCREEN = 'yes'
@@ -39,9 +41,10 @@ MANDATORY_CONFIG_OPTION = ['fullscreen', 'resolution', 'theme', 'lang']
 MANDATORY_PATH_OPTION = ['data', 'lang_config_file', 'unit_config_file', 'nation_config_file']
 MANDATORY_BATTLE_OPTION = ['diameter_battlemap', 'diameter_battlecity']
 MANDATORY_THEME_OPTION = ['name', 'description', 'coat_of_arms_graphics', 'flag_graphics', 'map_graphics',
-                          'unit_graphics', 'background', 'end_button','autocombat_button', 'help_button',
+                          'unit_graphics', 'background', 'end_button', 'autocombat_button', 'help_button',
                           'retreat_button', 'target_button']
 MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
+
 
 class Config:
     def __init__(self):
@@ -72,19 +75,19 @@ class Config:
         #
         try:
             self.diameter_battlemap = int(self.get_config('battle', 'diameter_battlemap', DEFAULT_DIAMETER_MAP, []))
-            if self.diameter_battlemap<=0:
+            if self.diameter_battlemap <= 0:
                 self.error_msg += 'diameter_battlemap must be a int>0'
-            if self.diameter_battlemap %2 == 0:
+            if self.diameter_battlemap % 2 == 0:
                 self.error_msg += 'diameter_battlemap must be a odd number'
-        except:
+        except ValueError:
             self.error_msg += 'diameter_battlemap must be a int'
         try:
             self.diameter_battlecity = int(self.get_config('battle', 'diameter_battlecity', DEFAULT_DIAMETER_CITY, []))
-            if self.diameter_battlecity<=0:
+            if self.diameter_battlecity <= 0:
                 self.error_msg += 'diameter_battlecity must be a int>0'
-            if self.diameter_battlecity %2 == 0:
-                self.error_msg += 'diameter_battlecity must be a odd number'    
-        except:
+            if self.diameter_battlecity % 2 == 0:
+                self.error_msg += 'diameter_battlecity must be a odd number'
+        except ValueError:
             self.error_msg += 'diameter_battlecity must be a int'
         #
         # Path config
@@ -133,8 +136,8 @@ class Config:
                     target_button = self.get_config(section, 'target_button', '', [])
                     try:
                         theme = Theme(name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
-                                unit_graphics,background,end_button,autocombat_button, help_button,
-                                retreat_button, target_button)
+                                      unit_graphics, background, end_button, autocombat_button, help_button,
+                                      retreat_button, target_button)
                         self.available_theme.append(theme)
 
                         if name == self.name_theme_selected:
@@ -166,15 +169,12 @@ class Config:
                         speed = int(self.get_config(section, 'speed', '', []))
                         creation_cost = float(self.get_config(section, 'creationcost', '', []))
                         upkeep = float(self.get_config(section, 'upkeep', '', []))
-                        graphic_charge = QPixmap(
-                            self.theme_selected.unit_graphics + '/' + self.get_config(section, 'pixmap.charge', '',
-                                                                                          []))
-                        graphic_shoot = QPixmap(
-                                self.theme_selected.unit_graphics + '/' + self.get_config(section, 'pixmap.shoot', '',
-                                                                                          []))
-                        graphic_stand = QPixmap(
-                                self.theme_selected.unit_graphics + '/' + self.get_config(section, 'pixmap.stand', '',
-                                                                                          []))
+                        graphic_charge = QPixmap(self.theme_selected.unit_graphics + '/' +
+                                                 self.get_config(section, 'pixmap.charge', '', []))
+                        graphic_shoot = QPixmap(self.theme_selected.unit_graphics + '/' +
+                                                self.get_config(section, 'pixmap.shoot', '', []))
+                        graphic_stand = QPixmap(self.theme_selected.unit_graphics + '/' +
+                                                self.get_config(section, 'pixmap.stand', '', []))
                         section = LandUnitType(name, evolution_level, description, officier, attack_strength,
                                                fire_range, speed, creation_cost, upkeep, graphic_charge,
                                                graphic_shoot, graphic_stand)
@@ -195,7 +195,7 @@ class Config:
                 try:
                     name = self.get_config(section, 'name', '', [])
                     description = self.get_config(section, 'description', '', [])
-                    lang = Lang(name,description)
+                    lang = Lang(name, description)
                     for option in self.config.options(section):
                         lang.add_string(option, self.get_config(section, option, '', []))
                     if name == self.name_lang_selected:
@@ -218,10 +218,13 @@ class Config:
             for section in self.config.sections():
                 try:
                     name = self.get_config(section, 'name', '', [])
-                    flag = QPixmap(self.theme_selected.flag_graphics + '/' + self.get_config(section, 'flag', '',[]))
-                    coat_of_arms = QPixmap(self.theme_selected.coat_of_arms_graphics + '/' + self.get_config(section, 'coat_of_arms', '',[]))
+                    flag = QPixmap(self.theme_selected.flag_graphics + '/' + self.get_config(section, 'flag', '', []))
+                    coat_of_arms = QPixmap(
+                            self.theme_selected.coat_of_arms_graphics + '/' + self.get_config(section, 'coat_of_arms',
+                                                                                              '',
+                                                                                              []))
 
-                    nation = Nation(name,False,flag,coat_of_arms)
+                    nation = Nation(name, False, flag, coat_of_arms)
                     for option in self.config.options(section):
                         lang.add_string(option, self.get_config(section, option, '', []))
                     if name == self.name_lang_selected:
@@ -231,9 +234,6 @@ class Config:
                     self.error_msg += str(e) + '\n'
         if len(self.available_nation) == 0:
             self.error_msg += 'No Nation available\n'
-
-
-
 
     #
     # Overwrite class method
@@ -257,7 +257,6 @@ class Config:
             retval += '\t-' + str(nation) + '\n'
         return retval
 
-
     #
     # Operation to simplify config parsing
     #
@@ -269,7 +268,7 @@ class Config:
             else:
                 if self.data_folder != 'error':
                     retval = retval.replace('$data', self.data_folder)
-                return retval.replace('//','/')
+                return retval.replace('//', '/')
         except configparser.NoOptionError:
             self.error_msg += 'Error : Missing mandatory option ' + str(option) + '\n'
 
@@ -291,7 +290,6 @@ class Config:
                         filename) + ' unknown option ' + option + ' in section ' + section + '\n'
         return retval
 
-
     #
     # Configuration getter
     #
@@ -312,7 +310,6 @@ class Config:
         """
         return self.theme_selected.get_unit_pixmap(file_name)
 
-
     def get_map_pixmap(self, file_name):
         """
         function get_map_pixmap
@@ -320,7 +317,6 @@ class Config:
         :return: the QPixmap corresponding
         """
         return self.theme_selected.get_map_pixmap(file_name)
-
 
     def get_flag_pixmap(self, file_name):
         """
@@ -334,7 +330,6 @@ class Config:
         if not isinstance(key, str) or key == '':
             raise ValueError('key must be a non empty string')
         return self.lang_selected.get_string(key)
-
 
 
 if __name__ == '__main__':
