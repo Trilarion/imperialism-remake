@@ -111,23 +111,6 @@ class Theme:
         path = (self.map_graphics + '/' + file_name).replace('//', '/')
         return QPixmap(path)
 
-    def get_flag_pixmap(self, file_name):
-        """
-        function get_flag_pixmap
-        :param file_name: filename of the flag image
-        :return: the QPixmap corresponding
-        """
-        path = (self.flag_graphics + '/' + file_name).replace('//', '/')
-        return QPixmap(path)
-
-    def get_coat_of_arm_pixmap(self, file_name):
-        """
-        function get_coat_of_arm_pixmap
-        :param file_name: filename of the coat of the arm image
-        :return: the QPixmap corresponding
-        """
-        path = (self.coat_of_arms_graphics + '/' + file_name).replace('//', '/')
-        return QPixmap(path)
 
     def get_background_pixmap(self):
         """

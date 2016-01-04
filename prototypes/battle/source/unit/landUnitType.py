@@ -15,8 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QTransform, QPixmap, QBrush
+from PyQt5.QtWidgets import QGraphicsRectItem
+def miror_pixmap(pixmap):
+    transform = QTransform()
+    transform.scale(-1, 1)
+    return QPixmap(pixmap.transformed(transform))
 
 
 class LandUnitType:
@@ -94,7 +99,14 @@ class LandUnitType:
         # TODO
         raise NotImplementedError()
 
-    def draw(self, defending, scene, size):
+    def get_pixmap(self, status):
+        if status == 'Charge':
+            return self.graphicCharge
+        elif status == 'Shoot':
+            return self.graphicShoot
+        return self.graphicStand
+
+    def draw(self, nation, defending, status, scene, size):
         """function draw
 
         :param defending: boolean
@@ -103,4 +115,18 @@ class LandUnitType:
 
         no return
         """
-        raise NotImplementedError()
+        pix =QPixmap('')
+        pix.width()
+
+
+        unit_pixmap = self.get_pixmap(status).scaled(size.width() * 80 / 100, size.height() * 80 / 100)
+        if defending:
+            unit_pixmap = miror_pixmap(unit_pixmap)
+        scene.addPixmap(unit_pixmap)
+        flag_width = nation.flag.width() * 10 / nation.flag.height()
+        item = scene.addPixmap(nation.flag.scaled(flag_width, 10))
+        item.setPos(size.width() - 5 - flag_width, 0)
+        item1 = QGraphicsRectItem(0, size.height() - 10, size.width() - 5, 5)
+        item1.setBrush(QBrush(Qt.green))
+        #item1.setPos(size.width() * 25 / 100, 81 / 100 * size.height())
+        scene.addItem(item1)

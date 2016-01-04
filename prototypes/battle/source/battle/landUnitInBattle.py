@@ -17,7 +17,6 @@
 
 from unit.landUnit import LandUnit
 
-
 class LandUnitInBattle(LandUnit):
     """Class LandUnitInBattle
     """
@@ -28,7 +27,7 @@ class LandUnitInBattle(LandUnit):
         :param dead
         :param status
         :param retreat
-        :param moral
+        :param moral: int range(0,100)
         :param unit_strength: int range(0,100)
         :param experience_level: int range(1,5)
         :param unit_type: LandUnitType
@@ -42,8 +41,8 @@ class LandUnitInBattle(LandUnit):
             raise ValueError('retreat must be a boolean')
         if not isinstance(status, str) or (status != 'Charge' and status != 'Shoot' and status != 'Stand'):
             raise ValueError('status must be a str in {\'Charge\', \'Shoot\', \'Stand\'}')
-        if not isinstance(moral, int) or moral not in range(0, 100):
-            raise ValueError('status must be a str in {\'Charge\', \'Shoot\', \'Stand\'}')
+        if not isinstance(moral, int) or moral not in range(0, 101):
+            raise ValueError('moral must be an int in range(0,100)')
         self.dead = dead
         self.status = status
         self.retreat = retreat

@@ -17,7 +17,6 @@
 
 from PyQt5.QtGui import QPixmap
 
-
 class Nation:
     """Class Nation
     """
@@ -25,7 +24,6 @@ class Nation:
     # Constructor:
     def __init__(self, name, computer, coat_of_arms, flag):
         """function __init__
-
         :param name: str (not empty)
         :param computer: bool
         :param coat_of_arms: QPixmap (not null)
@@ -55,6 +53,8 @@ class Nation:
         """
         raise NotImplementedError()
 
+
+
     def draw_coat_of_arms(self, scene, size):
         """function draw_coat_of_arms
 
@@ -63,7 +63,8 @@ class Nation:
 
         no return
         """
-        raise NotImplementedError()
+        pixmap = self.coatOfArms.scaled(size)
+        scene.addPixmap(pixmap)
 
     def __str__(self):
         return self.name

@@ -32,7 +32,7 @@ class LandUnit:
         :param unit_type: LandUnitType
         :param nation: Nation
         """
-        if not isinstance(unit_strength, int) or unit_strength not in range(0,100):
+        if not isinstance(unit_strength, int) or unit_strength not in range(0,101):
             raise ValueError('unit_strength must be an int in range(0,100)')
         if not isinstance(experience_level, int) or experience_level not in range(1, 5):
             raise ValueError('experience_level must be an int in range(1,5)')
@@ -53,7 +53,7 @@ class LandUnit:
         """
         raise NotImplementedError()
 
-    def draw(self, defending, scene, size):
+    def draw(self, nation, defending, status, scene, size):
         """function draw
 
         :param defending: boolean
@@ -62,4 +62,4 @@ class LandUnit:
 
         no return
         """
-        self.unitType.draw(defending, scene, size)
+        self.unitType.draw(nation, defending, status, scene, size)

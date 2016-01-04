@@ -27,7 +27,9 @@ from base import constants
 from base.config import Config
 from battle.landArmy import LandArmy
 from battle.landBattle import LandBattle
+from battle.landUnitInBattle import LandUnitInBattle
 
+Screen_Min_Size = (800, 600)
 
 class MainBattleWindows(QMainWindow):
 
@@ -114,9 +116,17 @@ class LandBattleView(QObject):
         self.dateLabel = QLabel(self.centralWidget)
         self.buttonHintLabel = QLabel(self.centralWidget)
         self.gridLayout.addWidget(self.graphicsView_main, 1, 0, 12, 1)
-        defender = LandArmy(False, None)
-        attacker = LandArmy(False, None)
-        self.landBattle = LandBattle(self.config,False, 0,None, None, defender, attacker)
+        #start test only
+        nation_uk = self.config.get_nation("uk")
+        nation_fr = self.config.get_nation("france")
+        nation_fr.computer = True
+        unit_type = self.config.get_unit_type('Militia I')
+        current_unit = LandUnitInBattle(False, 'Charge', False, 100, 100, 1, unit_type, nation_fr)
+        targetted_unit = LandUnitInBattle(False, 'Charge', False, 100, 100, 1, unit_type, nation_fr)
+        defender = LandArmy(False, None, nation_uk)
+        attacker = LandArmy(False, None, nation_fr)
+        #end test only
+        self.landBattle = LandBattle(self.config,False, 0,current_unit, targetted_unit, defender, attacker)
         self.mainScene.setLandBattle(self.landBattle)
 
     def setup_hint_label(self):
@@ -211,48 +221,48 @@ class LandBattleView(QObject):
         self.autoCombatButton.setIconSize(QSize(80, 80))
         self.gridLayout.addWidget(self.autoCombatButton, 12, 1, 1, 1)
 
-    def add_unit(self, scene, size, unit_pixmap_path, flag_pixmap_path, miror):
-        unit_pixmap = QPixmap(unit_pixmap_path).scaled(size * 90 / 100, size * 90 / 100)
-        if miror:
-            unit_pixmap = constants.miror_pixmap(unit_pixmap)
-        scene.addPixmap(unit_pixmap)
-        item = scene.addPixmap(
-                constants.miror_pixmap(QPixmap(flag_pixmap_path)).scaled(size * 23 / 100, 13 / 100 * size))
-        item.setPos(0, 80 / 100 * size)
-        item1 = QGraphicsRectItem(0, 0, size * 60 / 100, 5)
-        item1.setBrush(QBrush(Qt.green))
-        item1.setPos(size * 25 / 100, 81 / 100 * size)
-        scene.addItem(item1)
 
-    def setup_targeted_unit_view(self, targeted_unit):
-        # TODO setup_targeted_unit_view
-        print("TODO setup_targeted_unit_view (landBattleView.py)")
-        self.add_unit(self.targetedUnitGraphicsScene, 60, targeted_unit, constants.Flag_of_France, True)
-        size_policy = constants.default_size_policy(self.graphicsView_targetedUnit, QSizePolicy.Fixed,
-                                                    QSizePolicy.Fixed)
+    def setup_targeted_unit_view(self):
+        size = QSize(60, 60)
+        nation = self.landBattle.defender.nation
+        defending = False
+        if self.landBattle.attacker.nation.computer:
+            nation = self.landBattle.attacker.nation
+            defending = True
+        self.landBattle.draw_targetted_unit(nation, defending, self.targetedUnitGraphicsScene,size)
+        size_policy = constants.default_size_policy(self.graphicsView_targetedUnit, QSizePolicy.Fixed,QSizePolicy.Fixed)
         self.graphicsView_targetedUnit.setSizePolicy(size_policy)
-        self.graphicsView_targetedUnit.setMinimumSize(QSize(60, 60))
-        self.graphicsView_targetedUnit.setMaximumSize(QSize(60, 60))
+        self.graphicsView_targetedUnit.setMinimumSize(size)
+        self.graphicsView_targetedUnit.setMaximumSize(size)
         self.gridLayout.addWidget(self.graphicsView_targetedUnit, 9, 1, 1, 1, Qt.AlignCenter)
 
-    def setup_current_unit_view(self, current_unit):
+    def setup_current_unit_view(self):
         # TODO setup_current_unit_view
         print("TODO setup_current_unit_view (landBattleView.py)")
-        self.add_unit(self.currentUnitGraphicsScene, 60, current_unit, constants.Flag_of_Spain, False)
+        size = QSize(60, 60)
+        nation = self.landBattle.defender.nation
+        nation = self.landBattle.defender.nation
+        defending = False
+        if not self.landBattle.attacker.nation.computer:
+            nation = self.landBattle.attacker.nation
+            defending = True
+        self.landBattle.draw_current_unit(nation, defending, self.currentUnitGraphicsScene,size)
         size_policy = constants.default_size_policy(self.graphicsView_currentUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_currentUnit.setSizePolicy(size_policy)
-        self.graphicsView_currentUnit.setMinimumSize(QSize(60, 60))
-        self.graphicsView_currentUnit.setMaximumSize(QSize(60, 60))
+        self.graphicsView_currentUnit.setMinimumSize(size)
+        self.graphicsView_currentUnit.setMaximumSize(size)
         self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1, Qt.AlignCenter)
 
-    def setup_coat_of_arms_view(self, coat_of_arm_attacker):
-        img = QPixmap(coat_of_arm_attacker).scaled(90, 120)
-        self.coatOfArmsGraphicsScene.addPixmap(img)
+    def setup_coat_of_arms_view(self):
+        # TODO setup_coat_of_arms_view
+        print("TODO setup_coat_of_arms_view (landBattleView.py)")
+        size = QSize(90, 120)
+        self.landBattle.draw_coat_of_arms(self.coatOfArmsGraphicsScene,size)
         self.graphicsView_coatOfArm.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         size_policy = constants.default_size_policy(self.graphicsView_coatOfArm, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_coatOfArm.setSizePolicy(size_policy)
-        self.graphicsView_coatOfArm.setMinimumSize(QSize(90, 120))
-        self.graphicsView_coatOfArm.setMaximumSize(QSize(90, 120))
+        self.graphicsView_coatOfArm.setMinimumSize(size)
+        self.graphicsView_coatOfArm.setMaximumSize(size)
         self.graphicsView_coatOfArm.setStyleSheet("border-style: none;background: transparent")
         self.graphicsView_coatOfArm.setCacheMode(QGraphicsView.CacheBackground)
         self.gridLayout.addWidget(self.graphicsView_coatOfArm, 3, 1, 1, 1)
@@ -275,7 +285,7 @@ class LandBattleView(QObject):
         background = self.config.theme_selected.get_background_pixmap()
         palette = QPalette()
         palette.setBrush(QPalette.Background, QBrush(background))
-        self.BattleWindow.setMinimumSize(QSize(constants.Screen_Min_Size[0], constants.Screen_Min_Size[1]))
+        self.BattleWindow.setMinimumSize(QSize(Screen_Min_Size[0], Screen_Min_Size[1]))
         self.BattleWindow.setAutoFillBackground(True)
         self.gridLayout.setVerticalSpacing(0)
         # Label
@@ -294,11 +304,11 @@ class LandBattleView(QObject):
         # Automatic battle button
         self.setup_auto_combat_button()
         # Targeted Unit view
-        self.setup_targeted_unit_view(random.choice(constants.Graphics_Unit_list))
+        self.setup_targeted_unit_view()
         # Current Unit View
-        self.setup_current_unit_view(random.choice(constants.Graphics_Unit_list))
+        self.setup_current_unit_view()
         # Coat of Arm view
-        self.setup_coat_of_arms_view(random.choice(constants.Graphics_Coat_of_arms_list))
+        self.setup_coat_of_arms_view()
         # Main view
         self.setup_map()
         self.BattleWindow.setPalette(palette)

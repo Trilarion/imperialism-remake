@@ -19,7 +19,7 @@ from base.config import Config
 from battle.landArmy import LandArmy
 from battle.landBattleMap import LandBattleMap
 from battle.landUnitInBattle import LandUnitInBattle
-
+from nation.nation import Nation
 
 class LandBattle:
     """Class LandBattle
@@ -37,6 +37,7 @@ class LandBattle:
         :param targetted_unit: LandUnitInBattle
         :param defender: LandArmy
         :param attacker: LandArmy
+        :param nation: Nation
         :return:
         """
         if not isinstance(config, Config) and config.error_msg != '':
@@ -63,7 +64,7 @@ class LandBattle:
         self.attacker = attacker
 
     # Operations
-    def draw_current_unit(self, scene, size):
+    def draw_current_unit(self, nation, defending, scene, size):
         """function draw_current_unit
 
         :param scene: QGraphicsScene
@@ -71,9 +72,10 @@ class LandBattle:
 
         returns
         """
-        raise NotImplementedError()
+        if self.currentUnit is not None:
+            self.currentUnit.draw(nation, defending,self.currentUnit.status, scene,size)
 
-    def draw_targetted_unit(self, scene, size):
+    def draw_targetted_unit(self, nation, defending, scene, size):
         """function draw_targetted_unit
 
         :param scene: QGraphicsScene
@@ -81,7 +83,8 @@ class LandBattle:
 
         returns
         """
-        raise NotImplementedError()
+        if self.targettedUnit is not None:
+             self.targettedUnit.draw(nation, defending,self.targettedUnit.status, scene,size)
 
     def draw_battle_map(self, scene):
         """function draw_battle_map
@@ -101,6 +104,19 @@ class LandBattle:
         returns
         """
         raise NotImplementedError()
+
+    def draw_coat_of_arms(self, scene, size):
+        """function draw_coat_of_arms
+
+        :param scene: QGraphicsScene
+        :param size: QSize
+
+        returns
+        """
+        for army in self.attacker, self.defender:
+            if army is not None and not army.nation.computer:
+                army.nation.draw_coat_of_arms(scene,size)
+                return
 
     def draw_attacker(self, scene, size):
         """function draw_attacker

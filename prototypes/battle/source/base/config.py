@@ -224,7 +224,7 @@ class Config:
                                                                                               '',
                                                                                               []))
 
-                    nation = Nation(name, False, flag, coat_of_arms)
+                    nation = Nation(name, False, coat_of_arms, flag)
                     for option in self.config.options(section):
                         lang.add_string(option, self.get_config(section, option, '', []))
                     if name == self.name_lang_selected:
@@ -307,6 +307,7 @@ class Config:
         """
         return self.theme_selected.get_unit_pixmap(file_name)
 
+
     def get_map_pixmap(self, file_name):
         """
         function get_map_pixmap
@@ -315,18 +316,23 @@ class Config:
         """
         return self.theme_selected.get_map_pixmap(file_name)
 
-    def get_flag_pixmap(self, file_name):
-        """
-        function get_flag_pixmap
-        :param file_name: filename of the flag image
-        :return: the QPixmap corresponding
-        """
-        return self.theme_selected.get_flag_pixmap(file_name)
-
     def get_string(self, key):
         if not isinstance(key, str) or key == '':
             raise ValueError('key must be a non empty string')
         return self.lang_selected.get_string(key)
+
+
+    def get_nation(self, name):
+        for nation in self.available_nation:
+            if nation.name == name:
+                return nation
+        return None
+
+    def get_unit_type(self, name):
+        for unit_type in self.list_unit_type:
+            if unit_type.name == name:
+                return unit_type
+        return None
 
 
 if __name__ == '__main__':

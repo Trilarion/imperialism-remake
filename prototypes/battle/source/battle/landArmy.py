@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from nation.nation import Nation
 
 class LandArmy:
     """Class LandArmy
     """
 
     # Constructor
-    def __init__(self, retreat, land_units):
+    def __init__(self, retreat, land_units, nation):
         """function __init__
 
         :param retreat: bool
@@ -33,6 +34,9 @@ class LandArmy:
         print("TODO list LandUnitInBattle (landArmy.py)")
         # if not isinstance(land_units, LandUnitInBattle) or land_units is None:
         #    raise ValueError('land_units must be a not null LandUnitInBattle instance')
+        if not isinstance(nation, Nation) or nation is None:
+            raise ValueError('nation must be a not null Nation')
+        self.nation = nation
         self.retreat = retreat
         # self.landUnits = land_units
 
