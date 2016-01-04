@@ -30,14 +30,36 @@ from battle.landBattle import LandBattle
 
 
 class MainBattleWindows(QMainWindow):
+
     def __init__(self, parent=None):
         super(MainBattleWindows, self).__init__(parent)
         self.ui = LandBattleView(self, None)
+        self.config = self.ui.config
         self.ui.setup_ui()
 
     def resizeEvent(self, evt=None):
         self.ui.resizeEvent(evt)
 
+    def show(self):
+        if self.config is None:
+            self.showMaximized()
+        elif self.config.showFullscreen():
+            self.showFullScreen()
+        elif self.config.maximize():
+            self.showMaximized()
+        else:
+            # TODO set resolution
+            print('MainBattleWindows.show normal: todo set resolution')
+            self.showNormal()
+        self.resizeEvent()
+
+    def closeEvent(self,event):
+        result = QMessageBox.question(self,
+                                      self.config.get_string('exit.window.title'),
+                                      self.config.get_string('exit.window.content'),
+                      QMessageBox.Yes| QMessageBox.No)
+        if result == QMessageBox.No:
+            event.ignore()
 
 class mainQGraphicsScene(QGraphicsScene):
     def __init__(self):
@@ -84,6 +106,11 @@ class LandBattleView(QObject):
         self.retreatButton = CustomButton(self.centralWidget)
         self.endUnitTurnButton = CustomButton(self.centralWidget)
         self.nextTargetButton = CustomButton(self.centralWidget)
+        for button in self.autoCombatButton, self.helpButton, self.retreatButton,\
+            self.nextTargetButton, self.endUnitTurnButton:
+            button.addActionLeave(self.clearLabelHint)
+            button.addActionEnter(self.setLabelHint)
+            button.addActionClick(self.clickButton)
         self.dateLabel = QLabel(self.centralWidget)
         self.buttonHintLabel = QLabel(self.centralWidget)
         self.gridLayout.addWidget(self.graphicsView_main, 1, 0, 12, 1)
@@ -122,8 +149,7 @@ class LandBattleView(QObject):
         self.gridLayout.addItem(spacer_item3, 11, 1, 1, 1)
 
     def setup_next_target_button(self):
-        self.nextTargetButton.setbutton_hint_label_text(self.config.get_string('next.target.label'),
-                                                        self.buttonHintLabel)
+
         size_policy = constants.default_size_policy(self.nextTargetButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.nextTargetButton.setSizePolicy(size_policy)
         self.nextTargetButton.setMinimumSize(QSize(45, 45))
@@ -136,7 +162,6 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.nextTargetButton, 5, 1, 1, 1, Qt.AlignCenter)
 
     def setup_end_unit_button(self):
-        self.endUnitTurnButton.setbutton_hint_label_text(self.config.get_string('end.unit.label'), self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.endUnitTurnButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.endUnitTurnButton.setSizePolicy(size_policy)
         self.endUnitTurnButton.setMinimumSize(QSize(45, 45))
@@ -149,7 +174,6 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.endUnitTurnButton, 6, 1, 1, 1, Qt.AlignCenter)
 
     def setup_retreat_button(self):
-        self.retreatButton.setbutton_hint_label_text(self.config.get_string('retreat.all.label'), self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.retreatButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.retreatButton.setSizePolicy(size_policy)
         self.retreatButton.setMinimumSize(QSize(45, 45))
@@ -164,8 +188,6 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.retreatButton, 7, 1, 1, 1, Qt.AlignCenter)
 
     def setup_help_button(self):
-        self.helpButton.setbutton_hint_label_text(self.config.get_string('help.tacticalbattle.label'),
-                                                  self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.helpButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.helpButton.setSizePolicy(size_policy)
         self.helpButton.setMinimumSize(QSize(80, 80))
@@ -178,7 +200,6 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.helpButton, 0, 1, 2, 1)
 
     def setup_auto_combat_button(self):
-        self.autoCombatButton.setbutton_hint_label_text(self.config.get_string('auto.play.label'), self.buttonHintLabel)
         size_policy = constants.default_size_policy(self.autoCombatButton, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.autoCombatButton.setSizePolicy(size_policy)
         self.autoCombatButton.setMinimumSize(QSize(90, 90))
@@ -216,7 +237,6 @@ class LandBattleView(QObject):
 
     def setup_current_unit_view(self, current_unit):
         # TODO setup_current_unit_view
-
         print("TODO setup_current_unit_view (landBattleView.py)")
         self.add_unit(self.currentUnitGraphicsScene, 60, current_unit, constants.Flag_of_Spain, False)
         size_policy = constants.default_size_policy(self.graphicsView_currentUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -288,23 +308,74 @@ class LandBattleView(QObject):
     def resizeEvent(self, evt=None):
         self.setup_map()
 
+    def clearLabelHint(self, custom_button):
+        self.buttonHintLabel.setText('')
+
+    def setLabelHint(self, custom_button):
+        text = ''
+        if custom_button == self.autoCombatButton:
+            text = self.config.get_string('auto.play.label')
+        elif custom_button == self.helpButton:
+            text = self.config.get_string('help.tacticalbattle.label')
+        elif custom_button == self.retreatButton:
+            text = self.config.get_string('retreat.all.label')
+        elif custom_button == self.endUnitTurnButton:
+            text = self.config.get_string('end.unit.label')
+        elif custom_button == self.nextTargetButton:
+            text = self.config.get_string('next.target.label')
+        if text != '':
+            self.buttonHintLabel.setText(text)
+
+    def clickButton(self, custom_button):
+        if custom_button == self.autoCombatButton:
+            print('click autoCombatButton')
+        elif custom_button == self.helpButton:
+            print('click helpButton')
+        elif custom_button == self.retreatButton:
+            print('click retreatButton')
+        elif custom_button == self.endUnitTurnButton:
+            print('click endUnitTurnButton')
+        elif custom_button == self.nextTargetButton:
+            print('click nextTargetButton')
+
 
 class CustomButton(QPushButton):
-    text = ""
 
     def __init__(self, *__args):
         super().__init__(*__args)
-        self.label = None
-
-    def setbutton_hint_label_text(self, text, label):
-        self.text = text
-        self.label = label
+        self.enter_functions = []
+        self.leave_functions = []
+        self.click_functions = []
+        super().clicked.connect(self.click)
 
     def enterEvent(self, event):
-        if self.label is not None:
-            self.label.setText(str(self.text) + "  ")
+        for f in self.enter_functions:
+            f(self)
         super().enterEvent(event)
 
     def leaveEvent(self, event):
-        self.label.setText("")
+        for f in self.leave_functions:
+            f(self)
         super().leaveEvent(event)
+
+    def click(self):
+        for f in self.click_functions:
+            f(self)
+
+    def addActionEnter(self, enter_function):
+        self.enter_functions.append(enter_function)
+
+    def addActionLeave(self, leave_function):
+        self.leave_functions.append(leave_function)
+
+    def addActionClick(self, click_function):
+        self.click_functions.append(click_function)
+
+    def clearActionEnter(self):
+        self.enter_functions = []
+
+    def clearActionLeave(self):
+        self.leave_functions = []
+
+    def clearActionClick(self, click_function):
+        self.click_functions = []

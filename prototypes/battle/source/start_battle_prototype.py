@@ -24,5 +24,5 @@ from battle.landBattleView import MainBattleWindows
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     mySW = MainBattleWindows()
-    mySW.showMaximized()
+    mySW.show()
     sys.exit(app.exec_())

@@ -293,7 +293,7 @@ class Config:
     #
     # Configuration getter
     #
-    def fullscreen(self):
+    def showFullscreen(self):
         return self.fullscreen.lower() == 'yes'
 
     def maximize(self):
