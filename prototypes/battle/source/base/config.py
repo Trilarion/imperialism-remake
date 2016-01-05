@@ -18,9 +18,11 @@
 import configparser
 import os
 import sys
+import re
 
+from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QDesktopWidget
 
 from base.lang import Lang
 from base.theme import Theme
@@ -32,6 +34,7 @@ DEFAULT_FULLSCREEN = 'yes'
 DEFAULT_THEME = 'theme0'
 DEFAULT_LANG = 'en'
 DEFAULT_RESOLUTION = 'maximize'
+MINIMUM_RESOLUTION = 800, 600
 DEFAULT_DIAMETER_MAP = '20'
 DEFAULT_DIAMETER_CITY = '5'
 
@@ -47,10 +50,27 @@ MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 
 class Config:
+    def get_resolution_qsize(self):
+        w, h = self.get_resolution()
+        return QSize(w, h)
+
+    @staticmethod
+    def get_min_resolution_qsize():
+        w, h = MINIMUM_RESOLUTION
+        return QSize(w, h)
+
+    def get_resolution(self):
+        try:
+            m = re.search('^(\d+)\s*x\s*(\d+)$', self.resolution.lower())
+            w, h = int(m.group(1)), int(m.group(2))
+            return w, h
+        except AttributeError:
+            return -1, -1
+
     def __init__(self):
         self.error_msg = ''
         self.data_folder = 'error'
-        self.config = configparser.ConfigParser()
+        self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
         self.config.read_file(open(CONFIG_FILE))
         self.check_options('config', MANDATORY_CONFIG_OPTION, CONFIG_FILE)
         self.check_options('path', MANDATORY_PATH_OPTION, CONFIG_FILE)
@@ -64,17 +84,32 @@ class Config:
         self.fullscreen = self.get_config('config', 'fullscreen', DEFAULT_FULLSCREEN, ['yes', 'no'])
         # resolution
         # TODO get list supported  resolution...
-        self.resolution = self.get_config('config', 'resolution', DEFAULT_RESOLUTION, ['maximize'])
+        self.resolution = self.get_config('config', 'resolution', DEFAULT_RESOLUTION)
+        if 'maximize' and re.match('^(\d+)\s*x\s*(\d+)$|^maximize$', self.resolution.lower()):
+            self.resolution = self.resolution.lower()
+            w, h = self.get_resolution()
+            if w != -1 and h != -1:
+                minw, minh = MINIMUM_RESOLUTION
+                screen = QDesktopWidget().screenGeometry()
+                if w < minw or h < minh:
+                    self.error_msg = 'Error : Bad resolution (width must be superior to ' + str(
+                        minw) + ' and height must be superior to ' + str(minh) + ')'
+                if w > screen.width() or h > screen.height():
+                    self.error_msg = 'Error : Bad resolution (width must be inferior to screen width resolution ' + str(
+                        screen.width()) + ' and height must be inferior to screen height resolution ' + str(
+                        screen.height()) + ')'
+        else:
+            self.error_msg = 'Error : Bad value option resolution (format maxize or 800 x 600)'
         # theme
-        self.name_theme_selected = self.get_config('config', 'theme', DEFAULT_THEME, [])
+        self.name_theme_selected = self.get_config('config', 'theme', DEFAULT_THEME)
         # lang
-        self.name_lang_selected = self.get_config('config', 'lang', DEFAULT_LANG, [])
+        self.name_lang_selected = self.get_config('config', 'lang', DEFAULT_LANG)
 
         #
         # Battle option
         #
         try:
-            self.diameter_battlemap = int(self.get_config('battle', 'diameter_battlemap', DEFAULT_DIAMETER_MAP, []))
+            self.diameter_battlemap = int(self.get_config('battle', 'diameter_battlemap', DEFAULT_DIAMETER_MAP))
             if self.diameter_battlemap <= 0:
                 self.error_msg += 'diameter_battlemap must be a int>0'
             if self.diameter_battlemap % 2 == 0:
@@ -82,7 +117,7 @@ class Config:
         except ValueError:
             self.error_msg += 'diameter_battlemap must be a int'
         try:
-            self.diameter_battlecity = int(self.get_config('battle', 'diameter_battlecity', DEFAULT_DIAMETER_CITY, []))
+            self.diameter_battlecity = int(self.get_config('battle', 'diameter_battlecity', DEFAULT_DIAMETER_CITY))
             if self.diameter_battlecity <= 0:
                 self.error_msg += 'diameter_battlecity must be a int>0'
             if self.diameter_battlecity % 2 == 0:
@@ -94,22 +129,22 @@ class Config:
         #
 
         # data path folder
-        self.data_folder = self.get_config('path', 'data', '', [])
+        self.data_folder = self.get_config('path', 'data')
         if not os.path.isdir(self.data_folder):
             self.error_msg += 'data folder ' + self.data_folder + ' doesn\'t exist\n'
             self.data_folder = 'error'
         # lang config file
-        self.lang_config_file = self.get_config('path', 'lang_config_file', '', [])
+        self.lang_config_file = self.get_config('path', 'lang_config_file')
         if not os.path.exists(self.lang_config_file):
             self.error_msg += 'lang config file ' + self.lang_config_file + ' doesn\'t exist\n'
             self.lang_config_file = 'error'
         # unit config file
-        self.unit_config_file = self.get_config('path', 'unit_config_file', '', [])
+        self.unit_config_file = self.get_config('path', 'unit_config_file')
         if not os.path.exists(self.unit_config_file):
             self.error_msg += 'unit config file ' + self.unit_config_file + ' doesn\'t exist\n'
             self.unit_config_file = 'error'
         # nation config file
-        self.nation_config_file = self.get_config('path', 'nation_config_file', '', [])
+        self.nation_config_file = self.get_config('path', 'nation_config_file')
         if not os.path.exists(self.nation_config_file):
             self.error_msg += 'nation config file ' + self.nation_config_file + ' doesn\'t exist\n'
             self.nation_config_file = 'error'
@@ -122,18 +157,18 @@ class Config:
         for section in self.config.sections():
             if section.startswith('theme'):
                 if self.check_options(section, MANDATORY_THEME_OPTION, CONFIG_FILE):
-                    name = self.get_config(section, 'name', '', [])
-                    description = self.get_config(section, 'description', '', [])
-                    coat_of_arms_graphics = self.get_config(section, 'coat_of_arms_graphics', '', [])
-                    flag_graphics = self.get_config(section, 'flag_graphics', '', [])
-                    map_graphics = self.get_config(section, 'map_graphics', '', [])
-                    unit_graphics = self.get_config(section, 'unit_graphics', '', [])
-                    background = self.get_config(section, 'background', '', [])
-                    end_button = self.get_config(section, 'end_button', '', [])
-                    autocombat_button = self.get_config(section, 'autocombat_button', '', [])
-                    help_button = self.get_config(section, 'help_button', '', [])
-                    retreat_button = self.get_config(section, 'retreat_button', '', [])
-                    target_button = self.get_config(section, 'target_button', '', [])
+                    name = self.get_config(section, 'name')
+                    description = self.get_config(section, 'description')
+                    coat_of_arms_graphics = self.get_config(section, 'coat_of_arms_graphics')
+                    flag_graphics = self.get_config(section, 'flag_graphics')
+                    map_graphics = self.get_config(section, 'map_graphics')
+                    unit_graphics = self.get_config(section, 'unit_graphics')
+                    background = self.get_config(section, 'background')
+                    end_button = self.get_config(section, 'end_button')
+                    autocombat_button = self.get_config(section, 'autocombat_button')
+                    help_button = self.get_config(section, 'help_button')
+                    retreat_button = self.get_config(section, 'retreat_button')
+                    target_button = self.get_config(section, 'target_button')
                     try:
                         theme = Theme(name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
                                       unit_graphics, background, end_button, autocombat_button, help_button,
@@ -154,30 +189,30 @@ class Config:
         self.list_unit_type = []
         if self.unit_config_file != 'error':
 
-            self.config = configparser.ConfigParser()
+            self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
             self.config.read_file(open(self.unit_config_file))
             for section in self.config.sections():
                 if self.check_options(section, MANDATORY_UNIT_OPTION, self.unit_config_file):
                     try:
                         previous_error = self.error_msg
-                        name = self.get_config(section, 'name', '', [])
-                        evolution_level = int(self.get_config(section, 'level', '', []))
-                        description = self.get_config(section, 'description', '', [])
-                        officier = bool(self.get_config(section, 'officier', '', []))
-                        attack_strength = int(self.get_config(section, 'attack', '', []))
-                        fire_range = int(self.get_config(section, 'range', '', []))
-                        speed = int(self.get_config(section, 'speed', '', []))
-                        creation_cost = float(self.get_config(section, 'creationcost', '', []))
-                        upkeep = float(self.get_config(section, 'upkeep', '', []))
+                        name = self.get_config(section, 'name')
+                        evolution_level = int(self.get_config(section, 'level'))
+                        description = self.get_config(section, 'description')
+                        officier = bool(self.get_config(section, 'officier'))
+                        attack_strength = int(self.get_config(section, 'attack'))
+                        fire_range = int(self.get_config(section, 'range'))
+                        speed = int(self.get_config(section, 'speed'))
+                        creation_cost = float(self.get_config(section, 'creationcost'))
+                        upkeep = float(self.get_config(section, 'upkeep'))
                         graphic_charge = QPixmap(self.theme_selected.unit_graphics + '/' +
-                                                 self.get_config(section, 'pixmap.charge', '', []))
+                                                 self.get_config(section, 'pixmap.charge'))
                         graphic_shoot = QPixmap(self.theme_selected.unit_graphics + '/' +
-                                                self.get_config(section, 'pixmap.shoot', '', []))
+                                                self.get_config(section, 'pixmap.shoot'))
                         graphic_stand = QPixmap(self.theme_selected.unit_graphics + '/' +
-                                                self.get_config(section, 'pixmap.stand', '', []))
+                                                self.get_config(section, 'pixmap.stand'))
                         unit_type = LandUnitType(name, evolution_level, description, officier, attack_strength,
-                                               fire_range, speed, creation_cost, upkeep, graphic_charge,
-                                               graphic_shoot, graphic_stand)
+                                                 fire_range, speed, creation_cost, upkeep, graphic_charge,
+                                                 graphic_shoot, graphic_stand)
                         if previous_error == self.error_msg:
                             self.list_unit_type.append(unit_type)
                     except ValueError as e:
@@ -189,15 +224,16 @@ class Config:
         self.lang_selected = 'error'
         self.available_lang = []
         if self.lang_config_file != 'error':
-            self.config = configparser.ConfigParser()
+            self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation()
+                                                    )
             self.config.read_file(open(self.lang_config_file))
             for section in self.config.sections():
                 try:
-                    name = self.get_config(section, 'name', '', [])
-                    description = self.get_config(section, 'description', '', [])
+                    name = self.get_config(section, 'name')
+                    description = self.get_config(section, 'description')
                     lang = Lang(name, description)
                     for option in self.config.options(section):
-                        lang.add_string(option, self.get_config(section, option, '', []))
+                        lang.add_string(option, self.get_config(section, option))
                     if name == self.name_lang_selected:
                         self.lang_selected = lang
                     self.available_lang.append(lang)
@@ -213,20 +249,18 @@ class Config:
         #
         self.available_nation = []
         if self.nation_config_file != 'error':
-            self.config = configparser.ConfigParser()
+            self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
             self.config.read_file(open(self.nation_config_file))
             for section in self.config.sections():
                 try:
-                    name = self.get_config(section, 'name', '', [])
-                    flag = QPixmap(self.theme_selected.flag_graphics + '/' + self.get_config(section, 'flag', '', []))
+                    name = self.get_config(section, 'name')
+                    flag = QPixmap(self.theme_selected.flag_graphics + '/' + self.get_config(section, 'flag'))
                     coat_of_arms = QPixmap(
-                            self.theme_selected.coat_of_arms_graphics + '/' + self.get_config(section, 'coat_of_arms',
-                                                                                              '',
-                                                                                              []))
+                            self.theme_selected.coat_of_arms_graphics + '/' + self.get_config(section, 'coat_of_arms'))
 
                     nation = Nation(name, False, coat_of_arms, flag)
                     for option in self.config.options(section):
-                        lang.add_string(option, self.get_config(section, option, '', []))
+                        lang.add_string(option, self.get_config(section, option))
                     if name == self.name_lang_selected:
                         self.lang_seleted = lang
                     self.available_nation.append(nation)
@@ -260,15 +294,15 @@ class Config:
     #
     # Operation to simplify config parsing
     #
-    def get_config(self, section, option, default, expected_value):
+    def get_config(self, section, option, default='', expected_value=None):
+        if expected_value is None:
+            expected_value = []
         try:
             retval = self.config.get(section, option)
             if len(expected_value) != 0 and retval.lower() not in expected_value:
                 self.error_msg += 'Error : Bad value option ' + str(option) + ' expected ' + str(expected_value) + '\n'
             else:
-                if self.data_folder != 'error':
-                    retval = retval.replace('$data', self.data_folder)
-                return retval.replace('//', '/')
+                return retval
         except configparser.NoOptionError:
             self.error_msg += 'Error : Missing mandatory option ' + str(option) + '\n'
 
@@ -293,7 +327,7 @@ class Config:
     #
     # Configuration getter
     #
-    def showFullscreen(self):
+    def show_fullscreen(self):
         return self.fullscreen.lower() == 'yes'
 
     def maximize(self):
@@ -307,7 +341,6 @@ class Config:
         """
         return self.theme_selected.get_unit_pixmap(file_name)
 
-
     def get_map_pixmap(self, file_name):
         """
         function get_map_pixmap
@@ -320,7 +353,6 @@ class Config:
         if not isinstance(key, str) or key == '':
             raise ValueError('key must be a non empty string')
         return self.lang_selected.get_string(key)
-
 
     def get_nation(self, name):
         for nation in self.available_nation:

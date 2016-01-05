@@ -17,6 +17,7 @@
 
 from PyQt5.QtGui import QPixmap
 
+
 class Nation:
     """Class Nation
     """
@@ -52,8 +53,6 @@ class Nation:
         no return
         """
         raise NotImplementedError()
-
-
 
     def draw_coat_of_arms(self, scene, size):
         """function draw_coat_of_arms

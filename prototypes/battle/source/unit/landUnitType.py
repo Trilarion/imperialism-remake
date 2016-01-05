@@ -15,9 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QTransform, QPixmap, QBrush
-from PyQt5.QtWidgets import QGraphicsRectItem
+
+from PyQt5.QtGui import QTransform, QPixmap
+
+
 def miror_pixmap(pixmap):
     transform = QTransform()
     transform.scale(-1, 1)
@@ -86,9 +87,10 @@ class LandUnitType:
     # Operations
     def __str__(self):
         retval = 'name:' + self.name + ',evolutionLevel:' + str(
-            self.evolutionLevel) + ',description:' + self.description + ',officier:' + str(
-            self.officier) + ',attack: ' + str(self.attackStrength) + ',range:' + str(self.fireRange) + ',speed:' + str(
-            self.speed) + ',creationCost:' + str(self.creationCost) + ',upkeep:' + str(self.upkeep)
+                self.evolutionLevel) + ',description:' + self.description + ',officier:' + str(
+                self.officier) + ',attack: ' + str(self.attackStrength) + ',range:' + str(
+                self.fireRange) + ',speed:' + str(
+                self.speed) + ',creationCost:' + str(self.creationCost) + ',upkeep:' + str(self.upkeep)
         return retval
 
     def to_html_table_row(self):
@@ -106,27 +108,20 @@ class LandUnitType:
             return self.graphicShoot
         return self.graphicStand
 
-    def draw(self, nation, defending, status, scene, size):
+    def draw(self, defending, status, scene, size):
         """function draw
 
         :param defending: boolean
+        :param status: str {'Charge', 'Shoot', 'Stand'}
         :param scene: QGraphicsScene
         :param size: QSize
 
         no return
         """
-        pix =QPixmap('')
+        pix = QPixmap('')
         pix.width()
-
 
         unit_pixmap = self.get_pixmap(status).scaled(size.width() * 80 / 100, size.height() * 80 / 100)
         if defending:
             unit_pixmap = miror_pixmap(unit_pixmap)
         scene.addPixmap(unit_pixmap)
-        flag_width = nation.flag.width() * 10 / nation.flag.height()
-        item = scene.addPixmap(nation.flag.scaled(flag_width, 10))
-        item.setPos(size.width() - 5 - flag_width, 0)
-        item1 = QGraphicsRectItem(0, size.height() - 10, size.width() - 5, 5)
-        item1.setBrush(QBrush(Qt.green))
-        #item1.setPos(size.width() * 25 / 100, 81 / 100 * size.height())
-        scene.addItem(item1)

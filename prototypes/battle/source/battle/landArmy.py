@@ -17,6 +17,7 @@
 
 from nation.nation import Nation
 
+
 class LandArmy:
     """Class LandArmy
     """

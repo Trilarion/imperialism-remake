@@ -16,9 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
-import os
-
-from PyQt5.QtGui import QTransform, QPixmap, QFont
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QSizePolicy
 
 
@@ -38,7 +36,6 @@ def default_font():
     return font
 
 
-
 def format_money(money):
     str_init = str(money)
     retval = ""
@@ -47,4 +44,3 @@ def format_money(money):
             retval += ","
         retval += str_init[i]
     return retval
-

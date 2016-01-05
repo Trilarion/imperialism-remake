@@ -111,7 +111,6 @@ class Theme:
         path = (self.map_graphics + '/' + file_name).replace('//', '/')
         return QPixmap(path)
 
-
     def get_background_pixmap(self):
         """
         function get_background_pixmap

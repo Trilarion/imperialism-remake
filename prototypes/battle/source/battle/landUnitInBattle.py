@@ -17,6 +17,7 @@
 
 from unit.landUnit import LandUnit
 
+
 class LandUnitInBattle(LandUnit):
     """Class LandUnitInBattle
     """
@@ -24,29 +25,25 @@ class LandUnitInBattle(LandUnit):
     # Constructor:
     def __init__(self, dead, status, retreat, moral, unit_strength, experience_level, unit_type, nation):
         """function __init__
-        :param dead
-        :param status
-        :param retreat
+        :param dead: bool
+        :param status: str {'Charge', 'Shoot', 'Stand'}
+        :param retreat: bool
         :param moral: int range(0,100)
         :param unit_strength: int range(0,100)
         :param experience_level: int range(1,5)
         :param unit_type: LandUnitType
         :param nation: Nation
         """
-        super().__init__(unit_strength, experience_level, unit_type,
-                         nation)
+        super().__init__(moral, unit_strength, experience_level, unit_type, nation)
         if not isinstance(dead, bool):
             raise ValueError('dead must be a boolean')
         if not isinstance(retreat, bool):
             raise ValueError('retreat must be a boolean')
         if not isinstance(status, str) or (status != 'Charge' and status != 'Shoot' and status != 'Stand'):
             raise ValueError('status must be a str in {\'Charge\', \'Shoot\', \'Stand\'}')
-        if not isinstance(moral, int) or moral not in range(0, 101):
-            raise ValueError('moral must be an int in range(0,100)')
         self.dead = dead
         self.status = status
         self.retreat = retreat
-        self.moral = moral  # [0, 100]  # (int)
         self.moveUsed = 0
         self.hasShoot = False
 

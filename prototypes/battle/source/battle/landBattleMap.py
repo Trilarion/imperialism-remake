@@ -47,6 +47,8 @@ class LandBattleMap:
         self.diameter = self.config.diameter_battlemap
         self.cityDiameter = self.config.diameter_battlecity
         self.fields = []
+        self.sizeScreenWidth = 0
+        self.sizeScreenHeight = 0
 
     # Operations
     def get_size_tile(self):
@@ -92,20 +94,21 @@ class LandBattleMap:
         """
         if not isinstance(position, QPointF):
             raise ValueError('position must be a QPointF instance')
-        estimated_column = round(position.x()/(2 * self.get_size_tile()))
-        estimated_row = round(position.y()/(math.sqrt(3) * self.get_size_tile()))
+        estimated_column = round(position.x() / (2 * self.get_size_tile()))
+        estimated_row = round(position.y() / (math.sqrt(3) * self.get_size_tile()))
         for r in range(estimated_row - 3, estimated_row + 4):
             for c in range(estimated_column - 3, estimated_column + 4):
                 field_index = self.grid_position_to_index(c, r)
-                if len(self.fields)>field_index and self.fields[field_index].enable and \
-                        self.fields[field_index].hexa.containsPoint(position,Qt.OddEvenFill):
+                if len(self.fields) > field_index and self.fields[field_index].enable and \
+                        self.fields[field_index].hexa.containsPoint(position, Qt.OddEvenFill):
                     return c, r
         return -1, -1
 
     def grid_position_to_position(self, column, row):
         """function grid_position_to_position
 
-        :param gridposition: int, int
+        :param column: int
+        :param row: int
 
         returns QPointF return the QPointF corresponding to the couple (column,row)
         """
