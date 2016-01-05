@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os
-
+from battle.landBattleFieldType import LandBattleFieldType
 from PyQt5.QtGui import QPixmap
 
 
@@ -24,7 +24,8 @@ class Theme:
     # constructor
     def __init__(self, name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
                  unit_graphics, background, end_button, autocombat_button, help_button,
-                 retreat_button, target_button):
+                 retreat_button, target_button, outside_city_pixmap, outside_city_color,
+                 city_pixmap, city_color):
         """constructor
         :param name: str
         :param description: str
@@ -38,6 +39,10 @@ class Theme:
         :param help_button: str
         :param retreat_button: str
         :param target_button; str
+        :param outside_city_pixmap: str
+        :param outside_city_color: str
+        :param city_pixmap: str
+        :param city_color: str
         """
         if not isinstance(name, str) or name == '':
             raise ValueError('name must be a non empty string')
@@ -81,6 +86,8 @@ class Theme:
         self.help_button = help_button
         self.retreat_button = retreat_button
         self.target_button = target_button
+        self.city_field = LandBattleFieldType('city',city_color,city_pixmap)
+        self.outsidecity_field = LandBattleFieldType('outside city',outside_city_color,outside_city_pixmap)
 
     # Operator
     def __str__(self):

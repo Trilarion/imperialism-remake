@@ -28,6 +28,7 @@ from battle.landArmy import LandArmy
 from battle.landBattle import LandBattle
 from battle.landUnitInBattle import LandUnitInBattle
 
+CONFIG_FILE = 'config.ini'
 
 class MainBattleWindows(QMainWindow):
     def __init__(self, parent=None):
@@ -86,7 +87,7 @@ class LandBattleView(QObject):
 
     def __init__(self, battle_window, parent=None):
         super().__init__(parent)
-        self.config = Config()
+        self.config = Config(CONFIG_FILE)
         if self.config.error_msg != '':
             QMessageBox.critical(battle_window, 'Configuration Error', self.config.error_msg)
             exit(-1)

@@ -24,6 +24,9 @@ def miror_pixmap(pixmap):
     transform.scale(-1, 1)
     return QPixmap(pixmap.transformed(transform))
 
+UNIT_WIDTH = 400
+UNIT_HEIGHT = 400
+
 
 class LandUnitType:
     """Class LandUnitType
@@ -71,6 +74,12 @@ class LandUnitType:
             raise ValueError('creation_cost must be an float>0 ' + str(creation_cost))
         if not isinstance(upkeep, float) or upkeep < 0:
             raise ValueError('upkeep must be an float>0')
+        if graphic_charge.width() != UNIT_WIDTH or graphic_charge.height() != UNIT_HEIGHT:
+            raise ValueError('graphic_charge must have the dimension ' + str(UNIT_WIDTH) + 'x' + str(UNIT_HEIGHT))
+        if graphic_shoot.width() != UNIT_WIDTH or graphic_shoot.height() != UNIT_HEIGHT:
+            raise ValueError('graphic_shoot must have the dimension ' + str(UNIT_WIDTH) + 'x' + str(UNIT_HEIGHT))
+        if graphic_stand.width() != UNIT_WIDTH or graphic_stand.height() != UNIT_HEIGHT:
+            raise ValueError('graphic_stand must have the dimension ' + str(UNIT_WIDTH) + 'x' + str(UNIT_HEIGHT))
         self.name = name
         self.evolutionLevel = evolution_level
         self.description = description

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QColor
 
 
 class LandBattleFieldType:
@@ -25,13 +25,11 @@ class LandBattleFieldType:
     def __init__(self, name, color, texture):
         if not isinstance(name, str) or name == '':
             raise ValueError('name must be a non empty string')
-        if not isinstance(texture, QPixmap) and texture is not None:
-            raise ValueError('texture must be a QPixmap instance or None')
-        if color is None and texture is None:
+        self.color = QColor(color)
+        self.texture = QPixmap(texture)
+        if not self.color.isValid() and self.texture.isNull():
             raise ValueError('texture or color must be specified')
         self.name = name
-        self.color = color
-        self.texture = texture
 
 
 

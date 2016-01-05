@@ -30,7 +30,6 @@ from base.theme import Theme
 from nation.nation import Nation
 from unit.landUnitType import LandUnitType
 
-CONFIG_FILE = 'config.ini'
 DEFAULT_FULLSCREEN = 'yes'
 DEFAULT_THEME = 'theme0'
 DEFAULT_LANG = 'en'
@@ -48,7 +47,8 @@ MANDATORY_PATH_OPTION = ['data', 'lang_config_file', 'unit_config_file', 'nation
 MANDATORY_BATTLE_OPTION = ['diameter_battlemap', 'diameter_battlecity']
 MANDATORY_THEME_OPTION = ['name', 'description', 'coat_of_arms_graphics', 'flag_graphics', 'map_graphics',
                           'unit_graphics', 'background', 'end_button', 'autocombat_button', 'help_button',
-                          'retreat_button', 'target_button']
+                          'retreat_button', 'target_button', 'outside_city_pixmap', 'outside_city_color',
+                          'city_pixmap', 'city_color']
 MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 
@@ -77,14 +77,14 @@ class Config:
             logging.debug('[EXIT] get_resolution() => return -1,-1')
             return -1, -1
 
-    def __init__(self):
+    def __init__(self, main_config_file):
         self.error_msg = ''
         self.data_folder = 'error'
         self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-        self.config.read_file(open(CONFIG_FILE))
-        self.check_options('config', MANDATORY_CONFIG_OPTION, CONFIG_FILE)
-        self.check_options('path', MANDATORY_PATH_OPTION, CONFIG_FILE)
-        self.check_options('battle', MANDATORY_BATTLE_OPTION, CONFIG_FILE)
+        self.config.read_file(open(main_config_file))
+        self.check_options('config', MANDATORY_CONFIG_OPTION, main_config_file)
+        self.check_options('path', MANDATORY_PATH_OPTION, main_config_file)
+        self.check_options('battle', MANDATORY_BATTLE_OPTION, main_config_file)
 
         #
         # Config Option
@@ -169,7 +169,7 @@ class Config:
         self.theme_selected = None
         for section in self.config.sections():
             if section.startswith('theme'):
-                if self.check_options(section, MANDATORY_THEME_OPTION, CONFIG_FILE):
+                if self.check_options(section, MANDATORY_THEME_OPTION, main_config_file):
                     name = self.get_config(section, 'name')
                     description = self.get_config(section, 'description')
                     coat_of_arms_graphics = self.get_config(section, 'coat_of_arms_graphics')
@@ -182,10 +182,15 @@ class Config:
                     help_button = self.get_config(section, 'help_button')
                     retreat_button = self.get_config(section, 'retreat_button')
                     target_button = self.get_config(section, 'target_button')
+                    outside_city_pixmap= self.get_config(section, 'outside_city_pixmap')
+                    outside_city_color= self.get_config(section, 'outside_city_color')
+                    city_pixmap= self.get_config(section, 'city_pixmap')
+                    city_color= self.get_config(section, 'city_color')
                     try:
                         theme = Theme(name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
                                       unit_graphics, background, end_button, autocombat_button, help_button,
-                                      retreat_button, target_button)
+                                      retreat_button, target_button, outside_city_pixmap, outside_city_color,
+                                      city_pixmap, city_color)
                         self.available_theme.append(theme)
 
                         if name == self.name_theme_selected:
@@ -217,20 +222,27 @@ class Config:
                         speed = int(self.get_config(section, 'speed'))
                         creation_cost = float(self.get_config(section, 'creationcost'))
                         upkeep = float(self.get_config(section, 'upkeep'))
-                        graphic_charge = QPixmap(self.theme_selected.unit_graphics + '/' +
-                                                 self.get_config(section, 'pixmap.charge'))
-                        graphic_shoot = QPixmap(self.theme_selected.unit_graphics + '/' +
-                                                self.get_config(section, 'pixmap.shoot'))
-                        graphic_stand = QPixmap(self.theme_selected.unit_graphics + '/' +
-                                                self.get_config(section, 'pixmap.stand'))
+                        graphic_charge_filename = self.get_config(section, 'pixmap.charge')
+                        if not graphic_charge_filename.lower().endswith('.png'):
+                            raise ValueError('pixmap.charge must be a png file')
+                        graphic_charge = QPixmap(self.theme_selected.unit_graphics + '/' + graphic_charge_filename)
+                        graphic_shoot_filename = self.get_config(section, 'pixmap.shoot')
+                        if not graphic_shoot_filename.lower().endswith('.png'):
+                            raise ValueError('pixmap.shoot must be a png file')
+                        graphic_shoot = QPixmap(self.theme_selected.unit_graphics + '/' + graphic_shoot_filename)
+                        graphic_stand_filename = self.get_config(section, 'pixmap.stand')
+                        if not graphic_stand_filename.lower().endswith('.png'):
+                            raise ValueError('pixmap.stand must be a png file')
+                        graphic_stand = QPixmap(self.theme_selected.unit_graphics + '/' + graphic_stand_filename)
                         unit_type = LandUnitType(name, evolution_level, description, officier, attack_strength,
                                                  fire_range, speed, creation_cost, upkeep, graphic_charge,
                                                  graphic_shoot, graphic_stand)
                         if previous_error == self.error_msg:
                             self.list_unit_type.append(unit_type)
+                    except AttributeError as e:
+                        self.error_msg += str(e) + '\n'
                     except ValueError as e:
                         self.error_msg += str(e) + '\n'
-
         #
         # lang config
         #
@@ -267,9 +279,14 @@ class Config:
             for section in self.config.sections():
                 try:
                     name = self.get_config(section, 'name')
-                    flag = QPixmap(self.theme_selected.flag_graphics + '/' + self.get_config(section, 'flag'))
-                    coat_of_arms = QPixmap(
-                            self.theme_selected.coat_of_arms_graphics + '/' + self.get_config(section, 'coat_of_arms'))
+                    flag_filename = self.get_config(section, 'flag')
+                    if not flag_filename.lower().endswith('.png'):
+                        raise ValueError('flag must be a png file')
+                    flag = QPixmap(self.theme_selected.flag_graphics + '/' + flag_filename)
+                    coat_of_arms_filename = self.get_config(section, 'coat_of_arms')
+                    if not coat_of_arms_filename.lower().endswith('.png'):
+                        raise ValueError('coat of arms must be a png file')
+                    coat_of_arms = QPixmap(self.theme_selected.coat_of_arms_graphics + '/' + coat_of_arms_filename)
 
                     nation = Nation(name, False, coat_of_arms, flag)
                     for option in self.config.options(section):
@@ -277,6 +294,8 @@ class Config:
                     if name == self.name_lang_selected:
                         self.lang_seleted = lang
                     self.available_nation.append(nation)
+                except AttributeError as e:
+                    self.error_msg += str(e) + '\n'
                 except ValueError as e:
                     self.error_msg += str(e) + '\n'
         if len(self.available_nation) == 0:

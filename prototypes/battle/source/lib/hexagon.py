@@ -100,7 +100,7 @@ class QHexagon(QPolygonF):
         """
         if not isinstance(scene, QGraphicsScene) or scene is None:
             raise ValueError('texture must be a non null QGraphicsScene instance')
-        if not isinstance(texture, QPixmap) and texture is not None:
+        if not isinstance(texture, QPixmap) and not texture.isNull():
             raise ValueError('texture must be a QPixmap instance or None')
         if color is None and texture is None:
             raise ValueError('texture or color must be specified')

@@ -29,8 +29,6 @@ from lib.hexagon import QHexagon
 class LandBattleMap:
     ROTATION_FIELD = 30
     ROTATION_CITY_AND_MAP = 0
-    DEFAULT_FIELD_TYPE = LandBattleFieldType("default", Qt.green, None)
-    DEFAULT_CITY_FIELD_TYPE = LandBattleFieldType("city", Qt.red, None)
     """Class LandBattleMap
     """
 
@@ -169,8 +167,8 @@ class LandBattleMap:
                 hexa = QHexagon(center, self.get_size_tile(), LandBattleMap.ROTATION_FIELD)
                 enable = self.inside_map_hexagon(hexa)
                 if self.inside_city(hexa):
-                    field_type = LandBattleMap.DEFAULT_CITY_FIELD_TYPE
+                    field_type = self.config.theme_selected.city_field
                 else:
-                    field_type = LandBattleMap.DEFAULT_FIELD_TYPE
+                    field_type = self.config.theme_selected.outsidecity_field
                 fields = LandBattleField(enable, hexa.center, column, row, False, field_type, hexa)
                 self.fields.append(fields)

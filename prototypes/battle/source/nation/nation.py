@@ -17,6 +17,10 @@
 
 from PyQt5.QtGui import QPixmap
 
+FLAG_WIDTH = 600
+FLAG_HEIGHT = 400
+COAT_OF_ARMS_WIDTH = 600
+COAT_OF_ARMS_HEIGHT = 800
 
 class Nation:
     """Class Nation
@@ -38,6 +42,10 @@ class Nation:
             raise ValueError('coatOfArms must be a not null pixmap')
         if not isinstance(flag, QPixmap) or flag is None or flag.isNull():
             raise ValueError('flag must be a not null pixmap')
+        if coat_of_arms.width() != COAT_OF_ARMS_WIDTH or coat_of_arms.height() != COAT_OF_ARMS_HEIGHT:
+            raise ValueError('coat_of_arms must have the dimension ' + str(COAT_OF_ARMS_WIDTH) + 'x' + str(COAT_OF_ARMS_HEIGHT))
+        if flag.width() != FLAG_WIDTH or flag.height() != FLAG_HEIGHT:
+            raise ValueError('flag must have the dimension ' + str(FLAG_WIDTH) + 'x' + str(FLAG_HEIGHT))
         self.name = name
         self.computer = computer
         self.coatOfArms = coat_of_arms
