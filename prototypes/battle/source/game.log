@@ -1,0 +1,4 @@
+2016-01-05 22:27:36,077 config:config.py:get_resolution:70   DEBUG:[ENTER] get_resolution()
+2016-01-05 22:27:36,078 config:config.py:get_resolution:77   DEBUG:[EXIT] get_resolution() => return -1,-1
+2016-01-05 22:27:36,494 config:config.py:get_min_resolution_qsize:64   DEBUG:[ENTER] get_min_resolution_qsize()
+2016-01-05 22:27:36,494 config:config.py:get_min_resolution_qsize:66   DEBUG:[EXIT] get_min_resolution_qsize() => return 800,600

@@ -236,8 +236,6 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_targetedUnit, 9, 1, 1, 1, Qt.AlignCenter)
 
     def setup_current_unit_view(self):
-        # TODO setup_current_unit_view
-        print("TODO setup_current_unit_view (landBattleView.py)")
         size = QSize(60, 60)
         nation = self.landBattle.defender.nation
         nation = self.landBattle.defender.nation
@@ -253,8 +251,6 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_currentUnit, 10, 1, 1, 1, Qt.AlignCenter)
 
     def setup_coat_of_arms_view(self):
-        # TODO setup_coat_of_arms_view
-        print("TODO setup_coat_of_arms_view (landBattleView.py)")
         size = QSize(90, 120)
         self.landBattle.draw_coat_of_arms(self.coatOfArmsGraphicsScene, size)
         self.graphicsView_coatOfArm.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
