@@ -19,6 +19,7 @@ import configparser
 import os
 import sys
 import re
+import logging
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
@@ -37,10 +38,12 @@ DEFAULT_RESOLUTION = 'maximize'
 MINIMUM_RESOLUTION = 800, 600
 DEFAULT_DIAMETER_MAP = '20'
 DEFAULT_DIAMETER_CITY = '5'
+DEFAULT_LOGLEVEL ='50'
+LOG_FILENAME ='game.log'
 
 MANDATORY_UNIT_OPTION = ['name', 'description', 'officier', 'level', 'attack', 'range', 'speed', 'creationcost',
                          'upkeep', 'pixmap.charge', 'pixmap.shoot', 'pixmap.stand']
-MANDATORY_CONFIG_OPTION = ['fullscreen', 'resolution', 'theme', 'lang']
+MANDATORY_CONFIG_OPTION = ['fullscreen', 'resolution', 'theme', 'lang', 'log_level']
 MANDATORY_PATH_OPTION = ['data', 'lang_config_file', 'unit_config_file', 'nation_config_file']
 MANDATORY_BATTLE_OPTION = ['diameter_battlemap', 'diameter_battlecity']
 MANDATORY_THEME_OPTION = ['name', 'description', 'coat_of_arms_graphics', 'flag_graphics', 'map_graphics',
@@ -51,20 +54,27 @@ MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 class Config:
     def get_resolution_qsize(self):
+        logging.debug('[ENTER] get_resolution_qsize()')
         w, h = self.get_resolution()
+        logging.debug('[EXIT] get_resolution_qsize() => return ' + str(w) + ',' + str(h))
         return QSize(w, h)
 
     @staticmethod
     def get_min_resolution_qsize():
+        logging.debug('[ENTER] get_min_resolution_qsize()')
         w, h = MINIMUM_RESOLUTION
+        logging.debug('[EXIT] get_min_resolution_qsize() => return ' + str(w) + ',' + str(h))
         return QSize(w, h)
 
     def get_resolution(self):
+        logging.debug('[ENTER] get_resolution()')
         try:
             m = re.search('^(\d+)\s*x\s*(\d+)$', self.resolution.lower())
             w, h = int(m.group(1)), int(m.group(2))
+            logging.debug('[EXIT] get_resolution() => return ' + str(w) + ',' + str(h))
             return w, h
         except AttributeError:
+            logging.debug('[EXIT] get_resolution() => return -1,-1')
             return -1, -1
 
     def __init__(self):
@@ -82,9 +92,12 @@ class Config:
 
         # fullscreen option
         self.fullscreen = self.get_config('config', 'fullscreen', DEFAULT_FULLSCREEN, ['yes', 'no'])
+        # log level option
+        log_level = int(self.get_config('config', 'log_level', DEFAULT_LOGLEVEL, ['50', '40', '30', '20', '10']))
+        logging.basicConfig(level=log_level, filename=LOG_FILENAME, filemode='w', format='%(asctime)s %(module)s:%(filename)s:%(funcName)s:%(lineno)d   %(levelname)s:%(message)s')
         # resolution
         # TODO get list supported  resolution...
-        self.resolution = self.get_config('config', 'resolution', DEFAULT_RESOLUTION)
+        self.resolution = self.get_config('config', 'resolution')
         if 'maximize' and re.match('^(\d+)\s*x\s*(\d+)$|^maximize$', self.resolution.lower()):
             self.resolution = self.resolution.lower()
             w, h = self.get_resolution()

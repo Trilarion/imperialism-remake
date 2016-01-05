@@ -18,8 +18,7 @@ import unittest
 
 testmodules = [
     'testcase.hexagonTestCase',
-    'testcase.landBattleFieldTypeTestCase',
-    'testcase.landUnitType'
+    'testcase.landBattleFieldTypeTestCase'
 ]
 
 suite = unittest.TestSuite()
