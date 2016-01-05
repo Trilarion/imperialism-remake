@@ -114,7 +114,7 @@ class LandBattleView(QObject):
         self.dateLabel = QLabel(self.centralWidget)
         self.buttonHintLabel = QLabel(self.centralWidget)
         self.gridLayout.addWidget(self.graphicsView_main, 1, 0, 12, 1)
-        # start test only
+        # start testcase only
         nation_uk = self.config.get_nation("uk")
         nation_fr = self.config.get_nation("france")
         nation_fr.computer = True
@@ -123,7 +123,7 @@ class LandBattleView(QObject):
         targetted_unit = LandUnitInBattle(False, 'Shoot', False, 75, 50, 1, unit_type, nation_uk)
         defender = LandArmy(False, None, nation_uk)
         attacker = LandArmy(False, None, nation_fr)
-        # end test only
+        # end testcase only
         self.landBattle = LandBattle(self.config, False, 0, current_unit, targetted_unit, defender, attacker)
         self.mainScene.set_land_battle(self.landBattle)
 

@@ -28,21 +28,21 @@ class LandBattleFieldTypeTestCase(unittest.TestCase):
 
     def test_init0(self):
         try:
-            LandBattleFieldType("test", None, None)
+            LandBattleFieldType("testcase", None, None)
             self.assertTrue(False)
         except ValueError:
             self.assertTrue(True)
 
     def test_init1(self):
         try:
-            LandBattleFieldType("test", Qt.red, None)
+            LandBattleFieldType("testcase", Qt.red, None)
             self.assertTrue(True)
         except ValueError:
             self.assertTrue(False)
 
     def test_init2(self):
         try:
-            LandBattleFieldType("test", None, 1)
+            LandBattleFieldType("testcase", None, 1)
             self.assertTrue(False)
         except ValueError:
             self.assertTrue(True)
@@ -55,7 +55,7 @@ class LandBattleFieldTypeTestCase(unittest.TestCase):
             self.assertTrue(True)
 
 
-# Ceci lance le test si on exécute le script
+# Ceci lance le testcase si on exécute le script
 # directement.
 if __name__ == '__main__':
     unittest.main()

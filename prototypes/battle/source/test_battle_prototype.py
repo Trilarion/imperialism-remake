@@ -17,8 +17,9 @@
 import unittest
 
 testmodules = [
-    'lib.hexagonTestCase',
-    'battle.landBattleFieldTypeTestCase'
+    'testcase.hexagonTestCase',
+    'testcase.landBattleFieldTypeTestCase',
+    'testcase.landUnitType'
 ]
 
 suite = unittest.TestSuite()
@@ -30,9 +31,9 @@ for t in testmodules:
         suitefn = getattr(mod, 'suite')
         suite.addTest(suitefn())
     except (ImportError, AttributeError):
-        # else, just load all the test cases from the module.
+        # else, just load all the testcase cases from the module.
         suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
-# Ceci lance le test si on exécute le script
+# Ceci lance le testcase si on exécute le script
 # directement.
 if __name__ == '__main__':
     unittest.TextTestRunner().run(suite)

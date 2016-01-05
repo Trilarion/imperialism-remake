@@ -161,7 +161,7 @@ class QHexagonTestCase(unittest.TestCase):
         hexa2 = QHexagon(center, 1, 0)
         self.assertFalse(hexa == hexa2)
 
-        # Ceci lance le test si on exécute le script
+        # Ceci lance le testcase si on exécute le script
 
 
 # directement.

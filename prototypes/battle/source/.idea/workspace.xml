@@ -2,34 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a269a44d-0c1a-4ed1-bde5-7b9ab0d18b69" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/coat_of_arms/france.svg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/coat_of_arms/ottoman.svg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/coat_of_arms/russia.svg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/coat_of_arms/uk.svg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/flag/france.svg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/flag/ottoman.svg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/flag/russia.svg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/flag/uk.svg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/ui/background.jpg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../data/graphics/ui/background2.jpg" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../data/graphics/unit/infantry.charge.png" afterPath="$PROJECT_DIR$/../data/graphics/unit/infantry.charge.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../data/graphics/unit/infantry.shoot.png" afterPath="$PROJECT_DIR$/../data/graphics/unit/infantry.shoot.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../data/graphics/unit/infantry.stand.png" afterPath="$PROJECT_DIR$/../data/graphics/unit/infantry.stand.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../data/nation.ini" afterPath="$PROJECT_DIR$/../data/nation.ini" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/base/config.py" afterPath="$PROJECT_DIR$/base/config.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/base/constants.py" afterPath="$PROJECT_DIR$/base/constants.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/base/theme.py" afterPath="$PROJECT_DIR$/base/theme.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/battle/landArmy.py" afterPath="$PROJECT_DIR$/battle/landArmy.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/battle/landBattle.py" afterPath="$PROJECT_DIR$/battle/landBattle.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/battle/landBattleMap.py" afterPath="$PROJECT_DIR$/battle/landBattleMap.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/battle/landBattleView.py" afterPath="$PROJECT_DIR$/battle/landBattleView.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/battle/landUnitInBattle.py" afterPath="$PROJECT_DIR$/battle/landUnitInBattle.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config.ini" afterPath="$PROJECT_DIR$/config.ini" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nation/nation.py" afterPath="$PROJECT_DIR$/nation/nation.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test_battle_prototype.py" afterPath="$PROJECT_DIR$/test_battle_prototype.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/unit/landUnit.py" afterPath="$PROJECT_DIR$/unit/landUnit.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/unit/landUnitType.py" afterPath="$PROJECT_DIR$/unit/landUnitType.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/battle/landBattleFieldTypeTestCase.py" afterPath="$PROJECT_DIR$/testcase/landBattleFieldTypeTestCase.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/lib/hexagonTestCase.py" afterPath="$PROJECT_DIR$/testcase/hexagonTestCase.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/unit/landUnitType.py" afterPath="$PROJECT_DIR$/testcase/landUnitType.py" />
     </list>
     <ignored path="source.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -53,8 +31,8 @@
       <file leaf-file-name="config.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/base/config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5382003">
-              <caret line="309" column="57" selection-start-line="309" selection-start-column="57" selection-end-line="309" selection-end-column="57" />
+            <state vertical-scroll-proportion="1.7894737">
+              <caret line="74" column="74" selection-start-line="74" selection-start-column="74" selection-end-line="74" selection-end-column="74" />
               <folding />
             </state>
           </provider>
@@ -108,9 +86,10 @@
         <option value="$PROJECT_DIR$/battle/landArmy.py" />
         <option value="$PROJECT_DIR$/start_battle_prototype.py" />
         <option value="$PROJECT_DIR$/battle/landBattleView.py" />
-        <option value="$PROJECT_DIR$/test_battle_prototype.py" />
         <option value="$PROJECT_DIR$/config.ini" />
         <option value="$PROJECT_DIR$/base/config.py" />
+        <option value="$PROJECT_DIR$/test/hexagonTestCase.py" />
+        <option value="$PROJECT_DIR$/test_battle_prototype.py" />
       </list>
     </option>
   </component>
@@ -186,7 +165,49 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="testcase" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="source" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="source" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="nation" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="source" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="source" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="source" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="source" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="battle" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -216,11 +237,14 @@
     <property name="settings.editor.splitter.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="G:\perso\source\imperialism-remake\prototypes\battle\source\test" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="F:\source\imperialism-remake\prototypes\battlev2" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
+  <component name="RunManager" selected="Python.test">
     <configuration default="true" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
       <method />
     </configuration>
@@ -449,15 +473,16 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="0" width="1497" height="990" extended-state="1" />
+    <frame x="-8" y="0" width="1497" height="990" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2532073" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26818183" sideWeight="0.43484133" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26818183" sideWeight="0.4375422" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3272727" sideWeight="0.41525996" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26818183" sideWeight="0.56515867" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26818183" sideWeight="0.5624578" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
@@ -468,7 +493,6 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3968504" sideWeight="0.76207906" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32755905" sideWeight="0.4172767" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -539,13 +563,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/battle/landBattleView.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="236" column="93" selection-start-line="236" selection-start-column="93" selection-end-line="236" selection-end-column="93" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/base/constants.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -556,7 +573,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/unit/landUnitType.py">
+    <entry file="file://$PROJECT_DIR$/testcase/landUnitType.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -596,7 +613,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/unit/landUnitType.py">
+    <entry file="file://$PROJECT_DIR$/testcase/landUnitType.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="46" column="91" selection-start-line="46" selection-start-column="91" selection-end-line="46" selection-end-column="91" />
@@ -767,20 +784,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/hexagonTestCase.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.15748031">
-          <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/battle/landBattleFieldTypeTestCase.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7454068">
-          <caret line="19" column="13" selection-start-line="19" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/battle/landBattleFieldType.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.6535433">
@@ -857,13 +860,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/unit/landUnitType.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.52112675">
-          <caret line="123" column="8" selection-start-line="123" selection-start-column="8" selection-end-line="123" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/battle/landArmy.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.66760564">
@@ -896,13 +892,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test_battle_prototype.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7702703">
-          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config.ini">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="1.9297297">
@@ -911,10 +900,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/base/config.py">
+    <entry file="file://$PROJECT_DIR$/testcase/landBattleFieldTypeTestCase.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.5483871">
+          <caret line="19" column="13" selection-start-line="19" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testcase/landUnitType.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.7572156">
+          <caret line="123" column="8" selection-start-line="123" selection-start-column="8" selection-end-line="123" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testcase/hexagonTestCase.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.1443124">
+          <caret line="10" column="21" selection-start-line="10" selection-start-column="21" selection-end-line="10" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_battle_prototype.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5382003">
-          <caret line="309" column="57" selection-start-line="309" selection-start-column="57" selection-end-line="309" selection-end-column="57" />
+          <caret line="30" column="39" selection-start-line="30" selection-start-column="39" selection-end-line="30" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/base/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.7894737">
+          <caret line="74" column="74" selection-start-line="74" selection-start-column="74" selection-end-line="74" selection-end-column="74" />
           <folding />
         </state>
       </provider>
