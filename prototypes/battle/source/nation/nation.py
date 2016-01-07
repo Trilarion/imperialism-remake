@@ -39,11 +39,11 @@ class Nation:
         if not isinstance(computer, bool):
             raise ValueError('computer must be a boolean')
         if not isinstance(coat_of_arms, QPixmap) or coat_of_arms is None or coat_of_arms.isNull():
-            raise ValueError('coatOfArms must be a not null pixmap')
+            raise ValueError('coatOfArms must be a not null pixmap ' + name)
         if not isinstance(flag, QPixmap) or flag is None or flag.isNull():
             raise ValueError('flag must be a not null pixmap')
         if coat_of_arms.width() != COAT_OF_ARMS_WIDTH or coat_of_arms.height() != COAT_OF_ARMS_HEIGHT:
-            raise ValueError('coat_of_arms must have the dimension ' + str(COAT_OF_ARMS_WIDTH) + 'x' + str(COAT_OF_ARMS_HEIGHT))
+            raise ValueError('coat_of_arms must have the dimension ' + str(COAT_OF_ARMS_WIDTH) + 'x' + str(COAT_OF_ARMS_HEIGHT) + ' ' + name)
         if flag.width() != FLAG_WIDTH or flag.height() != FLAG_HEIGHT:
             raise ValueError('flag must have the dimension ' + str(FLAG_WIDTH) + 'x' + str(FLAG_HEIGHT))
         self.name = name
