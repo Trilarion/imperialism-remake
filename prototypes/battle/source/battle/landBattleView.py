@@ -117,8 +117,8 @@ class LandBattleView(QObject):
         self.gridLayout.addWidget(self.graphicsView_main, 1, 0, 12, 1)
         # start testcase only
         nation_uk = self.config.get_nation("uk")
+        nation_uk.computer = True
         nation_fr = self.config.get_nation("france")
-        nation_fr.computer = True
         unit_type = self.config.get_unit_type('Militia I')
         current_unit = LandUnitInBattle(False, 'Charge', False, 50, 25, 1, unit_type, nation_fr)
         targetted_unit = LandUnitInBattle(False, 'Shoot', False, 75, 50, 1, unit_type, nation_uk)
@@ -135,11 +135,11 @@ class LandBattleView(QObject):
         self.buttonHintLabel.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
         self.gridLayout.addWidget(self.buttonHintLabel, 0, 0, 1, 1)
 
-    def setup_date_label(self, date, money):
+    def setup_turn_label(self):
         size_policy = constants.default_size_policy(self.dateLabel, QSizePolicy.Preferred, QSizePolicy.Fixed)
         self.dateLabel.setSizePolicy(size_policy)
         self.dateLabel.setFont(constants.default_font())
-        self.dateLabel.setText(str(date) + "\t\t$" + constants.format_money(money))
+        self.dateLabel.setText('Turn ' + str(self.landBattle.turn))
         self.dateLabel.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.gridLayout.addWidget(self.dateLabel, 0, 0, 1, 1)
 
@@ -222,11 +222,9 @@ class LandBattleView(QObject):
 
     def setup_targeted_unit_view(self):
         size = QSize(60, 60)
-        nation = self.landBattle.defender.nation
-        defending = False
-        if self.landBattle.attacker.nation.computer:
-            nation = self.landBattle.attacker.nation
-            defending = True
+        army = self.getComputerArmy()
+        nation = army.nation
+        defending = (army == self.landBattle.defender)
         self.landBattle.draw_targetted_unit(defending, self.targetedUnitGraphicsScene, size)
         size_policy = constants.default_size_policy(self.graphicsView_targetedUnit, QSizePolicy.Fixed,
                                                     QSizePolicy.Fixed)
@@ -237,12 +235,9 @@ class LandBattleView(QObject):
 
     def setup_current_unit_view(self):
         size = QSize(60, 60)
-        nation = self.landBattle.defender.nation
-        nation = self.landBattle.defender.nation
-        defending = False
-        if not self.landBattle.attacker.nation.computer:
-            nation = self.landBattle.attacker.nation
-            defending = True
+        army = self.getHumanArmy()
+        nation = army.nation
+        defending = (army == self.landBattle.defender)
         self.landBattle.draw_current_unit(nation, defending, self.currentUnitGraphicsScene, size)
         size_policy = constants.default_size_policy(self.graphicsView_currentUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_currentUnit.setSizePolicy(size_policy)
@@ -285,7 +280,7 @@ class LandBattleView(QObject):
         self.gridLayout.setVerticalSpacing(0)
         # Label
         self.setup_hint_label()
-        self.setup_date_label("Spring, 1811", 10000)
+        self.setup_turn_label()
         # Space item
         self.setup_space()
         # Help Push Button
@@ -334,16 +329,25 @@ class LandBattleView(QObject):
 
     def click_button(self, custom_button):
         if custom_button == self.autoCombatButton:
-            print('click autoCombatButton')
+            self.landBattle.autoCombat = True
         elif custom_button == self.helpButton:
             print('click helpButton')
         elif custom_button == self.retreatButton:
-            print('click retreatButton')
+            self.getHumanArmy().retreat = True
         elif custom_button == self.endUnitTurnButton:
             print('click endUnitTurnButton')
         elif custom_button == self.nextTargetButton:
             print('click nextTargetButton')
 
+    def getHumanArmy(self):
+        if self.landBattle.attacker.nation.computer:
+            return self.landBattle.defender
+        return self.landBattle.attacker
+
+    def getComputerArmy(self):
+        if self.landBattle.attacker.nation.computer:
+            return self.landBattle.attacker
+        return self.landBattle.defender
 
 class CustomButton(QPushButton):
     def __init__(self, *__args):
