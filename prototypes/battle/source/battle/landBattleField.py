@@ -63,7 +63,7 @@ class LandBattleField:
         self.enable = enable
 
     # Operations
-    def draw(self, scene):
+    def draw(self, scene, distance):
         """function draw
 
         :param scene: QGraphicsScene
@@ -72,22 +72,9 @@ class LandBattleField:
         """
         if self.enable:
             self.hexa.draw(scene, self.fieldType.color, self.fieldType.texture)
-            text = '({},{})'.format(self.sx, self.sy)
-            item = QGraphicsSimpleTextItem(text)
-            item.setBrush(QBrush(Qt.black))
-            item.setPos(self.position.x() - self.hexa.size / 2, self.position.y() - self.hexa.size / 2)
-            item.setZValue(1001)
-            scene.addItem(item)
-
-
-
-    def distance(self, field):
-        """function distance
-
-        :param field: LandBattleField
-
-        returns int
-        """
-        return (abs(self.sx - field.sx)
-          + abs(self.sx + self.sy - field.sx - field.sy)
-          + abs(self.sy - field.sy)) / 2
+        text = '({},{})\n{}'.format(self.sx, self.sy, distance)
+        item = QGraphicsSimpleTextItem(text)
+        item.setBrush(QBrush(Qt.black))
+        item.setPos(self.position.x() - self.hexa.size / 2, self.position.y() - self.hexa.size / 2)
+        item.setZValue(1001)
+        scene.addItem(item)

@@ -23,7 +23,7 @@ from PyQt5.QtCore import Qt
 from base.config import Config
 from battle.landBattleField import LandBattleField
 from battle.landBattleFieldType import LandBattleFieldType
-from lib.hexagon import QHexagon
+from lib.hexagon import QHexagon, distance
 
 
 class LandBattleMap:
@@ -57,14 +57,22 @@ class LandBattleMap:
         return min(self.sizeScreenHeight / ((self.diameter - 1) * 3 / 4 + 1),
                    self.sizeScreenWidth / ((self.diameter - 1) * math.sqrt(3) / 2 + 1)) * 0.5
 
+    @staticmethod
+    def get_center_coord(diameter):
+        return round((diameter - 1) / 2), round((diameter - 1) / 2)
+
     def get_center_screen(self):
         """function get_center_screen
 
         returns QPointF
         """
-        column = round((self.diameter - 1) / 2)
-        row = round((self.diameter - 1) / 2)
+        column, row = self.get_center_coord(self.diameter)
         return self.grid_position_to_position(column, row)
+
+    def get_field_center(self):
+        column, row = self.get_center_coord(self.diameter)
+        index  = self.grid_position_to_index(column, row)
+        return self.fields[index]
 
     def draw(self, scene):
         """function draw
@@ -78,7 +86,8 @@ class LandBattleMap:
         self.fields = []
         self.create_fields()
         for field in self.fields:
-            field.draw(scene)
+            d = distance(field.sx, field.sy,self.get_field_center().sx, self.get_field_center().sy)
+            field.draw(scene,d)
 
     def grid_position_to_index(self, column, row):
         return row + column * self.diameter
@@ -114,47 +123,16 @@ class LandBattleMap:
         center = QPointF((posx + 0.5) * self.get_size_tile() * 2, (posy + 0.5) * self.get_size_tile() * 2)
         return center
 
-    def map_hexagon(self):
-        """function map_hexagon
+    def inside_city(self, col1, row1):
+        return self.distance_center_map(col1, row1) <= (self.cityDiameter - 1) / 2
 
-        returns QHexagon
-        """
-        return QHexagon(self.get_center_screen(), math.sqrt(3) / 2 * self.get_size_tile() * (self.diameter - 1),
-                        LandBattleMap.ROTATION_CITY_AND_MAP)
+    def distance_center_map(self, col1, row1):
+        col2, row2 = self.get_center_coord(self.diameter)
+        return distance(col1, row1, col2, row2)
 
-    def city_hexagon(self):
-        """function city_hexagon
+    def inside_map_hexagon(self, col1, row1):
+        return self.distance_center_map(col1, row1) <= (self.diameter - 1) / 2
 
-        returns QHexagon
-        """
-        return QHexagon(self.get_center_screen(),
-                        0.90 * math.sqrt(3) / 2 * self.get_size_tile() * (self.cityDiameter - 1),
-                        LandBattleMap.ROTATION_CITY_AND_MAP)
-
-    def inside_map_hexagon(self, hexa):
-        """function inside_map_hexagon: return true if hexa is inside the main hexagon
-        :param hexa; QHexagon
-        returns boolean
-        """
-        if not isinstance(hexa, QHexagon):
-            raise ValueError('hexa must be a QHexagon instance')
-        if hexa.intersected(self.map_hexagon()):
-            return True
-        else:
-            return False
-
-    def inside_city(self, hexa):
-        """
-            function inside_city: return true if hexe is inside the city hexagon
-            :param hexa; QHexagon
-            returns boolean
-        """
-        if not isinstance(hexa, QHexagon):
-            raise ValueError('hexa must be a QHexagon instance')
-        if hexa.intersected(self.city_hexagon()):
-            return True
-        else:
-            return False
 
     def create_fields(self):
         """function create_fields: create the fields list
@@ -165,8 +143,8 @@ class LandBattleMap:
             for row in range(0, self.diameter):
                 center = self.grid_position_to_position(column, row)
                 hexa = QHexagon(center, self.get_size_tile(), LandBattleMap.ROTATION_FIELD)
-                enable = self.inside_map_hexagon(hexa)
-                if self.inside_city(hexa):
+                enable = self.inside_map_hexagon(column, row)
+                if self.inside_city(column, row):
                     field_type = self.config.theme_selected.city_field
                 else:
                     field_type = self.config.theme_selected.outsidecity_field

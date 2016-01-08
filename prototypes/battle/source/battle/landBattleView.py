@@ -349,6 +349,8 @@ class LandBattleView(QObject):
             return self.landBattle.attacker
         return self.landBattle.defender
 
+
+
 class CustomButton(QPushButton):
     def __init__(self, *__args):
         super().__init__(*__args)

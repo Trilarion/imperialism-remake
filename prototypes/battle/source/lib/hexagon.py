@@ -15,12 +15,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import math
-
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QPolygonF, QPixmap, QBrush
 from PyQt5.QtWidgets import QGraphicsScene
+from PyQt5.QtWidgets import QPushButton
+from math import sqrt, pi, cos, sin, ceil
 
+
+
+def hexgrid_offset_to_cube(col, row):
+    x = col - (row + (row&1)) / 2
+    z = row
+    y = -x-z
+    return x, y, z
+
+def distance(col1, row1, col2, row2):
+        ax, ay, az = hexgrid_offset_to_cube(col1, row1)
+        bx, by, bz = hexgrid_offset_to_cube(col2, row2)
+        return (abs(ax - bx) + abs(ay - by) + abs(az - bz)) / 2
 
 def hex_corner(center, size, i, offset):
     # check center QPointF
@@ -39,9 +51,9 @@ def hex_corner(center, size, i, offset):
     except TypeError:
         raise ValueError('size type must be an unorderable type')
     angle_deg = 60 * i + offset
-    angle_rad = math.pi / 180 * angle_deg
-    return QPointF(center.x() + size * math.cos(angle_rad),
-                   center.y() + size * math.sin(angle_rad))
+    angle_rad = pi / 180 * angle_deg
+    return QPointF(center.x() + size * cos(angle_rad),
+                   center.y() + size * sin(angle_rad))
 
 
 class QHexagon(QPolygonF):
@@ -82,7 +94,7 @@ class QHexagon(QPolygonF):
 
         returns int
         """
-        return self.size * math.sqrt(3) / 2
+        return self.size * sqrt(3) / 2
 
     def height(self):
         """function height
