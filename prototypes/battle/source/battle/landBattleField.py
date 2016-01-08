@@ -79,6 +79,8 @@ class LandBattleField:
             item.setZValue(1001)
             scene.addItem(item)
 
+
+
     def distance(self, field):
         """function distance
 
@@ -86,4 +88,6 @@ class LandBattleField:
 
         returns int
         """
-        raise NotImplementedError()
+        return (abs(self.sx - field.sx)
+          + abs(self.sx + self.sy - field.sx - field.sy)
+          + abs(self.sy - field.sy)) / 2
