@@ -97,10 +97,12 @@ class Theme:
             function __str__
         :return: string describing the theme
         """
-        retval = 'name:' + self.name + ',description:' + self.description + ',coat_of_arms_graphics:' + \
-                 self.coat_of_arms_graphics + ',flag_graphics:' + self.flag_graphics + ',map_graphics:' + \
-                 self.map_graphics + ',unit_graphics:' + self.unit_graphics
-        return retval
+        return '\n\t\tName: %s\n\t\tDescription: %s\n\t\tCoat of arms graphics:%s\n\t\tFlag graphics:%s\n\t\tMap graphics:%s\n' \
+               '\t\tUnit graphics: %s\n\t\tBackground: %s\n\t\tEnd button: %s\n\t\tAutocombat button: %s\n\t\t' \
+               'Help button:%s\n\t\tRetreat Button: %s\n\t\tTarget Button:%s\n\t\tCity Field: %s\n\t\tOutside City Field: %s\n' \
+               % (self.name, self.description, self.coat_of_arms_graphics, self.flag_graphics, self.map_graphics,
+                  self.unit_graphics, self.background, self.end_button, self.autocombat_button, self.help_button,
+                  self.retreat_button, self.target_button, str(self.city_field), str(self.outsidecity_field))
 
     def get_unit_pixmap(self, file_name):
         """

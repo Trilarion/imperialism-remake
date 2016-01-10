@@ -76,4 +76,4 @@ class Nation:
         scene.addPixmap(pixmap)
 
     def __str__(self):
-        return self.name
+        return '\n\tName: %s\n\tComputer: %r\n' % (self.name, self.computer)

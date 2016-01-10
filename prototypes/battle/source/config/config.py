@@ -179,8 +179,10 @@ class Config(ConfigParserExtended):
         self.check_options('config', MANDATORY_CONFIG_OPTION)
         self.check_options('path', MANDATORY_PATH_OPTION)
         self.check_options('battle', MANDATORY_BATTLE_OPTION)
-        self.fullscreen = self.get_boolean('config', 'fullscreen')
+        # set log level
         self.log_level = self.get_int('config', 'log_level', expected_values=[50, 40, 30, 20, 10])
+        logging.basicConfig(level=self.log_level, filename=LOG_FILENAME, filemode='w', format=LOG_PATTERN)
+        self.fullscreen = self.get_boolean('config', 'fullscreen')
         self.name_theme_selected = self.get_string('config', 'theme')
         self.name_lang_selected = self.get_string('config', 'lang')
         self.resolution = self.get_string('config', 'resolution', pattern='^(\d+)\s*x\s*(\d+)$|^maximize$')
@@ -200,52 +202,67 @@ class Config(ConfigParserExtended):
         self.lang_selected, self.available_lang = self.load_langs_config()
         # load nation config
         self.available_nation = self.load_nations_config()
-        print('here: ' + self.get_error_str() + '\n\n')
+        self.check_resolution()
+        logging.info('[END] __init__ => %s' % str(self))
+
+
+    def __str__(self):
+        themes = '\n'
+        for t in self.available_theme:
+            themes += '\t\tTheme \'%s\': %s' % (t.name, str(t).replace('\t\t','\t\t\t'))
+        units = '\n'
+        for u in self.list_unit_type:
+            units += '\t\tUnit Type \'%s\': %s' % (u.name, str(u).replace('\t','\t\t\t'))
+        nations = '\n'
+        for n in self.available_nation:
+            nations += '\t\tNation \'%s\': %s' % (n.name, str(n).replace('\t','\t\t\t'))
+        langs = ''
+        for l in self.available_lang:
+            langs += '\n\t\tLang \'%s\': %s' % (l.name, str(l).replace('\t\t','\t\t\t'))
+        return '\n\tError: %s\n\tLog level: %d\n\tFullscreen: %r\n\tTheme: %s\n\tLang: %s\n\tResolution: %s\n\tBattle map diameter: %d\n' \
+               '\tCity diameter: %d\n\tData folder: %s\n\tLang config file: %s\n\tUnit config file: %s\n\tNation config file: %s\n' \
+               '\tTheme selected: %s\n\tLang Selected: %s\n\tAvailable Themes:%s\n\tAvailable Units: %s\n\tAvailable Nations: %s\n\t' \
+               'Available langs: %s' \
+               % (self.get_error_str(), self.log_level, self.fullscreen, self.name_theme_selected, self.name_lang_selected,
+                  self.resolution, self.diameter_battlemap, self.diameter_battlecity, self.data_folder, self.lang_config_file,
+                  self.unit_config_file, self.nation_config_file, self.theme_selected, self.lang_selected, themes, units, nations,langs)
+
+
+    def check_resolution(self):
+        logging.debug('[ENTER] check_resolution(), resolution=%s' % (self.resolution))
         # check resolution min, max...
         w, h = parse_resolution(self.resolution)
         if w != -1 and h != -1:
             minw, minh = MINIMUM_RESOLUTION
             screen = QDesktopWidget().screenGeometry()
             maxw, maxh = screen.width(), screen.height()
+            logging.debug('check_resolution() => current width=%d, current_height=%d, min width=%d, '
+                          'min height=%d, max width=%d, max height=%d' % (w, h, minw, minh, maxw, maxh))
             if w < minw or h < minh:
-                self.errors.append('Bad resolution (width must be superior to %d and height must be superior to %d) (current %d x %d)' % (
-                minw, minh, w, h))
+                msg = 'Bad resolution (width must be superior to %d and height must be superior to %d) (current %d x %d)' % (
+                minw, minh, w, h)
+                self.errors.append(msg)
+                logging.error(msg)
             if w > maxw or h > maxh:
-                self.errors.append('Bad resolution (width must be inferior to screen width resolution %d and height must be inferior to screen height resolution %d) (current %d x %d)' % (
-                maxw, maxh, w, h))
-        # set log level
-        logging.basicConfig(level=self.log_level, filename=LOG_FILENAME, filemode='w', format=LOG_PATTERN)
+                msg = 'Bad resolution (width must be inferior to screen width resolution %d and height must be inferior to screen height resolution %d) (current %d x %d)' % (
+                maxw, maxh, w, h)
+                self.errors.append(msg)
+                logging.error(msg)
+        logging.debug('[EXIT] check_resolution(), resolution=%s' % (self.fullscreen))
 
-    #
-    # Overwrite class method
-    #
-    def __str__(self):
-        retval = 'Error : \n'
-        retval += self.get_error_str()
-        retval += 'Config : \n'
-        retval += 'Resolution:' + str(self.resolution) + '\n'
-        retval += 'data folder:' + str(self.data_folder) + '\n'
-        retval += 'lang config file:' + str(self.lang_config_file) + '\n'
-        retval += 'unit config file:' + str(self.unit_config_file) + '\n'
-        retval += 'unit type:\n'
-        for utype in self.list_unit_type:
-            retval += '\t-' + str(utype) + '\n'
-        retval += 'theme:\n'
-        for theme in self.available_theme:
-            retval += '\t-' + str(theme) + '\n'
-        retval += 'nation:\n'
-        for nation in self.available_nation:
-            retval += '\t-' + str(nation) + '\n'
-        return retval
 
     #
     # Configuration getter
     #
     def show_fullscreen(self):
+        logging.debug('[ENTER|EXIT] show_fullscreen() => return %r' % self.fullscreen)
         return self.fullscreen
 
     def maximize(self):
-        return self.resolution.lower() == 'maximize'
+        logging.debug('[ENTER] maximize()')
+        retval = self.resolution.lower() == 'maximize'
+        logging.debug('[EXIT] maximize() return \'%r\'' % retval)
+        return retval
 
     def get_unit_pixmap(self, file_name):
         """
@@ -253,6 +270,7 @@ class Config(ConfigParserExtended):
         :param file_name: filename of the unit image
         :return: the QPixmap corresponding
         """
+        logging.debug('[ENTER|EXIT] get_unit_pixmap(file_name=\'%s\')' % file_name)
         return self.theme_selected.get_unit_pixmap(file_name)
 
     def get_map_pixmap(self, file_name):
@@ -261,22 +279,33 @@ class Config(ConfigParserExtended):
         :param file_name: filename of the map image
         :return: the QPixmap corresponding
         """
+        logging.debug('[ENTER|EXIT] get_map_pixmap(file_name=\'%s\')' % file_name)
         return self.theme_selected.get_map_pixmap(file_name)
 
     def get_text(self, key):
+        logging.debug('[ENTER] get_text(key=\'%s\')' % key)
         if not isinstance(key, str) or key == '':
+            logging.error('[ERROR] get_text(key=\'%s\') : key must be a non empty string' % key)
             raise ValueError('key must be a non empty string')
-        return self.lang_selected.get_string(key)
+        retval = self.lang_selected.get_string(key)
+        logging.debug('[EXIT] get_text(key=\'%s\') return \'%s\'' % (key,retval))
+        return retval
 
     def get_nation(self, name):
+        logging.debug('[ENTER] get_nation(name=\'%s\')' % name)
         for nation in self.available_nation:
             if nation.name == name:
+                logging.debug('[EXIT] get_nation(name=\'%s\') return None' % name)
                 return nation
+        logging.debug('[EXIT] get_nation(name=\'%s\') return None' % name)
         return None
 
     def get_unit_type(self, name):
+        logging.debug('[ENTER] get_unit_type(name=\'%s\')' % name)
         for unit_type in self.list_unit_type:
             if unit_type.name == name:
+                logging.debug('[EXIT] get_unit_type(name=\'%s\') return \'%s\'' % (name, name))
                 return unit_type
+        logging.debug('[EXIT] get_unit_type(name=\'%s\') return None' % name)
         return None
 

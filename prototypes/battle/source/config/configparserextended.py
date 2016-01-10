@@ -19,6 +19,7 @@ import configparser
 import os
 import re
 import sys
+import logging
 
 
 class ConfigParserExtended(configparser.ConfigParser):

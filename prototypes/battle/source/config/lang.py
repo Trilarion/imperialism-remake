@@ -52,3 +52,9 @@ class Lang:
         if not isinstance(key, str) or key == '':
             raise ValueError('key must be a non empty string')
         return self.strings.get(key, DEFAULT_STRING)
+
+    def __str__(self):
+        retval = '\n\t\tName: %s\n\t\tDescription: %s' % (self.name, self.description)
+        for key,val in self.strings.items():
+            retval += '\n\t\t%s: %s' % (key,val)
+        return retval

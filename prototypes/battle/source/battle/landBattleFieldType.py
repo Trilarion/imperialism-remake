@@ -26,7 +26,12 @@ class LandBattleFieldType:
         if not isinstance(name, str) or name == '':
             raise ValueError('name must be a non empty string')
         self.color = QColor(color)
+        self.color_str = color
+        self.texture_str = texture
         self.texture = QPixmap(texture)
         if not self.color.isValid() and self.texture.isNull():
             raise ValueError('texture or color must be specified')
         self.name = name
+
+    def __str__(self):
+        return 'name=\'%s\' color=\'%s\' texture=\'%s\'' % (self.name, self.color_str, self.texture_str)

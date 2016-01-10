@@ -96,12 +96,10 @@ class LandUnitType:
 
     # Operations
     def __str__(self):
-        retval = 'name:' + self.name + ',evolutionLevel:' + str(
-                self.evolutionLevel) + ',description:' + self.description + ',officier:' + str(
-                self.officier) + ',attack: ' + str(self.attackStrength) + ',range:' + str(
-                self.fireRange) + ',speed:' + str(
-                self.speed) + ',creationCost:' + str(self.creationCost) + ',upkeep:' + str(self.upkeep)
-        return retval
+        return 'Name: %s\n\tEvolution level: %d\n\tDescription: %s\n\tOfficer: %r\n\t' \
+               'Attacks: %d\n\tSpeed: %d\n\tRange: %d\n\tCreation Cost: %f\n\tUpkeep: %d\n'\
+                % (self.name, self.evolutionLevel, self.description, self.officier, self.attackStrength,
+                   self.speed, self.fireRange, self.creationCost, self.upkeep)
 
     def to_html_table_row(self):
         """function to_html_table_row
