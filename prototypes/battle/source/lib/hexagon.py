@@ -15,24 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from math import sqrt, pi, cos, sin
+
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QPolygonF, QPixmap, QBrush
 from PyQt5.QtWidgets import QGraphicsScene
-from PyQt5.QtWidgets import QPushButton
-from math import sqrt, pi, cos, sin, ceil
-
 
 
 def hexgrid_offset_to_cube(col, row):
-    x = col - (row + (row&1)) / 2
+    x = col - (row + (row & 1)) / 2
     z = row
-    y = -x-z
+    y = -x - z
     return x, y, z
 
+
 def distance(col1, row1, col2, row2):
-        ax, ay, az = hexgrid_offset_to_cube(col1, row1)
-        bx, by, bz = hexgrid_offset_to_cube(col2, row2)
-        return (abs(ax - bx) + abs(ay - by) + abs(az - bz)) / 2
+    ax, ay, az = hexgrid_offset_to_cube(col1, row1)
+    bx, by, bz = hexgrid_offset_to_cube(col2, row2)
+    return (abs(ax - bx) + abs(ay - by) + abs(az - bz)) / 2
+
 
 def hex_corner(center, size, i, offset):
     # check center QPointF

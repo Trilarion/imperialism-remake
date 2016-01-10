@@ -30,9 +30,3 @@ class LandBattleFieldType:
         if not self.color.isValid() and self.texture.isNull():
             raise ValueError('texture or color must be specified')
         self.name = name
-
-
-
-
-
-

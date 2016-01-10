@@ -19,8 +19,13 @@
 DEFAULT_STRING = 'default'
 
 
-class Lang:
+class ConfigLang:
+    # Constructor
+    def __init__(self, config_filename):
+        self.config_filename = config_filename
 
+
+class Lang:
     # Constructor
     def __init__(self, name, description):
         """constructor
@@ -46,5 +51,4 @@ class Lang:
     def get_string(self, key):
         if not isinstance(key, str) or key == '':
             raise ValueError('key must be a non empty string')
-        return self.strings.get(key,DEFAULT_STRING)
-
+        return self.strings.get(key, DEFAULT_STRING)

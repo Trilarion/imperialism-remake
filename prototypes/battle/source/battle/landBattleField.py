@@ -67,7 +67,7 @@ class LandBattleField:
         """function draw
 
         :param scene: QGraphicsScene
-
+        :param distance: int
         no return
         """
         if self.enable:

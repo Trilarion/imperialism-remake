@@ -15,23 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import sys
-import os
 import cProfile
+import os
 import pstats
-from base.config import Config
+import sys
+
 from PyQt5.QtWidgets import QApplication
+
+from config.config import Config
 
 CONFIG_FILE = 'config.ini'
 TMP_FILE = 'tmp'
+
 
 def config():
     c = Config(CONFIG_FILE)
     print(c.error_msg)
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    cProfile.run('config()',TMP_FILE)
+    cProfile.run('config()', TMP_FILE)
     p = pstats.Stats(TMP_FILE)
     p.sort_stats('cumtime')
     p.print_stats()

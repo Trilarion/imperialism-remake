@@ -23,12 +23,13 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QPushButton, QGridLayout, QLab
     QGraphicsScene, QGraphicsView, QMainWindow
 
 from base import constants
-from base.config import Config
 from battle.landArmy import LandArmy
 from battle.landBattle import LandBattle
 from battle.landUnitInBattle import LandUnitInBattle
+from config.config import Config
 
 CONFIG_FILE = 'config.ini'
+
 
 class MainBattleWindows(QMainWindow):
     def __init__(self, parent=None):
@@ -54,8 +55,8 @@ class MainBattleWindows(QMainWindow):
 
     def closeEvent(self, event):
         result = QMessageBox.question(self,
-                                      self.config.get_string('exit.window.title'),
-                                      self.config.get_string('exit.window.content'),
+                                      self.config.get_text('exit.window.title'),
+                                      self.config.get_text('exit.window.content'),
                                       QMessageBox.Yes | QMessageBox.No)
         if result == QMessageBox.No:
             event.ignore()
@@ -88,8 +89,8 @@ class LandBattleView(QObject):
     def __init__(self, battle_window, parent=None):
         super().__init__(parent)
         self.config = Config(CONFIG_FILE)
-        if self.config.error_msg != '':
-            QMessageBox.critical(battle_window, 'Configuration Error', self.config.error_msg)
+        if len(self.config.errors) != 0:
+            QMessageBox.critical(battle_window, 'Configuration Error', self.config.get_error_str())
             exit(-1)
         self.BattleWindow = battle_window
         self.centralWidget = QWidget(self.BattleWindow)
@@ -108,7 +109,7 @@ class LandBattleView(QObject):
         self.endUnitTurnButton = CustomButton(self.centralWidget)
         self.nextTargetButton = CustomButton(self.centralWidget)
         for button in self.autoCombatButton, self.helpButton, self.retreatButton, \
-                      self.nextTargetButton, self.endUnitTurnButton:
+                self.nextTargetButton, self.endUnitTurnButton:
             button.add_action_leave(self.clear_label_hint)
             button.add_action_enter(self.set_label_hint)
             button.add_action_click(self.click_button)
@@ -222,7 +223,7 @@ class LandBattleView(QObject):
 
     def setup_targeted_unit_view(self):
         size = QSize(60, 60)
-        army = self.getComputerArmy()
+        army = self.get_computer_army()
         nation = army.nation
         defending = (army == self.landBattle.defender)
         self.landBattle.draw_targetted_unit(defending, self.targetedUnitGraphicsScene, size)
@@ -235,7 +236,7 @@ class LandBattleView(QObject):
 
     def setup_current_unit_view(self):
         size = QSize(60, 60)
-        army = self.getHumanArmy()
+        army = self.get_human_army()
         nation = army.nation
         defending = (army == self.landBattle.defender)
         self.landBattle.draw_current_unit(nation, defending, self.currentUnitGraphicsScene, size)
@@ -271,11 +272,11 @@ class LandBattleView(QObject):
         self.landBattle.draw_battle_map(self.mainScene)
 
     def setup_ui(self):
-        self.BattleWindow.setWindowTitle(self.config.get_string('battle.window.title'))
+        self.BattleWindow.setWindowTitle(self.config.get_text('battle.window.title'))
         background = self.config.theme_selected.get_background_pixmap()
         palette = QPalette()
         palette.setBrush(QPalette.Background, QBrush(background))
-        self.BattleWindow.setMinimumSize(Config.get_min_resolution_qsize())
+        self.BattleWindow.setMinimumSize(constants.get_min_resolution_qsize())
         self.BattleWindow.setAutoFillBackground(True)
         self.gridLayout.setVerticalSpacing(0)
         # Label
@@ -305,7 +306,6 @@ class LandBattleView(QObject):
         self.BattleWindow.setCentralWidget(self.centralWidget)
         QMetaObject.connectSlotsByName(self.BattleWindow)
 
-
     def resize_event(self):
         self.setup_map()
 
@@ -315,15 +315,15 @@ class LandBattleView(QObject):
     def set_label_hint(self, custom_button):
         text = ''
         if custom_button == self.autoCombatButton:
-            text = self.config.get_string('auto.play.label')
+            text = self.config.get_text('auto.play.label')
         elif custom_button == self.helpButton:
-            text = self.config.get_string('help.tacticalbattle.label')
+            text = self.config.get_text('help.tacticalbattle.label')
         elif custom_button == self.retreatButton:
-            text = self.config.get_string('retreat.all.label')
+            text = self.config.get_text('retreat.all.label')
         elif custom_button == self.endUnitTurnButton:
-            text = self.config.get_string('end.unit.label')
+            text = self.config.get_text('end.unit.label')
         elif custom_button == self.nextTargetButton:
-            text = self.config.get_string('next.target.label')
+            text = self.config.get_text('next.target.label')
         if text != '':
             self.buttonHintLabel.setText(text)
 
@@ -333,22 +333,21 @@ class LandBattleView(QObject):
         elif custom_button == self.helpButton:
             print('click helpButton')
         elif custom_button == self.retreatButton:
-            self.getHumanArmy().retreat = True
+            self.get_human_army().retreat = True
         elif custom_button == self.endUnitTurnButton:
             print('click endUnitTurnButton')
         elif custom_button == self.nextTargetButton:
             print('click nextTargetButton')
 
-    def getHumanArmy(self):
+    def get_human_army(self):
         if self.landBattle.attacker.nation.computer:
             return self.landBattle.defender
         return self.landBattle.attacker
 
-    def getComputerArmy(self):
+    def get_computer_army(self):
         if self.landBattle.attacker.nation.computer:
             return self.landBattle.attacker
         return self.landBattle.defender
-
 
 
 class CustomButton(QPushButton):

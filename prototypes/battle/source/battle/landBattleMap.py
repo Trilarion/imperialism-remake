@@ -20,9 +20,8 @@ import math
 from PyQt5.QtCore import QPointF
 from PyQt5.QtCore import Qt
 
-from base.config import Config
 from battle.landBattleField import LandBattleField
-from battle.landBattleFieldType import LandBattleFieldType
+from config.config import Config
 from lib.hexagon import QHexagon, distance
 
 
@@ -71,7 +70,7 @@ class LandBattleMap:
 
     def get_field_center(self):
         column, row = self.get_center_coord(self.diameter)
-        index  = self.grid_position_to_index(column, row)
+        index = self.grid_position_to_index(column, row)
         return self.fields[index]
 
     def draw(self, scene):
@@ -86,8 +85,8 @@ class LandBattleMap:
         self.fields = []
         self.create_fields()
         for field in self.fields:
-            d = distance(field.sx, field.sy,self.get_field_center().sx, self.get_field_center().sy)
-            field.draw(scene,d)
+            d = distance(field.sx, field.sy, self.get_field_center().sx, self.get_field_center().sy)
+            field.draw(scene, d)
 
     def grid_position_to_index(self, column, row):
         return row + column * self.diameter
@@ -132,7 +131,6 @@ class LandBattleMap:
 
     def inside_map_hexagon(self, col1, row1):
         return self.distance_center_map(col1, row1) <= (self.diameter - 1) / 2
-
 
     def create_fields(self):
         """function create_fields: create the fields list

@@ -16,8 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os
-from battle.landBattleFieldType import LandBattleFieldType
+
 from PyQt5.QtGui import QPixmap
+
+from battle.landBattleFieldType import LandBattleFieldType
 
 
 class Theme:
@@ -86,8 +88,8 @@ class Theme:
         self.help_button = help_button
         self.retreat_button = retreat_button
         self.target_button = target_button
-        self.city_field = LandBattleFieldType('city',city_color,city_pixmap)
-        self.outsidecity_field = LandBattleFieldType('outside city',outside_city_color,outside_city_pixmap)
+        self.city_field = LandBattleFieldType('city', city_color, city_pixmap)
+        self.outsidecity_field = LandBattleFieldType('outside city', outside_city_color, outside_city_pixmap)
 
     # Operator
     def __str__(self):

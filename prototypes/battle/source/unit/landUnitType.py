@@ -24,6 +24,7 @@ def miror_pixmap(pixmap):
     transform.scale(-1, 1)
     return QPixmap(pixmap.transformed(transform))
 
+
 UNIT_WIDTH = 400
 UNIT_HEIGHT = 400
 

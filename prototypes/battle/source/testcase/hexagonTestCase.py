@@ -7,7 +7,6 @@ from lib.hexagon import QHexagon
 
 
 class QHexagonTestCase(unittest.TestCase):
-
     def test_0(self):
         self.assertTrue(True)
 
