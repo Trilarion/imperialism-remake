@@ -18,7 +18,7 @@
 from math import sqrt, pi, cos, sin
 
 from PyQt5.QtCore import QPointF
-from PyQt5.QtGui import QPolygonF, QPixmap, QBrush
+from PyQt5.QtGui import QPolygonF, QPixmap, QBrush, QPen, QColor
 from PyQt5.QtWidgets import QGraphicsScene
 
 
@@ -115,11 +115,18 @@ class QHexagon(QPolygonF):
             raise ValueError('texture must be a non null QGraphicsScene instance')
         if not isinstance(texture, QPixmap) and not texture.isNull():
             raise ValueError('texture must be a QPixmap instance or None')
-        if color is None and texture is None:
+        if color is None and (texture is None or texture.isNull()):
             raise ValueError('texture or color must be specified')
         item = scene.addPolygon(self)
+        # hide outline
+        item.setPen(QPen(QColor(0xFF, 0xFF, 0xFF, 0x00)))
         if color is not None:
             item.setBrush(QBrush(color))
+        if texture is not None and not texture.isNull():
+            print('here')
+            item.setBrush(QBrush(texture))
+
+
 
     def __eq__(self, other):
         if isinstance(other, QHexagon):

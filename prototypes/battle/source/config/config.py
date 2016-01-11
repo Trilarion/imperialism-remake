@@ -125,11 +125,13 @@ class Config(ConfigParserExtended):
         return list_unit_type
 
     def load_langs_config(self):
+        logging.debug('[ENTER] load_langs_config()')
         lang_selected = None
         available_lang = []
         if self.lang_config_file != 'error':
             langs_config = ConfigParserExtended(self.lang_config_file)
             for section in langs_config.sections():
+                logging.debug('[LOOP] load_langs_config(), section %s' % section)
                 try:
                     name = langs_config.get_string(section, 'name')
                     description = langs_config.get_string(section, 'description')
@@ -140,21 +142,27 @@ class Config(ConfigParserExtended):
                         lang_selected = lang
                     available_lang.append(lang)
                 except ValueError as e:
+                    logging.error('[ERROR] load_langs_config() : %s' % str(e))
                     langs_config.errors.append(str(e))
             self.errors.extend(langs_config.errors)
         if lang_selected is None:
-            self.errors.append('Lang: \'%s\' not found' % self.name_lang_selected)
+            msg = 'Lang: \'%s\' not found' % self.name_lang_selected
+            logging.error('[ERROR] load_langs_config() : %s' % msg)
+            self.errors.append(msg)
         if len(available_lang) == 0:
+            logging.error('[ERROR] load_langs_config() : No Lang available')
             self.errors.append('No Lang available')
-
+        logging.debug('[EXIT] load_langs_config()')
         return lang_selected, available_lang
 
     def load_nations_config(self):
+        self.logging.debug('[ENTER] load_nations_config()')
         available_nation = []
         if self.nation_config_file != 'error' and self.theme_selected is not None:
             nations_config = ConfigParserExtended(self.nation_config_file)
             for section in nations_config.sections():
                 try:
+                    logging.debug('[LOOP] load_nations_config(), section %s' % section)
                     name = nations_config.get_string(section, 'name')
                     flag_filename = nations_config.get_string(section, 'flag', pattern='^.*\.(png|PNG)$')
                     flag = QPixmap(self.theme_selected.flag_graphics + '/' + flag_filename)
@@ -164,15 +172,20 @@ class Config(ConfigParserExtended):
                     nation = Nation(name, False, coat_of_arms, flag)
                     available_nation.append(nation)
                 except AttributeError as e:
+                    logging.error('[ERROR] load_nations_config() : %s' % str(e))
                     nations_config.errors.append(str(e))
                 except ValueError as e:
+                    logging.error('[ERROR] load_nations_config() : %s' % str(e))
                     nations_config.errors.append(str(e))
             self.errors.extend(nations_config.errors)
         if len(available_nation) == 0  and self.theme_selected is not None:
+            logging.error('[ERROR] load_nations_config() : No Nation available')
             self.errors.append('No Nation available')
+        logging.debug('[EXIT] load_nations_config()')
         return available_nation
 
     def __init__(self, main_config_file):
+        logging.info('[ENTER] __init__(main_config_file=%s)' % main_config_file)
         # load main option
         self.data_folder = 'error'
         ConfigParserExtended.__init__(self, main_config_file)
@@ -181,6 +194,7 @@ class Config(ConfigParserExtended):
         self.check_options('battle', MANDATORY_BATTLE_OPTION)
         # set log level
         self.log_level = self.get_int('config', 'log_level', expected_values=[50, 40, 30, 20, 10])
+        self.logging =  logging
         logging.basicConfig(level=self.log_level, filename=LOG_FILENAME, filemode='w', format=LOG_PATTERN)
         self.fullscreen = self.get_boolean('config', 'fullscreen')
         self.name_theme_selected = self.get_string('config', 'theme')
@@ -203,10 +217,11 @@ class Config(ConfigParserExtended):
         # load nation config
         self.available_nation = self.load_nations_config()
         self.check_resolution()
-        logging.info('[END] __init__ => %s' % str(self))
+        logging.info('[END] __init__(main_config_file=%s) => %s' % (main_config_file, str(self)))
 
 
     def __str__(self):
+        logging.debug('[ENTER] __str__()')
         themes = '\n'
         for t in self.available_theme:
             themes += '\t\tTheme \'%s\': %s' % (t.name, str(t).replace('\t\t','\t\t\t'))
@@ -219,6 +234,7 @@ class Config(ConfigParserExtended):
         langs = ''
         for l in self.available_lang:
             langs += '\n\t\tLang \'%s\': %s' % (l.name, str(l).replace('\t\t','\t\t\t'))
+        logging.debug('[EXIT] __str__()')
         return '\n\tError: %s\n\tLog level: %d\n\tFullscreen: %r\n\tTheme: %s\n\tLang: %s\n\tResolution: %s\n\tBattle map diameter: %d\n' \
                '\tCity diameter: %d\n\tData folder: %s\n\tLang config file: %s\n\tUnit config file: %s\n\tNation config file: %s\n' \
                '\tTheme selected: %s\n\tLang Selected: %s\n\tAvailable Themes:%s\n\tAvailable Units: %s\n\tAvailable Nations: %s\n\t' \

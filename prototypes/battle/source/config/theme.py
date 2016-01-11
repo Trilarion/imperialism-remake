@@ -88,6 +88,8 @@ class Theme:
         self.help_button = help_button
         self.retreat_button = retreat_button
         self.target_button = target_button
+        city_pixmap = self.map_graphics + '/' + city_pixmap
+        outside_city_pixmap = self.map_graphics + '/' + outside_city_pixmap
         self.city_field = LandBattleFieldType('city', city_color, city_pixmap)
         self.outsidecity_field = LandBattleFieldType('outside city', outside_city_color, outside_city_pixmap)
 

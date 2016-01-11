@@ -72,9 +72,9 @@ class LandBattleField:
         """
         if self.enable:
             self.hexa.draw(scene, self.fieldType.color, self.fieldType.texture)
-        text = '({},{})\n{}'.format(self.sx, self.sy, distance)
-        item = QGraphicsSimpleTextItem(text)
-        item.setBrush(QBrush(Qt.black))
-        item.setPos(self.position.x() - self.hexa.size / 2, self.position.y() - self.hexa.size / 2)
-        item.setZValue(1001)
-        scene.addItem(item)
+            text = '({},{})\n{}'.format(self.sx, self.sy, distance)
+            item = QGraphicsSimpleTextItem(text)
+            item.setBrush(QBrush(Qt.black))
+            item.setPos(self.position.x() - self.hexa.size / 2, self.position.y() - self.hexa.size / 2)
+            item.setZValue(1001)
+            scene.addItem(item)
