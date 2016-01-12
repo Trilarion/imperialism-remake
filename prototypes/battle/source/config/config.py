@@ -40,7 +40,9 @@ MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 
 class Config(ConfigParserExtended):
-    def __init__(self, main_config_file):
+
+    def __init__(self, main_config_file,version):
+        self.version = version
         # load main option
         self.data_folder = 'error'
         ConfigParserExtended.__init__(self, main_config_file)
@@ -342,6 +344,5 @@ class Config(ConfigParserExtended):
         logging.debug('[EXIT] get_unit_type(name=\'%s\') return None' % name)
         return None
 
+    
 
-if __name__ == '__main__':
-    print('TODO generate manuel')

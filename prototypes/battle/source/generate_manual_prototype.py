@@ -18,21 +18,11 @@
 import sys
 
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QIcon
-from battle.landBattleView import MainBattleWindows
 from config.config import Config
-from base.constants import version
 
 CONFIG_FILE = 'config.ini'
 
 if __name__ == '__main__':
-    v = version()
-    print('Battle prototype version: %d' % version())
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon('icon.png'))
-    # load config files
-    config = Config(CONFIG_FILE,v)
-    # start the battle view
-    mySW = MainBattleWindows(config)
-    mySW.show()
-    sys.exit(app.exec_())
+    config = Config(CONFIG_FILE)
+    print('TODO generate manuel')

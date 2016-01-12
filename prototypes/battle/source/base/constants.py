@@ -44,16 +44,6 @@ def default_font():
     return font
 
 
-def format_money(money):
-    str_init = str(money)
-    retval = ""
-    for i in range(0, len(str_init)):
-        if (len(str_init) - i) % 3 == 0 and i != 0:
-            retval += ","
-        retval += str_init[i]
-    return retval
-
-
 def parse_resolution(res_str):
     try:
         m = re.search(RESOLUTION_PATTERN, res_str)
@@ -71,3 +61,14 @@ def parse_resolution_to_qsize(res_str):
 def get_min_resolution_qsize():
     w, h = MINIMUM_RESOLUTION
     return QSize(w, h)
+    
+def version():
+    try:
+        f = open('version.txt', 'r')
+        return int(f.read())
+    except FileNotFoundError:
+        print('Error: No version.txt file found')
+        return -1 
+    except ValueError:
+        print('Error: version.txt must contain a integer')
+        return -1      
