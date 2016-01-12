@@ -27,7 +27,7 @@ class Theme:
     def __init__(self, name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
                  unit_graphics, background, end_button, autocombat_button, help_button,
                  retreat_button, target_button, outside_city_pixmap, outside_city_color,
-                 city_pixmap, city_color):
+                 city_pixmap, city_color, victory_pixmap, defeat_pixmap):
         """constructor
         :param name: str
         :param description: str
@@ -45,6 +45,8 @@ class Theme:
         :param outside_city_color: str
         :param city_pixmap: str
         :param city_color: str
+        :param victory_pixmap: str
+        :param defeat_pixmap: str
         """
         if not isinstance(name, str) or name == '':
             raise ValueError('name must be a non empty string')
@@ -76,6 +78,10 @@ class Theme:
             raise ValueError('retreat_button must be a non empty string, corresponding to the path of a existing file')
         if not isinstance(target_button, str) or target_button == '' or not os.path.exists(target_button):
             raise ValueError('target_button must be a non empty string, corresponding to the path of a existing file')
+        if not isinstance(victory_pixmap, str) or victory_pixmap == '' or not os.path.exists(victory_pixmap):
+            raise ValueError('victory_pixmap must be a non empty string, corresponding to the path of a existing file')
+        if not isinstance(defeat_pixmap, str) or defeat_pixmap == '' or not os.path.exists(defeat_pixmap):
+            raise ValueError('defeat_pixmap must be a non empty string, corresponding to the path of a existing file')
         self.name = name
         self.description = description
         self.coat_of_arms_graphics = coat_of_arms_graphics
@@ -88,9 +94,9 @@ class Theme:
         self.help_button = help_button
         self.retreat_button = retreat_button
         self.target_button = target_button
-        city_pixmap = self.map_graphics + '/' + city_pixmap
-        outside_city_pixmap = self.map_graphics + '/' + outside_city_pixmap
         self.city_field = LandBattleFieldType('city', city_color, city_pixmap)
+        self.victory_pixmap = victory_pixmap
+        self.defeat_pixmap = defeat_pixmap
         self.outsidecity_field = LandBattleFieldType('outside city', outside_city_color, outside_city_pixmap)
 
     # Operator
@@ -165,3 +171,19 @@ class Theme:
         :return: the QPixmap corresponding to the target button
         """
         return QPixmap(self.target_button)
+
+
+    def get_victory_pixmap(self):
+        """
+        function get_victory_pixmap
+        :return: the QPixmap corresponding to the victory image
+        """
+        return QPixmap(self.victory_pixmap)
+
+
+    def get_defeat_pixmap(self):
+        """
+        function get_defeat_pixmap
+        :return: the QPixmap corresponding to the defeat image
+        """
+        return QPixmap(self.defeat_pixmap)

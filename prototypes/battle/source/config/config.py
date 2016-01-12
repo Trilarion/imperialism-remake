@@ -35,7 +35,7 @@ MANDATORY_BATTLE_OPTION = ['diameter_battlemap', 'diameter_battlecity']
 MANDATORY_THEME_OPTION = ['name', 'description', 'coat_of_arms_graphics', 'flag_graphics', 'map_graphics',
                           'unit_graphics', 'background', 'end_button', 'autocombat_button', 'help_button',
                           'retreat_button', 'target_button', 'outside_city_pixmap', 'outside_city_color',
-                          'city_pixmap', 'city_color']
+                          'city_pixmap', 'city_color', 'defeat_graphics', 'victory_graphics']
 MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 
@@ -99,11 +99,13 @@ class Config(ConfigParserExtended):
                     outside_city_color = self.get_string(section, 'outside_city_color')
                     city_pixmap = self.get_string(section, 'city_pixmap')
                     city_color = self.get_string(section, 'city_color')
+                    victory_pixmap = self.get_string(section, 'victory_graphics',pattern='^.*\.(png|PNG)$')
+                    defeat_pixmap = self.get_string(section, 'defeat_graphics',pattern='^.*\.(png|PNG)$')
                     try:
                         theme = Theme(name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
                                       unit_graphics, background, end_button, autocombat_button, help_button,
                                       retreat_button, target_button, outside_city_pixmap, outside_city_color,
-                                      city_pixmap, city_color)
+                                      city_pixmap, city_color, victory_pixmap, defeat_pixmap)
                         available_theme.append(theme)
 
                         if name == self.name_theme_selected:
