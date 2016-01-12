@@ -20,8 +20,22 @@ import unittest
 from PyQt5.QtWidgets import QApplication
 
 testmodules = [
+    'testcase.configparserextendedTestCase',
+    'testcase.configTestCase',
+    'testcase.constantsTestCase',
     'testcase.hexagonTestCase',
-    'testcase.landBattleFieldTypeTestCase'
+    'testcase.landArmyTestCase',
+    'testcase.landBattleFieldTestCase',
+    'testcase.landBattleFieldTypeTestCase',
+    'testcase.landBattleMapTestCase',
+    'testcase.landBattleTestCase',
+    'testcase.landBattleViewTestCase',
+    'testcase.landUnitInBattleTestCase',
+    'testcase.landUnitTestCase',
+    'testcase.landUnitTypeTestCase',
+    'testcase.langTestCase',
+    'testcase.nationTestCase',
+    'testcase.themeTestCase'
 ]
 
 suite = unittest.TestSuite()

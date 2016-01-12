@@ -32,7 +32,7 @@ class LandArmy:
         if not isinstance(retreat, bool):
             raise ValueError('retreat must be a boolean')
         # TODO list LandUnitInBattle
-        print("TODO list LandUnitInBattle (landArmy.py)")
+        print("TODO list LandUnitInBattle (landArmyTestCase.py)")
         # if not isinstance(land_units, LandUnitInBattle) or land_units is None:
         #    raise ValueError('land_units must be a not null LandUnitInBattle instance')
         if not isinstance(nation, Nation) or nation is None:
