@@ -14,7 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+import sys
 import unittest
+
+from PyQt5.QtWidgets import QApplication
 
 testmodules = [
     'testcase.hexagonTestCase',
@@ -35,4 +38,5 @@ for t in testmodules:
 # Ceci lance le testcase si on exécute le script
 # directement.
 if __name__ == '__main__':
+    app = QApplication(sys.argv)
     unittest.TextTestRunner().run(suite)

@@ -25,6 +25,10 @@ class LandBattleFieldType:
     def __init__(self, name, color, texture):
         if not isinstance(name, str) or name == '':
             raise ValueError('name must be a non empty string')
+        if texture is not None and (not isinstance(texture, str) or texture == ''):
+            raise ValueError('texture must be a non empty string')
+        if color is not None and (not isinstance(color, str) or color == ''):
+            raise ValueError('color must be a non empty string')
         self.color = QColor(color)
         self.color_str = color
         self.texture_str = texture

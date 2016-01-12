@@ -22,7 +22,7 @@ from PyQt5.QtGui import QPolygonF, QPixmap, QBrush, QPen, QColor
 from PyQt5.QtWidgets import QGraphicsScene
 
 
-def hexgrid_offset_to_cube(col, row):
+def hexagonal_grid_offset_to_cube(col, row):
     x = col - (row + (row & 1)) / 2
     z = row
     y = -x - z
@@ -30,8 +30,8 @@ def hexgrid_offset_to_cube(col, row):
 
 
 def distance(col1, row1, col2, row2):
-    ax, ay, az = hexgrid_offset_to_cube(col1, row1)
-    bx, by, bz = hexgrid_offset_to_cube(col2, row2)
+    ax, ay, az = hexagonal_grid_offset_to_cube(col1, row1)
+    bx, by, bz = hexagonal_grid_offset_to_cube(col2, row2)
     return (abs(ax - bx) + abs(ay - by) + abs(az - bz)) / 2
 
 
@@ -48,7 +48,7 @@ def hex_corner(center, size, i, offset):
         # check size
     try:
         if size < 0:
-            raise ValueError('size must be supperior to 0')
+            raise ValueError('size must be superior to 0')
     except TypeError:
         raise ValueError('size type must be an unorderable type')
     angle_deg = 60 * i + offset
@@ -77,7 +77,7 @@ class QHexagon(QPolygonF):
         # check size
         try:
             if size < 0:
-                raise ValueError('size must be supperior to 0')
+                raise ValueError('size must be superior to 0')
         except TypeError:
             raise ValueError('size type must be an unorderable type')
         self.center = center
@@ -123,10 +123,7 @@ class QHexagon(QPolygonF):
         if color is not None:
             item.setBrush(QBrush(color))
         if texture is not None and not texture.isNull():
-            print('here')
             item.setBrush(QBrush(texture))
-
-
 
     def __eq__(self, other):
         if isinstance(other, QHexagon):

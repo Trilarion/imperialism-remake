@@ -20,9 +20,13 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from battle.landBattleView import MainBattleWindows
+from config.config import Config
+
+CONFIG_FILE = 'config.ini'
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    mySW = MainBattleWindows()
+    config = Config(CONFIG_FILE)
+    mySW = MainBattleWindows(config)
     mySW.show()
     sys.exit(app.exec_())

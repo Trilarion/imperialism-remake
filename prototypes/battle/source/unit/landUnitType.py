@@ -97,9 +97,9 @@ class LandUnitType:
     # Operations
     def __str__(self):
         return 'Name: %s\n\tEvolution level: %d\n\tDescription: %s\n\tOfficer: %r\n\t' \
-               'Attacks: %d\n\tSpeed: %d\n\tRange: %d\n\tCreation Cost: %f\n\tUpkeep: %d\n'\
-                % (self.name, self.evolutionLevel, self.description, self.officier, self.attackStrength,
-                   self.speed, self.fireRange, self.creationCost, self.upkeep)
+               'Attacks: %d\n\tSpeed: %d\n\tRange: %d\n\tCreation Cost: %f\n\tUpkeep: %d\n' \
+               % (self.name, self.evolutionLevel, self.description, self.officier, self.attackStrength,
+                  self.speed, self.fireRange, self.creationCost, self.upkeep)
 
     def to_html_table_row(self):
         """function to_html_table_row

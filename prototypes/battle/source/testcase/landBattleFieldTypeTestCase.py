@@ -17,8 +17,6 @@
 
 import unittest
 
-from PyQt5.QtCore import Qt
-
 from battle.landBattleFieldType import LandBattleFieldType
 
 
@@ -35,7 +33,7 @@ class LandBattleFieldTypeTestCase(unittest.TestCase):
 
     def test_init1(self):
         try:
-            LandBattleFieldType("testcase", Qt.red, None)
+            LandBattleFieldType("testcase", '#0000FF', None)
             self.assertTrue(True)
         except ValueError:
             self.assertTrue(False)
@@ -49,7 +47,7 @@ class LandBattleFieldTypeTestCase(unittest.TestCase):
 
     def test_init3(self):
         try:
-            LandBattleFieldType("", Qt.red, None)
+            LandBattleFieldType("", '#00FFFF', None)
             self.assertTrue(False)
         except ValueError:
             self.assertTrue(True)

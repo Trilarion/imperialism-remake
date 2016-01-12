@@ -55,6 +55,6 @@ class Lang:
 
     def __str__(self):
         retval = '\n\t\tName: %s\n\t\tDescription: %s' % (self.name, self.description)
-        for key,val in self.strings.items():
-            retval += '\n\t\t%s: %s' % (key,val)
+        for key, val in self.strings.items():
+            retval += '\n\t\t%s: %s' % (key, val)
         return retval

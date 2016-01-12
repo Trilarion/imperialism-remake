@@ -63,10 +63,9 @@ class LandBattle:
         self.attacker = attacker
 
     # Operations
-    def draw_current_unit(self, nation, defending, scene, size):
+    def draw_current_unit(self, defending, scene, size):
         """function draw_current_unit
 
-        :param nation: Nation
         :param defending: bool
         :param scene: QGraphicsScene
         :param size: QSize

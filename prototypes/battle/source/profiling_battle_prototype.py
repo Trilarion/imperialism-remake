@@ -30,7 +30,7 @@ TMP_FILE = 'tmp'
 
 def config():
     c = Config(CONFIG_FILE)
-    print(c.error_msg)
+    print(c.get_error_str())
 
 
 if __name__ == '__main__':

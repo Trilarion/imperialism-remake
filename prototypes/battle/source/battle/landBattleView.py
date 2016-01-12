@@ -26,15 +26,12 @@ from base import constants
 from battle.landArmy import LandArmy
 from battle.landBattle import LandBattle
 from battle.landUnitInBattle import LandUnitInBattle
-from config.config import Config
-
-CONFIG_FILE = 'config.ini'
 
 
 class MainBattleWindows(QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
         super(MainBattleWindows, self).__init__(parent)
-        self.ui = LandBattleView(self, None)
+        self.ui = LandBattleView(self, config, None)
         self.config = self.ui.config
         self.ui.setup_ui()
 
@@ -54,6 +51,7 @@ class MainBattleWindows(QMainWindow):
         self.resizeEvent()
 
     def closeEvent(self, event):
+        # noinspection PyTypeChecker,PyCallByClass
         result = QMessageBox.question(self,
                                       self.config.get_text('exit.window.title'),
                                       self.config.get_text('exit.window.content'),
@@ -86,10 +84,11 @@ class LandBattleView(QObject):
     """Class LandBattleView
     """
 
-    def __init__(self, battle_window, parent=None):
+    def __init__(self, battle_window, config, parent=None):
         super().__init__(parent)
-        self.config = Config(CONFIG_FILE)
+        self.config = config
         if len(self.config.errors) != 0:
+            # noinspection PyArgumentList
             QMessageBox.critical(battle_window, 'Configuration Error', self.config.get_error_str())
             exit(-1)
         self.BattleWindow = battle_window
@@ -109,7 +108,7 @@ class LandBattleView(QObject):
         self.endUnitTurnButton = CustomButton(self.centralWidget)
         self.nextTargetButton = CustomButton(self.centralWidget)
         for button in self.autoCombatButton, self.helpButton, self.retreatButton, \
-                self.nextTargetButton, self.endUnitTurnButton:
+                      self.nextTargetButton, self.endUnitTurnButton:
             button.add_action_leave(self.clear_label_hint)
             button.add_action_enter(self.set_label_hint)
             button.add_action_click(self.click_button)
@@ -224,7 +223,6 @@ class LandBattleView(QObject):
     def setup_targeted_unit_view(self):
         size = QSize(60, 60)
         army = self.get_computer_army()
-        nation = army.nation
         defending = (army == self.landBattle.defender)
         self.landBattle.draw_targetted_unit(defending, self.targetedUnitGraphicsScene, size)
         size_policy = constants.default_size_policy(self.graphicsView_targetedUnit, QSizePolicy.Fixed,
@@ -237,9 +235,8 @@ class LandBattleView(QObject):
     def setup_current_unit_view(self):
         size = QSize(60, 60)
         army = self.get_human_army()
-        nation = army.nation
         defending = (army == self.landBattle.defender)
-        self.landBattle.draw_current_unit(nation, defending, self.currentUnitGraphicsScene, size)
+        self.landBattle.draw_current_unit(defending, self.currentUnitGraphicsScene, size)
         size_policy = constants.default_size_policy(self.graphicsView_currentUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_currentUnit.setSizePolicy(size_policy)
         self.graphicsView_currentUnit.setMinimumSize(size)
@@ -304,6 +301,7 @@ class LandBattleView(QObject):
         self.setup_map()
         self.BattleWindow.setPalette(palette)
         self.BattleWindow.setCentralWidget(self.centralWidget)
+        # noinspection PyArgumentList
         QMetaObject.connectSlotsByName(self.BattleWindow)
 
     def resize_event(self):
@@ -356,6 +354,7 @@ class CustomButton(QPushButton):
         self.enter_functions = []
         self.leave_functions = []
         self.click_functions = []
+        # noinspection PyUnresolvedReferences
         super().clicked.connect(self.click)
 
     def enterEvent(self, event):
@@ -387,5 +386,5 @@ class CustomButton(QPushButton):
     def clear_action_leave(self):
         self.leave_functions = []
 
-    def clear_action_click(self, click_function):
+    def clear_action_click(self):
         self.click_functions = []

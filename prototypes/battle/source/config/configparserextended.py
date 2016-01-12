@@ -19,12 +19,11 @@ import configparser
 import os
 import re
 import sys
-import logging
 
 
 class ConfigParserExtended(configparser.ConfigParser):
     def __init__(self, file_name):
-        self.errors=[]
+        self.errors = []
         configparser.ConfigParser.__init__(self, interpolation=configparser.ExtendedInterpolation())
         self.read_file(open(file_name))
         self.file_name = file_name
@@ -32,11 +31,13 @@ class ConfigParserExtended(configparser.ConfigParser):
     def check_options(self, section, list_option):
         for option in list_option:
             if not self.has_option(section, option):
-                self.errors.append('In \'%s\' missing option \'%s\' in section \'%s\'' % (self.file_name, option, section))
+                self.errors.append(
+                        'In \'%s\' missing option \'%s\' in section \'%s\'' % (self.file_name, option, section))
                 return False
         for option in self.options(section):
             if option not in list_option:
-                self.errors.append('In \'%s\' unknown option \'%s\' in section \'%s\'' % (self.file_name, option, section))
+                self.errors.append(
+                        'In \'%s\' unknown option \'%s\' in section \'%s\'' % (self.file_name, option, section))
                 return False
         return True
 
@@ -45,8 +46,9 @@ class ConfigParserExtended(configparser.ConfigParser):
         try:
             retval = self.get(section, option)
             if pattern is not None and not re.match(pattern, retval):
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad syntax option \'%s\', expected syntax \'%s\' (current \'%s\')' % (
-                    self.file_name, section, option, pattern, retval))
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad syntax option \'%s\', expected syntax \'%s\' (current \'%s\')' % (
+                            self.file_name, section, option, pattern, retval))
             if len(self.errors) == nb_error:
                 return retval
         except configparser.NoOptionError:
@@ -57,26 +59,31 @@ class ConfigParserExtended(configparser.ConfigParser):
                 self.file_name, section))
         return default
 
-    def get_int(self, section, option, default=0, min=-sys.maxsize + 1, max=sys.maxsize, even=True, odd=True,
+    def get_int(self, section, option, default=0, int_min=-sys.maxsize + 1, int_max=sys.maxsize, even=True, odd=True,
                 expected_values=None):
         nb_error = len(self.errors)
         try:
             retval = self.getint(section, option)
-            if retval < min:
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad option \'%s\' should be inferior to %d (current:%d)' % (
-                    self.file_name, section, option, min, retval))
-            if retval > max:
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad option \'%s\' should be superior to %d (current:%d)' % (
-                    self.file_name, section, option, max, retval))
+            if retval < int_min:
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be inferior to %d (current:%d)' % (
+                            self.file_name, section, option, int_min, retval))
+            if retval > int_max:
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be superior to %d (current:%d)' % (
+                            self.file_name, section, option, int_max, retval))
             if retval % 2 == 0 and not even:
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad option \'%s\' should be a even number (current:%d)' % (
-                    self.file_name, section, option, retval))
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be a even number (current:%d)' % (
+                            self.file_name, section, option, retval))
             if retval % 2 == 1 and not odd:
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad option \'%s\' should be a odd number (current:%d)' % (
-                    self.file_name, section, option, retval))
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be a odd number (current:%d)' % (
+                            self.file_name, section, option, retval))
             if expected_values is not None and not retval in expected_values:
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad option \'%s\' should be in \'%s\' (current:%d)' % (
-                    self.file_name, section, option, str(expected_values), retval))
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be in \'%s\' (current:%d)' % (
+                            self.file_name, section, option, str(expected_values), retval))
             if len(self.errors) == nb_error:
                 return retval
         except configparser.NoOptionError:
@@ -85,22 +92,27 @@ class ConfigParserExtended(configparser.ConfigParser):
         except configparser.NoSectionError:
             self.errors.append('In file \'%s\' : Missing mandatory section \'%s\'' % (self.file_name, section))
         except ValueError as e:
-            self.errors.append('In file \'%s\' in section \'%s\', option \'%s\' : \'%s\'' % (self.file_name, section,option, str(e)))
+            self.errors.append(
+                    'In file \'%s\' in section \'%s\', option \'%s\' : \'%s\'' % (
+                        self.file_name, section, option, str(e)))
         return default
 
-    def get_float(self, section, option, default=0, min=-sys.maxsize + 1, max=sys.maxsize, expected_values=None):
+    def get_float(self, section, option, default=0, float_min=-sys.maxsize + 1, float_max=sys.maxsize, expected_values=None):
         nb_error = len(self.errors)
         try:
             retval = self.getfloat(section, option)
-            if retval < min:
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad option \'%s\' should be inferior to %d (current:%d)' % (
-                    self.file_name, section, option, min, retval))
-            if retval > max:
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad option \'%s\' should be superior to %d (current:%d)' % (
-                    self.file_name, section, option, max, retval))
+            if retval < float_min:
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be inferior to %d (current:%d)' % (
+                            self.file_name, section, option, float_min, retval))
+            if retval > float_max:
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be superior to %d (current:%d)' % (
+                            self.file_name, section, option, float_max, retval))
             if expected_values is not None and not retval in expected_values:
-                self.errors.append('In file \'%s\' and section \'%s\' : Bad option \'%s\' should be in \'%s\' (current:%d)' % (
-                    self.file_name, section, option, str(expected_values), retval))
+                self.errors.append(
+                        'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be in \'%s\' (current:%d)' % (
+                            self.file_name, section, option, str(expected_values), retval))
             if len(self.errors) == nb_error:
                 return retval
         except configparser.NoOptionError:
@@ -109,7 +121,9 @@ class ConfigParserExtended(configparser.ConfigParser):
         except configparser.NoSectionError:
             self.errors.append('In file \'%s\' : Missing mandatory section \'%s\'' % (self.file_name, section))
         except ValueError as e:
-            self.errors.append('In file \'%s\' in section \'%s\', option \'%s\' : \'%s\'' % (self.file_name, section,option, str(e)))
+            self.errors.append(
+                    'In file \'%s\' in section \'%s\', option \'%s\' : \'%s\'' % (
+                        self.file_name, section, option, str(e)))
         return default
 
     def get_boolean(self, section, option, default=False):
@@ -122,7 +136,9 @@ class ConfigParserExtended(configparser.ConfigParser):
         except configparser.NoSectionError:
             self.errors.append('In file \'%s\' : Missing mandatory section \'%s\'' % (self.file_name, section))
         except ValueError as e:
-            self.errors.append('In file \'%s\' in section \'%s\', option \'%s\' : \'%s\'' % (self.file_name, section,option, str(e)))
+            self.errors.append(
+                    'In file \'%s\' in section \'%s\', option \'%s\' : \'%s\'' % (
+                        self.file_name, section, option, str(e)))
         return default
 
     def get_dirname(self, section, option, default=''):
@@ -140,7 +156,6 @@ class ConfigParserExtended(configparser.ConfigParser):
                 self.file_name, section, option))
             return default
         return retval
-
 
     def get_error_str(self):
         retval = ''

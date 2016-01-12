@@ -16,10 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import logging
-import sys
 
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QDesktopWidget
+from PyQt5.QtWidgets import QDesktopWidget
 
 from base.constants import parse_resolution, LOG_FILENAME, LOG_PATTERN, MINIMUM_RESOLUTION
 from config.configparserextended import ConfigParserExtended
@@ -41,12 +40,45 @@ MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 
 class Config(ConfigParserExtended):
-
+    def __init__(self, main_config_file):
+        # load main option
+        self.data_folder = 'error'
+        ConfigParserExtended.__init__(self, main_config_file)
+        self.check_options('config', MANDATORY_CONFIG_OPTION)
+        self.check_options('path', MANDATORY_PATH_OPTION)
+        self.check_options('battle', MANDATORY_BATTLE_OPTION)
+        # set log level
+        self.log_level = self.get_int('config', 'log_level', expected_values=[50, 40, 30, 20, 10])
+        logging.basicConfig(level=self.log_level, filename=LOG_FILENAME, filemode='w', format=LOG_PATTERN)
+        self.fullscreen = self.get_boolean('config', 'fullscreen')
+        self.name_theme_selected = self.get_string('config', 'theme')
+        self.name_lang_selected = self.get_string('config', 'lang')
+        self.resolution = self.get_string('config', 'resolution', pattern='^(\d+)\s*x\s*(\d+)$|^maximize$')
+        # load battle option
+        self.diameter_battlemap = self.get_int('battle', 'diameter_battlemap', even=False)
+        self.diameter_battlecity = self.get_int('battle', 'diameter_battlecity', even=False)
+        # load path config
+        self.data_folder = self.get_dirname('path', 'data')
+        self.lang_config_file = self.get_filename('path', 'lang_config_file')
+        self.unit_config_file = self.get_filename('path', 'unit_config_file')
+        self.nation_config_file = self.get_filename('path', 'nation_config_file')
+        # load theme config
+        self.theme_selected, self.available_theme = self.load_themes_config()
+        # load unit config
+        self.list_unit_type = self.load_units_config()
+        # load lang config
+        self.lang_selected, self.available_lang = self.load_langs_config()
+        # load nation config
+        self.available_nation = self.load_nations_config()
+        self.check_resolution()
+        logging.info('[END] __init__(main_config_file=%s) => %s' % (main_config_file, str(self)))
 
     def load_themes_config(self):
+        logging.debug('[ENTER] load_themes_config()')
         available_theme = []
         theme_selected = None
         for section in self.sections():
+            logging.debug('[LOOP] load_themes_config(): section=%s' % section)
             if section.startswith('theme'):
                 if self.check_options(section, MANDATORY_THEME_OPTION):
                     name = self.get_string(section, 'name')
@@ -75,22 +107,30 @@ class Config(ConfigParserExtended):
                         if name == self.name_theme_selected:
                             theme_selected = theme
                     except ValueError as e:
+                        logging.error('[ERROR] load_themes_config() : %s' % str(e))
                         self.errors.append(str(e))
         if theme_selected is None:
             tmp = 'Theme \'%s\' not found (available theme: [' % self.name_theme_selected
             for t in available_theme:
                 tmp += '\'%s\',' % t.name
             tmp += '])'
-            self.errors.append(tmp.replace(',]',']'))
+            tmp = tmp.replace(',]', ']')
+            logging.error(tmp)
+            self.errors.append(tmp)
         if len(available_theme) == 0:
+            logging.error('No Theme available')
             self.errors.append('No Theme available')
+        logging.debug(
+                '[EXIT] load_themes_config() => found %d themes, selected=%s' % (len(available_theme), theme_selected))
         return theme_selected, available_theme
 
     def load_units_config(self):
+        logging.debug('[ENTER] load_units_config()')
         list_unit_type = []
         if self.unit_config_file != 'error' and self.theme_selected is not None:
             units_config = ConfigParserExtended(self.unit_config_file)
             for section in units_config.sections():
+                logging.debug('[LOOP] load_units_config(): section=%s' % section)
                 if units_config.check_options(section, MANDATORY_UNIT_OPTION):
                     try:
                         nb_error = len(units_config.errors)
@@ -118,10 +158,15 @@ class Config(ConfigParserExtended):
                         if nb_error == len(units_config.errors):
                             list_unit_type.append(unit_type)
                     except AttributeError as e:
+                        logging.error('[ERROR] load_units_config() : %s' % str(e))
                         units_config.errors.append(str(e))
                     except ValueError as e:
+                        logging.error('[ERROR] load_units_config() : %s' % str(e))
                         units_config.errors.append(str(e))
             self.errors.extend(units_config.errors)
+            if len(units_config.errors) != 0:
+                logging.error('[ERROR] load_units_config() : %s' % units_config.get_error_str())
+        logging.debug('[EXIT] load_units_config() => found %d units type' % len(list_unit_type))
         return list_unit_type
 
     def load_langs_config(self):
@@ -145,6 +190,8 @@ class Config(ConfigParserExtended):
                     logging.error('[ERROR] load_langs_config() : %s' % str(e))
                     langs_config.errors.append(str(e))
             self.errors.extend(langs_config.errors)
+            if len(langs_config.errors) != 0:
+                logging.error('[ERROR] load_langs_config() : %s' % langs_config.get_error_str())
         if lang_selected is None:
             msg = 'Lang: \'%s\' not found' % self.name_lang_selected
             logging.error('[ERROR] load_langs_config() : %s' % msg)
@@ -152,11 +199,12 @@ class Config(ConfigParserExtended):
         if len(available_lang) == 0:
             logging.error('[ERROR] load_langs_config() : No Lang available')
             self.errors.append('No Lang available')
-        logging.debug('[EXIT] load_langs_config()')
+        logging.debug(
+                '[EXIT] load_langs_config() => found %d langs, selected %s' % (len(available_lang), str(lang_selected)))
         return lang_selected, available_lang
 
     def load_nations_config(self):
-        self.logging.debug('[ENTER] load_nations_config()')
+        logging.debug('[ENTER] load_nations_config()')
         available_nation = []
         if self.nation_config_file != 'error' and self.theme_selected is not None:
             nations_config = ConfigParserExtended(self.nation_config_file)
@@ -178,74 +226,44 @@ class Config(ConfigParserExtended):
                     logging.error('[ERROR] load_nations_config() : %s' % str(e))
                     nations_config.errors.append(str(e))
             self.errors.extend(nations_config.errors)
-        if len(available_nation) == 0  and self.theme_selected is not None:
+            if len(nations_config.errors) != 0:
+                logging.error('[ERROR] load_nations_config() : %s' % nations_config.get_error_str())
+        if len(available_nation) == 0 and self.theme_selected is not None:
             logging.error('[ERROR] load_nations_config() : No Nation available')
             self.errors.append('No Nation available')
-        logging.debug('[EXIT] load_nations_config()')
+        logging.debug('[EXIT] load_nations_config() => found %d' % len(available_nation))
         return available_nation
-
-    def __init__(self, main_config_file):
-        logging.info('[ENTER] __init__(main_config_file=%s)' % main_config_file)
-        # load main option
-        self.data_folder = 'error'
-        ConfigParserExtended.__init__(self, main_config_file)
-        self.check_options('config', MANDATORY_CONFIG_OPTION)
-        self.check_options('path', MANDATORY_PATH_OPTION)
-        self.check_options('battle', MANDATORY_BATTLE_OPTION)
-        # set log level
-        self.log_level = self.get_int('config', 'log_level', expected_values=[50, 40, 30, 20, 10])
-        self.logging =  logging
-        logging.basicConfig(level=self.log_level, filename=LOG_FILENAME, filemode='w', format=LOG_PATTERN)
-        self.fullscreen = self.get_boolean('config', 'fullscreen')
-        self.name_theme_selected = self.get_string('config', 'theme')
-        self.name_lang_selected = self.get_string('config', 'lang')
-        self.resolution = self.get_string('config', 'resolution', pattern='^(\d+)\s*x\s*(\d+)$|^maximize$')
-        # load battle option
-        self.diameter_battlemap = self.get_int('battle', 'diameter_battlemap', even=False)
-        self.diameter_battlecity = self.get_int('battle', 'diameter_battlecity', even=False)
-        # load path config
-        self.data_folder = self.get_dirname('path', 'data')
-        self.lang_config_file = self.get_filename('path', 'lang_config_file')
-        self.unit_config_file = self.get_filename('path', 'unit_config_file')
-        self.nation_config_file = self.get_filename('path', 'nation_config_file')
-        # load theme config
-        self.theme_selected, self.available_theme = self.load_themes_config()
-        # load unit config
-        self.list_unit_type = self.load_units_config()
-        # load lang config
-        self.lang_selected, self.available_lang = self.load_langs_config()
-        # load nation config
-        self.available_nation = self.load_nations_config()
-        self.check_resolution()
-        logging.info('[END] __init__(main_config_file=%s) => %s' % (main_config_file, str(self)))
-
 
     def __str__(self):
         logging.debug('[ENTER] __str__()')
         themes = '\n'
         for t in self.available_theme:
-            themes += '\t\tTheme \'%s\': %s' % (t.name, str(t).replace('\t\t','\t\t\t'))
+            themes += '\t\tTheme \'%s\': %s' % (t.name, str(t).replace('\t\t', '\t\t\t'))
         units = '\n'
         for u in self.list_unit_type:
-            units += '\t\tUnit Type \'%s\': %s' % (u.name, str(u).replace('\t','\t\t\t'))
+            units += '\t\tUnit Type \'%s\': %s' % (u.name, str(u).replace('\t', '\t\t\t'))
         nations = '\n'
         for n in self.available_nation:
-            nations += '\t\tNation \'%s\': %s' % (n.name, str(n).replace('\t','\t\t\t'))
+            nations += '\t\tNation \'%s\': %s' % (n.name, str(n).replace('\t', '\t\t\t'))
         langs = ''
         for l in self.available_lang:
-            langs += '\n\t\tLang \'%s\': %s' % (l.name, str(l).replace('\t\t','\t\t\t'))
+            langs += '\n\t\tLang \'%s\': %s' % (l.name, str(l).replace('\t\t', '\t\t\t'))
         logging.debug('[EXIT] __str__()')
         return '\n\tError: %s\n\tLog level: %d\n\tFullscreen: %r\n\tTheme: %s\n\tLang: %s\n\tResolution: %s\n\tBattle map diameter: %d\n' \
                '\tCity diameter: %d\n\tData folder: %s\n\tLang config file: %s\n\tUnit config file: %s\n\tNation config file: %s\n' \
                '\tTheme selected: %s\n\tLang Selected: %s\n\tAvailable Themes:%s\n\tAvailable Units: %s\n\tAvailable Nations: %s\n\t' \
                'Available langs: %s' \
-               % (self.get_error_str(), self.log_level, self.fullscreen, self.name_theme_selected, self.name_lang_selected,
-                  self.resolution, self.diameter_battlemap, self.diameter_battlecity, self.data_folder, self.lang_config_file,
-                  self.unit_config_file, self.nation_config_file, self.theme_selected, self.lang_selected, themes, units, nations,langs)
-
+               % (
+                   self.get_error_str(), self.log_level, self.fullscreen, self.name_theme_selected,
+                   self.name_lang_selected,
+                   self.resolution, self.diameter_battlemap, self.diameter_battlecity, self.data_folder,
+                   self.lang_config_file,
+                   self.unit_config_file, self.nation_config_file, self.theme_selected, self.lang_selected, themes,
+                   units,
+                   nations, langs)
 
     def check_resolution(self):
-        logging.debug('[ENTER] check_resolution(), resolution=%s' % (self.resolution))
+        logging.debug('[ENTER] check_resolution(), resolution=%s' % self.resolution)
         # check resolution min, max...
         w, h = parse_resolution(self.resolution)
         if w != -1 and h != -1:
@@ -256,16 +274,15 @@ class Config(ConfigParserExtended):
                           'min height=%d, max width=%d, max height=%d' % (w, h, minw, minh, maxw, maxh))
             if w < minw or h < minh:
                 msg = 'Bad resolution (width must be superior to %d and height must be superior to %d) (current %d x %d)' % (
-                minw, minh, w, h)
+                    minw, minh, w, h)
                 self.errors.append(msg)
                 logging.error(msg)
             if w > maxw or h > maxh:
                 msg = 'Bad resolution (width must be inferior to screen width resolution %d and height must be inferior to screen height resolution %d) (current %d x %d)' % (
-                maxw, maxh, w, h)
+                    maxw, maxh, w, h)
                 self.errors.append(msg)
                 logging.error(msg)
-        logging.debug('[EXIT] check_resolution(), resolution=%s' % (self.fullscreen))
-
+        logging.debug('[EXIT] check_resolution(), resolution=%s' % self.fullscreen)
 
     #
     # Configuration getter
@@ -304,7 +321,7 @@ class Config(ConfigParserExtended):
             logging.error('[ERROR] get_text(key=\'%s\') : key must be a non empty string' % key)
             raise ValueError('key must be a non empty string')
         retval = self.lang_selected.get_string(key)
-        logging.debug('[EXIT] get_text(key=\'%s\') return \'%s\'' % (key,retval))
+        logging.debug('[EXIT] get_text(key=\'%s\') return \'%s\'' % (key, retval))
         return retval
 
     def get_nation(self, name):
@@ -325,3 +342,6 @@ class Config(ConfigParserExtended):
         logging.debug('[EXIT] get_unit_type(name=\'%s\') return None' % name)
         return None
 
+
+if __name__ == '__main__':
+    print('TODO generate manuel')
