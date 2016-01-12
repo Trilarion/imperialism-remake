@@ -85,8 +85,11 @@ class LandBattleMap:
         self.fields = []
         self.create_fields()
         for field in self.fields:
-            d = distance(field.sx, field.sy, self.get_field_center().sx, self.get_field_center().sy)
-            field.draw(scene, d)
+            status = -1
+            d = self.distance_center_map(field.sx, field.sy)
+            if d == round((self.diameter-1)/2):
+                status = 3
+            field.draw(scene,status)
 
     def grid_position_to_index(self, column, row):
         return row + column * self.diameter
@@ -131,6 +134,7 @@ class LandBattleMap:
 
     def inside_map_hexagon(self, col1, row1):
         return self.distance_center_map(col1, row1) <= (self.diameter - 1) / 2
+
 
     def create_fields(self):
         """function create_fields: create the fields list

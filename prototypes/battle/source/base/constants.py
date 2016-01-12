@@ -65,10 +65,10 @@ def get_min_resolution_qsize():
 def version():
     try:
         f = open('version.txt', 'r')
-        return int(f.read())
+        return float(f.read())
     except FileNotFoundError:
         print('Error: No version.txt file found')
         return -1 
     except ValueError:
-        print('Error: version.txt must contain a integer')
+        print('Error: version.txt must contain a float')
         return -1      

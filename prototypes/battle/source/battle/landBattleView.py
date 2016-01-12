@@ -269,7 +269,7 @@ class LandBattleView(QObject):
         self.landBattle.draw_battle_map(self.mainScene)
 
     def setup_ui(self):
-        self.BattleWindow.setWindowTitle(self.config.get_text('battle.window.title') + ' V' + str(self.config.version))
+        self.BattleWindow.setWindowTitle(self.config.get_text('battle.window.title') + ' v' + str(self.config.version))
         background = self.config.theme_selected.get_background_pixmap()
         palette = QPalette()
         palette.setBrush(QPalette.Background, QBrush(background))

@@ -14,25 +14,30 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-
 import sys
-
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QIcon
-from battle.landBattleView import MainBattleWindows
+from battle.landArmy import LandArmy
+from battle.landBattleMap import LandBattleMap
+from battle.landUnitInBattle import LandUnitInBattle
 from config.config import Config
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QApplication
 from base.constants import version
-
 CONFIG_FILE = 'config.ini'
+
+
+class LandBattleResult(QWidget):
+    """Class LandBattle
+    """
+    def __init__(self, config):
+        self.config = config
+        super().__init__()
+        self.setWindowTitle(config.get_text('victory'))
+
 
 if __name__ == '__main__':
     v = version()
-    print('Battle prototype version: %f' % version())
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon('icon.png'))
-    # load config files
     config = Config(CONFIG_FILE,v)
-    # start the battle view
-    mySW = MainBattleWindows(config)
-    mySW.show()
+    rst = LandBattleResult(config)
+    rst.show()
     sys.exit(app.exec_())
