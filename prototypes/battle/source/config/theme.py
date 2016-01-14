@@ -172,7 +172,6 @@ class Theme:
         """
         return QPixmap(self.target_button)
 
-
     def get_victory_pixmap(self):
         """
         function get_victory_pixmap
@@ -180,10 +179,10 @@ class Theme:
         """
         return QPixmap(self.victory_pixmap)
 
-
     def get_defeat_pixmap(self):
         """
         function get_defeat_pixmap
         :return: the QPixmap corresponding to the defeat image
         """
         return QPixmap(self.defeat_pixmap)
+

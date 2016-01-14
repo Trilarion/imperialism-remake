@@ -17,7 +17,7 @@
 
 import unittest
 
-class LandBattleFieldTestCase(unittest.TestCase):
 
+class LandBattleFieldTestCase(unittest.TestCase):
     def test_0(self):
         self.assertTrue(True)

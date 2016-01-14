@@ -17,7 +17,7 @@
 
 import unittest
 
-class ConfigParserExtendedTestCase(unittest.TestCase):
 
+class ConfigParserExtendedTestCase(unittest.TestCase):
     def test_0(self):
         self.assertTrue(True)

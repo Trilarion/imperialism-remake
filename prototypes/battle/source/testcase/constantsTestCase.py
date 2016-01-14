@@ -17,7 +17,7 @@
 
 import unittest
 
-class ConstantsTestCase(unittest.TestCase):
 
+class ConstantsTestCase(unittest.TestCase):
     def test_0(self):
         self.assertTrue(True)

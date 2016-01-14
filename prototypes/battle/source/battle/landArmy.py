@@ -23,6 +23,7 @@ class LandArmy:
     """
 
     # Constructor
+    # noinspection PyUnusedLocal
     def __init__(self, retreat, land_units, nation):
         """function __init__
 

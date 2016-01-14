@@ -70,7 +70,7 @@ class LandBattleField:
         """function draw
 
         :param scene: QGraphicsScene
-        :param distance: int
+        :param status: int
         no return
         """
         if self.enable:
@@ -84,10 +84,10 @@ class LandBattleField:
             if status == 1 or status == 2 or status == 3:
                 if status == 1:
                     color = Qt.green
-                elif status ==2:
+                elif status == 2:
                     color = Qt.red
-                elif status == 3:
+                else:
                     color = Qt.white
-                item = scene.addEllipse(self.position.x(), self.position.y(), 7, 5, brush = QBrush(color))
+                item = scene.addEllipse(self.position.x(), self.position.y(), 7, 5, brush=QBrush(color))
                 item.setPen(QPen(QColor(0xFF, 0xFF, 0xFF, 0x00)))
 

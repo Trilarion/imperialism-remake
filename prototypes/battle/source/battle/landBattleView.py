@@ -108,7 +108,7 @@ class LandBattleView(QObject):
         self.endUnitTurnButton = CustomButton(self.centralWidget)
         self.nextTargetButton = CustomButton(self.centralWidget)
         for button in self.autoCombatButton, self.helpButton, self.retreatButton, \
-                      self.nextTargetButton, self.endUnitTurnButton:
+                self.nextTargetButton, self.endUnitTurnButton:
             button.add_action_leave(self.clear_label_hint)
             button.add_action_enter(self.set_label_hint)
             button.add_action_click(self.click_button)
@@ -307,6 +307,7 @@ class LandBattleView(QObject):
     def resize_event(self):
         self.setup_map()
 
+    # noinspection PyUnusedLocal
     def clear_label_hint(self, custom_button):
         self.buttonHintLabel.setText('')
 

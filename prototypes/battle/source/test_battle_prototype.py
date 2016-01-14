@@ -35,7 +35,8 @@ testmodules = [
     'testcase.landUnitTypeTestCase',
     'testcase.langTestCase',
     'testcase.nationTestCase',
-    'testcase.themeTestCase'
+    'testcase.themeTestCase',
+    'testcase.landBattleResultViewTestCase'
 ]
 
 suite = unittest.TestSuite()

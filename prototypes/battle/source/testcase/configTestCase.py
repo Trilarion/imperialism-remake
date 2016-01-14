@@ -17,7 +17,7 @@
 
 import unittest
 
-class ConfigTestCase(unittest.TestCase):
 
+class ConfigTestCase(unittest.TestCase):
     def test_0(self):
         self.assertTrue(True)

@@ -61,14 +61,15 @@ def parse_resolution_to_qsize(res_str):
 def get_min_resolution_qsize():
     w, h = MINIMUM_RESOLUTION
     return QSize(w, h)
-    
+
+
 def version():
     try:
         f = open('version.txt', 'r')
         return float(f.read())
     except FileNotFoundError:
         print('Error: No version.txt file found')
-        return -1 
+        return -1
     except ValueError:
         print('Error: version.txt must contain a float')
-        return -1      
+        return -1

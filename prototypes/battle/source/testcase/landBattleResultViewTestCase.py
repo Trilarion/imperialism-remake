@@ -15,30 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import cProfile
-import os
-import pstats
-import sys
-
-from PyQt5.QtWidgets import QApplication
-
-from config.config import Config
-
-CONFIG_FILE = 'config.ini'
-TMP_FILE = 'tmp'
+import unittest
 
 
-def config():
-    c = Config(CONFIG_FILE)
-    print(c.get_error_str())
+class LandBattleResultTestCase(unittest.TestCase):
+    def test_0(self):
+        self.assertTrue(True)
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    cProfile.run('config()', TMP_FILE)
-    p = pstats.Stats(TMP_FILE)
-    p.sort_stats('cumtime')
-    p.print_stats()
-    p.sort_stats('ncalls')
-    p.print_stats()
-    os.remove(TMP_FILE)

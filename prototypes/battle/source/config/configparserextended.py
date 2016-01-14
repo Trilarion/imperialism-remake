@@ -80,7 +80,7 @@ class ConfigParserExtended(configparser.ConfigParser):
                 self.errors.append(
                         'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be a odd number (current:%d)' % (
                             self.file_name, section, option, retval))
-            if expected_values is not None and not retval in expected_values:
+            if expected_values is not None and retval not in expected_values:
                 self.errors.append(
                         'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be in \'%s\' (current:%d)' % (
                             self.file_name, section, option, str(expected_values), retval))
@@ -97,7 +97,8 @@ class ConfigParserExtended(configparser.ConfigParser):
                         self.file_name, section, option, str(e)))
         return default
 
-    def get_float(self, section, option, default=0, float_min=-sys.maxsize + 1, float_max=sys.maxsize, expected_values=None):
+    def get_float(self, section, option, default=0, float_min=-sys.maxsize + 1, float_max=sys.maxsize,
+                  expected_values=None):
         nb_error = len(self.errors)
         try:
             retval = self.getfloat(section, option)
@@ -109,7 +110,7 @@ class ConfigParserExtended(configparser.ConfigParser):
                 self.errors.append(
                         'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be superior to %d (current:%d)' % (
                             self.file_name, section, option, float_max, retval))
-            if expected_values is not None and not retval in expected_values:
+            if expected_values is not None and retval not in expected_values:
                 self.errors.append(
                         'In file \'%s\' and section \'%s\' : Bad option \'%s\' should be in \'%s\' (current:%d)' % (
                             self.file_name, section, option, str(expected_values), retval))

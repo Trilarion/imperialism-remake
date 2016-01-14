@@ -17,7 +17,7 @@
 
 import unittest
 
-class LangTestCase(unittest.TestCase):
 
+class LangTestCase(unittest.TestCase):
     def test_0(self):
         self.assertTrue(True)

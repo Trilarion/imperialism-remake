@@ -17,7 +17,7 @@
 
 import unittest
 
-class NationTestCase(unittest.TestCase):
 
+class NationTestCase(unittest.TestCase):
     def test_0(self):
         self.assertTrue(True)
