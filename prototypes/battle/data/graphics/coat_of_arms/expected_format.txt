@@ -1,0 +1,2 @@
+File format: PNG
+Dimensions : 600 x 800
