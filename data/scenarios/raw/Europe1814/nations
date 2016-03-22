@@ -1,26 +1,18 @@
 0:
   properties: {capital_province: 9, color: '#1168BA', description: France, name: France}
-  provinces: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-    20]
+  provinces: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 1:
-  properties: {capital_province: 37, color: '#F4797E', description: Austria-Hungary,
-    name: Austria-Hungary}
-  provinces: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-    38, 39, 40, 41, 42, 43, 44, 45, 46]
+  properties: {capital_province: 37, color: '#F4797E', description: Austria-Hungary, name: Austria-Hungary}
+  provinces: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46]
 2:
-  properties: {capital_province: 47, color: '#AA94D6', description: Ottoman Empire,
-    name: Ottoman Empire}
-  provinces: [47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
-    64, 65, 66, 67]
+  properties: {capital_province: 47, color: '#AA94D6', description: Ottoman Empire, name: Ottoman Empire}
+  provinces: [47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67]
 3:
-  properties: {capital_province: 69, color: '#6FB1D2', description: Russian Empire,
-    name: Russian Empire}
-  provinces: [68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84,
-    85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]
+  properties: {capital_province: 69, color: '#6FB1D2', description: Russian Empire, name: Russian Empire}
+  provinces: [68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]
 4:
   properties: {capital_province: 111, color: '#F5A761', description: Prussia, name: Prussia}
-  provinces: [96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110,
-    111, 112]
+  provinces: [96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112]
 5:
   properties: {capital_province: 119, color: '#8EA750', description: Italy, name: Italy}
   provinces: [113, 114, 115, 116, 117, 118, 119, 120, 121]
@@ -55,24 +47,22 @@
   properties: {capital_province: 180, color: '#D4B9A0', description: Bavaria, name: Bavaria}
   provinces: [178, 179, 180, 181]
 16:
-  properties: {capital_province: 183, color: '#B88363', description: BeNeLux, name: BeNeLux}
+  properties: {capital_province: 183, color: '#B88363', description: Switzerland, name: Switzerland}
   provinces: [182, 183, 184]
 17:
-  properties: {capital_province: 188, color: '#CFA66B', description: Switzerland,
-    name: Switzerland}
+  properties: {capital_province: 188, color: '#CFA66B', description: BeNeLux, name: BeNeLux}
   provinces: [185, 186, 187, 188, 189, 190]
 18:
-  properties: {capital_province: 191, color: '#A17F7C', description: Danmark, name: Danmark}
+  properties: {capital_province: 191, color: '#A17F7C', description: Lower Saxony, name: Lower Saxony}
   provinces: [191, 192, 193, 194]
 19:
-  properties: {capital_province: 195, color: '#A36E45', description: Lower Saxony,
-    name: Lower Saxony}
+  properties: {capital_province: 195, color: '#A36E45', description: Danmark, name: Danmark}
   provinces: [195, 196, 197, 198]
 20:
-  properties: {capital_province: 202, color: '#CEA29F', description: Serbia, name: Serbia}
+  properties: {capital_province: 202, color: '#CEA29F', description: Sweden, name: Sweden}
   provinces: [199, 200, 201, 202]
 21:
-  properties: {capital_province: 204, color: '#EBBEBA', description: Sweden, name: Sweden}
+  properties: {capital_province: 204, color: '#EBBEBA', description: Serbia, name: Serbia}
   provinces: [203, 204, 205, 206, 207]
 22:
   properties: {capital_province: 211, color: '#B38F8C', description: Greece, name: Greece}
