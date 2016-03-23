@@ -17,17 +17,13 @@
 
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QBrush, QPen, QColor
-from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from prototypes.battle.source.battle.land.landBattleFieldType import LandBattleFieldType
 from prototypes.battle.source.lib.hexagon import QHexagon
 
 
 class LandBattleField:
-    """Class LandBattleField
-    """
 
-    # Constructor:
     def __init__(self, enable, position, sx, sy, occupied, field_type, hexa):
         """
         function __init__
@@ -75,12 +71,7 @@ class LandBattleField:
         """
         if self.enable:
             self.hexa.draw(scene, self.fieldType.color, self.fieldType.texture)
-            text = '({},{})'.format(self.sx, self.sy)
-            item = QGraphicsSimpleTextItem(text)
-            item.setBrush(QBrush(Qt.black))
-            item.setPos(self.position.x() - self.hexa.size / 2, self.position.y() - self.hexa.size / 2)
-            item.setZValue(1001)
-            scene.addItem(item)
+
             if status == 1 or status == 2 or status == 3:
                 if status == 1:
                     color = Qt.green
@@ -88,5 +79,9 @@ class LandBattleField:
                     color = Qt.red
                 else:
                     color = Qt.white
+
                 item = scene.addEllipse(self.position.x(), self.position.y(), 7, 5, brush=QBrush(color))
                 item.setPen(QPen(QColor(0xFF, 0xFF, 0xFF, 0x00)))
+
+    def __str__(self):
+        return 'Map tile ({},{})'.format(self.sx, self.sy)

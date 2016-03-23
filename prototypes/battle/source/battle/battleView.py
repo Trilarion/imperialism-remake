@@ -52,10 +52,6 @@ class MainQGraphicsScene(QGraphicsScene):
             x, y = self.battleView.map.position_to_grid_position(position)
             if x >= 0 and y >= 0:
                 print('TODO mouse click on grid ' + str(x) + ';' + str(y))
-                # if ev.button() == Qt.LeftButton:
-                #    item = QtGui.QGraphicsTextItem("CLICK")
-                #    item.setPos(ev.scenePos())
-                #    self.addItem(item)
 
     def set_battle_view(self, battle_view):
         self.battleView = battle_view
@@ -296,7 +292,10 @@ class BattleView(QObject):
 
     def set_label_hint(self, generic_element):
         text = ''
-        if generic_element == self.graphicsView_currentUnit:
+        if generic_element in self.battleView.map.fields:
+            # TODO - not hooked up
+            text = str(generic_element)
+        elif generic_element == self.graphicsView_currentUnit:
             text = str(self.battleView.currentUnit)
         elif generic_element == self.graphicsView_targetedUnit:
             text = str(self.battleView.targettedUnit)

@@ -28,10 +28,7 @@ from prototypes.battle.source.lib.hexagon import QHexagon, distance
 class LandBattleMap:
     ROTATION_FIELD = 30
     ROTATION_CITY_AND_MAP = 0
-    """Class LandBattleMap
-    """
 
-    # Constructor:
     def __init__(self, config):
         """
         function __init__
@@ -145,9 +142,11 @@ class LandBattleMap:
                 center = self.grid_position_to_position(column, row)
                 hexa = QHexagon(center, self.get_size_tile(), LandBattleMap.ROTATION_FIELD)
                 enable = self.inside_map_hexagon(column, row)
+
                 if self.inside_city(column, row):
                     field_type = self.config.theme_selected.city_field
                 else:
                     field_type = self.config.theme_selected.outsidecity_field
-                fields = LandBattleField(enable, hexa.center, column, row, False, field_type, hexa)
-                self.fields.append(fields)
+
+                field_tile = LandBattleField(enable, hexa.center, column, row, False, field_type, hexa)
+                self.fields.append(field_tile)
