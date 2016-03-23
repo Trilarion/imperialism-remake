@@ -100,7 +100,7 @@ class LandUnitInBattle(LandUnit):
 
         returns string
         """
-        raise NotImplementedError()
+        return "{info}{dead}".format(info=super().__str__(), dead=" (killed)" if self.dead else "")
 
     def print_to_text_edit(self, font, text_edit):
         """function print_to_text_edit

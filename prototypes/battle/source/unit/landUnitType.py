@@ -30,10 +30,6 @@ UNIT_HEIGHT = 400
 
 
 class LandUnitType:
-    """Class LandUnitType
-    """
-
-    # Construtor
     def __init__(self, name, evolution_level, description, officier, attack_strength, fire_range, speed, creation_cost,
                  upkeep, graphic_charge, graphic_shoot, graphic_stand):
         """function __init__
@@ -96,6 +92,10 @@ class LandUnitType:
 
     # Operations
     def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        # TODO - blurgh!
         return 'Name: %s\n\tEvolution level: %d\n\tDescription: %s\n\tOfficer: %r\n\t' \
                'Attacks: %d\n\tSpeed: %d\n\tRange: %d\n\tCreation Cost: %f\n\tUpkeep: %d\n' \
                % (self.name, self.evolutionLevel, self.description, self.officier, self.attackStrength,

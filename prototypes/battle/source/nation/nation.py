@@ -24,10 +24,6 @@ COAT_OF_ARMS_HEIGHT = 800
 
 
 class Nation:
-    """Class Nation
-    """
-
-    # Constructor:
     def __init__(self, name, computer, coat_of_arms, flag):
         """function __init__
         :param name: str (not empty)
@@ -76,4 +72,7 @@ class Nation:
         scene.addPixmap(pixmap)
 
     def __str__(self):
+        return self.name.title()  # capitalize all words
+
+    def __repr__(self):
         return '\n\tName: %s\n\tComputer: %r\n' % (self.name, self.computer)

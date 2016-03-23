@@ -93,3 +93,10 @@ class LandUnit:
         scene.addItem(item2)
         scene.addItem(item3)
         scene.addItem(item4)
+
+    def __str__(self):
+        """function __str__
+
+        returns string
+        """
+        return "{type} [{exp}/5] of {nation}".format(type=self.unitType, exp=self.experienceLevel, nation=self.nation)

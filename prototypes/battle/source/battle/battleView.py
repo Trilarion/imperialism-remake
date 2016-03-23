@@ -44,7 +44,7 @@ class MainBattleWindow(QMainWindow):
 class MainQGraphicsScene(QGraphicsScene):
     def __init__(self):
         self.battleView = None
-        super(MainQGraphicsScene, self).__init__()
+        super().__init__()
 
     def mousePressEvent(self, event):
         position = QPointF(event.scenePos())
@@ -76,12 +76,13 @@ class BattleView(QObject):
         self.gridLayout = QGridLayout(self.centralWidget)
 
         # misc side elements
-        self.coatOfArmsGraphicsScene = QGraphicsScene()
-        self.currentUnitGraphicsScene = QGraphicsScene()
-        self.targetedUnitGraphicsScene = QGraphicsScene()
-        self.graphicsView_coatOfArm = QGraphicsView(self.coatOfArmsGraphicsScene)
-        self.graphicsView_currentUnit = QGraphicsView(self.currentUnitGraphicsScene)
-        self.graphicsView_targetedUnit = QGraphicsView(self.targetedUnitGraphicsScene)
+        self.graphicsView_coatOfArm = CustomScene()
+        self.graphicsView_currentUnit = CustomScene()
+        self.graphicsView_targetedUnit = CustomScene()
+
+        for button in self.graphicsView_coatOfArm, self.graphicsView_currentUnit, self.graphicsView_targetedUnit:
+            button.enter_functions.append(self.set_label_hint)
+            button.leave_functions.append(self.clear_label_hint)
 
         # buttons
         self.autoCombatButton = CustomButton(self.centralWidget)
@@ -91,9 +92,9 @@ class BattleView(QObject):
         self.nextTargetButton = CustomButton(self.centralWidget)
 
         for button in self.autoCombatButton, self.helpButton, self.retreatButton, self.nextTargetButton, self.endUnitTurnButton:
-            button.add_action_leave(self.clear_label_hint)
-            button.add_action_enter(self.set_label_hint)
-            button.add_action_click(self.click_button)
+            button.enter_functions.append(self.set_label_hint)
+            button.leave_functions.append(self.clear_label_hint)
+            button.click_functions.append(self.click_button)
 
         # info containers
         self.dateLabel = QLabel(self.centralWidget)  # display current turn in battle
@@ -182,7 +183,7 @@ class BattleView(QObject):
 
     def setup_coat_of_arms_view(self):
         size = QSize(90, 120)
-        self.battleView.draw_coat_of_arms(self.coatOfArmsGraphicsScene, size)
+        self.battleView.draw_coat_of_arms(self.graphicsView_coatOfArm.scene(), size)
         self.graphicsView_coatOfArm.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         size_policy = constants.default_size_policy(self.graphicsView_coatOfArm, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_coatOfArm.setSizePolicy(size_policy)
@@ -197,7 +198,7 @@ class BattleView(QObject):
         size = QSize(60, 60)
         army = self.get_computer_army()
         defending = (army == self.battleView.defender)
-        self.battleView.draw_targetted_unit(defending, self.targetedUnitGraphicsScene, size)
+        self.battleView.draw_targetted_unit(defending, self.graphicsView_targetedUnit.scene(), size)
         size_policy = constants.default_size_policy(self.graphicsView_targetedUnit, QSizePolicy.Fixed,
                                                     QSizePolicy.Fixed)
         self.graphicsView_targetedUnit.setSizePolicy(size_policy)
@@ -209,7 +210,7 @@ class BattleView(QObject):
         size = QSize(60, 60)
         army = self.get_human_army()
         defending = (army == self.battleView.defender)
-        self.battleView.draw_current_unit(defending, self.currentUnitGraphicsScene, size)
+        self.battleView.draw_current_unit(defending, self.graphicsView_currentUnit.scene(), size)
         size_policy = constants.default_size_policy(self.graphicsView_currentUnit, QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.graphicsView_currentUnit.setSizePolicy(size_policy)
         self.graphicsView_currentUnit.setMinimumSize(size)
@@ -289,44 +290,67 @@ class BattleView(QObject):
         self.autoCombatButton.setIconSize(QSize(80, 80))
         self.gridLayout.addWidget(self.autoCombatButton, 12, 1, 1, 1)
 
-    # button interaction
-    def clear_label_hint(self, custom_button):
+    # element interactions
+    def clear_label_hint(self, generic_element):
         self.hintLabel.setText('')
 
-    def set_label_hint(self, custom_button):
+    def set_label_hint(self, generic_element):
         text = ''
-        if custom_button == self.autoCombatButton:
+        if generic_element == self.graphicsView_currentUnit:
+            text = str(self.battleView.currentUnit)
+        elif generic_element == self.graphicsView_targetedUnit:
+            text = str(self.battleView.targettedUnit)
+        elif generic_element == self.autoCombatButton:
             text = self.battleWindow.config.get_text('auto.play.label')
-        elif custom_button == self.helpButton:
+        elif generic_element == self.helpButton:
             text = self.battleWindow.config.get_text('help.tacticalbattle.label')
-        elif custom_button == self.retreatButton:
+        elif generic_element == self.retreatButton:
             text = self.battleWindow.config.get_text('retreat.all.label')
-        elif custom_button == self.endUnitTurnButton:
+        elif generic_element == self.endUnitTurnButton:
             text = self.battleWindow.config.get_text('end.unit.label')
-        elif custom_button == self.nextTargetButton:
+        elif generic_element == self.nextTargetButton:
             text = self.battleWindow.config.get_text('next.target.label')
         if text != '':
             self.hintLabel.setText(text)
 
-    def click_button(self, custom_button):
-        if custom_button == self.autoCombatButton:
+    def click_button(self, button_element):
+        if button_element == self.autoCombatButton:
             self.battleView.autoCombat = True
-        elif custom_button == self.helpButton:
+        elif button_element == self.helpButton:
             print('click helpButton')
-        elif custom_button == self.retreatButton:
+        elif button_element == self.retreatButton:
             self.get_human_army().retreat = True
-        elif custom_button == self.endUnitTurnButton:
+        elif button_element == self.endUnitTurnButton:
             print('click endUnitTurnButton')
-        elif custom_button == self.nextTargetButton:
+        elif button_element == self.nextTargetButton:
             print('click nextTargetButton')
 
 
+class CustomScene(QGraphicsView):
+    enter_functions = []
+    leave_functions = []
+
+    def __init__(self):
+        super().__init__(QGraphicsScene())
+
+    def enterEvent(self, event):
+        for f in self.enter_functions:
+            f(self)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        for f in self.leave_functions:
+            f(self)
+        super().leaveEvent(event)
+
+
 class CustomButton(QPushButton):
+    enter_functions = []
+    leave_functions = []
+    click_functions = []
+
     def __init__(self, *__args):
         super().__init__(*__args)
-        self.enter_functions = []
-        self.leave_functions = []
-        self.click_functions = []
         # noinspection PyUnresolvedReferences
         super().clicked.connect(self.click)
 
@@ -343,21 +367,3 @@ class CustomButton(QPushButton):
     def click(self):
         for f in self.click_functions:
             f(self)
-
-    def add_action_enter(self, enter_function):
-        self.enter_functions.append(enter_function)
-
-    def add_action_leave(self, leave_function):
-        self.leave_functions.append(leave_function)
-
-    def add_action_click(self, click_function):
-        self.click_functions.append(click_function)
-
-    def clear_action_enter(self):
-        self.enter_functions = []
-
-    def clear_action_leave(self):
-        self.leave_functions = []
-
-    def clear_action_click(self):
-        self.click_functions = []
