@@ -41,6 +41,7 @@ class ConfigParserExtended(configparser.ConfigParser):
 
     def get_string(self, section, option, default='', pattern=None):
         nb_error = len(self.errors)
+
         try:
             retval = self.get(section, option)
             if pattern is not None and not re.match(pattern, retval):
@@ -49,11 +50,13 @@ class ConfigParserExtended(configparser.ConfigParser):
                     % (self.file_name, section, option, pattern, retval))
             if len(self.errors) == nb_error:
                 return retval
+
         except configparser.NoOptionError:
             self.errors.append('In file \'%s\' and section \'%s\' : Missing mandatory option \'%s\''
                                % (self.file_name, section, option))
         except configparser.NoSectionError:
             self.errors.append('In file \'%s\' : Missing mandatory section \'%s\'' % (self.file_name, section))
+
         return default
 
     def get_int(self, section, option, default=0, int_min=-sys.maxsize + 1, int_max=sys.maxsize,

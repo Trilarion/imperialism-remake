@@ -247,32 +247,57 @@ class Config(ConfigParserExtended):
         return available_nation
 
     def __str__(self):
-        logging.debug('[ENTER] __str__()')
+        return str(self.__unicode__())
+
+    def __unicode__(self):
+        logging.debug('[ENTER] __unicode__()')
+
         themes = '\n'
         for t in self.available_theme:
             themes += '\t\tTheme \'%s\': %s' % (t.name, str(t).replace('\t\t', '\t\t\t'))
+
         units = '\n'
         for u in self.list_unit_type:
             units += '\t\tUnit Type \'%s\': %s' % (u.name, str(u).replace('\t', '\t\t\t'))
+
         nations = '\n'
         for n in self.available_nation:
             nations += '\t\tNation \'%s\': %s' % (n.name, str(n).replace('\t', '\t\t\t'))
+
         langs = ''
         for l in self.available_lang:
             langs += '\n\t\tLang \'%s\': %s' % (l.name, str(l).replace('\t\t', '\t\t\t'))
+
         logging.debug('[EXIT] __str__()')
-        return '\n\tError: %s\n\tLog level: %d\n\tFullscreen: %r\n\tTheme: %s\n\tLang: %s\n\tResolution: %s\n\tBattle map diameter: %d\n' \
-               '\tCity diameter: %d\n\tData folder: %s\n\tLang config file: %s\n\tUnit config file: %s\n\tNation config file: %s\n' \
-               '\tTheme selected: %s\n\tLang Selected: %s\n\tAvailable Themes:%s\n\tAvailable Units: %s\n\tAvailable Nations: %s\n\t' \
-               'Available langs: %s' \
-               % (
-                   self.get_error_str(), self.log_level, self.fullscreen, self.name_theme_selected,
-                   self.name_lang_selected,
-                   self.resolution, self.diameter_battlemap, self.diameter_battlecity, self.data_folder,
-                   self.lang_config_file,
-                   self.unit_config_file, self.nation_config_file, self.theme_selected, self.lang_selected, themes,
-                   units,
-                   nations, langs)
+
+        obj_string = u"""
+        Error: {error}
+        Log level: {loglevel}
+        Fullscreen: {fullscreen}
+        Theme: {theme_name}
+        Language: {language_name}
+        Resolution: {resolution}
+        Battle map diameter: {battle_diameter}
+        City diameter: {city_diameter}
+        Data folder: {data_folder}
+        Lang config file: {lang_config_file}
+        Unit config file: {unit_config_file}
+        Nation config file: {nation_config_file}
+        Theme selected: {theme_selected}
+        Lang Selected: {lang_selected}
+        Available Themes: {themes}
+        Available Units: {units}
+        Available Nations: {nations}
+        Available langs: {langs}"""
+
+        return obj_string.format(
+            error=self.get_error_str(), loglevel=self.log_level, fullscreen=self.fullscreen,
+            theme_name=self.name_theme_selected, language_name=self.name_lang_selected, resolution=self.resolution,
+            battle_diameter=self.diameter_battlemap, city_diameter=self.diameter_battlecity,
+            data_folder=self.data_folder, lang_config_file=self.lang_config_file,
+            unit_config_file=self.unit_config_file, nation_config_file=self.nation_config_file,
+            theme_selected=self.theme_selected, lang_selected=self.lang_selected,
+            themes=themes, units=units, nations=nations, langs=langs)
 
     def check_resolution(self):
         logging.debug('[ENTER] check_resolution(), resolution=%s' % self.resolution)
