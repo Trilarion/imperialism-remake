@@ -19,10 +19,7 @@ from prototypes.battle.source.unit.landUnit import LandUnit
 
 
 class LandUnitInBattle(LandUnit):
-    """Class LandUnitInBattle
-    """
 
-    # Constructor:
     def __init__(self, dead, status, retreat, moral, unit_strength, experience_level, unit_type, nation):
         """function __init__
         :param dead: bool

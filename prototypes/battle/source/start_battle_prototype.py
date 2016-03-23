@@ -20,8 +20,10 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 
-from prototypes.battle.source.battle.battleView import MainBattleWindows
+from prototypes.battle.source.battle.battleView import MainBattleWindow
+from prototypes.battle.source.battle.land.landArmy import LandArmy
 from prototypes.battle.source.battle.land.landBattleView import LandBattleView
+from prototypes.battle.source.battle.land.landUnitInBattle import LandUnitInBattle
 from prototypes.battle.source.config.config import Config
 from prototypes.battle.source.base.constants import version
 
@@ -35,14 +37,28 @@ if __name__ == '__main__':
     app.setWindowIcon(QIcon('icon.png'))
 
     # load config files
-    config = Config(CONFIG_FILE, v)
-
-    # start the battle view
-    mySW = MainBattleWindows(config)
+    window_config = Config(CONFIG_FILE, v)
 
     # Set up a land battle
-    mySW.ui = LandBattleView(mySW, config, None)
-    mySW.ui.setup_ui()
+    nation_uk = window_config.get_nation("uk")
+    nation_uk.computer = True
+    nation_fr = window_config.get_nation("france")
 
-    mySW.show()
+    unit_militia_default = window_config.get_unit_type('Militia I')
+    current_unit = LandUnitInBattle(False, 'Charge', False, 50, 25, 1, unit_militia_default, nation_fr)
+    targetted_unit = LandUnitInBattle(False, 'Shoot', False, 75, 50, 1, unit_militia_default, nation_uk)
+
+    defender = LandArmy(False, None, nation_uk)
+    attacker = LandArmy(False, None, nation_fr)
+
+    initial_battle_state = dict(auto_combat=False, turn=0,
+                                current_unit=current_unit, targetted_unit=targetted_unit,
+                                defender=defender, attacker=attacker)
+
+    # start the battle view
+    mainWindow = MainBattleWindow(window_config)
+    mainWindow.ui = LandBattleView(mainWindow, initial_battle_state, None)
+    mainWindow.ui.setup_ui()
+    mainWindow.show()
+
     sys.exit(app.exec_())

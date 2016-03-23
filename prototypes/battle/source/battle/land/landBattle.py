@@ -22,12 +22,8 @@ from prototypes.battle.source.config.config import Config
 
 
 class LandBattle:
-    """Class LandBattle
-    """
 
-    # Constructor:
-    def __init__(self, config, auto_combat, turn, current_unit,
-                 targetted_unit, defender, attacker):
+    def __init__(self, config, auto_combat, turn, current_unit, targetted_unit, defender, attacker):
         """
         constructor
         :param config: Config
@@ -40,19 +36,20 @@ class LandBattle:
         :return:
         """
         if not isinstance(config, Config) and config.error_msg != '':
-            raise ValueError('size_screen_width must be a int instance')
+            raise ValueError('config must be a Config instance without errors')
         if not isinstance(auto_combat, bool):
             raise ValueError('auto_combat must be a boolean')
         if not isinstance(turn, int) or turn < 0:
             raise ValueError('turn must be an int>0')
         if not isinstance(current_unit, LandUnitInBattle) and current_unit is not None:
-            raise ValueError('current_unit must be a not null LandUnitInBattle')
+            raise ValueError('current_unit must be a valid LandUnitInBattle')
         if not isinstance(targetted_unit, LandUnitInBattle) and targetted_unit is not None:
-            raise ValueError('targetted_unit must be a not null LandUnitInBattle')
+            raise ValueError('targetted_unit must be a valid LandUnitInBattle')
         if not isinstance(defender, LandArmy) or defender is None:
-            raise ValueError('defender must be a not null LandArmy')
+            raise ValueError('defender must be a valid LandArmy')
         if not isinstance(attacker, LandArmy) or attacker is None:
-            raise ValueError('attacker must be a not null LandArmy')
+            raise ValueError('attacker must be a valid LandArmy')
+
         self.autoCombat = auto_combat
         self.turn = turn
         self.currentUnit = current_unit
