@@ -19,7 +19,7 @@ import os
 
 from PyQt5.QtGui import QPixmap
 
-from prototypes.battle.source.battle.landBattleFieldType import LandBattleFieldType
+from prototypes.battle.source.battle.land.landBattleFieldType import LandBattleFieldType
 
 
 class Theme:

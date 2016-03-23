@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from prototypes.battle.source.battle.landArmy import LandArmy
-from prototypes.battle.source.battle.landBattleMap import LandBattleMap
-from prototypes.battle.source.battle.landUnitInBattle import LandUnitInBattle
+from prototypes.battle.source.battle.land.landArmy import LandArmy
+from prototypes.battle.source.battle.land.landBattleMap import LandBattleMap
+from prototypes.battle.source.battle.land.landUnitInBattle import LandUnitInBattle
 from prototypes.battle.source.config.config import Config
 
 

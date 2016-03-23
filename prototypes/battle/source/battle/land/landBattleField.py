@@ -19,7 +19,7 @@ from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QBrush, QPen, QColor
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from prototypes.battle.source.battle.landBattleFieldType import LandBattleFieldType
+from prototypes.battle.source.battle.land.landBattleFieldType import LandBattleFieldType
 from prototypes.battle.source.lib.hexagon import QHexagon
 
 

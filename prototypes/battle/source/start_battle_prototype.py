@@ -20,7 +20,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 
-from prototypes.battle.source.battle.landBattleView import MainBattleWindows
+from prototypes.battle.source.battle.battleView import MainBattleWindows
 from prototypes.battle.source.config.config import Config
 from prototypes.battle.source.base.constants import version
 
