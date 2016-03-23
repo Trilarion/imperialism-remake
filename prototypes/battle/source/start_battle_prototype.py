@@ -21,8 +21,10 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
 
 from prototypes.battle.source.battle.battleView import MainBattleWindows
+from prototypes.battle.source.battle.land.landBattleView import LandBattleView
 from prototypes.battle.source.config.config import Config
 from prototypes.battle.source.base.constants import version
+
 
 CONFIG_FILE = 'config.ini'
 
@@ -37,5 +39,10 @@ if __name__ == '__main__':
 
     # start the battle view
     mySW = MainBattleWindows(config)
+
+    # Set up a land battle
+    mySW.ui = LandBattleView(mySW, config, None)
+    mySW.ui.setup_ui()
+
     mySW.show()
     sys.exit(app.exec_())

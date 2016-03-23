@@ -17,43 +17,24 @@
 
 import math
 
-from PyQt5.QtCore import QSize, Qt, QObject, QMetaObject, QPointF
+from PyQt5.QtCore import QSize, Qt, QMetaObject
 from PyQt5.QtGui import QPixmap, QPalette, QBrush, QIcon
-from PyQt5.QtWidgets import QMessageBox, QWidget, QPushButton, QGridLayout, QLabel, QSpacerItem, QSizePolicy, \
-    QGraphicsScene, QGraphicsView, QMainWindow
+from PyQt5.QtWidgets import QMessageBox, QWidget, QGridLayout, QLabel, QSpacerItem, QSizePolicy, \
+    QGraphicsScene, QGraphicsView
 
 from prototypes.battle.source.base import constants
+from prototypes.battle.source.battle.battleView import BattleView, MainQGraphicsScene, CustomButton
 from prototypes.battle.source.battle.land.landArmy import LandArmy
 from prototypes.battle.source.battle.land.landBattle import LandBattle
 from prototypes.battle.source.battle.land.landUnitInBattle import LandUnitInBattle
 
 
-class MainQGraphicsScene(QGraphicsScene):
-    def __init__(self):
-        self.landBattle = None
-        super(MainQGraphicsScene, self).__init__()
-
-    def mousePressEvent(self, event):
-        position = QPointF(event.scenePos())
-        if self.landBattle is not None:
-            x, y = self.landBattle.map.position_to_grid_position(position)
-            if x >= 0 and y >= 0:
-                print('TODO mouse click on grid ' + str(x) + ';' + str(y))
-                # if ev.button() == Qt.LeftButton:
-                #    item = QtGui.QGraphicsTextItem("CLICK")
-                #    item.setPos(ev.scenePos())
-                #    self.addItem(item)
-
-    def set_land_battle(self, land_battle):
-        self.landBattle = land_battle
-
-
-class LandBattleView(QObject):
+class LandBattleView(BattleView):
     """Class LandBattleView
     """
 
     def __init__(self, battle_window, config, parent=None):
-        super().__init__(parent)
+        super().__init__(battle_window, config, parent)
         self.config = config
         if len(self.config.errors) != 0:
             # noinspection PyArgumentList
@@ -65,7 +46,6 @@ class LandBattleView(QObject):
         self.coatOfArmsGraphicsScene = QGraphicsScene()
         self.currentUnitGraphicsScene = QGraphicsScene()
         self.targetedUnitGraphicsScene = QGraphicsScene()
-        self.mainScene = MainQGraphicsScene()
         self.graphicsView_coatOfArm = QGraphicsView(self.coatOfArmsGraphicsScene)
         self.graphicsView_currentUnit = QGraphicsView(self.currentUnitGraphicsScene)
         self.graphicsView_targetedUnit = QGraphicsView(self.targetedUnitGraphicsScene)
@@ -309,45 +289,3 @@ class LandBattleView(QObject):
         if self.landBattle.attacker.nation.computer:
             return self.landBattle.attacker
         return self.landBattle.defender
-
-
-class CustomButton(QPushButton):
-    def __init__(self, *__args):
-        super().__init__(*__args)
-        self.enter_functions = []
-        self.leave_functions = []
-        self.click_functions = []
-        # noinspection PyUnresolvedReferences
-        super().clicked.connect(self.click)
-
-    def enterEvent(self, event):
-        for f in self.enter_functions:
-            f(self)
-        super().enterEvent(event)
-
-    def leaveEvent(self, event):
-        for f in self.leave_functions:
-            f(self)
-        super().leaveEvent(event)
-
-    def click(self):
-        for f in self.click_functions:
-            f(self)
-
-    def add_action_enter(self, enter_function):
-        self.enter_functions.append(enter_function)
-
-    def add_action_leave(self, leave_function):
-        self.leave_functions.append(leave_function)
-
-    def add_action_click(self, click_function):
-        self.click_functions.append(click_function)
-
-    def clear_action_enter(self):
-        self.enter_functions = []
-
-    def clear_action_leave(self):
-        self.leave_functions = []
-
-    def clear_action_click(self):
-        self.click_functions = []
