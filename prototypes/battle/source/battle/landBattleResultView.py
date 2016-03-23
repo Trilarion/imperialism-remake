@@ -20,8 +20,8 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTextEdit, QGraphicsView, QGraphicsScene, QLabel
 
-from base.constants import version
-from config.config import Config
+from prototypes.battle.source.base.constants import version
+from prototypes.battle.source.config.config import Config
 
 CONFIG_FILE = 'config.ini'
 

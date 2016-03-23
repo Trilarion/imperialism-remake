@@ -19,9 +19,10 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
-from battle.landBattleView import MainBattleWindows
-from config.config import Config
-from base.constants import version
+
+from prototypes.battle.source.battle.landBattleView import MainBattleWindows
+from prototypes.battle.source.config.config import Config
+from prototypes.battle.source.base.constants import version
 
 CONFIG_FILE = 'config.ini'
 
@@ -30,8 +31,10 @@ if __name__ == '__main__':
     print('Battle prototype version: %f' % version())
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon('icon.png'))
+
     # load config files
-    config = Config(CONFIG_FILE,v)
+    config = Config(CONFIG_FILE, v)
+
     # start the battle view
     mySW = MainBattleWindows(config)
     mySW.show()

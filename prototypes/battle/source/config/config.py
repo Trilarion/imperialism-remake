@@ -20,12 +20,13 @@ import logging
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QDesktopWidget
 
-from base.constants import parse_resolution, LOG_FILENAME, LOG_PATTERN, MINIMUM_RESOLUTION
-from config.configparserextended import ConfigParserExtended
-from config.lang import Lang
-from config.theme import Theme
-from nation.nation import Nation
-from unit.landUnitType import LandUnitType
+from prototypes.battle.source.base.constants import parse_resolution, LOG_FILENAME, LOG_PATTERN, MINIMUM_RESOLUTION
+from prototypes.battle.source.config.configparserextended import ConfigParserExtended
+from prototypes.battle.source.config.lang import Lang
+from prototypes.battle.source.config.theme import Theme
+from prototypes.battle.source.nation.nation import Nation
+from prototypes.battle.source.unit.landUnitType import LandUnitType
+
 
 MANDATORY_UNIT_OPTION = ['name', 'description', 'officier', 'level', 'attack', 'range', 'speed', 'creationcost',
                          'upkeep', 'pixmap.charge', 'pixmap.shoot', 'pixmap.stand']
@@ -41,14 +42,16 @@ MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 class Config(ConfigParserExtended):
 
-    def __init__(self, main_config_file,version):
+    def __init__(self, main_config_file, version):
         self.version = version
+
         # load main option
         self.data_folder = 'error'
         ConfigParserExtended.__init__(self, main_config_file)
         self.check_options('config', MANDATORY_CONFIG_OPTION)
         self.check_options('path', MANDATORY_PATH_OPTION)
         self.check_options('battle', MANDATORY_BATTLE_OPTION)
+
         # set log level
         self.log_level = self.get_int('config', 'log_level', expected_values=[50, 40, 30, 20, 10])
         logging.basicConfig(level=self.log_level, filename=LOG_FILENAME, filemode='w', format=LOG_PATTERN)
@@ -56,23 +59,30 @@ class Config(ConfigParserExtended):
         self.name_theme_selected = self.get_string('config', 'theme')
         self.name_lang_selected = self.get_string('config', 'lang')
         self.resolution = self.get_string('config', 'resolution', pattern='^(\d+)\s*x\s*(\d+)$|^maximize$')
+
         # load battle option
         self.diameter_battlemap = self.get_int('battle', 'diameter_battlemap', even=False)
         self.diameter_battlecity = self.get_int('battle', 'diameter_battlecity', even=False)
+
         # load path config
         self.data_folder = self.get_dirname('path', 'data')
         self.lang_config_file = self.get_filename('path', 'lang_config_file')
         self.unit_config_file = self.get_filename('path', 'unit_config_file')
         self.nation_config_file = self.get_filename('path', 'nation_config_file')
+
         # load theme config
         self.theme_selected, self.available_theme = self.load_themes_config()
+
         # load unit config
         self.list_unit_type = self.load_units_config()
+
         # load lang config
         self.lang_selected, self.available_lang = self.load_langs_config()
+
         # load nation config
         self.available_nation = self.load_nations_config()
         self.check_resolution()
+
         logging.info('[END] __init__(main_config_file=%s) => %s' % (main_config_file, str(self)))
 
     def load_themes_config(self):
@@ -99,8 +109,8 @@ class Config(ConfigParserExtended):
                     outside_city_color = self.get_string(section, 'outside_city_color')
                     city_pixmap = self.get_string(section, 'city_pixmap')
                     city_color = self.get_string(section, 'city_color')
-                    victory_pixmap = self.get_string(section, 'victory_graphics',pattern='^.*\.(png|PNG)$')
-                    defeat_pixmap = self.get_string(section, 'defeat_graphics',pattern='^.*\.(png|PNG)$')
+                    victory_pixmap = self.get_string(section, 'victory_graphics', pattern='^.*\.(png|PNG)$')
+                    defeat_pixmap = self.get_string(section, 'defeat_graphics', pattern='^.*\.(png|PNG)$')
                     try:
                         theme = Theme(name, description, coat_of_arms_graphics, flag_graphics, map_graphics,
                                       unit_graphics, background, end_button, autocombat_button, help_button,
@@ -124,8 +134,7 @@ class Config(ConfigParserExtended):
         if len(available_theme) == 0:
             logging.error('No Theme available')
             self.errors.append('No Theme available')
-        logging.debug(
-                '[EXIT] load_themes_config() => found %d themes, selected=%s' % (len(available_theme), theme_selected))
+        logging.debug('[EXIT] load_themes_config() => found %d themes, selected=%s' % (len(available_theme), theme_selected))
         return theme_selected, available_theme
 
     def load_units_config(self):
@@ -203,8 +212,7 @@ class Config(ConfigParserExtended):
         if len(available_lang) == 0:
             logging.error('[ERROR] load_langs_config() : No Lang available')
             self.errors.append('No Lang available')
-        logging.debug(
-                '[EXIT] load_langs_config() => found %d langs, selected %s' % (len(available_lang), str(lang_selected)))
+        logging.debug('[EXIT] load_langs_config() => found %d langs, selected %s' % (len(available_lang), str(lang_selected)))
         return lang_selected, available_lang
 
     def load_nations_config(self):
@@ -345,6 +353,3 @@ class Config(ConfigParserExtended):
                 return unit_type
         logging.debug('[EXIT] get_unit_type(name=\'%s\') return None' % name)
         return None
-
-    
-

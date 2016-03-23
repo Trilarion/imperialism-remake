@@ -20,8 +20,8 @@ from PyQt5.QtCore import QSize, Qt, QUrl
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTextEdit, QGraphicsView, QGraphicsScene, QLabel, QToolBar, QAction, QVBoxLayout
 from PyQt5.QtWebKitWidgets import QWebView, QWebPage
-from config.config import Config
-from base.constants import version
+from prototypes.battle.source.config.config import Config
+from prototypes.battle.source.base.constants import version
 
 """
     Browser based on QtWebKit.QtWebView. Provides Home, Forward, Backward (in history) functionality.

@@ -22,10 +22,10 @@ from PyQt5.QtGui import QPixmap, QPalette, QBrush, QIcon
 from PyQt5.QtWidgets import QMessageBox, QWidget, QPushButton, QGridLayout, QLabel, QSpacerItem, QSizePolicy, \
     QGraphicsScene, QGraphicsView, QMainWindow
 
-from base import constants
-from battle.landArmy import LandArmy
-from battle.landBattle import LandBattle
-from battle.landUnitInBattle import LandUnitInBattle
+from prototypes.battle.source.base import constants
+from prototypes.battle.source.battle.landArmy import LandArmy
+from prototypes.battle.source.battle.landBattle import LandBattle
+from prototypes.battle.source.battle.landUnitInBattle import LandUnitInBattle
 
 
 class MainBattleWindows(QMainWindow):
@@ -276,31 +276,25 @@ class LandBattleView(QObject):
         self.BattleWindow.setMinimumSize(constants.get_min_resolution_qsize())
         self.BattleWindow.setAutoFillBackground(True)
         self.gridLayout.setVerticalSpacing(0)
-        # Label
-        self.setup_hint_label()
-        self.setup_turn_label()
-        # Space item
-        self.setup_space()
-        # Help Push Button
-        self.setup_help_button()
-        # Next Target Button
-        self.setup_next_target_button()
-        # End Unit Button
-        self.setup_end_unit_button()
-        # Retreat Button
-        self.setup_retreat_button()
-        # Automatic battle button
-        self.setup_auto_combat_button()
-        # Targeted Unit view
-        self.setup_targeted_unit_view()
-        # Current Unit View
-        self.setup_current_unit_view()
-        # Coat of Arm view
-        self.setup_coat_of_arms_view()
-        # Main view
-        self.setup_map()
+
+        self.setup_hint_label()  # Labels
+        self.setup_turn_label()  # Labels
+        self.setup_space()  # Space item
+
+        self.setup_help_button()  # Help Push Button
+        self.setup_next_target_button()  # Next Target Button
+        self.setup_end_unit_button()  # End Unit Button
+        self.setup_retreat_button()  # Retreat Button
+        self.setup_auto_combat_button()  # Automatic battle button
+
+        self.setup_targeted_unit_view()  # Targeted Unit view
+        self.setup_current_unit_view()  # Current Unit View
+        self.setup_coat_of_arms_view()  # Coat of Arm view
+
+        self.setup_map()  # Main view
         self.BattleWindow.setPalette(palette)
         self.BattleWindow.setCentralWidget(self.centralWidget)
+
         # noinspection PyArgumentList
         QMetaObject.connectSlotsByName(self.BattleWindow)
 

@@ -17,7 +17,7 @@
 
 import unittest
 
-from battle.landBattleFieldType import LandBattleFieldType
+from prototypes.battle.source.battle.landBattleFieldType import LandBattleFieldType
 
 
 class LandBattleFieldTypeTestCase(unittest.TestCase):

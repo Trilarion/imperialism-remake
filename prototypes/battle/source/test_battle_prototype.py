@@ -50,8 +50,8 @@ for t in testmodules:
     except (ImportError, AttributeError):
         # else, just load all the testcase cases from the module.
         suite.addTest(unittest.defaultTestLoader.loadTestsFromName(t))
-# Ceci lance le testcase si on exécute le script
-# directement.
+
+# Launch the tests if the script is called directly.
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     unittest.TextTestRunner().run(suite)

@@ -20,7 +20,7 @@ import unittest
 
 from PyQt5.QtCore import QPointF
 
-from lib.hexagon import QHexagon
+from prototypes.battle.source.lib.hexagon import QHexagon
 
 
 class QHexagonTestCase(unittest.TestCase):

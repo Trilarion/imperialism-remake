@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from battle.landArmy import LandArmy
-from battle.landBattleMap import LandBattleMap
-from battle.landUnitInBattle import LandUnitInBattle
-from config.config import Config
+from prototypes.battle.source.battle.landArmy import LandArmy
+from prototypes.battle.source.battle.landBattleMap import LandBattleMap
+from prototypes.battle.source.battle.landUnitInBattle import LandUnitInBattle
+from prototypes.battle.source.config.config import Config
 
 
 class LandBattle:

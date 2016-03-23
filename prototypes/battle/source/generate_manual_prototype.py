@@ -18,12 +18,12 @@
 import sys
 
 from PyQt5.QtWidgets import QApplication
-from config.config import Config
-from base.constants import version
+from prototypes.battle.source.config.config import Config
+from prototypes.battle.source.base.constants import version
 
 CONFIG_FILE = 'config.ini'
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     config = Config(CONFIG_FILE, version())
-    print('TODO generate manuel')
+    print('TODO generating manually')

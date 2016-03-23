@@ -19,8 +19,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush
 from PyQt5.QtWidgets import QGraphicsRectItem
 
-from nation.nation import Nation
-from unit.landUnitType import LandUnitType
+from prototypes.battle.source.nation.nation import Nation
+from prototypes.battle.source.unit.landUnitType import LandUnitType
 
 
 class LandUnit:

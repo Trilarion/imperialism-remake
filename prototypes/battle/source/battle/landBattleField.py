@@ -19,8 +19,8 @@ from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QBrush, QPen, QColor
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from battle.landBattleFieldType import LandBattleFieldType
-from lib.hexagon import QHexagon
+from prototypes.battle.source.battle.landBattleFieldType import LandBattleFieldType
+from prototypes.battle.source.lib.hexagon import QHexagon
 
 
 class LandBattleField:
@@ -90,4 +90,3 @@ class LandBattleField:
                     color = Qt.white
                 item = scene.addEllipse(self.position.x(), self.position.y(), 7, 5, brush=QBrush(color))
                 item.setPen(QPen(QColor(0xFF, 0xFF, 0xFF, 0x00)))
-
