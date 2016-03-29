@@ -2,7 +2,7 @@
     Calculates the countour of nation maps
 """
 
-from PySide import QtGui
+from PyQt5 import QtGui
 
 from base import constants as c
 from server.scenario import *

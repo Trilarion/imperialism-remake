@@ -1,14 +1,23 @@
-import base.constants as c
-from server.network import ServerProcess
-from multiprocessing import Pipe
+from PyQt5 import QtNetwork, QtCore
 
-if __name__ == '__main__':
-    parent_conn, child_conn = Pipe()
-    server_process = ServerProcess(c.Network_Port, child_conn)
-    server_process.start()
+def new_server_connection():
+    print('new server connection')
 
-    # stop server
-    parent_conn.send('quit')
-    server_process.join()
+def new_client_connection():
+    print('new client connection')
 
-    print('will exit')
+def setup():
+    server.listen(QtNetwork.QHostAddress.LocalHost, 34543)
+    client_socket.connectToHost(QtNetwork.QHostAddress.LocalHost, 34543)
+
+
+app = QtCore.QCoreApplication([])
+
+server = QtNetwork.QTcpServer()
+server.newConnection.connect(new_server_connection)
+client_socket = QtNetwork.QTcpSocket()
+client_socket.connected.connect(new_client_connection)
+
+QtCore.QTimer.singleShot(0, setup)
+QtCore.QTimer.singleShot(3000, app.quit)
+app.exec_()

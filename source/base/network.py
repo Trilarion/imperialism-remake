@@ -88,6 +88,7 @@ class NetworkClient(Client):
 
             Get the corresponding Channel object and emit its received signal.
         """
+        print(message)
         channel_name = message['channel']
 
         # do we have receivers in this category

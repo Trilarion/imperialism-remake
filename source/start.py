@@ -110,7 +110,7 @@ if __name__ == '__main__':
     #server_process.start()
     from server.network import ServerManager
     server_manager = ServerManager()
-    server_manager.server.start(c.Network_Port)
+    # server_manager.server.start(c.Network_Port) # can't do it here because listen won't work otherwise
 
     # start client, we will return when the programm finishes
     from client import client

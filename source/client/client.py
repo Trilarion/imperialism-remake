@@ -981,12 +981,15 @@ def network_start():
         Starts the local server and connects the local client to it.
     """
 
+    start.server_manager.server.start(c.Network_Port)
+
     # connect network client of client
+    print('will connect to host')
     network_client.connect_to_host(c.Network_Port)
 
     # TODO must be run at the end before app finishes
     # disconnect client
-    # network_client.disconnectFromHost()
+    # client.disconnectFromHost()
 
 def start():
     """

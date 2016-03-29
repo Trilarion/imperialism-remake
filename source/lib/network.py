@@ -36,7 +36,7 @@ class Client(QtCore.QObject):
 
         Additionally sends and reads messages via serialization (yaml), compression (zlib) and wrapping (QByteArray).
     """
-    connected = QtCore.pyqtSignal()
+    #connected = QtCore.pyqtSignal()
     disconnected = QtCore.pyqtSignal()
     error = QtCore.pyqtSignal(QtNetwork.QAbstractSocket.SocketError)
     received = QtCore.pyqtSignal(object)
@@ -68,6 +68,10 @@ class Client(QtCore.QObject):
         self.socket.disconnected.connect(self.disconnected)
         self.socket.bytesWritten.connect(self.count_bytes_written)
 
+    def connected(self):
+        print('client connected')
+        print('{}, {}'.format(self.socket.peerAddress(), self.socket.peerPort()))
+
     def disconnect_from_host(self):
         """
             If you want to disconnect, just call this method which basically just calls the same method on the socket.
@@ -80,7 +84,10 @@ class Client(QtCore.QObject):
         """
         if host is 'local':
             host = SCOPE['local']
+        print('client connects to {} on port {}'.format(host, port))
         self.socket.connectToHost(host, port)
+        print(self.socket.waitForConnected(2000))
+        print(self.socket.error())
 
     def receive(self):
         """
@@ -102,6 +109,8 @@ class Client(QtCore.QObject):
             # decode from utf-8 bytes to unicode and deserialize from yaml
             value = yaml.load(uncompressed.decode())
 
+            print(value)
+
             # print('connection id {} received {}'.format(self.id, value))
             self.received.emit(value)
 
@@ -110,6 +119,7 @@ class Client(QtCore.QObject):
             We send a message back to the client.
             We do it by serialization, compressing and writing of a QByteArray to the TCPSocket.
         """
+        print(value)
         # serialize value to yaml
         serialized = yaml.dump(value, allow_unicode=True)
 
@@ -140,7 +150,11 @@ class Server(QtCore.QObject):
         """
         super().__init__()
         self.server = QtNetwork.QTcpServer(self)
+        self.server.acceptError.connect(self.accept_error)
         self.server.newConnection.connect(self.new_connection)
+
+    def accept_error(self, socket_error):
+        print('accept error {}'.format(socket_error))
 
     def start(self, port, scope='local'):
         """
@@ -148,8 +162,10 @@ class Server(QtCore.QObject):
             QtNetwork.QHostAddress.Any
         """
         host = SCOPE[scope]
-        if not self.server.listen(host, port):
+        print('server listens on {} on port {}'.format(host, port))
+        if not self.server.listen(host, port): # app must run because newconnection is only made when listening
             raise RuntimeError('Network error: cannot listen')
+        print('is listening {}'.format(self.server.isListening()))
 
     def is_listening(self):
         return self.server.isListening()
@@ -172,6 +188,7 @@ class Server(QtCore.QObject):
         """
             Zero or more new clients might be available, emit new_client signal for each of them.
         """
+        print('new connection')
         while self.server.hasPendingConnections():
             # returns a new QTcpSocket
             socket = self.server.nextPendingConnection()
