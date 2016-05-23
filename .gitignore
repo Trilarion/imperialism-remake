@@ -3,5 +3,6 @@
 /data/manual
 /tools/imperialism_map_import.py
 /tools/board-content.json.backup
+/prototypes/battle/source/game.log
 build
 __pycache__

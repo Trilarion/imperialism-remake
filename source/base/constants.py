@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import os
+import sys
 from enum import unique
 
 import lib.utils as u
@@ -41,9 +42,19 @@ def extend(path, *parts):
 Debug_Mode = False
 Used_Resources = set()
 
+# resolve Project_Root directory as the directory that holds the .git folder
+Project_Root = os.getcwd()
+while '.git' not in [_dir for _dir in os.listdir(Project_Root)]:
+    Project_Root = os.path.abspath(os.path.join(Project_Root, ".."))
+    if Debug_Mode:
+        sys.stderr.write("Searching for project root folder in: {0}\n".format(Project_Root))
+    if Project_Root.count(os.sep) == 1:
+        raise SystemExit
+
 # base folders (do not directly contain data)
-Data_Folder = extend('.', 'data')
+Data_Folder = extend(Project_Root, 'data')
 Artwork_Folder = extend(Data_Folder, 'artwork')
+Resources_Folder = extend(Project_Root, 'resources')
 
 # scenarios (save games)
 Scenario_Folder = extend(Data_Folder, 'scenarios')
@@ -63,7 +74,7 @@ Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 Graphics_Map_Folder = extend(Graphics_Folder, 'map')
 
 # special locations
-Manual_Index = extend(Data_Folder, 'manual', 'index.html')
+Manual_Index = extend(Resources_Folder, 'manual', 'index.md')
 Global_Stylesheet = extend(Graphics_UI_Folder, 'style.css')
 
 # other specific constants

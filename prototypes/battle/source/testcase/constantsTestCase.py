@@ -1,5 +1,6 @@
+#!/usr/bin/python3
 # Imperialism remake
-# Copyright (C) 2014 Trilarion
+# Copyright (C) 2015 Spitaels <spitaelsantoine@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,20 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtCore, QtGui
-
-if __name__ == '__main__':
-
-    app = QtGui.QApplication([])
-    app.setStyleSheet('')
-
-    window = QtGui.QMainWindow()
-    window.setWindowTitle('Battle prototype')
-    window.setMinimumSize(800, 600)
-
-    general_menu = window.menuBar().addMenu('General')
+import unittest
 
 
-
-    window.show()
-    app.exec_()
+class ConstantsTestCase(unittest.TestCase):
+    def test_0(self):
+        self.assertTrue(True)

@@ -42,6 +42,10 @@ Only PySide and PyYAML are required for running, Markdown and cx_Freeze are addi
 Check the [API documentation](http://pyside.github.io/docs/pyside/) and also the underlying Qt 4.8 C++
 [API classes overview](http://qt-project.org/doc/qt-4.8/classes.html) which is linked better.
 
+#### PyYAML
+
+[PyYAML](http://pyyaml.org/wiki/PyYAML) is required for running.
+
 #### Markdown
 
 [Markdown](https://pypi.python.org/pypi/Markdown) is required for creating the HTML pages of the manual. 
