@@ -1,31 +1,36 @@
-from PySide import QtCore
+from PyQt5 import QtCore, QtNetwork
 
 from base import constants as c
-from server.network import server_manager
-from client.client import network_client
+from server.network import ServerManager
+from lib.network import Server
+from base.network import Client
 
+server = ServerManager()
+server.server.start(c.Network_Port)
+client = Client()
+client.set_socket()
 
 def setup():
-    server_manager.server.start(c.Network_Port)
-    network_client.connect_to_host(c.Network_Port)
+    client.connect_to_host(c.Network_Port)
+    # print('wait {}'.format(server.server.waitForNewConnection(1000)))
 
 def send():
     message = {
-        'type': 'chat.register',
-        'message': c.MessageType.scenario_preview.value
+        'channel': c.CH_SCENARIO_PREVIEW,
+        'content': None
     }
-    network_client.send(message)
+    client.send(message)
 
     message = {
-        'type' : 'chat.message',
-        'text' : 'Hi guys'
+        'channel' : c.CH_CORE_SCENARIO_TITLES,
+        'content' : 'Hi guys'
     }
-    network_client.send(message)
+    client.send(message)
 
 
 app = QtCore.QCoreApplication([])
 
-QtCore.QTimer.singleShot(0, setup)
-QtCore.QTimer.singleShot(100, send)
+QtCore.QTimer.singleShot(100, setup)
+QtCore.QTimer.singleShot(1000, send)
 QtCore.QTimer.singleShot(3000, app.quit)
 app.exec_()

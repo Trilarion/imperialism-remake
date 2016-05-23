@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 import lib.graphics as g
 from base import tools as t
@@ -26,7 +26,7 @@ from base import tools as t
 """
 
 
-class GameDialog(QtGui.QWidget):
+class GameDialog(QtWidgets.QWidget):
     """
         Create a dialog (widget) with many preconfigured properties (modality, title, parent, content, help callback, ...
 
@@ -38,7 +38,7 @@ class GameDialog(QtGui.QWidget):
     def __init__(self, parent, content, title=None, modal=True, delete_on_close=False, help_callback=None,
                  close_callback=None):
         # no frame but a standalong window
-        super().__init__(parent, f=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
+        super().__init__(parent, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
 
         # we need this
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
@@ -56,39 +56,39 @@ class GameDialog(QtGui.QWidget):
         title_bar = g.DraggableToolBar()
         title_bar.setIconSize(QtCore.QSize(20, 20))
         title_bar.setObjectName('titlebar')
-        title_bar.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Fixed)
+        title_bar.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
         title_bar.dragged.connect(lambda delta: self.move(self.pos() + delta))
 
         # title in titlebar and close icon
-        title = QtGui.QLabel(title)
+        title = QtWidgets.QLabel(title)
         title.setObjectName('gamedialog-title')
         title_bar.addWidget(title)
 
         # spacer between titlebar and help/close icons
-        spacer = QtGui.QWidget()
-        spacer.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        spacer = QtWidgets.QWidget()
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         title_bar.addWidget(spacer)
 
         # if help call back is given, add help icon
         if help_callback:
-            help_action = QtGui.QAction(t.load_ui_icon('icon.help.png'), 'Help', title_bar)
+            help_action = QtWidgets.QAction(t.load_ui_icon('icon.help.png'), 'Help', title_bar)
             help_action.triggered.connect(help_callback)
             title_bar.addAction(help_action)
 
         self.close_callback = close_callback
         # the close button always calls self.close (but in closeEvent we call the close callback if existing)
-        close_action = QtGui.QAction(t.load_ui_icon('icon.close.png'), 'Close', title_bar)
+        close_action = QtWidgets.QAction(t.load_ui_icon('icon.close.png'), 'Close', title_bar)
         close_action.triggered.connect(self.close)
         title_bar.addAction(close_action)
 
         # escape key for close
-        action = QtGui.QAction(self)
+        action = QtWidgets.QAction(self)
         action.setShortcut(QtGui.QKeySequence('Escape'))
         action.triggered.connect(self.close)
         self.addAction(action)
 
         # layout is 2 pixel contents margin (border), title bar and content widget
-        self.layout = QtGui.QVBoxLayout(self)
+        self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setContentsMargins(2, 2, 2, 2)
         self.layout.addWidget(title_bar)
         self.layout.addWidget(content)
@@ -114,8 +114,8 @@ class MiniMapNationItem(g.ClickablePathItem):
         super().__init__(path)
         self.z_entered = z_entered
         self.z_left = z_left
-        self.entered.connect(self.entered_item)
-        self.left.connect(self.left_item)
+        self.signaller.entered.connect(self.entered_item)
+        self.signaller.left.connect(self.left_item)
         self.hover_effect = QtGui.QGraphicsDropShadowEffect()
         self.hover_effect.setOffset(4, 4)
         self.setGraphicsEffect(self.hover_effect)

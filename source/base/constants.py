@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from PyQt5 import QtCore
 import os
 import sys
 from enum import unique
@@ -154,3 +155,8 @@ class NationPropertyKeyNames:
     NAME = 'name'
     DESCRIPTION = 'description'
     CAPITAL_PROVINCE = 'capital_province'
+
+def local_url(relative_path):
+    absolute_path = os.path.abspath(relative_path)
+    url = QtCore.QUrl.fromLocalFile(absolute_path)
+    return url

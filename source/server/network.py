@@ -20,7 +20,7 @@ import time
 from multiprocessing import Process
 from threading import Thread
 
-from PySide import QtCore
+from PyQt5 import QtCore
 
 from lib.network import Server
 import lib.utils as u
@@ -55,10 +55,12 @@ class ServerProcess(Process):
 
         # run event loop of app
         app.exec_()
+        print('end process')
 
     def listen(self, app, server_manager):
         while True:
             message = self.child_conn.recv()
+            print('received message {}'.format(message))
             if message == 'quit':
                 server_manager.server.stop()
                 app.quit()
@@ -96,6 +98,7 @@ class ServerManager(QtCore.QObject):
                 # not any == none
                 break
         client.client_id = new_id
+        print('new client {}'.format(new_id))
 
         # add some general receivers.
         client.connect_to_channel(c.CH_SCENARIO_PREVIEW, self.scenario_preview)
@@ -110,6 +113,7 @@ class ServerManager(QtCore.QObject):
             A server client received a message on the c.CH_CORE_SCENARIO_TITLES channel. Return all available core
             scenario titles and file names.
         """
+        print('receivet core message')
         # get all core scenario files
         scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
 
@@ -133,6 +137,7 @@ class ServerManager(QtCore.QObject):
         titles = {
             'scenarios': scenarios
         }
+        print(scenario_files)
         client.send(message['reply-to'], titles)
 
     def scenario_preview(self, client, message):

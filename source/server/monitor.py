@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 """
     Monitors the server state
 """
 
 
-class ServerMonitorWidget(QtGui.QWidget):
+class ServerMonitorWidget(QtWidgets.QWidget):
     """
         Displays server stats
     """
@@ -29,9 +29,9 @@ class ServerMonitorWidget(QtGui.QWidget):
     def __init__(self):
         super().__init__()
 
-        layout = QtGui.QGridLayout(self)
+        layout = QtWidgets.QGridLayout(self)
 
-        self.status_label = QtGui.QLabel()
+        self.status_label = QtWidgets.QLabel()
         layout.addWidget(self.status_label, 0, 0)
 
         # set timer for update

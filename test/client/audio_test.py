@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+# TODO update to PyQt5
 from PySide import QtGui
 
 from client import audio

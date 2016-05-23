@@ -28,11 +28,11 @@ if __name__ == '__main__':
     if sys.version_info < required_version:
         raise RuntimeError('Python version must be {}.{} at least.'.format(*required_version))
 
-    # test for existence of PySide
+    # test for existence of PyQt5
     try:
-        from PySide import QtCore
+        from PyQt5 import QtCore
     except ImportError:
-        raise RuntimeError('PySide must be installed.')
+        raise RuntimeError('PyQt5 must be installed.')
 
     import os, codecs
 
@@ -63,8 +63,9 @@ if __name__ == '__main__':
     Error_File = os.path.join(User_Folder, 'remake.error.log')
     # in debug mode print to the console instead
     if not c.Debug_Mode:
-        sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
-        sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
+        pass
+        #sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
+        #sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
 
     # import some base libraries
     from base import constants as c
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     # test for phonon availability
     if t.get_option(c.O.PHONON_SUPPORTED):
         try:
-            from PySide.phonon import Phonon
+            from PyQt5.phonon import Phonon
         except ImportError:
             t.log_error('Phonon backend not available, no sound.')
             t.set_option(c.O.PHONON_SUPPORTED, False)
@@ -101,19 +102,24 @@ if __name__ == '__main__':
     # now we can safely assume that the environment is good to us
 
     # start server
-    from server.network import ServerProcess
-    from multiprocessing import Pipe
-    parent_conn, child_conn = Pipe()
-    server_process = ServerProcess(c.Network_Port, child_conn)
-    server_process.start()
+    # TODO in PyQt5 the separate Process does not terminate but hangs for an unknown reason...
+    #from server.network import ServerProcess
+    #from multiprocessing import Pipe
+    #parent_conn, child_conn = Pipe()
+    #server_process = ServerProcess(c.Network_Port, child_conn)
+    #server_process.start()
+    from server.network import ServerManager
+    server_manager = ServerManager()
+    # server_manager.server.start(c.Network_Port) # can't do it here because listen won't work otherwise
 
     # start client, we will return when the programm finishes
     from client import client
     client.start()
 
     # stop server
-    parent_conn.send('quit')
-    server_process.join()
+    #parent_conn.send('quit')
+    #server_process.join()
+    server_manager.server.stop()
 
     # save options
     t.save_options(Options_File)

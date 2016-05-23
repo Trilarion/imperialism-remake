@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PySide import QtCore
-from PySide.phonon import Phonon
+from PyQt5 import QtCore
+# from PyQt5.phonon import Phonon
 
 from lib import utils as u
 from base import constants as c
@@ -30,8 +30,9 @@ def is_mime_type_ogg_available():
     """
         Checks if the ogg mime type 'audio/ogg' is contained in the list of available mime types
     """
-    available_types = Phonon.BackendCapabilities.availableMimeTypes()
-    return 'audio/ogg' in available_types
+    #available_types = Phonon.BackendCapabilities.availableMimeTypes()
+    #return 'audio/ogg' in available_types
+    return False
 
 
 def load_soundtrack_playlist():
@@ -55,7 +56,7 @@ class Player(QtCore.QObject):
         Public attribute: auto_rewind (True means that after the playlist has finished starts again´)
     """
 
-    next = QtCore.Signal(str)
+    next = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
         """
@@ -67,13 +68,13 @@ class Player(QtCore.QObject):
         super().__init__(parent=parent)
 
         # set up audio output and media object and connect both
-        self.audio_output = Phonon.AudioOutput(Phonon.MusicCategory, self)
-        self.media_object = Phonon.MediaObject(self)
-        Phonon.createPath(self.media_object, self.audio_output)
+        #self.audio_output = Phonon.AudioOutput(Phonon.MusicCategory, self)
+        #self.media_object = Phonon.MediaObject(self)
+        #Phonon.createPath(self.media_object, self.audio_output)
 
         # connect signal of media object
-        self.media_object.stateChanged.connect(self.state_changed)
-        self.media_object.aboutToFinish.connect(self.before_finish)
+        #self.media_object.stateChanged.connect(self.state_changed)
+        #self.media_object.aboutToFinish.connect(self.before_finish)
 
         # default values
         self.playlist = []
@@ -95,13 +96,13 @@ class Player(QtCore.QObject):
         if self.playlist:
             # schedule next and start playing
             self.schedule_next()
-            self.media_object.play()
+            #self.media_object.play()
 
     def stop(self):
         """
             Stop playing. Should not do anything if we already stopped before.
         """
-        self.media_object.stop()
+        #self.media_object.stop()
 
     def schedule_next(self):
         """
@@ -109,7 +110,7 @@ class Player(QtCore.QObject):
         """
         if self.playlist:
             next_source = self.playlist[self.song_index][0]
-            self.media_object.enqueue(Phonon.MediaSource(next_source))
+            #self.media_object.enqueue(Phonon.MediaSource(next_source))
 
             next_title = self.playlist[self.song_index][1]
             self.next.emit(next_title)
@@ -136,7 +137,7 @@ class Player(QtCore.QObject):
             See Phonon.MediaObject.stateChanged
         """
         # print('new state {}'.format(new_state))
-        if new_state == Phonon.ErrorState:
-            print(self.media_object.errorType())
-            print(self.media_object.errorString())
-            # TODO turn off music and tell the user about the error
+        #if new_state == Phonon.ErrorState:
+        #    print(self.media_object.errorType())
+        #    print(self.media_object.errorString())
+        #    # TODO turn off music and tell the user about the error

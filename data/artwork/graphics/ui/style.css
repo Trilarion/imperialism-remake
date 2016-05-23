@@ -2,11 +2,6 @@
 	Imperialism Remake UI style definition used by the Qt framework (css)
 */
 
-.QWidget
-{
-	background-color: black;
-}
-
 QWidget#gamedialog
 {
 	border: 1px solid black;
