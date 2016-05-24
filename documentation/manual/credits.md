@@ -1,5 +1,18 @@
 # Credits
 
+## Release 0.2.2
+
+Date: 2016-05-XX
+
+Changes:
+
+- uses PyQt5
+- battle prototype (Antoine Spitaels)
+
+Contribution
+
+- Programming: Trilarion, [Antoine Spitaels](https://github.com/spitaels), [wkoot](https://github.com/wkoot)
+
 ## Release 0.2.1
 
 Date: 2015-02-15

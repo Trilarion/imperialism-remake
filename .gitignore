@@ -1,8 +1,19 @@
-# custom
+# https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
 /.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/dictionaries
+/.idea/vcs.xml
+/.idea/jsLibraryMappings.xml
+
+# python
+
+__pycache__
+
+# ours
+
 /data/manual
 /tools/imperialism_map_import.py
 /tools/board-content.json.backup
 /prototypes/battle/source/game.log
-build
-__pycache__
+/build
+
