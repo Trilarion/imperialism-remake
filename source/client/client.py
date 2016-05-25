@@ -407,7 +407,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             path = path.simplified()
 
             item = MiniMapNationItem(path, 1, 2)
-            item.signaller.clicked.connect(partial(self.map_selected_nation, u.find_in_list(nation_names, nation_name)))
+            item.signaller.clicked.connect(partial(self.map_selected_nation, u.index_of_element(nation_names, nation_name)))
             item.signaller.entered.connect(partial(self.change_map_name, nation_name))
             item.signaller.left.connect(partial(self.change_map_name, ''))
             brush = QtGui.QBrush(color)

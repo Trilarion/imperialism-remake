@@ -35,6 +35,7 @@ from client.editor import EditorScreen
     Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
 """
 
+
 class MapItem(QtCore.QObject):
     """
         Holds together a clickable QPixmapItem, a description text and a reference to a label that shows the text
@@ -226,8 +227,8 @@ class GameLobbyWidget(QtWidgets.QWidget):
 
             # noinspection PyCallByClass
             file_name = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', c.Scenario_Folder,
-                                                  'Scenario Files (*.scenario)')[0]
+                QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', c.Scenario_Folder,
+                                                      'Scenario Files (*.scenario)')[0]
             if file_name:
                 # TODO check that it is a valid single player scenario in play
                 pass
@@ -306,10 +307,10 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         super().__init__()
 
         # add a channel for us
-        network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
+        #network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
 
         # send a message and ask for preview
-        network_client.send(c.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
+        #network_client.send(c.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
 
         self.selected_nation = None
 
@@ -318,7 +319,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             Populates the widget after the network reply comes from the server with the preview.
         """
         # immediately close the channel, we do not want to get this message twice
-        network_client.remove_channel(self.CH_PREVIEW)
+        #network_client.remove_channel(self.CH_PREVIEW)
 
         # fill the widget with useful stuff
         layout = QtWidgets.QGridLayout(self)
@@ -411,7 +412,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             path = path.simplified()
 
             item = MiniMapNationItem(path, 1, 2)
-            item.signaller.clicked.connect(partial(self.map_selected_nation, u.find_in_list(nation_names, nation_name)))
+            item.signaller.clicked.connect(partial(self.map_selected_nation, u.index_of_element(nation_names, nation_name)))
             item.signaller.entered.connect(partial(self.change_map_name, nation_name))
             item.signaller.left.connect(partial(self.change_map_name, ''))
             brush = QtGui.QBrush(color)
@@ -871,11 +872,11 @@ class Client:
         self.notification = None
 
         # audio player
-        #self.player = audio.Player()
-        #self.player.next.connect(self.audio_notification)
-        #self.player.set_playlist(audio.load_soundtrack_playlist())
+        # self.player = audio.Player()
+        # self.player.next.connect(self.audio_notification)
+        # self.player.set_playlist(audio.load_soundtrack_playlist())
         # start audio player if wished
-        #if not t.get_option(c.O.BG_MUTE):
+        # if not t.get_option(c.O.BG_MUTE):
         #    self.player.start()
 
         # after the player starts, the main window is not active anymore

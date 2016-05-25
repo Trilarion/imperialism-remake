@@ -20,8 +20,8 @@ from PyQt5 import QtWidgets, QtWebEngineWidgets
     Browser based on QtWebKit.QtWebView. Provides Home, Forward, Backward (in history) functionality.
 """
 
-class BrowserWidget(QtWidgets.QWidget):
 
+class BrowserWidget(QtWidgets.QWidget):
     def __init__(self, home_url, icon_provider):
         super().__init__()
 

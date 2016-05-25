@@ -25,7 +25,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 """
 
 
-class RelativeLayoutConstraint():
+class RelativeLayoutConstraint:
     """
         Defines a relative position. The position depends on our own size, the parent rectangle and a constant offset.
     """
@@ -87,81 +87,11 @@ class RelativeLayoutConstraint():
 def calculate_relative_position(parent_rect, own_size, constraint):
     """
         Returns the left, upper corner of an object if the parent_rectangle is given and our own size and a relative
-        position constraint.
+        layout constraint (see RelativeLayoutConstraint).
     """
     x = parent_rect.x() + constraint.x[0] * parent_rect.width() + constraint.x[1] * own_size.width() + constraint.x[2]
     y = parent_rect.y() + constraint.y[0] * parent_rect.height() + constraint.y[1] * own_size.height() + constraint.y[2]
     return x, y
-
-
-class Notification(QtCore.QObject):
-    """
-        Holding a small widget (notification), the fading animations and a position specifier together.
-
-        Also has signals, currently only when finished. Connect to if you want to be notified of the ending.
-    """
-    finished = QtCore.pyqtSignal()
-    clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
-
-    def __init__(self, parent, content, fade_duration=2000, stay_duration=2000, position_constraint=None):
-        """
-            parent - parent widget (QWidget)
-            content - either a widget or a string (is then placed into a QLabel widget)
-                style it with stylesheet and modifier 'notification'
-            fade_duration - duration of fade in/out in ms
-            stay_duration - duration of stay in ms (if 0 stays forever)
-            position_constraint - a RelativeLayoutConstraint to be used with method calculate_relative_position()
-        """
-        super().__init__()
-
-        # create a clickable widget as standalone window and without a frame
-        self.widget = ClickableWidget(parent, QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
-
-        # widget must be translucent, otherwise when setting semi-transparent background colors
-        self.widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-
-        # connect widget clicked signal to our clicked signal
-        self.widget.clicked.connect(self.clicked.emit)
-
-        # replace content by QLabel if content is a string
-        if isinstance(content, str):
-            content = QtWidgets.QLabel(content)
-            content.setObjectName('notification')
-
-        # set background
-        layout = QtWidgets.QVBoxLayout(self.widget)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(content)
-
-        # fade animation
-        self.fade = FadeAnimation(self.widget)
-        self.fade.set_duration(fade_duration)
-
-        # fading out and waiting for fading out makes only sense if a positive stay_duration has been given
-        if stay_duration > 0:
-            # when fade out has finished, emit finished
-            self.fade.fadeout_finished.connect(self.finished.emit)
-
-            # timer for fading out animation
-            self.timer = QtCore.QTimer()
-            self.timer.setSingleShot(True)
-            self.timer.setInterval(stay_duration)
-            self.timer.timeout.connect(self.fade.fadeout)
-
-            # start the timer as soon as the fading in animation has finished
-            self.fade.fadein_finished.connect(self.timer.start)
-
-        # if given, set a position
-        if parent is not None and position_constraint is not None:
-            x, y = calculate_relative_position(parent.geometry(), content.sizeHint(), position_constraint)
-            self.widget.move(QtCore.QPoint(x, y))
-
-    def show(self):
-        """
-            Show and start fade in
-        """
-        self.widget.show()
-        self.fade.fadein()
 
 
 class RelativeLayout(QtWidgets.QLayout):
@@ -241,6 +171,76 @@ class RelativeLayout(QtWidgets.QLayout):
         return QtCore.QSize(min_width, min_height)
 
 
+class Notification(QtCore.QObject):
+    """
+        Holding a small widget (notification), the fading animations and a position specifier together.
+
+        Also has signals, currently only when finished. Connect to if you want to be notified of the ending.
+    """
+    finished = QtCore.pyqtSignal()
+    clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
+
+    def __init__(self, parent, content, fade_duration=2000, stay_duration=2000, position_constraint=None):
+        """
+            parent - parent widget (QWidget)
+            content - either a widget or a string (is then placed into a QLabel widget)
+                style it with stylesheet and modifier 'notification'
+            fade_duration - duration of fade in/out in ms
+            stay_duration - duration of stay in ms (if 0 stays forever)
+            position_constraint - a RelativeLayoutConstraint to be used with method calculate_relative_position()
+        """
+        super().__init__()
+
+        # create a clickable widget as standalone window and without a frame
+        self.widget = ClickableWidget(parent, QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
+
+        # widget must be translucent, otherwise when setting semi-transparent background colors
+        self.widget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+
+        # connect widget clicked signal to our clicked signal
+        self.widget.clicked.connect(self.clicked.emit)
+
+        # replace content by QLabel if content is a string
+        if isinstance(content, str):
+            content = QtWidgets.QLabel(content)
+            content.setObjectName('notification')
+
+        # set background
+        layout = QtWidgets.QVBoxLayout(self.widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(content)
+
+        # fade animation
+        self.fade = FadeAnimation(self.widget)
+        self.fade.set_duration(fade_duration)
+
+        # fading out and waiting for fading out makes only sense if a positive stay_duration has been given
+        if stay_duration > 0:
+            # when fade out has finished, emit finished
+            self.fade.fadeout_finished.connect(self.finished.emit)
+
+            # timer for fading out animation
+            self.timer = QtCore.QTimer()
+            self.timer.setSingleShot(True)
+            self.timer.setInterval(stay_duration)
+            self.timer.timeout.connect(self.fade.fadeout)
+
+            # start the timer as soon as the fading in animation has finished
+            self.fade.fadein_finished.connect(self.timer.start)
+
+        # if given, set a position
+        if parent is not None and position_constraint is not None:
+            x, y = calculate_relative_position(parent.geometry(), content.sizeHint(), position_constraint)
+            self.widget.move(QtCore.QPoint(x, y))
+
+    def show(self):
+        """
+            Show and start fade in
+        """
+        self.widget.show()
+        self.fade.fadein()
+
+
 class FadeAnimation(QtCore.QObject):
     """
         Fade animation on a QtWidgets.QGraphicsItem. As usual a reference to an instance must be stored.
@@ -305,7 +305,7 @@ class FadeAnimation(QtCore.QObject):
             self.fadeout_finished.emit()
 
 
-class GraphicsItemSet():
+class GraphicsItemSet:
     """
         A set of QGraphicsItem elements.
         Some collective actions are possible like setting a Z-value to each of them.
@@ -331,7 +331,7 @@ class GraphicsItemSet():
             item.setZValue(level)
 
 
-class ZStackingManager():
+class ZStackingManager:
     """
         Puts several QtWidgets.QGraphicsItem into different sets (floors) and in the end sets their z-value so that lower
         floors have lower z-value.
@@ -415,6 +415,7 @@ def make_widget_clickable(parent):
         Takes any QtWidgets.QWidget derived class and emits a signal emitting on mousePressEvent.
     """
 
+    # noinspection PyPep8Naming
     class ClickableWidgetSubclass(parent):
         clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
 
@@ -435,6 +436,7 @@ def make_widget_draggable(parent):
         we can use it to listen to dragging or implement dragging.
     """
 
+    # noinspection PyPep8Naming
     class DraggableWidgetSubclass(parent):
         dragged = QtCore.pyqtSignal(QtCore.QPoint)
 
@@ -461,8 +463,8 @@ def make_widget_draggable(parent):
 
     return DraggableWidgetSubclass
 
-class ClickableGraphicsItemSignaller(QtCore.QObject):
 
+class ClickableGraphicsItemSignaller(QtCore.QObject):
     entered = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
     left = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
     clicked = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneMouseEvent)
@@ -471,6 +473,7 @@ class ClickableGraphicsItemSignaller(QtCore.QObject):
         super().__init__()
 
 
+# noinspection PyPep8Naming
 def make_GraphicsItem_clickable(parent):
     """
         Takes a QtWidgets.QGraphicsItem and adds signals for entering, leaving and clicking on the item. For this the item
@@ -479,8 +482,8 @@ def make_GraphicsItem_clickable(parent):
     """
 
     # class ClickableGraphicsItem(parent, QtCore.QObject):
+    # noinspection PyPep8Naming
     class ClickableGraphicsItem(parent):
-
         def __init__(self, *args, **kwargs):
             """
                 QGraphicsItems by default do not accept hover events or accept mouse buttons (for performance reasons).
@@ -517,6 +520,7 @@ def make_GraphicsItem_clickable(parent):
     return ClickableGraphicsItem
 
 
+# noinspection PyPep8Naming
 def make_GraphicsItem_draggable(parent):
     """
         Takes a QtWidgets.QGraphicsItem and adds signals for dragging the object around. For this the item must have the
@@ -524,6 +528,7 @@ def make_GraphicsItem_draggable(parent):
         some performance hit attached.
     """
 
+    # noinspection PyPep8Naming
     class DraggableGraphicsItem(parent, QtCore.QObject):
         changed = QtCore.pyqtSignal(object)
 
@@ -548,6 +553,7 @@ def make_GraphicsItem_draggable(parent):
             return parent.itemChange(self, change, value)
 
     return DraggableGraphicsItem
+
 
 # Some classes we need (just to make the naming clear), Name will be used in Stylesheet selectors
 DraggableToolBar = make_widget_draggable(QtWidgets.QToolBar)
@@ -580,6 +586,7 @@ class ClockLabel(QtWidgets.QLabel):
         """
         text = datetime.now().strftime('%H:%M')
         self.setText(text)
+
 
 # some constant expressions
 TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)

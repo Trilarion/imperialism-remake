@@ -160,12 +160,12 @@ class List2D:
         self._array[index] = v
 
 
-def find_in_list(data, element):
+def index_of_element(sequence, element):
     """
         Finds the index of a certain element in a list. Returns the index of the first occurence or ValueError if the
         element is not contained in the list. This is a slow operation (O(n)).
     """
-    for index, e in enumerate(data):
+    for index, e in enumerate(sequence):
         if e == element:
             return index
     return ValueError
