@@ -1,4 +1,4 @@
-from PyQt5 import QtNetwork, QtCore
+from PyQt5 import QtCore, QtNetwork
 
 def new_server_connection():
     print('new server connection')

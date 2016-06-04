@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+from PyQt5 import QtCore
 import os
+import sys
 from enum import unique
 
 import lib.utils as u
@@ -37,14 +39,23 @@ def extend(path, *parts):
         Used_Resources.add(extended)
     return extended
 
-
 # debug mode and helpers
 Debug_Mode = False
 Used_Resources = set()
 
+# resolve Project_Root directory as the directory that holds the .git folder
+Project_Root = os.getcwd()
+while '.git' not in [_dir for _dir in os.listdir(Project_Root)]:
+    Project_Root = os.path.abspath(os.path.join(Project_Root, ".."))
+    if Debug_Mode:
+        sys.stderr.write("Searching for project root folder in: {0}\n".format(Project_Root))
+    if Project_Root.count(os.sep) == 1:
+        raise SystemExit
+
 # base folders (do not directly contain data)
-Data_Folder = extend('.', 'data')
+Data_Folder = extend(Project_Root, 'data')
 Artwork_Folder = extend(Data_Folder, 'artwork')
+Resources_Folder = extend(Project_Root, 'resources')
 
 # scenarios (save games)
 Scenario_Folder = extend(Data_Folder, 'scenarios')
@@ -64,7 +75,7 @@ Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
 Graphics_Map_Folder = extend(Graphics_Folder, 'map')
 
 # special locations
-Manual_Index = extend(Data_Folder, 'manual', 'index.html')
+Manual_Index = extend(Resources_Folder, 'manual', 'index.md')
 Global_Stylesheet = extend(Graphics_UI_Folder, 'style.css')
 
 # other specific constants
@@ -75,30 +86,28 @@ Network_Port = 42932
 # minimal screen resolution
 Screen_Min_Size = (1024, 768)
 
-
 # options
 
 @unique
 class O(u.AutoNumberedEnum):
     VERSION = ()
-    # to be displayed on the start screen
+        # to be displayed on the start screen
     LS_OPEN = ()
-    # local server accepts outside connections
+        # local server accepts outside connections
     LS_NAME = ()
     MW_BOUNDS = ()
     MW_MAXIMIZED = ()
     FULLSCREEN = ()
-    # we start full screen (can be unset by the program for some linux desktop environments
+        # we start full screen (can be unset by the program for some linux desktop environments
     FULLSCREEN_SUPPORTED = ()
-    # is full screen supported
+        # is full screen supported
     PHONON_SUPPORTED = ()
     BG_MUTE = ()
 
     def __init__(self):
         self.default = None
 
-
-Options = O.__members__  # dictionary of name, Enum-value pairs
+Options = O.__members__ # dictionary of name, Enum-value pairs
 
 # default values for the Options
 O.VERSION.default = 'v0.2.2 (2015-??-??)'
@@ -124,9 +133,6 @@ class TileDirections(u.AutoNumberedEnum):
     SouthEast = ()
     SouthWest = ()
 
-    def __init__(self):
-        self.default = None
-
 
 class PropertyKeyNames:
     """
@@ -149,3 +155,8 @@ class NationPropertyKeyNames:
     NAME = 'name'
     DESCRIPTION = 'description'
     CAPITAL_PROVINCE = 'capital_province'
+
+def local_url(relative_path):
+    absolute_path = os.path.abspath(relative_path)
+    url = QtCore.QUrl.fromLocalFile(absolute_path)
+    return url

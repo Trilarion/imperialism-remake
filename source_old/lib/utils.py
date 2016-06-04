@@ -19,6 +19,7 @@ import zipfile
 
 import yaml
 
+
 """
     General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
     to our project.
@@ -61,11 +62,9 @@ def write_as_yaml(file_name, value):
     """
     with open(file_name, 'w') as file:
         yaml.dump(value, file, allow_unicode=True, Dumper=Dumper)
-
-
 # TODO are keys of dictionaries in YAML sorted automatically?
 
-class ZipArchiveReader:
+class ZipArchiveReader():
     """
         Encapsulates a zip file and reads binary files from it, or even converts from JSON to a Python object.
 
@@ -88,8 +87,8 @@ class ZipArchiveReader:
         """
             First reads the file as byte array, then convert to UTF-8, then convert by YAML to Python object.
         """
-        data = self.read(name)
-        obj = yaml.load(data.decode(), Loader=Loader)
+        bytes = self.read(name)
+        obj = yaml.load(bytes.decode(), Loader=Loader)
         return obj
 
     def __del__(self):
@@ -99,7 +98,7 @@ class ZipArchiveReader:
         self.zip.close()
 
 
-class ZipArchiveWriter:
+class ZipArchiveWriter():
     """
         Ecapsulates a zip file to write files into it or even whole Python objects via JSON.
     """
@@ -110,18 +109,18 @@ class ZipArchiveWriter:
         """
         self.zip = zipfile.ZipFile(file, mode='w', compression=zipfile.ZIP_DEFLATED)
 
-    def write(self, name, data):
+    def write(self, name, bytes):
         """
             Writes a byte array to an entry in the zip file.
         """
-        self.zip.writestr(name, data)
+        self.zip.writestr(name, bytes)
 
     def write_as_yaml(self, name, obj):
         """
             Write a Python object via YAML into an entry in the zip file.
         """
-        data = yaml.dump(obj, allow_unicode=True, Dumper=Dumper).encode()
-        self.write(name, data)
+        bytes = yaml.dump(obj, allow_unicode=True, Dumper=Dumper).encode()
+        self.write(name, bytes)
 
     def __del__(self):
         """
@@ -130,7 +129,7 @@ class ZipArchiveWriter:
         self.zip.close()
 
 
-class List2D:
+class List2D():
     """
         Implements an 2D array with getter and setter for two indices (x,y). Based on list.
     """
@@ -160,12 +159,12 @@ class List2D:
         self._array[index] = v
 
 
-def index_of_element(sequence, element):
+def find_in_list(data, element):
     """
         Finds the index of a certain element in a list. Returns the index of the first occurence or ValueError if the
         element is not contained in the list. This is a slow operation (O(n)).
     """
-    for index, e in enumerate(sequence):
+    for index, e in enumerate(data):
         if e == element:
             return index
     return ValueError
