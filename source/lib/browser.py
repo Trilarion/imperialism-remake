@@ -14,19 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PyQt5 import QtWidgets, QtWebKitWidgets
+import PyQt5.QtWidgets as QtWidgets
+import PyQt5.QtWebEngineWidgets as QtWebEngineWidgets
 
 """
-    Browser based on QtWebKit.QtWebView. Provides Home, Forward, Backward (in history) functionality.
+    Browser based on QtWebEngineWidgets.QWebEngineView. Provides Home, Forward, Backward (history) functionality.
 """
+
 
 class BrowserWidget(QtWidgets.QWidget):
+    def __init__(self, icon_provider):
+        """
 
-    def __init__(self, home_url, icon_provider):
+        """
         super().__init__()
 
-        # store home url
-        self.home_url = home_url
+        # start with empty home url
+        self.home_url = None
 
         # create and add tool bar on top (non floatable or movable)
         tool_bar = QtWidgets.QToolBar(self)
@@ -35,31 +39,29 @@ class BrowserWidget(QtWidgets.QWidget):
         action_home = QtWidgets.QAction(self)
         action_home.setIcon(icon_provider('icon.home.png'))
         action_home.setToolTip('Home')
-        action_home.triggered.connect(self.load_home_url)
+        action_home.triggered.connect(self.home)
         tool_bar.addAction(action_home)
 
         action_backward = QtWidgets.QAction(self)
-        action_backward.setEnabled(False)
+        action_backward.setEnabled(False) # initially not enabled
         action_backward.setIcon(icon_provider('icon.backward.png'))
         tool_bar.addAction(action_backward)
         self.action_backward = action_backward
 
         action_forward = QtWidgets.QAction(self)
-        action_forward.setEnabled(False)
+        action_forward.setEnabled(False) # initially not enabled
         action_forward.setIcon(icon_provider('icon.forward.png'))
         tool_bar.addAction(action_forward)
         self.action_forward = action_forward
 
-        # create and add web view, connect linkClicked signal with our newPage method
-        web_view = QtWebKitWidgets.QWebView()
-        # must set DelegationPolicy to include all links
-        web_view.page().setLinkDelegationPolicy(QtWebKitWidgets.QWebPage.DelegateAllLinks)
-        web_view.linkClicked.connect(self.load)
+        # create and add web view, also store history
+        web_view = QtWebEngineWidgets.QWebEngineView()
         self.web_view = web_view
+        self.web_view.loadFinished.connect(self.validate_forward_backward_actions)
 
         # wire forward, backward
-        action_backward.triggered.connect(web_view.back)
-        action_forward.triggered.connect(web_view.forward)
+        action_backward.triggered.connect(self.backward)
+        action_forward.triggered.connect(self.forward)
 
         # set Layout
         layout = QtWidgets.QVBoxLayout(self)
@@ -67,13 +69,30 @@ class BrowserWidget(QtWidgets.QWidget):
         layout.addWidget(tool_bar)
         layout.addWidget(web_view)
 
-    def load_home_url(self):
-        self.load(self.home_url)
+    def home(self):
+        """
 
-    def load(self, url):
-        self.web_view.load(url)
+        """
+        if self.home_url:
+            self.web_view.load(self.home_url)
+            self.web_view.history().clear()  # deletes the history
+            # TODO this doesn't work, do it after it is loaded...
 
-        # update enabled disabled status of actions
-        history = self.web_view.history()
-        self.action_backward.setEnabled(history.canGoBack())
-        self.action_forward.setEnabled(history.canGoForward())
+    def forward(self):
+        """
+
+        """
+        self.web_view.history().forward()
+
+    def backward(self):
+        """
+
+        """
+        self.web_view.history().back()
+
+    def validate_forward_backward_actions(self):
+        """
+
+        """
+        self.action_backward.setEnabled(self.web_view.history().canGoBack())
+        self.action_forward.setEnabled(self.web_view.history().canGoForward())

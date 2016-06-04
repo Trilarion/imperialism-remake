@@ -14,8 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import gui.browser as browser
+"""
+    Starts the browser
+"""
+
+import PyQt5.QtWidgets as QtWidgets
+import PyQt5.QtGui as QtGui
+import PyQt5.QtCore as QtCore
+from lib.browser import BrowserWidget
 
 if __name__ == '__main__':
 
-    help = browser.BrowserWindow()
+    app = QtWidgets.QApplication([])
+
+    widget = BrowserWidget(lambda x: QtGui.QIcon())
+    widget.home_url = QtCore.QUrl(("http://qt-project.org/"))
+    widget.show()
+
+    app.exec_()

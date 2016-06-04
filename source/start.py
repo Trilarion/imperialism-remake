@@ -24,7 +24,7 @@ if __name__ == '__main__':
     import sys
 
     # test for python version
-    required_version = (3, 4)
+    required_version = (3, 5)
     if sys.version_info < required_version:
         raise RuntimeError('Python version must be {}.{} at least.'.format(*required_version))
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
 
-    import os, codecs
+    import os
 
     # determine home dir
     if os.name == 'posix':
@@ -56,6 +56,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         c.Debug_Mode = True
+    if c.Debug_Mode:
         print('debug mode is on')
 
     # redirect output to log files (will be overwritten at each start)
@@ -63,15 +64,15 @@ if __name__ == '__main__':
     Error_File = os.path.join(User_Folder, 'remake.error.log')
     # in debug mode print to the console instead
     if not c.Debug_Mode:
-        pass
-        #sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
-        #sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
+        pass  # TODO change for production code
+        # sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
+        # sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
 
     # import some base libraries
     from base import constants as c
     from base import tools as t
 
-    # search for existing options file, if not existing, save it once (should just save an empty dictionary
+    # search for existing options file, if not existing, save it once (should just save an empty dictionary)
     Options_File = os.path.join(User_Folder, 'options.info')
     if not os.path.exists(Options_File):
         t.save_options(Options_File)
@@ -80,13 +81,7 @@ if __name__ == '__main__':
     t.load_options(Options_File)
     t.log_info('options loaded from user folder ({})'.format(User_Folder))
 
-    # test for phonon availability
-    if t.get_option(c.O.PHONON_SUPPORTED):
-        try:
-            from PyQt5.phonon import Phonon
-        except ImportError:
-            t.log_error('Phonon backend not available, no sound.')
-            t.set_option(c.O.PHONON_SUPPORTED, False)
+    # TODO test for Phonon or Multimedia
 
     # special case of some desktop environments under Linux where full screen mode does not work well
     if t.get_option(c.O.FULLSCREEN_SUPPORTED):
@@ -101,25 +96,11 @@ if __name__ == '__main__':
 
     # now we can safely assume that the environment is good to us
 
-    # start server
-    # TODO in PyQt5 the separate Process does not terminate but hangs for an unknown reason...
-    #from server.network import ServerProcess
-    #from multiprocessing import Pipe
-    #parent_conn, child_conn = Pipe()
-    #server_process = ServerProcess(c.Network_Port, child_conn)
-    #server_process.start()
-    from server.network import ServerManager
-    server_manager = ServerManager()
-    # server_manager.server.start(c.Network_Port) # can't do it here because listen won't work otherwise
-
     # start client, we will return when the programm finishes
     from client import client
     client.start()
 
-    # stop server
-    #parent_conn.send('quit')
-    #server_process.join()
-    server_manager.server.stop()
+    # client finished
 
     # save options
     t.save_options(Options_File)

@@ -26,7 +26,6 @@ from base.constants import PropertyKeyNames as k
 import client.graphics as cg
 from server.scenario import Scenario
 
-
 """
     GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
     know anything about the scenario, we put it in the server module.
@@ -313,14 +312,10 @@ class EditorMainMap(QtWidgets.QGraphicsView):
 
         # TODO should load only once and cache (universal cache)
         # load all textures
-        brushes = {}
-        brushes[0] = QtGui.QBrush(QtGui.QColor(64, 64, 255))
-        brushes[1] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-        brushes[2] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-        brushes[3] = QtGui.QBrush(QtGui.QColor(64, 255, 64))
-        brushes[4] = QtGui.QBrush(QtGui.QColor(222, 222, 222))
-        brushes[5] = QtGui.QBrush(QtGui.QColor(0, 128, 0))
-        brushes[6] = QtGui.QBrush(QtGui.QColor(222, 222, 0))
+        brushes = {0: QtGui.QBrush(QtGui.QColor(64, 64, 255)), 1: QtGui.QBrush(QtGui.QColor(64, 255, 64)),
+                   2: QtGui.QBrush(QtGui.QColor(64, 255, 64)), 3: QtGui.QBrush(QtGui.QColor(64, 255, 64)),
+                   4: QtGui.QBrush(QtGui.QColor(222, 222, 222)), 5: QtGui.QBrush(QtGui.QColor(0, 128, 0)),
+                   6: QtGui.QBrush(QtGui.QColor(222, 222, 0))}
 
         # fill the ground layer with ocean
         item = self.scene.addRect(0, 0, width, height, brush=brushes[0], pen=g.TRANSPARENT_PEN)
@@ -703,13 +698,18 @@ class EditorScreen(QtWidgets.QWidget):
         self.toolbar.setIconSize(QtCore.QSize(32, 32))
         self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
                                                self.show_new_scenario_dialog))
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, self.load_scenario_dialog))
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog))
+        self.toolbar.addAction(
+            g.create_action(t.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, self.load_scenario_dialog))
+        self.toolbar.addAction(
+            g.create_action(t.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog))
 
         self.toolbar.addSeparator()
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.general.png'), 'Edit base properties', self, self.show_general_properties_dialog))
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog))
-        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self, self.show_provinces_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.general.png'), 'Edit base properties', self,
+                                               self.show_general_properties_dialog))
+        self.toolbar.addAction(
+            g.create_action(t.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog))
+        self.toolbar.addAction(g.create_action(t.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
+                                               self.show_provinces_dialog))
 
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -781,7 +781,8 @@ class EditorScreen(QtWidgets.QWidget):
         """
         # noinspection PyCallByClass
         file_name = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder,
+                                                  'Scenario Files (*.scenario)')[
                 0]
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
@@ -794,7 +795,8 @@ class EditorScreen(QtWidgets.QWidget):
         """
         # noinspection PyCallByClass
         file_name = \
-            QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
+            QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder,
+                                                  'Scenario Files (*.scenario)')[
                 0]
         if file_name:
             self.scenario.save(file_name)

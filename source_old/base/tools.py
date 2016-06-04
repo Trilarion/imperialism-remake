@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import datetime
-import os
 import sys
+import datetime
 
 from PyQt5 import QtGui, QtCore
 
-from base import constants as c
 from lib.utils import read_as_yaml, write_as_yaml
+from base import constants as c
+
 
 """
     Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.
@@ -79,7 +79,6 @@ def find_unused_resources():
     """
     pass  # TODO not implemented yet
 
-
 # singleton options dictionary (we only need one throughout the application)
 options = {}
 
@@ -107,20 +106,17 @@ def load_options(file_name):
     if rect is not None:
         set_option(c.O.MW_BOUNDS, QtCore.QRect(*rect))
 
-
 def get_option(option):
     """
         For an option (OptionEnum in Constants), returns the entry in the options dictionary stored here.
     """
     return options[option.name]
 
-
 def set_option(option, value):
     """
         For an option (OptionEnum in Constants), sets the entry of the options dictionary store here to a certain value.
     """
     options[option.name] = value
-
 
 def save_options(file_name):
     """
@@ -134,9 +130,3 @@ def save_options(file_name):
 
     # write to file
     write_as_yaml(file_name, data)
-
-
-def local_url(relative_path):
-    absolute_path = os.path.abspath(relative_path)
-    url = QtCore.QUrl.fromLocalFile(absolute_path)
-    return url

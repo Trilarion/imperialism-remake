@@ -116,7 +116,7 @@ class MiniMapNationItem(g.ClickablePathItem):
         self.z_left = z_left
         self.signaller.entered.connect(self.entered_item)
         self.signaller.left.connect(self.left_item)
-        self.hover_effect = QtGui.QGraphicsDropShadowEffect()
+        self.hover_effect = QtWidgets.QGraphicsDropShadowEffect()
         self.hover_effect.setOffset(4, 4)
         self.setGraphicsEffect(self.hover_effect)
         # the graphics effect is enabled initially, disable by calling left_item
