@@ -6,12 +6,12 @@ from lib.network import Server
 from base.network import Client
 
 server = ServerManager()
-server.server.start(c.Network_Port)
+server.server.start(c.NETWORK_PORT)
 client = Client()
 client.set_socket()
 
 def setup():
-    client.connect_to_host(c.Network_Port)
+    client.connect_to_host(c.NETWORK_PORT)
     # print('wait {}'.format(server.server.waitForNewConnection(1000)))
 
 def send():

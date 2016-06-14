@@ -10,7 +10,7 @@ from server.scenario import *
 # load scenario
 
 scenario = Scenario()
-scenario.load(c.extend(c.Core_Scenario_Folder, 'Europe1814.scenario'))
+scenario.load(c.extend(c.CORE_SCENARIO_FOLDER, 'Europe1814.scenario'))
 
 # nation map
 columns = scenario[MAP_COLUMNS]

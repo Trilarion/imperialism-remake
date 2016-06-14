@@ -18,9 +18,11 @@ import datetime
 import os
 import sys
 
-from PyQt5 import QtGui, QtCore
+import PyQt5.QtGui as QtGui
+import PyQt5.QtCore as QtCore
 
-from base import constants as c
+import base.constants as constants
+
 from lib.utils import read_as_yaml, write_as_yaml
 
 """
@@ -30,9 +32,9 @@ from lib.utils import read_as_yaml, write_as_yaml
 
 def load_ui_icon(name):
     """
-        Load an icon from a base icon path.
+        Loads an icon from a base icon path.
     """
-    file_name = c.extend(c.Graphics_UI_Folder, name)
+    file_name = constants.extend(constants.GRAPHICS_UI_FOLDER, name)
     return QtGui.QIcon(file_name)
 
 
@@ -94,18 +96,18 @@ def load_options(file_name):
 
     # delete entries that are not in Constants.Options
     for key in list(options.keys()):
-        if key not in c.Options:
+        if key not in constants.Options:
             del options[key]
 
     # copy values that are in Constants.Options but not here
-    for key in c.Options:
+    for key in constants.Options:
         if key not in options:
-            options[key] = c.Options[key].default
+            options[key] = constants.Options[key].default
 
     # main window bounding rectangle, convert from list to QRect
-    rect = get_option(c.O.MW_BOUNDS)
+    rect = get_option(constants.Opt.MW_BOUNDS)
     if rect is not None:
-        set_option(c.O.MW_BOUNDS, QtCore.QRect(*rect))
+        set_option(constants.Opt.MW_BOUNDS, QtCore.QRect(*rect))
 
 
 def get_option(option):
@@ -129,14 +131,17 @@ def save_options(file_name):
     data = options.copy()
 
     # main window bounding rectangle, convert from QRect to list
-    rect = data[c.O.MW_BOUNDS.name]
-    data[c.O.MW_BOUNDS.name] = [rect.x(), rect.y(), rect.width(), rect.height()]
+    rect = data[constants.Opt.MW_BOUNDS.name]
+    data[constants.Opt.MW_BOUNDS.name] = [rect.x(), rect.y(), rect.width(), rect.height()]
 
     # write to file
     write_as_yaml(file_name, data)
 
 
 def local_url(relative_path):
+    """
+        Some things have problems with URLs with relative paths, that's why we convert to absolute paths before.
+    """
     absolute_path = os.path.abspath(relative_path)
     url = QtCore.QUrl.fromLocalFile(absolute_path)
     return url

@@ -19,6 +19,9 @@
     Start in project root folder and with 'debug' as parameter if wished.
 """
 
+def exception_hook(type, value, tback):
+    sys.__excepthook__(type, value, tback)
+
 if __name__ == '__main__':
 
     import sys
@@ -34,65 +37,65 @@ if __name__ == '__main__':
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
 
+    # because PyQt5 snarfs exceptions in the event thread this workaround
+    sys.excepthook = exception_hook
+
     import os
 
     # determine home dir
     if os.name == 'posix':
         # Linux / Unix
-        User_Folder = os.path.join(os.getenv('HOME'), 'Imperialism Remake User Data')
+        user_folder = os.path.join(os.getenv('HOME'), 'Imperialism Remake User Data')
     if (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
         # MS Windows
-        User_Folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
+        user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
     else:
-        User_Folder = 'User Data'
-    print('user data stored in: {}'.format(User_Folder))
+        user_folder = 'User Data'
+    print('user data stored in: {}'.format(user_folder))
 
     # if not exist, create user folder
-    if not os.path.isdir(User_Folder):
-        os.mkdir(User_Folder)
+    if not os.path.isdir(user_folder):
+        os.mkdir(user_folder)
 
-    # determine Debug_Mode from runtime arguments
-    from base import constants as c
+    # determine DEBUG_MODE from runtime arguments
+    import base.constants as constants
 
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        c.Debug_Mode = True
-    if c.Debug_Mode:
+        constants.DEBUG_MODE = True
+    if constants.DEBUG_MODE:
         print('debug mode is on')
 
     # redirect output to log files (will be overwritten at each start)
-    Log_File = os.path.join(User_Folder, 'remake.log')
-    Error_File = os.path.join(User_Folder, 'remake.error.log')
+    Log_File = os.path.join(user_folder, 'remake.log')
+    Error_File = os.path.join(user_folder, 'remake.error.log')
     # in debug mode print to the console instead
-    if not c.Debug_Mode:
-        pass  # TODO change for production code
-        # sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
-        # sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
+    if not constants.DEBUG_MODE:
+        import codecs
+        sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
+        sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
 
     # import some base libraries
-    from base import constants as c
-    from base import tools as t
+    import base.tools as tools
 
     # search for existing options file, if not existing, save it once (should just save an empty dictionary)
-    Options_File = os.path.join(User_Folder, 'options.info')
+    Options_File = os.path.join(user_folder, 'options.info')
     if not os.path.exists(Options_File):
-        t.save_options(Options_File)
+        tools.save_options(Options_File)
 
     # create single options object, load options and send a log message
-    t.load_options(Options_File)
-    t.log_info('options loaded from user folder ({})'.format(User_Folder))
-
-    # TODO test for Phonon or Multimedia
+    tools.load_options(Options_File)
+    tools.log_info('options loaded from user folder ({})'.format(user_folder))
 
     # special case of some desktop environments under Linux where full screen mode does not work well
-    if t.get_option(c.O.FULLSCREEN_SUPPORTED):
+    if tools.get_option(constants.Opt.FULLSCREEN_SUPPORTED):
         desktop_session = os.environ.get("DESKTOP_SESSION")
         if desktop_session and (desktop_session.startswith('ubuntu') or 'xfce' in desktop_session
                                 or desktop_session.startswith('xubuntu') or 'gnome' in desktop_session):
-            t.set_option(c.O.FULLSCREEN_SUPPORTED, False)
-            t.log_warning(
+            tools.set_option(constants.Opt.FULLSCREEN_SUPPORTED, False)
+            tools.log_warning(
                 'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
-    if not t.get_option(c.O.FULLSCREEN_SUPPORTED):
-        t.set_option(c.O.FULLSCREEN, False)
+    if not tools.get_option(constants.Opt.FULLSCREEN_SUPPORTED):
+        tools.set_option(constants.Opt.FULLSCREEN, False)
 
     # now we can safely assume that the environment is good to us
 
@@ -103,12 +106,12 @@ if __name__ == '__main__':
     # client finished
 
     # save options
-    t.save_options(Options_File)
-    t.log_info('options saved')
+    tools.save_options(Options_File)
+    tools.log_info('options saved')
 
     # report on unused resources
-    if c.Debug_Mode:
-        t.find_unused_resources()
+    if constants.DEBUG_MODE:
+        tools.find_unused_resources()
 
     # good bye message
-    t.log_info('will exit soon - good bye')
+    tools.log_info('will exit soon - good bye')

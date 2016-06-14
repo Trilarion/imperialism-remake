@@ -334,7 +334,7 @@ class Scenario(QtCore.QObject):
 
         """
         # read rules
-        rule_file = c.extend(c.Scenario_Ruleset_Folder, self._properties['rules'])
+        rule_file = c.extend(c.SCENARIO_RULESET_FOLDER, self._properties['rules'])
         self._properties['rules'] = u.read_as_yaml(rule_file)
 
     def save(self, file_name):

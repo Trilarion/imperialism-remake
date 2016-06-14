@@ -115,10 +115,10 @@ class ServerManager(QtCore.QObject):
         """
         print('receivet core message')
         # get all core scenario files
-        scenario_files = [x for x in os.listdir(c.Core_Scenario_Folder) if x.endswith('.scenario')]
+        scenario_files = [x for x in os.listdir(c.CORE_SCENARIO_FOLDER) if x.endswith('.scenario')]
 
         # joing the path
-        scenario_files = [os.path.join(c.Core_Scenario_Folder, x) for x in scenario_files]
+        scenario_files = [os.path.join(c.CORE_SCENARIO_FOLDER, x) for x in scenario_files]
 
         # read scenario titles
         scenario_titles = []

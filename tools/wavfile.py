@@ -233,7 +233,7 @@ def write(filename, rate, data):
 
     try:
         dkind = data.dtype.kind
-        if not (dkind == 'i' or dkind == 'f' or (dkind == 'u' and data.dtype.itemsize == 1)):
+        if not (dkind == 'i' or dkind == 'f' or (dkind == 'utils' and data.dtype.itemsize == 1)):
             raise ValueError("Unsupported data type '%s'" % data.dtype)
 
         fid.write(b'RIFF')

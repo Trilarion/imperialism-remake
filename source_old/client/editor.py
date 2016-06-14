@@ -406,7 +406,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
             item.setZValue(5)
 
         # draw towns and names
-        city_pixmap = QtGui.QPixmap(c.extend(c.Graphics_Map_Folder, 'city.png'))
+        city_pixmap = QtGui.QPixmap(c.extend(c.GRAPHICS_MAP_FOLDER, 'city.png'))
         for nation in self.scenario.all_nations():
             # get all provinces of this nation
             provinces = self.scenario.get_provinces_of_nation(nation)
@@ -781,7 +781,7 @@ class EditorScreen(QtWidgets.QWidget):
         """
         # noinspection PyCallByClass
         file_name = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', c.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[
                 0]
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
@@ -794,7 +794,7 @@ class EditorScreen(QtWidgets.QWidget):
         """
         # noinspection PyCallByClass
         file_name = \
-            QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', c.Scenario_Folder, 'Scenario Files (*.scenario)')[
+            QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', c.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[
                 0]
         if file_name:
             self.scenario.save(file_name)

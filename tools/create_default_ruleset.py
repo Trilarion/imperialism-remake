@@ -38,6 +38,6 @@ terrain_names = {
 rules['terrain.names'] = terrain_names
 
 # save
-file = c.Scenario_Ruleset_Standard_File
+file = c.SCENARIO_RULESET_STANDARD_FILE
 print('write to {}'.format(file))
 u.write_as_yaml(file, rules)

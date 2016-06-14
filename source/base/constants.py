@@ -17,7 +17,7 @@
 import os
 from enum import unique
 
-import lib.utils as u
+import lib.utils as utils
 
 """
     Game specific path locations for artwork, music, ...
@@ -33,53 +33,53 @@ def extend(path, *parts):
     extended = os.path.join(path, *parts)
     if not os.path.exists(extended):
         raise RuntimeError('constructed path {} does not exist'.format(extended))
-    if Debug_Mode:
-        Used_Resources.add(extended)
+    if DEBUG_MODE:
+        used_resources.add(extended)
     return extended
 
 
 # debug mode and helpers
-Debug_Mode = False
-Used_Resources = set()
+DEBUG_MODE = False
+used_resources = set()
 
 # base folders (do not directly contain data)
-Data_Folder = extend('.', 'data')
-Artwork_Folder = extend(Data_Folder, 'artwork')
+DATA_FOLDER = extend('.', 'data')
+ARTWORK_FOLDER = extend(DATA_FOLDER, 'artwork')
 
 # scenarios (save games)
-Scenario_Folder = extend(Data_Folder, 'scenarios')
-Core_Scenario_Folder = extend(Scenario_Folder, 'core')
-Scenario_Ruleset_Folder = extend(Scenario_Folder, 'rules')
-Scenario_Ruleset_Standard_File = extend(Scenario_Ruleset_Folder, 'standard.rules')
-# Saved_Scenario_Folder = extend(Scenario_Folder, 'saved')
+SCENARIO_FOLDER = extend(DATA_FOLDER, 'scenarios')
+CORE_SCENARIO_FOLDER = extend(SCENARIO_FOLDER, 'core')
+SCENARIO_RULESET_FOLDER = extend(SCENARIO_FOLDER, 'rules')
+SCENARIO_RULESET_STANDARD_FILE = extend(SCENARIO_RULESET_FOLDER, 'standard.rules')
+# Saved_Scenario_Folder = extend(SCENARIO_FOLDER, 'saved')
 
 # music related folders
-Music_Folder = extend(Artwork_Folder, 'music')
-Soundtrack_Folder = extend(Music_Folder, 'soundtrack')
-Soundtrack_Playlist = extend(Soundtrack_Folder, 'playlist.info')
+MUSIC_FOLDER = extend(ARTWORK_FOLDER, 'music')
+SOUNDTRACK_FOLDER = extend(MUSIC_FOLDER, 'soundtrack')
+SOUNDTRACK_INFO_FILE = extend(SOUNDTRACK_FOLDER, 'soundtrack.info')
 
 # graphics related folders
-Graphics_Folder = extend(Artwork_Folder, 'graphics')
-Graphics_UI_Folder = extend(Graphics_Folder, 'ui')
-Graphics_Map_Folder = extend(Graphics_Folder, 'map')
+GRAPHICS_FOLDER = extend(ARTWORK_FOLDER, 'graphics')
+GRAPHICS_UI_FOLDER = extend(GRAPHICS_FOLDER, 'ui')
+GRAPHICS_MAP_FOLDER = extend(GRAPHICS_FOLDER, 'map')
 
 # special locations
-Manual_Index = extend(Data_Folder, 'manual', 'index.html')
-Global_Stylesheet = extend(Graphics_UI_Folder, 'style.css')
+DOCUMENTATION_INDEX_FILE = extend(DATA_FOLDER, 'manual', 'index.html')
+GLOBAL_STYLESHEET_FILE = extend(GRAPHICS_UI_FOLDER, 'style.css')
 
 # other specific constants
 
 # network communication
-Network_Port = 42932
+NETWORK_PORT = 42932
 
 # minimal screen resolution
-Screen_Min_Size = (1024, 768)
+MINIMAL_SCREEN_SIZE = (1024, 768)
 
 
 # options
 
 @unique
-class O(u.AutoNumberedEnum):
+class Opt(utils.AutoNumberedEnum):
     VERSION = ()
     # to be displayed on the start screen
     LS_OPEN = ()
@@ -98,22 +98,22 @@ class O(u.AutoNumberedEnum):
         self.default = None
 
 
-Options = O.__members__  # dictionary of name, Enum-value pairs
+Options = Opt.__members__  # dictionary of name, Enum-value pairs
 
 # default values for the Options
-O.VERSION.default = 'v0.2.2 (2015-??-??)'
-O.LS_OPEN.default = False
-O.LS_NAME.default = 'server name'
-O.FULLSCREEN.default = True
-O.PHONON_SUPPORTED.default = True
-O.BG_MUTE.default = False
+Opt.VERSION.default = 'v0.2.2 (2015-??-??)'
+Opt.LS_OPEN.default = False
+Opt.LS_NAME.default = 'server name'
+Opt.FULLSCREEN.default = True
+Opt.PHONON_SUPPORTED.default = True
+Opt.BG_MUTE.default = False
 
 # predefined channel names for network communication
 CH_SCENARIO_PREVIEW = 'general.scenario.preview'
 CH_CORE_SCENARIO_TITLES = 'general.core.scenarios.titles'
 
 
-class TileDirections(u.AutoNumberedEnum):
+class TileDirections(utils.AutoNumberedEnum):
     """
         Six directions for six neighbored tiles in clockwise order.
     """

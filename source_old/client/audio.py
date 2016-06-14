@@ -41,10 +41,10 @@ def load_soundtrack_playlist():
 
         A playlist is a list where each entry is a list of two strings: filepath, title
     """
-    playlist = u.read_as_yaml(c.Soundtrack_Playlist)
+    playlist = u.read_as_yaml(c.SOUNDTRACK_INFO_FILE)
     # add the soundtrack folder to each file name
     for entry in playlist:
-        entry[0] = c.extend(c.Soundtrack_Folder, entry[0])
+        entry[0] = c.extend(c.SOUNDTRACK_FOLDER, entry[0])
     return playlist
 
 

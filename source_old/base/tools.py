@@ -32,7 +32,7 @@ def load_ui_icon(name):
     """
         Load an icon from a base icon path.
     """
-    file_name = c.extend(c.Graphics_UI_Folder, name)
+    file_name = c.extend(c.GRAPHICS_UI_FOLDER, name)
     return QtGui.QIcon(file_name)
 
 
@@ -102,9 +102,9 @@ def load_options(file_name):
             options[key] = c.Options[key].default
 
     # main window bounding rectangle, convert from list to QRect
-    rect = get_option(c.O.MW_BOUNDS)
+    rect = get_option(c.Opt.MW_BOUNDS)
     if rect is not None:
-        set_option(c.O.MW_BOUNDS, QtCore.QRect(*rect))
+        set_option(c.Opt.MW_BOUNDS, QtCore.QRect(*rect))
 
 def get_option(option):
     """
@@ -125,8 +125,8 @@ def save_options(file_name):
     data = options.copy()
 
     # main window bounding rectangle, convert from QRect to list
-    rect = data[c.O.MW_BOUNDS.name]
-    data[c.O.MW_BOUNDS.name] = [rect.x(), rect.y(), rect.width(), rect.height()]
+    rect = data[c.Opt.MW_BOUNDS.name]
+    data[c.Opt.MW_BOUNDS.name] = [rect.x(), rect.y(), rect.width(), rect.height()]
 
     # write to file
     write_as_yaml(file_name, data)

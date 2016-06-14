@@ -16,7 +16,9 @@
 
 from datetime import datetime
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+import PyQt5.QtCore as QtCore
+import PyQt5.QtGui as QtGui
+import PyQt5.QtWidgets as QtWidgets
 
 """
     Graphics (Qt) based objects and algorithms that do not depend specifically on the project but only on Qt.

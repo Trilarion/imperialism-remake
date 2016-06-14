@@ -51,18 +51,18 @@ if __name__ == '__main__':
     if not os.path.isdir(User_Folder):
         os.mkdir(User_Folder)
 
-    # determine Debug_Mode from runtime arguments
+    # determine DEBUG_MODE from runtime arguments
     from base import constants as c
 
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        c.Debug_Mode = True
+        c.DEBUG_MODE = True
         print('debug mode is on')
 
     # redirect output to log files (will be overwritten at each start)
     Log_File = os.path.join(User_Folder, 'remake.log')
     Error_File = os.path.join(User_Folder, 'remake.error.log')
     # in debug mode print to the console instead
-    if not c.Debug_Mode:
+    if not c.DEBUG_MODE:
         pass
         #sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
         #sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
@@ -81,23 +81,23 @@ if __name__ == '__main__':
     t.log_info('options loaded from user folder ({})'.format(User_Folder))
 
     # test for phonon availability
-    if t.get_option(c.O.PHONON_SUPPORTED):
+    if t.get_option(c.Opt.PHONON_SUPPORTED):
         try:
             from PyQt5.phonon import Phonon
         except ImportError:
             t.log_error('Phonon backend not available, no sound.')
-            t.set_option(c.O.PHONON_SUPPORTED, False)
+            t.set_option(c.Opt.PHONON_SUPPORTED, False)
 
     # special case of some desktop environments under Linux where full screen mode does not work well
-    if t.get_option(c.O.FULLSCREEN_SUPPORTED):
+    if t.get_option(c.Opt.FULLSCREEN_SUPPORTED):
         desktop_session = os.environ.get("DESKTOP_SESSION")
         if desktop_session and (desktop_session.startswith('ubuntu') or 'xfce' in desktop_session
                                 or desktop_session.startswith('xubuntu') or 'gnome' in desktop_session):
-            t.set_option(c.O.FULLSCREEN_SUPPORTED, False)
+            t.set_option(c.Opt.FULLSCREEN_SUPPORTED, False)
             t.log_warning(
                 'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
-    if not t.get_option(c.O.FULLSCREEN_SUPPORTED):
-        t.set_option(c.O.FULLSCREEN, False)
+    if not t.get_option(c.Opt.FULLSCREEN_SUPPORTED):
+        t.set_option(c.Opt.FULLSCREEN, False)
 
     # now we can safely assume that the environment is good to us
 
@@ -106,11 +106,11 @@ if __name__ == '__main__':
     #from server.network import ServerProcess
     #from multiprocessing import Pipe
     #parent_conn, child_conn = Pipe()
-    #server_process = ServerProcess(c.Network_Port, child_conn)
+    #server_process = ServerProcess(c.NETWORK_PORT, child_conn)
     #server_process.start()
     from server.network import ServerManager
     server_manager = ServerManager()
-    # server_manager.server.start(c.Network_Port) # can't do it here because listen won't work otherwise
+    # server_manager.server.start(c.NETWORK_PORT) # can't do it here because listen won't work otherwise
 
     # start client, we will return when the programm finishes
     from client import client
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     t.log_info('options saved')
 
     # report on unused resources
-    if c.Debug_Mode:
+    if c.DEBUG_MODE:
         t.find_unused_resources()
 
     # good bye message

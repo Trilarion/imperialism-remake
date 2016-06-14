@@ -92,7 +92,7 @@ class StartScreen(QtWidgets.QWidget):
 
         layout = g.RelativeLayout(self)
 
-        start_image = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, 'start.background.jpg'))
+        start_image = QtGui.QPixmap(c.extend(c.GRAPHICS_UI_FOLDER, 'start.background.jpg'))
         start_image_item = QtWidgets.QGraphicsPixmapItem(start_image)
         start_image_item.setZValue(1)
 
@@ -120,7 +120,7 @@ class StartScreen(QtWidgets.QWidget):
             'options': client.show_options_dialog
         }
 
-        image_map_file = c.extend(c.Graphics_UI_Folder, 'start.overlay.info')
+        image_map_file = c.extend(c.GRAPHICS_UI_FOLDER, 'start.overlay.info')
         image_map = u.read_as_yaml(image_map_file)
 
         # security check, they have to be the same
@@ -129,7 +129,7 @@ class StartScreen(QtWidgets.QWidget):
 
         for k, v in image_map.items():
             # add action from our predefined action dictionary
-            pixmap = QtGui.QPixmap(c.extend(c.Graphics_UI_Folder, v['overlay']))
+            pixmap = QtGui.QPixmap(c.extend(c.GRAPHICS_UI_FOLDER, v['overlay']))
             mapitem = MapItem(view, pixmap, label=subtitle, description=v['label'])
             mapitem.item.setZValue(3)
             offset = v['offset']
@@ -142,7 +142,7 @@ class StartScreen(QtWidgets.QWidget):
             frame_item.setZValue(4)
             scene.addItem(mapitem.item)
 
-        version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'.format(t.get_option(c.O.VERSION)))
+        version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'.format(t.get_option(c.Opt.VERSION)))
         version_label.layout_constraint = g.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
@@ -222,7 +222,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
         if checked is True:
 
             # noinspection PyCallByClass
-            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', c.Scenario_Folder,
+            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', c.SCENARIO_FOLDER,
                                                           'Scenario Files (*.scenario)')[0]
             if file_name:
                 # TODO check that it is a valid single player scenario in play
@@ -616,7 +616,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
 
         # full screen mode
         checkbox = QtWidgets.QCheckBox('Full screen mode')
-        self.register_checkbox(checkbox, c.O.FULLSCREEN)
+        self.register_checkbox(checkbox, c.Opt.FULLSCREEN)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -642,7 +642,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
 
         # mute checkbox
         checkbox = QtWidgets.QCheckBox('Mute background music')
-        self.register_checkbox(checkbox, c.O.BG_MUTE)
+        self.register_checkbox(checkbox, c.Opt.BG_MUTE)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -688,7 +688,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
         l = QtWidgets.QVBoxLayout()
         # accepts incoming connections checkbox
         checkbox = QtWidgets.QCheckBox('Accepts incoming connections')
-        self.register_checkbox(checkbox, c.O.LS_OPEN)
+        self.register_checkbox(checkbox, c.Opt.LS_OPEN)
         l.addWidget(checkbox)
         # alias name edit box
         l2 = QtWidgets.QHBoxLayout()
@@ -697,7 +697,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
         edit.setFixedWidth(300)
         l2.addWidget(edit)
         l2.addStretch()
-        self.register_lineedit(edit, c.O.LS_NAME)
+        self.register_lineedit(edit, c.Opt.LS_NAME)
         l.addLayout(l2)
         # actions toolbar
         l2 = QtWidgets.QHBoxLayout()
@@ -752,7 +752,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
                 for (box, option) in self.checkboxes:
                     t.set_option(option, box.isChecked())
                 # what else do we need to do?
-                if t.get_option(c.O.BG_MUTE):
+                if t.get_option(c.Opt.BG_MUTE):
                     # t.player.stop()
                     pass
                 else:
@@ -775,7 +775,7 @@ class MainWindow(QtWidgets.QWidget):
         """
         super().__init__()
         # set geometry
-        self.setGeometry(t.get_option(c.O.MW_BOUNDS))
+        self.setGeometry(t.get_option(c.Opt.MW_BOUNDS))
         # set icon
         self.setWindowIcon(t.load_ui_icon('icon.ico'))
         # set title
@@ -787,17 +787,17 @@ class MainWindow(QtWidgets.QWidget):
         self.content = None
 
         # show in full screen, maximized or normal
-        if t.get_option(c.O.FULLSCREEN):
+        if t.get_option(c.Opt.FULLSCREEN):
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
             self.showFullScreen()
-        elif t.get_option(c.O.MW_MAXIMIZED):
+        elif t.get_option(c.Opt.MW_MAXIMIZED):
             self.showMaximized()
         else:
             self.show()
 
         # loading animation
         # TODO animation right and start, stop in client
-        self.animation = QtGui.QMovie(c.extend(c.Graphics_UI_Folder, 'loading.gif'))
+        self.animation = QtGui.QMovie(c.extend(c.GRAPHICS_UI_FOLDER, 'loading.gif'))
         # self.animation.start()
         self.loading_label = QtWidgets.QLabel(self, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
         self.loading_label.setAttribute(QtCore.Qt.WA_TranslucentBackground)
@@ -829,7 +829,7 @@ class Client():
         self.main_window = MainWindow()
 
         # help browser
-        self.help_browser_widget = BrowserWidget(c.local_url(c.Manual_Index), t.load_ui_icon)
+        self.help_browser_widget = BrowserWidget(c.local_url(c.DOCUMENTATION_INDEX_FILE), t.load_ui_icon)
         self.help_browser_widget.load_home_url()
         self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
@@ -859,7 +859,7 @@ class Client():
         self.player.next.connect(self.audio_notification)
         self.player.set_playlist(audio.load_soundtrack_playlist())
         # start audio player if wished
-        if not t.get_option(c.O.BG_MUTE):
+        if not t.get_option(c.Opt.BG_MUTE):
             self.player.start()
 
         # after the player starts, the main window is not active anymore
@@ -966,8 +966,8 @@ class Client():
             Cleans up and closes the main window which causes app.exec_() to finish.
         """
         # store state in options
-        t.set_option(c.O.MW_BOUNDS, self.main_window.normalGeometry())
-        t.set_option(c.O.MW_MAXIMIZED, self.main_window.isMaximized())
+        t.set_option(c.Opt.MW_BOUNDS, self.main_window.normalGeometry())
+        t.set_option(c.Opt.MW_MAXIMIZED, self.main_window.isMaximized())
 
         # audio
         # self.player.stop()
@@ -981,11 +981,11 @@ def network_start():
         Starts the local server and connects the local client to it.
     """
 
-    start.server_manager.server.start(c.Network_Port)
+    start.server_manager.server.start(c.NETWORK_PORT)
 
     # connect network client of client
     print('will connect to host')
-    network_client.connect_to_host(c.Network_Port)
+    network_client.connect_to_host(c.NETWORK_PORT)
 
     # TODO must be run at the end before app finishes
     # disconnect client
@@ -1004,20 +1004,20 @@ def start():
     # test for desktop availability
     desktop = app.desktop()
     rect = desktop.screenGeometry()
-    if rect.width() < c.Screen_Min_Size[0] or rect.height() < c.Screen_Min_Size[1]:
+    if rect.width() < c.MINIMAL_SCREEN_SIZE[0] or rect.height() < c.MINIMAL_SCREEN_SIZE[1]:
         # noinspection PyTypeChecker
         QtGui.QMessageBox.warning(None, 'Warning',
-                                  'Actual screen size below minimal screen size {}.'.format(c.Screen_Min_Size))
+                                  'Actual screen size below minimal screen size {}.'.format(c.MINIMAL_SCREEN_SIZE))
         return
 
     # if no bounds are set, set resonable bounds
-    if t.get_option(c.O.MW_BOUNDS) is None:
-        t.set_option(c.O.MW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
-        t.set_option(c.O.MW_MAXIMIZED, True)
+    if t.get_option(c.Opt.MW_BOUNDS) is None:
+        t.set_option(c.Opt.MW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
+        t.set_option(c.Opt.MW_MAXIMIZED, True)
         t.log_info('No previous bounds of the main window stored, start maximized')
 
     # load global stylesheet to app
-    with open(c.Global_Stylesheet, 'r', encoding='utf-8') as file:
+    with open(c.GLOBAL_STYLESHEET_FILE, 'r', encoding='utf-8') as file:
         style_sheet = file.read()
     app.setStyleSheet(style_sheet)
 

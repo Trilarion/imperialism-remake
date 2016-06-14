@@ -31,5 +31,5 @@ playlist = [['01 Imperialism Theme.ogg', 'Imperialism Theme']]
 playlist.append(['02 Silent Ashes.ogg', 'Silent Ashes'])
 
 # write
-print('write to {}'.format(c.Soundtrack_Playlist))
-u.write_as_yaml(c.Soundtrack_Playlist, playlist)
+print('write to {}'.format(c.SOUNDTRACK_INFO_FILE))
+u.write_as_yaml(c.SOUNDTRACK_INFO_FILE, playlist)

@@ -35,6 +35,8 @@ os.chdir('..')
 # run conversion of help files from markdown
 manual_markdown_converter.convert()
 
+print('start building')
+
 # set options
 options = {'build_exe': {
     'optimize': 2,
@@ -53,7 +55,7 @@ if sys.platform == 'win32':
 executables = [Executable(os.path.join('source', 'start.py'), targetName='ImperialismRemake.exe', base=base)]
 
 # delete previous build directory completely
-path = os.path.join('build', 'exe.win-amd64-3.4')
+path = os.path.join('build', 'exe.win-amd64-3.5')
 if os.path.isdir(path):
     shutil.rmtree(path)
 

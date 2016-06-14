@@ -270,7 +270,7 @@ class Config(ConfigParserExtended):
 
         logging.debug('[EXIT] __str__()')
 
-        obj_string = u"""
+        obj_string = utils"""
         Error: {error}
         Log level: {loglevel}
         Fullscreen: {fullscreen}
