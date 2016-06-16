@@ -22,17 +22,12 @@
 """
 
 import PyQt5.QtMultimedia as QtMultimedia
-import PyQt5.QtCore as QtCore
 
 from lib import utils
-from base import constants
+from base import constants, tools
 
-# wire soundtrack player and playlist
-soundtrack_player = QtMultimedia.QMediaPlayer()
-soundtrack_playlist = QtMultimedia.QMediaPlaylist()
-soundtrack_playlist.setPlaybackMode(QtMultimedia.QMediaPlaylist.Loop)
-soundtrack_player.setPlaylist(soundtrack_playlist)
-
+soundtrack_player = None
+soundtrack_playlist = None
 
 def load_soundtrack_playlist():
     """
@@ -40,9 +35,11 @@ def load_soundtrack_playlist():
 
         A playlist is a list where each entry is a list of two strings: filepath, title
     """
+    global soundtrack_playlist
 
-    # clear playlist
-    soundtrack_playlist.clear()
+    # create playlist
+    soundtrack_playlist = QtMultimedia.QMediaPlaylist()
+    soundtrack_playlist.setPlaybackMode(QtMultimedia.QMediaPlaylist.Loop)
 
     # read information file
     data = utils.read_as_yaml(constants.SOUNDTRACK_INFO_FILE)
@@ -50,6 +47,16 @@ def load_soundtrack_playlist():
     # add the soundtrack folder to each file name
     for entry in data:
         file = constants.extend(constants.SOUNDTRACK_FOLDER, entry[0])
-        url = QtCore.QUrl.fromLocalFile(file)
+        url = tools.local_url(file)
         media = QtMultimedia.QMediaContent(url)
         soundtrack_playlist.addMedia(media)
+
+def setup_soundtrack_player():
+    """
+
+    """
+    global soundtrack_player
+    global soundtrack_playlist
+
+    soundtrack_player = QtMultimedia.QMediaPlayer()
+    soundtrack_player.setPlaylist(soundtrack_playlist)

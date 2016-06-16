@@ -22,17 +22,17 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
-import lib.graphics as graphics
+import lib.qt_graphics as qt_graphics
 import lib.utils as utils
-from lib.browser import BrowserWidget
+from lib.qt_graphics import BrowserWidget
 import base.tools as tools
 import base.constants as constants
 
 import client.audio as audio
 
 from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
-from client.graphics import MiniMapNationItem
-import client.graphics as cg
+import client.graphics as graphics
+
 from client.main_screen import GameMainScreen
 from client.editor import EditorScreen
 
@@ -57,8 +57,8 @@ class MapItem(QtCore.QObject):
         self.description = description
 
         # create clickable pixmap item and create fade animation
-        self.item = graphics.ClickablePixmapItem(pixmap)
-        self.fade = graphics.FadeAnimation(self.item)
+        self.item = qt_graphics.ClickablePixmapItem(pixmap)
+        self.fade = qt_graphics.FadeAnimation(self.item)
         self.fade.set_duration(300)
 
         # wire to fade in/out
@@ -91,7 +91,7 @@ class StartScreen(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setProperty('background', 'texture')
 
-        layout = graphics.RelativeLayout(self)
+        layout = qt_graphics.RelativeLayout(self)
 
         start_image = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.background.jpg'))
         start_image_item = QtWidgets.QGraphicsPixmapItem(start_image)
@@ -105,11 +105,11 @@ class StartScreen(QtWidgets.QWidget):
         view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setSceneRect(0, 0, start_image.width(), start_image.height())
-        view.layout_constraint = graphics.RelativeLayoutConstraint().center_horizontal().center_vertical()
+        view.layout_constraint = qt_graphics.RelativeLayoutConstraint().center_horizontal().center_vertical()
         layout.addWidget(view)
 
         subtitle = QtWidgets.QLabel('')
-        subtitle.layout_constraint = graphics.RelativeLayoutConstraint((0.5, -0.5, 0),
+        subtitle.layout_constraint = qt_graphics.RelativeLayoutConstraint((0.5, -0.5, 0),
                                                                 (0.5, -0.5, start_image.height() / 2 + 20))
         layout.addWidget(subtitle)
 
@@ -144,7 +144,7 @@ class StartScreen(QtWidgets.QWidget):
             scene.addItem(mapitem.item)
 
         version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'.format(tools.get_option(constants.Opt.VERSION)))
-        version_label.layout_constraint = graphics.RelativeLayoutConstraint().east(20).south(20)
+        version_label.layout_constraint = qt_graphics.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
 
@@ -169,19 +169,19 @@ class GameLobbyWidget(QtWidgets.QWidget):
         action_group = QtWidgets.QActionGroup(toolbar)
 
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario',
+            qt_graphics.create_action(tools.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario',
                             action_group, toggle_connection=self.toggled_single_player_scenario_selection,
                             checkable=True))
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario',
+            qt_graphics.create_action(tools.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario',
                             action_group, toggle_connection=self.toggled_single_player_load_scenario, checkable=True))
 
         toolbar.addSeparator()
 
-        toolbar.addAction(graphics.create_action(tools.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group,
+        toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group,
                                           toggle_connection=self.toggled_server_lobby, checkable=True))
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario',
+            qt_graphics.create_action(tools.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario',
                             action_group, toggle_connection=self.toggled_multiplayer_scenario_selection,
                             checkable=True))
 
@@ -268,7 +268,7 @@ class ServerLobby(QtWidgets.QWidget):
         l2 = QtWidgets.QVBoxLayout()
         edit = QtWidgets.QTextEdit()
         edit.setEnabled(False)
-        box = graphics.wrap_in_groupbox(edit, 'Server')
+        box = qt_graphics.wrap_in_groupbox(edit, 'Server')
         box.setFixedSize(200, 150)
         l2.addWidget(box)
 
@@ -278,7 +278,7 @@ class ServerLobby(QtWidgets.QWidget):
         client_list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         client_list.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         client_list.addItems(['Alf', 'Rolf', 'Marcel'])
-        box = graphics.wrap_in_groupbox(client_list, 'Clients')
+        box = qt_graphics.wrap_in_groupbox(client_list, 'Clients')
         box.setFixedWidth(200)
         l2.addWidget(box)
 
@@ -287,9 +287,9 @@ class ServerLobby(QtWidgets.QWidget):
         l2 = QtWidgets.QVBoxLayout()
         edit = QtWidgets.QTextEdit()
         edit.setEnabled(False)
-        l2.addWidget(graphics.wrap_in_groupbox(edit, 'Chat log'))
+        l2.addWidget(qt_graphics.wrap_in_groupbox(edit, 'Chat log'))
         edit = QtWidgets.QLineEdit()
-        l2.addWidget(graphics.wrap_in_groupbox(edit, 'Chat input'))
+        l2.addWidget(qt_graphics.wrap_in_groupbox(edit, 'Chat input'))
 
         l1.addLayout(l2)
 
@@ -335,15 +335,15 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.nations_list.setFixedWidth(200)
         self.nations_list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.nations_list.itemSelectionChanged.connect(self.nations_list_selection_changed)
-        layout.addWidget(graphics.wrap_in_groupbox(self.nations_list, 'Nations'), 0, 0)
+        layout.addWidget(qt_graphics.wrap_in_groupbox(self.nations_list, 'Nations'), 0, 0)
 
         # map view (no scroll bars)
         self.map_scene = QtWidgets.QGraphicsScene()
-        self.map_view = graphics.FitSceneInViewGraphicsView(self.map_scene)
+        self.map_view = qt_graphics.FitSceneInViewGraphicsView(self.map_scene)
         self.map_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
-        layout.addWidget(graphics.wrap_in_groupbox(self.map_view, 'Map'), 0, 1)
+        layout.addWidget(qt_graphics.wrap_in_groupbox(self.map_view, 'Map'), 0, 1)
 
         # scenario description
         self.description = QtWidgets.QTextEdit()
@@ -351,7 +351,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.description.setReadOnly(True)
         self.description.setFixedHeight(60)
-        layout.addWidget(graphics.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1, 2)  # goes over two columns
+        layout.addWidget(qt_graphics.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1, 2)  # goes over two columns
 
         # nation description
         self.nation_info = QtWidgets.QTextEdit()
@@ -359,7 +359,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.nation_info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.nation_info.setReadOnly(True)
         self.nation_info.setFixedHeight(100)
-        layout.addWidget(graphics.wrap_in_groupbox(self.nation_info, 'Nation Info'), 2, 0, 1, 2)
+        layout.addWidget(qt_graphics.wrap_in_groupbox(self.nation_info, 'Nation Info'), 2, 0, 1, 2)
 
         # stretching of the elements
         layout.setRowStretch(0, 1)  # nation list and map get all the available height
@@ -367,7 +367,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
 
         # add the start button
         toolbar = QtWidgets.QToolBar()
-        toolbar.addAction(graphics.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
+        toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
                                           trigger_connection=self.start_scenario_clicked))
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
@@ -387,12 +387,12 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         # fill the ground layer with a neutral color
         item = self.map_scene.addRect(0, 0, columns, rows)
         item.setBrush(QtCore.Qt.lightGray)
-        item.setPen(graphics.TRANSPARENT_PEN)
+        item.setPen(qt_graphics.TRANSPARENT_PEN)
         item.setZValue(0)
 
         # text display
         self.map_name_item = self.map_scene.addSimpleText('')
-        self.map_name_item.setPen(graphics.TRANSPARENT_PEN)
+        self.map_name_item.setPen(qt_graphics.TRANSPARENT_PEN)
         self.map_name_item.setBrush(QtGui.QBrush(QtCore.Qt.darkRed))
         self.map_name_item.setZValue(3)
         self.map_name_item.setPos(0, 0)
@@ -555,18 +555,18 @@ class OptionsContentWidget(QtWidgets.QWidget):
         toolbar.setIconSize(QtCore.QSize(32, 32))
         action_group = QtWidgets.QActionGroup(toolbar)
 
-        action_preferences_general = graphics.create_action(tools.load_ui_icon('icon.preferences.general.png'),
+        action_preferences_general = qt_graphics.create_action(tools.load_ui_icon('icon.preferences.general.png'),
                                                      'Show general preferences', action_group,
                                                      toggle_connection=self.toggled_general, checkable=True)
         toolbar.addAction(action_preferences_general)
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show network preferences', action_group,
+            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show network preferences', action_group,
                             toggle_connection=self.toggled_network, checkable=True))
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group,
+            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group,
                             toggle_connection=self.toggled_graphics, checkable=True))
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group,
+            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group,
                             toggle_connection=self.toggled_music, checkable=True))
 
         self.stacked_layout = QtWidgets.QStackedLayout()
@@ -697,12 +697,12 @@ class OptionsContentWidget(QtWidgets.QWidget):
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # connect to remote server
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server',
+            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server',
                             toolbar, checkable=True))
         l2.addWidget(toolbar)
         l2.addStretch()
         l.addLayout(l2)
-        tab_layout.addWidget(graphics.wrap_in_groupbox(l, 'Remote Server'))
+        tab_layout.addWidget(qt_graphics.wrap_in_groupbox(l, 'Remote Server'))
 
         # local server group box
         l = QtWidgets.QVBoxLayout()
@@ -725,15 +725,15 @@ class OptionsContentWidget(QtWidgets.QWidget):
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # show local server monitor
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor', toolbar))
+            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor', toolbar))
         # local server is on/off
         toolbar.addAction(
-            graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Turn local server on/off', toolbar,
+            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Turn local server on/off', toolbar,
                             checkable=True))
         l2.addWidget(toolbar)
         l2.addStretch()
         l.addLayout(l2)
-        tab_layout.addWidget(graphics.wrap_in_groupbox(l, 'Local Server'))
+        tab_layout.addWidget(qt_graphics.wrap_in_groupbox(l, 'Local Server'))
 
         # vertical stretch
         tab_layout.addStretch()
@@ -768,18 +768,18 @@ class OptionsContentWidget(QtWidgets.QWidget):
         # check if something was changed
         options_modified = any([box.isChecked() is not tools.get_option(option) for (box, option) in self.checkboxes])
         if options_modified:
-            answer = QtGui.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences',
-                                                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.Yes)
-            if answer == QtGui.QMessageBox.Yes:
+            answer = QtWidgets.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences',
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
+            if answer == QtWidgets.QMessageBox.Yes:
                 # all checkboxes
                 for (box, option) in self.checkboxes:
                     tools.set_option(option, box.isChecked())
                 # start/stop audio player (depending on mute)
                 if tools.get_option(constants.Opt.BG_MUTE):
-                    #audio.soundtrack_player.stop()
+                    audio.soundtrack_player.stop()
                     pass
                 else:
-                    #audio.soundtrack_player.start()
+                    audio.soundtrack_player.play()
                     pass
         return True
 
@@ -855,7 +855,7 @@ class Client:
         self.help_browser_widget = BrowserWidget(tools.load_ui_icon)
         self.help_browser_widget.home_url = tools.local_url(constants.DOCUMENTATION_INDEX_FILE)
         self.help_browser_widget.home()
-        self.help_dialog = cg.GameDialog(self.main_window, self.help_browser_widget, title='Help')
+        self.help_dialog = graphics.GameDialog(self.main_window, self.help_browser_widget, title='Help')
         self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
         # move to lower right border, so that overlap with other windows is not that strong
         self.help_dialog.move(self.main_window.x() + self.main_window.width() - 800,
@@ -875,14 +875,8 @@ class Client:
 
         # for the notifications
         self.pending_notifications = []
-        self.notification_position_constraint = graphics.RelativeLayoutConstraint().center_horizontal().south(20)
+        self.notification_position_constraint = qt_graphics.RelativeLayoutConstraint().center_horizontal().south(20)
         self.notification = None
-
-        # audio player
-        # start audio player if wished
-        if not tools.get_option(constants.Opt.BG_MUTE):
-            # audio.soundtrack_player.start()
-            pass
 
         # after the player starts, the main window is not active anymore
         # set it active again or it doesn't get keyboard focus
@@ -903,7 +897,7 @@ class Client:
         """
         if len(self.pending_notifications) > 0:
             message = self.pending_notifications.pop(0)
-            self.notification = graphics.Notification(self.main_window, message,
+            self.notification = qt_graphics.Notification(self.main_window, message,
                                                position_constraint=self.notification_position_constraint)
             self.notification.finished.connect(self.show_next_notification)
             self.notification.show()
@@ -929,7 +923,7 @@ class Client:
             Is invoked when pressing F2.
         """
         # monitor_widget = ServerMonitorWidget()
-        # dialog = cg.GameDialog(self.main_window, monitor_widget, delete_on_close=True, title='Server Monitor')
+        # dialog = graphics.GameDialog(self.main_window, monitor_widget, delete_on_close=True, title='Server Monitor')
         # dialog.setFixedSize(QtCore.QSize(800, 600))
         # dialog.show()
 
@@ -945,7 +939,7 @@ class Client:
             Shows the game lobby dialog.
         """
         lobby_widget = GameLobbyWidget()
-        dialog = cg.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby',
+        dialog = graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby',
                                help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         lobby_widget.single_player_start.connect(partial(self.single_player_start, dialog))
@@ -971,7 +965,7 @@ class Client:
             Shows the preferences dialog.
         """
         options_widget = OptionsContentWidget()
-        dialog = cg.GameDialog(self.main_window, options_widget, delete_on_close=True, title='Preferences',
+        dialog = graphics.GameDialog(self.main_window, options_widget, delete_on_close=True, title='Preferences',
                                help_callback=self.show_help_browser, close_callback=options_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
@@ -1020,21 +1014,18 @@ def start_client_application():
         style_sheet = file.read()
     app.setStyleSheet(style_sheet)
 
-    # load soundtrack playlist
-    #audio.load_soundtrack_playlist()
-    #audio.soundtrack_player.play()
+    # setup sound system
+    audio.load_soundtrack_playlist()
+    audio.setup_soundtrack_player()
 
-    import PyQt5.QtMultimedia as QtMultimedia
-    player = QtMultimedia.QMediaPlayer()
-    url = tools.local_url(constants.extend(constants.SOUNDTRACK_FOLDER, '12 - Slipped Away.mp3'))
-    player.setMedia(QtMultimedia.QMediaContent(url))
-    player.play()
+    # start audio player if wished
+    if not tools.get_option(constants.Opt.BG_MUTE):
+        audio.soundtrack_player.play()
+    pass
 
     # create client object and switch to start screen
-    #client = Client()
-    #client.switch_to_start_screen()
-    w = QtWidgets.QWidget()
-    w.show()
+    client = Client()
+    client.switch_to_start_screen()
 
     tools.log_info('client initialized, start Qt app execution')
     app.exec_()

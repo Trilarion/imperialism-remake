@@ -16,7 +16,7 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-import lib.graphics as g
+import lib.qt_graphics as g
 from base import tools as t
 
 """

@@ -20,9 +20,9 @@ from functools import partial
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-import lib.graphics as g
+import lib.qt_graphics as g
 import lib.utils as u
-from lib.browser import BrowserWidget
+from lib.qt_graphics import BrowserWidget
 import base.tools as t
 import base.constants as c
 import base.network as net

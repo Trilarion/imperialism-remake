@@ -19,7 +19,7 @@ import math
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-import lib.graphics as g
+import lib.qt_graphics as g
 import base.tools as t
 import base.constants as c
 from base.constants import PropertyKeyNames as k

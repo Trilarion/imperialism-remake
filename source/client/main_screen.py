@@ -16,7 +16,7 @@
 
 from PyQt5 import QtWidgets
 
-import base.tools as t
+import base.tools as tools
 
 """
     The main game screen.
@@ -59,11 +59,11 @@ class GameMainScreen(QtWidgets.QWidget):
         super().__init__()
 
         self.toolbar = QtWidgets.QToolBar()
-        action_help = QtWidgets.QAction(t.load_ui_icon('icon.help.png'), 'Show help', self)
+        action_help = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Show help', self)
         action_help.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
-        action_quit = QtWidgets.QAction(t.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
+        action_quit = QtWidgets.QAction(tools.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
         action_quit.triggered.connect(client.switch_to_start_screen)
         self.toolbar.addAction(action_quit)
 

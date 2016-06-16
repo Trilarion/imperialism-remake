@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 from PyQt5 import QtWidgets
-import lib.graphics as g
+import lib.qt_graphics as g
 
 class Window(QtWidgets.QWidget):
     def __init__(self):

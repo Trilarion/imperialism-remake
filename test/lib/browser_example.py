@@ -21,7 +21,7 @@
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtGui as QtGui
 import PyQt5.QtCore as QtCore
-from lib.browser import BrowserWidget
+from lib.qt_graphics import BrowserWidget
 
 if __name__ == '__main__':
 

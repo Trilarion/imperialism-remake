@@ -18,7 +18,7 @@
 from PySide import QtGui
 
 from client import audio
-import lib.graphics as g
+import lib.qt_graphics as g
 
 
 def show_notification(text):
