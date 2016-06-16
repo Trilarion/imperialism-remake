@@ -29,7 +29,7 @@ def convert():
     """
 
     # set input and output directory
-    lookup_dir = os.path.join('documentation', 'manual')
+    lookup_dir = os.path.join('documentation', 'game manual')
     install_dir = os.path.join('data', 'manual')
 
     # clean and re-create install directory

@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from math import sqrt, pi, cos, sin
+import math
 
-from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QPolygonF, QPixmap, QBrush, QPen, QColor
-from PyQt5.QtWidgets import QGraphicsScene
-
+import PyQt5.QtCore as QtCore
+import PyQt5.QtGui as QtGui
+import PyQt5.QtWidgets as QtWidgets
 
 def hexagonal_grid_offset_to_cube(col, row):
     x = col - (row + (row & 1)) / 2
@@ -36,29 +35,23 @@ def distance(col1, row1, col2, row2):
 
 
 def hex_corner(center, size, i, offset):
-    # check center QPointF
-    if not isinstance(center, QPointF):
-        raise ValueError('center must be a QPointF instance')
+    """
+        Computes
+    """
+
     # check i = 0 1 2 3 4 5
     if (not isinstance(i, int)) or i < 0 or i > 5:
         raise ValueError('i must be a int instance and i must be in range [0,5]')
-    # check offset angle 0 or 30
-    if (not isinstance(offset, int)) or (offset != 0 and offset != 30):
-        raise ValueError('offset must be a int instance and offset must be equal to 0 or 30')
-        # check size
-    try:
-        if size < 0:
-            raise ValueError('size must be superior to 0')
-    except TypeError:
-        raise ValueError('size type must be an unorderable type')
+
     angle_deg = 60 * i + offset
-    angle_rad = pi / 180 * angle_deg
-    return QPointF(center.x() + size * cos(angle_rad),
-                   center.y() + size * sin(angle_rad))
+    angle_rad = math.pi / 180 * angle_deg
+    return QtCore.QPointF(center.x() + size * math.cos(angle_rad),
+                   center.y() + size * math.sin(angle_rad))
 
 
-class QHexagon(QPolygonF):
-    """Class QHexagon
+class QHexagon(QtGui.QPolygonF):
+    """
+        Hexagon
     """
 
     def __init__(self, center, size, rotation):
@@ -68,24 +61,30 @@ class QHexagon(QPolygonF):
         :param size: int>0
         :param rotation; int 0 or 30
         """
+
         # check center QPointF
-        if not isinstance(center, QPointF):
+        if not isinstance(center, QtCore.QPointF):
             raise ValueError('center must be a QPointF instance')
+
         # check offset angle 0 or 30
-        if (not isinstance(rotation, int)) or (rotation != 0 and rotation != 30):
+        if not isinstance(rotation, int) or (rotation != 0 and rotation != 30):
             raise ValueError('rotation must be a int instance and rotation must be equal to 0 or 30')
+
         # check size
         try:
             if size < 0:
                 raise ValueError('size must be superior to 0')
         except TypeError:
             raise ValueError('size type must be an unorderable type')
+
         self.center = center
         self.size = size
         self.rotation = rotation
+
         self.corners = []
         for i in range(0, 6):
             self.corners.append(hex_corner(self.center, self.size, i, self.rotation))
+
         # init QPolygonF
         super(self.__class__, self).__init__(self.corners)
 
@@ -95,7 +94,7 @@ class QHexagon(QPolygonF):
 
         returns int
         """
-        return self.size * sqrt(3) / 2
+        return self.size * math.sqrt(3) / 2
 
     def height(self):
         """function height
@@ -111,20 +110,20 @@ class QHexagon(QPolygonF):
         :param scene: QGraphicsScene
         :param color: QColor
         """
-        if not isinstance(scene, QGraphicsScene) or scene is None:
+        if not isinstance(scene, QtWidgets.QGraphicsScene) or scene is None:
             raise ValueError('texture must be a non null QGraphicsScene instance')
-        if not isinstance(texture, QPixmap) and not texture.isNull():
+        if not isinstance(texture, QtGui.QPixmap) and not texture.isNull():
             raise ValueError('texture must be a QPixmap instance or None')
         if color is None and (texture is None or texture.isNull()):
             raise ValueError('texture or color must be specified')
 
         tile = scene.addPolygon(self)
-        tile.setPen(QPen(QColor(Qt.black), 1, Qt.DotLine))  # dotted tile borders (TODO: ugly)
+        tile.setPen(QtGui.QPen(QtGui.QColor(QtCore.Qt.black), 1, QtCore.Qt.DotLine))  # dotted tile borders (TODO: ugly)
 
         if color is not None:
-            tile.setBrush(QBrush(color))
+            tile.setBrush(QtGui.QBrush(color))
         if texture is not None and not texture.isNull():
-            tile.setBrush(QBrush(texture))
+            tile.setBrush(QtGui.QBrush(texture))
 
     def __eq__(self, other):
         if isinstance(other, QHexagon):

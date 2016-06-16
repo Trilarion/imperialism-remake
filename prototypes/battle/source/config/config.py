@@ -42,8 +42,7 @@ MANDATORY_NATION_OPTION = ['name', 'flag', 'coat_of_arms']
 
 class Config(ConfigParserExtended):
 
-    def __init__(self, main_config_file, version):
-        self.version = version
+    def __init__(self, main_config_file):
 
         # load main option
         self.data_folder = 'error'
@@ -270,7 +269,7 @@ class Config(ConfigParserExtended):
 
         logging.debug('[EXIT] __str__()')
 
-        obj_string = utils"""
+        obj_string = u"""
         Error: {error}
         Log level: {loglevel}
         Fullscreen: {fullscreen}

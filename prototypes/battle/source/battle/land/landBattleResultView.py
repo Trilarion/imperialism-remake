@@ -14,17 +14,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import sys
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QTextEdit, QGraphicsView, QGraphicsScene, QLabel
 
-from prototypes.battle.source.base.constants import version
 from prototypes.battle.source.config.config import Config
 
-CONFIG_FILE = 'config.ini'
+import os
 
+CONFIG_FILE = os.path.join('prototypes', 'battle', 'data', 'config.ini')
 
 class LandBattleResultView(QWidget):
     """Class LandBattle
@@ -85,9 +84,8 @@ class LandBattleResultView(QWidget):
 
 
 if __name__ == '__main__':
-    v = version()
-    app = QApplication(sys.argv)
-    config = Config(CONFIG_FILE, v)
+    app = QApplication([])
+    config = Config(CONFIG_FILE)
     rst = LandBattleResultView(config, False)
     rst.show()
-    sys.exit(app.exec_())
+    app.exec_()
