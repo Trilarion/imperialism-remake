@@ -15,12 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Starts the application.
+    Starts the application (a client and a server).
     Start in project root folder and with 'debug' as parameter if wished.
 """
 
+
 def exception_hook(type, value, tback):
+    """
+        PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
+    """
     sys.__excepthook__(type, value, tback)
+
 
 if __name__ == '__main__':
 
@@ -37,7 +42,7 @@ if __name__ == '__main__':
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
 
-    # because PyQt5 snarfs exceptions in the event thread this workaround
+    # because PyQt5 eats exceptions in the event thread this workaround
     sys.excepthook = exception_hook
 
     import os
@@ -71,6 +76,7 @@ if __name__ == '__main__':
     # in debug mode print to the console instead
     if not constants.DEBUG_MODE:
         import codecs
+
         sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
         sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
 
@@ -89,8 +95,9 @@ if __name__ == '__main__':
     # special case of some desktop environments under Linux where full screen mode does not work well
     if tools.get_option(constants.Opt.FULLSCREEN_SUPPORTED):
         desktop_session = os.environ.get("DESKTOP_SESSION")
-        if desktop_session and (desktop_session.startswith('ubuntu') or 'xfce' in desktop_session
-                                or desktop_session.startswith('xubuntu') or 'gnome' in desktop_session):
+        if desktop_session and (
+                    desktop_session.startswith('ubuntu') or 'xfce' in desktop_session or desktop_session.startswith(
+                'xubuntu') or 'gnome' in desktop_session):
             tools.set_option(constants.Opt.FULLSCREEN_SUPPORTED, False)
             tools.log_warning(
                 'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
@@ -100,7 +107,7 @@ if __name__ == '__main__':
     # now we can safely assume that the environment is good to us
 
     # start client, we will return when the programm finishes
-    from  client.client import start_client_application
+    from client.client import start_client_application
     start_client_application()
 
     # client finished

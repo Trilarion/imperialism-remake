@@ -3,11 +3,22 @@
   <component name="ProjectCodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS">
       <value>
+        <MarkdownNavigatorCodeStyleSettings>
+          <option name="RIGHT_MARGIN" value="72" />
+        </MarkdownNavigatorCodeStyleSettings>
+        <Python>
+          <option name="ALIGN_MULTILINE_IMPORTS" value="false" />
+        </Python>
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
+        <codeStyleSettings language="Python">
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="false" />
+        </codeStyleSettings>
       </value>
     </option>
-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default" />
+    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
   </component>
 </project>

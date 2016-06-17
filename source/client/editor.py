@@ -14,18 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import os
 import math
+import os
 
 import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
-import lib.qt_graphics as qt_graphics
-import base.tools as tools
 import base.constants as constants
-from base.constants import PropertyKeyNames as k
+import base.tools as tools
 import client.graphics as graphics
+import lib.qt_graphics as qt_graphics
+from base.constants import PropertyKeyNames as k
 from server.scenario import Scenario
 
 """
@@ -37,11 +37,7 @@ from server.scenario import Scenario
 
 # A dictionary with all the default properties of a new scenario.
 # TODO should this rather go to scenario as a static function?
-NEW_SCENARIO_DEFAULT_PROPERTIES = {
-    k.TITLE: 'Unnamed',
-    k.MAP_COLUMNS: 100,
-    k.MAP_ROWS: 60
-}
+NEW_SCENARIO_DEFAULT_PROPERTIES = {k.TITLE: 'Unnamed', k.MAP_COLUMNS: 100, k.MAP_ROWS: 60}
 
 
 class EditorScenario(Scenario):
@@ -106,13 +102,13 @@ class EditorMiniMap(QtWidgets.QWidget):
         # action group (only one of them can be checked at each time)
         action_group = QtWidgets.QActionGroup(self.toolbar)
         # political view in the beginning
-        action_political = qt_graphics.create_action(tools.load_ui_icon('icon.mini.political.png'), 'Show political view',
-                                           action_group, toggle_connection=self.toggled_political, checkable=True)
+        action_political = qt_graphics.create_action(tools.load_ui_icon('icon.mini.political.png'),
+            'Show political view', action_group, toggle_connection=self.toggled_political, checkable=True)
         self.toolbar.addAction(action_political)
         # geographical view
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group,
-                            toggle_connection=self.toggled_geographical, checkable=True))
+            qt_graphics.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view',
+                action_group, toggle_connection=self.toggled_geographical, checkable=True))
 
         # wrap tool bar into horizontal layout with stretch
         l = QtWidgets.QHBoxLayout()
@@ -210,14 +206,8 @@ class EditorMiniMap(QtWidgets.QWidget):
                         # not for sea
                         sx, sy = self.scenario.scene_position(column, row)
                         paths[t].addRect(sx * tile_width, sy * tile_height, tile_width, tile_height)
-            colors = {
-                1: QtCore.Qt.green,
-                2: QtCore.Qt.darkGreen,
-                3: QtCore.Qt.darkGray,
-                4: QtCore.Qt.white,
-                5: QtCore.Qt.darkYellow,
-                6: QtCore.Qt.yellow
-            }
+            colors = {1: QtCore.Qt.green, 2: QtCore.Qt.darkGreen, 3: QtCore.Qt.darkGray, 4: QtCore.Qt.white,
+                5: QtCore.Qt.darkYellow, 6: QtCore.Qt.yellow}
             for t in paths:
                 path = paths[t]
                 path = path.simplified()
@@ -347,10 +337,10 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         for row in range(0, rows):
             if row % 2 == 0:
                 item = self.scene.addRect(columns * self.TILE_SIZE, row * self.TILE_SIZE, self.TILE_SIZE / 2,
-                                          self.TILE_SIZE, pen=qt_graphics.TRANSPARENT_PEN)
+                    self.TILE_SIZE, pen=qt_graphics.TRANSPARENT_PEN)
             else:
                 item = self.scene.addRect(0, row * self.TILE_SIZE, self.TILE_SIZE / 2, self.TILE_SIZE,
-                                          pen=qt_graphics.TRANSPARENT_PEN)
+                    pen=qt_graphics.TRANSPARENT_PEN)
             item.setBrush(brush)
             item.setZValue(1)
 
@@ -433,7 +423,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
                 path = QtGui.QPainterPath()
                 path.addRoundedRect(background, 50, 50)
                 item = self.scene.addPath(path, pen=qt_graphics.TRANSPARENT_PEN,
-                                          brush=QtGui.QBrush(QtGui.QColor(128, 128, 255, 64)))
+                    brush=QtGui.QBrush(QtGui.QColor(128, 128, 255, 64)))
                 item.setZValue(5)
 
         # draw the grid and the coordinates
@@ -523,8 +513,9 @@ class InfoBox(QtWidgets.QWidget):
 
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(20, 20))
-        toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self,
-                                          self.change_terrain))
+        toolbar.addAction(
+            qt_graphics.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self,
+                self.change_terrain))
 
         layout.addWidget(toolbar)
         layout.addStretch()
@@ -609,8 +600,9 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         # add the button
         layout = QtWidgets.QHBoxLayout()
         toolbar = QtWidgets.QToolBar()
-        toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar,
-                                          self.create_scenario_clicked))
+        toolbar.addAction(
+            qt_graphics.create_action(tools.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar,
+                self.create_scenario_clicked))
         layout.addStretch()
         layout.addWidget(toolbar)
         widget_layout.addLayout(layout)
@@ -619,8 +611,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         """
             "Create scenario" is clicked.
         """
-        p = {k.TITLE: self.properties[k.TITLE].text(),
-             k.MAP_COLUMNS: int(self.properties[k.MAP_COLUMNS].text()),
+        p = {k.TITLE: self.properties[k.TITLE].text(), k.MAP_COLUMNS: int(self.properties[k.MAP_COLUMNS].text()),
              k.MAP_ROWS: int(self.properties[k.MAP_ROWS].text())}
         # TODO conversion can fail, (ValueError) give error message
         # we close the parent window and emit the appropriate signal
@@ -698,20 +689,26 @@ class EditorScreen(QtWidgets.QWidget):
 
         self.toolbar = QtWidgets.QToolBar()
         self.toolbar.setIconSize(QtCore.QSize(32, 32))
-        self.toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
-                                               self.show_new_scenario_dialog))
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, self.load_scenario_dialog))
+            qt_graphics.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
+                self.show_new_scenario_dialog))
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog))
+            qt_graphics.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
+                self.load_scenario_dialog))
+        self.toolbar.addAction(
+            qt_graphics.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self,
+                self.save_scenario_dialog))
 
         self.toolbar.addSeparator()
-        self.toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit base properties', self,
-                                               self.show_general_properties_dialog))
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog))
-        self.toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
-                                               self.show_provinces_dialog))
+            qt_graphics.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit base properties', self,
+                self.show_general_properties_dialog))
+        self.toolbar.addAction(
+            qt_graphics.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self,
+                self.show_nations_dialog))
+        self.toolbar.addAction(
+            qt_graphics.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
+                self.show_provinces_dialog))
 
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -772,8 +769,8 @@ class EditorScreen(QtWidgets.QWidget):
         """
         new_scenario_widget = NewScenarioDialogWidget(NEW_SCENARIO_DEFAULT_PROPERTIES.copy())
         new_scenario_widget.create_scenario.connect(self.create_new_scenario)
-        dialog = graphics.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario', delete_on_close=True,
-                               help_callback=self.client.show_help_browser)
+        dialog = graphics.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario',
+            delete_on_close=True, help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
 
@@ -782,10 +779,8 @@ class EditorScreen(QtWidgets.QWidget):
             Show the load a scenario dialog. Then loads it if the user has selected one.
         """
         # noinspection PyCallByClass
-        file_name = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', constants.SCENARIO_FOLDER,
-                                                  'Scenario Files (*.scenario)')[
-                0]
+        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', constants.SCENARIO_FOLDER,
+            'Scenario Files (*.scenario)')[0]
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
             self.scenario.load(file_name)
@@ -796,10 +791,8 @@ class EditorScreen(QtWidgets.QWidget):
             Show the save a scenario dialog. Then saves it.
         """
         # noinspection PyCallByClass
-        file_name = \
-            QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', constants.SCENARIO_FOLDER,
-                                                  'Scenario Files (*.scenario)')[
-                0]
+        file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', constants.SCENARIO_FOLDER,
+            'Scenario Files (*.scenario)')[0]
         if file_name:
             self.scenario.save(file_name)
             path, name = os.path.split(file_name)
@@ -819,8 +812,8 @@ class EditorScreen(QtWidgets.QWidget):
         """
         content_widget = GeneralPropertiesWidget(self.scenario)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='General Properties',
-                               delete_on_close=True,
-                               help_callback=self.client.show_help_browser, close_callback=content_widget.close_request)
+            delete_on_close=True, help_callback=self.client.show_help_browser,
+            close_callback=content_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
@@ -830,7 +823,7 @@ class EditorScreen(QtWidgets.QWidget):
         """
         content_widget = NationPropertiesWidget()
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Nations', delete_on_close=True,
-                               help_callback=self.client.show_help_browser)
+            help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
@@ -840,6 +833,6 @@ class EditorScreen(QtWidgets.QWidget):
         """
         content_widget = ProvincePropertiesWidget()
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Provinces', delete_on_close=True,
-                               help_callback=self.client.show_help_browser)
+            help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()

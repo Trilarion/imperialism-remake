@@ -20,9 +20,9 @@ import math
 from PyQt5.QtCore import QPointF
 from PyQt5.QtCore import Qt
 
-from lib.hexagon import QHexagon, distance
 from prototypes.battle.source.battle.land.landBattleField import LandBattleField
 from prototypes.battle.source.config.config import Config
+from prototypes.battle.source.config.hexagon import QHexagon, distance
 
 
 class LandBattleMap:

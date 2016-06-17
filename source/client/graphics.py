@@ -36,7 +36,7 @@ class GameDialog(QtWidgets.QWidget):
     """
 
     def __init__(self, parent, content, title=None, modal=True, delete_on_close=False, help_callback=None,
-                 close_callback=None):
+            close_callback=None):
         # no frame but a standalong window
         super().__init__(parent, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
 

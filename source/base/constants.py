@@ -64,7 +64,9 @@ GRAPHICS_UI_FOLDER = extend(GRAPHICS_FOLDER, 'ui')
 GRAPHICS_MAP_FOLDER = extend(GRAPHICS_FOLDER, 'map')
 
 # special locations
-DOCUMENTATION_INDEX_FILE = extend(DATA_FOLDER, 'manual', 'index.html')
+DOCUMENTATION_BASE = extend(DATA_FOLDER, 'manual')
+DOCUMENTATION_INDEX_FILE = extend(DOCUMENTATION_BASE, 'index.html')
+DOCUMENTATION_PREFERENCES_FILE = extend(DOCUMENTATION_BASE, 'preferences.html')
 GLOBAL_STYLESHEET_FILE = extend(GRAPHICS_UI_FOLDER, 'style.css')
 
 # other specific constants
@@ -85,14 +87,14 @@ class Opt(utils.AutoNumberedEnum):
     LS_OPEN = ()
     # local server accepts outside connections
     LS_NAME = ()
-    MW_BOUNDS = ()
-    MW_MAXIMIZED = ()
+    MAINWINDOW_BOUNDS = ()
+    MAINWINDOW_MAXIMIZED = ()   # bool
     FULLSCREEN = ()
-    # we start full screen (can be unset by the program for some linux desktop environments
-    FULLSCREEN_SUPPORTED = ()
-    # is full screen supported
-    PHONON_SUPPORTED = ()
-    BG_MUTE = ()
+    FULLSCREEN_SUPPORTED = ()   # is full screen supported
+
+    # soundtrack
+    SOUNDTRACK_MUTE = ()        # bool
+    SOUNDTRACK_VOLUME = ()      # int from 0 to 100
 
     def __init__(self):
         self.default = None
@@ -104,9 +106,9 @@ Options = Opt.__members__  # dictionary of name, Enum-value pairs
 Opt.VERSION.default = 'v0.2.2 (2015-??-??)'
 Opt.LS_OPEN.default = False
 Opt.LS_NAME.default = 'server name'
-Opt.FULLSCREEN.default = True
-Opt.PHONON_SUPPORTED.default = True
-Opt.BG_MUTE.default = False
+Opt.FULLSCREEN.default = True               # we start full screen (can be unset by the program for some linux desktop environments
+Opt.SOUNDTRACK_MUTE.default = False
+Opt.SOUNDTRACK_VOLUME.default = 50
 
 # predefined channel names for network communication
 CH_SCENARIO_PREVIEW = 'general.scenario.preview'

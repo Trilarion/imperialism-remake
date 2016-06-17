@@ -23,11 +23,12 @@
 
 import PyQt5.QtMultimedia as QtMultimedia
 
-from lib import utils
 from base import constants, tools
+from lib import utils
 
 soundtrack_player = None
 soundtrack_playlist = None
+
 
 def load_soundtrack_playlist():
     """
@@ -50,6 +51,7 @@ def load_soundtrack_playlist():
         url = tools.local_url(file)
         media = QtMultimedia.QMediaContent(url)
         soundtrack_playlist.addMedia(media)
+
 
 def setup_soundtrack_player():
     """

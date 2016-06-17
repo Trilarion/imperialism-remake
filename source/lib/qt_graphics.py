@@ -18,9 +18,8 @@ from datetime import datetime
 
 import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
-import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtWebEngineWidgets as QtWebEngineWidgets
-
+import PyQt5.QtWidgets as QtWidgets
 
 """
     Graphics (Qt) based objects and algorithms that do not depend specifically on the project but only on Qt.
@@ -446,6 +445,7 @@ def make_widget_draggable(parent):
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
+            self.position_on_click = None
 
         def mousePressEvent(self, event):
             """
@@ -611,6 +611,22 @@ def create_action(icon, text, parent, trigger_connection=None, toggle_connection
     action.setCheckable(checkable)
     return action
 
+def wrap_in_boxlayout(items, horizontal=True, add_stretch=True):
+    """
+
+    """
+    if horizontal:
+        layout = QtWidgets.QHBoxLayout()
+    else:
+        layout = QtWidgets.QVBoxLayout()
+    if isinstance(items, (list, tuple)):
+        for item in items:
+            layout.addWidget(item)
+    else:
+        layout.addWidget(items)
+    if add_stretch:
+        layout.addStretch()
+    return layout
 
 def wrap_in_groupbox(item, title):
     """
@@ -648,6 +664,7 @@ class BrowserWidget(QtWidgets.QWidget):
     """
         Browser based on QtWebEngineWidgets.QWebEngineView. Provides Home, Forward, Backward (history) functionality.
     """
+
     def __init__(self, icon_provider):
         """
 
@@ -668,13 +685,13 @@ class BrowserWidget(QtWidgets.QWidget):
         tool_bar.addAction(action_home)
 
         action_backward = QtWidgets.QAction(self)
-        action_backward.setEnabled(False) # initially not enabled
+        action_backward.setEnabled(False)  # initially not enabled
         action_backward.setIcon(icon_provider('icon.backward.png'))
         tool_bar.addAction(action_backward)
         self.action_backward = action_backward
 
         action_forward = QtWidgets.QAction(self)
-        action_forward.setEnabled(False) # initially not enabled
+        action_forward.setEnabled(False)  # initially not enabled
         action_forward.setIcon(icon_provider('icon.forward.png'))
         tool_bar.addAction(action_forward)
         self.action_forward = action_forward
@@ -702,6 +719,9 @@ class BrowserWidget(QtWidgets.QWidget):
             self.web_view.load(self.home_url)
             self.web_view.history().clear()  # deletes the history
             # TODO this doesn't work, do it after it is loaded...
+
+    def load(self, url):
+        self.web_view.load(url)
 
     def forward(self):
         """

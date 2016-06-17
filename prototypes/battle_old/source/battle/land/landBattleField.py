@@ -18,8 +18,8 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QBrush, QPen, QColor
 
-from lib.hexagon import QHexagon
 from prototypes.battle.source.battle.land.landBattleFieldType import LandBattleFieldType
+from prototypes.battle.source.config.hexagon import QHexagon
 
 
 class LandBattleField:

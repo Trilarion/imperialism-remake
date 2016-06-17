@@ -117,7 +117,7 @@ class StartScreen(QtWidgets.QWidget):
             'help': client.show_help_browser,
             'lobby': client.show_game_lobby_dialog,
             'editor': client.switch_to_editor_screen,
-            'options': client.show_options_dialog
+            'options': client.show_preferences_dialog
         }
 
         image_map_file = c.extend(c.GRAPHICS_UI_FOLDER, 'start.overlay.info')
@@ -642,7 +642,7 @@ class OptionsContentWidget(QtWidgets.QWidget):
 
         # mute checkbox
         checkbox = QtWidgets.QCheckBox('Mute background music')
-        self.register_checkbox(checkbox, c.Opt.BG_MUTE)
+        self.register_checkbox(checkbox, c.Opt.SOUNDTRACK_MUTE)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -748,11 +748,11 @@ class OptionsContentWidget(QtWidgets.QWidget):
             answer = QtGui.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences',
                                                 QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.Yes)
             if answer == QtGui.QMessageBox.Yes:
-                # all checkboxes
+                # all _check_boxes
                 for (box, option) in self.checkboxes:
                     t.set_option(option, box.isChecked())
                 # what else do we need to do?
-                if t.get_option(c.Opt.BG_MUTE):
+                if t.get_option(c.Opt.SOUNDTRACK_MUTE):
                     # t.player.stop()
                     pass
                 else:
@@ -775,7 +775,7 @@ class MainWindow(QtWidgets.QWidget):
         """
         super().__init__()
         # set geometry
-        self.setGeometry(t.get_option(c.Opt.MW_BOUNDS))
+        self.setGeometry(t.get_option(c.Opt.MAINWINDOW_BOUNDS))
         # set icon
         self.setWindowIcon(t.load_ui_icon('icon.ico'))
         # set title
@@ -790,7 +790,7 @@ class MainWindow(QtWidgets.QWidget):
         if t.get_option(c.Opt.FULLSCREEN):
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
             self.showFullScreen()
-        elif t.get_option(c.Opt.MW_MAXIMIZED):
+        elif t.get_option(c.Opt.MAINWINDOW_MAXIMIZED):
             self.showMaximized()
         else:
             self.show()
@@ -859,7 +859,7 @@ class Client():
         self.player.next.connect(self.audio_notification)
         self.player.set_playlist(audio.load_soundtrack_playlist())
         # start audio player if wished
-        if not t.get_option(c.Opt.BG_MUTE):
+        if not t.get_option(c.Opt.SOUNDTRACK_MUTE):
             self.player.start()
 
         # after the player starts, the main window is not active anymore
@@ -966,8 +966,8 @@ class Client():
             Cleans up and closes the main window which causes app.exec_() to finish.
         """
         # store state in options
-        t.set_option(c.Opt.MW_BOUNDS, self.main_window.normalGeometry())
-        t.set_option(c.Opt.MW_MAXIMIZED, self.main_window.isMaximized())
+        t.set_option(c.Opt.MAINWINDOW_BOUNDS, self.main_window.normalGeometry())
+        t.set_option(c.Opt.MAINWINDOW_MAXIMIZED, self.main_window.isMaximized())
 
         # audio
         # self.player.stop()
@@ -1011,9 +1011,9 @@ def start():
         return
 
     # if no bounds are set, set resonable bounds
-    if t.get_option(c.Opt.MW_BOUNDS) is None:
-        t.set_option(c.Opt.MW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
-        t.set_option(c.Opt.MW_MAXIMIZED, True)
+    if t.get_option(c.Opt.MAINWINDOW_BOUNDS) is None:
+        t.set_option(c.Opt.MAINWINDOW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
+        t.set_option(c.Opt.MAINWINDOW_MAXIMIZED, True)
         t.log_info('No previous bounds of the main window stored, start maximized')
 
     # load global stylesheet to app

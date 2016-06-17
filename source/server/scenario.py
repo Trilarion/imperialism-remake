@@ -18,13 +18,14 @@ import math
 
 from PyQt5 import QtCore
 
-import lib.utils as utils
 import base.constants as constants
+import lib.utils as utils
 
 """
     Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
     thin client).
 """
+
 
 # TODO rivers are implemented inefficiently
 
@@ -64,10 +65,7 @@ class Scenario(QtCore.QObject):
         """
             Adds a river with a list of tiles and a name.
         """
-        river = {
-            'name': name,
-            'tiles': tiles
-        }
+        river = {'name': name, 'tiles': tiles}
         self._properties[constants.PropertyKeyNames.RIVERS].extend([river])
 
     def set_terrain_at(self, column, row, terrain):
@@ -100,8 +98,8 @@ class Scenario(QtCore.QObject):
         """
         column = math.floor(x - (y % 2) / 2)
         row = math.floor(y)
-        if row < 0 or row >= self._properties[constants.PropertyKeyNames.MAP_ROWS] or column < 0\
-                or column >= self._properties[constants.PropertyKeyNames.MAP_COLUMNS]:
+        if row < 0 or row >= self._properties[constants.PropertyKeyNames.MAP_ROWS] or column < 0 or column >= \
+                self._properties[constants.PropertyKeyNames.MAP_COLUMNS]:
             return -1, -1
         return column, row
 
