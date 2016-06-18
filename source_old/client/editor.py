@@ -22,7 +22,7 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 import lib.qt_graphics as g
 import base.tools as t
 import base.constants as c
-from base.constants import PropertyKeyNames as k
+from base.constants import ScenarioProperties as k
 import client.graphics as cg
 from server.scenario import Scenario
 
@@ -37,7 +37,7 @@ from server.scenario import Scenario
 # A dictionary with all the default properties of a new scenario.
 # TODO should this rather go to scenario as a static function?
 NEW_SCENARIO_DEFAULT_PROPERTIES = {
-    k.TITLE: 'Unnamed',
+    k.SCENARIO_TITLE: 'Unnamed',
     k.MAP_COLUMNS: 100,
     k.MAP_ROWS: 60
 }
@@ -578,8 +578,8 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(box)
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
-        edit.setText(self.properties[k.TITLE])
-        self.properties[k.TITLE] = edit
+        edit.setText(self.properties[k.SCENARIO_TITLE])
+        self.properties[k.SCENARIO_TITLE] = edit
         layout.addWidget(edit)
         widget_layout.addWidget(box)
 
@@ -622,7 +622,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         """
             "Create scenario" is clicked.
         """
-        p = {k.TITLE: self.properties[k.TITLE].text(),
+        p = {k.SCENARIO_TITLE: self.properties[k.SCENARIO_TITLE].text(),
              k.MAP_COLUMNS: int(self.properties[k.MAP_COLUMNS].text()),
              k.MAP_ROWS: int(self.properties[k.MAP_ROWS].text())}
         # TODO conversion can fail, (ValueError) give error message
@@ -648,7 +648,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(box)
         self.edit = QtWidgets.QLineEdit()
         self.edit.setFixedWidth(300)
-        self.edit.setText(self.scenario[k.TITLE])
+        self.edit.setText(self.scenario[k.SCENARIO_TITLE])
         layout.addWidget(self.edit)
 
         widget_layout.addWidget(box)
@@ -659,7 +659,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
         """
             Dialog will be closed, save data.
         """
-        self.scenario[k.TITLE] = self.edit.text()
+        self.scenario[k.SCENARIO_TITLE] = self.edit.text()
         return True
 
 
@@ -754,8 +754,8 @@ class EditorScreen(QtWidgets.QWidget):
             Create new scenario (from the create new scenario dialog).
         """
         self.scenario.reset()
-        self.scenario[k.TITLE] = properties[k.TITLE]
-        self.scenario.create_map(properties[k.MAP_COLUMNS], properties[k.MAP_ROWS])
+        self.scenario[k.SCENARIO_TITLE] = properties[k.SCENARIO_TITLE]
+        self.scenario.create_empty_map(properties[k.MAP_COLUMNS], properties[k.MAP_ROWS])
 
         # standard rules
         self.scenario['rules'] = 'standard.rules'
@@ -786,7 +786,7 @@ class EditorScreen(QtWidgets.QWidget):
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
             self.scenario.load(file_name)
-            self.client.schedule_notification('Loaded scenario {}'.format(self.scenario[k.TITLE]))
+            self.client.schedule_notification('Loaded scenario {}'.format(self.scenario[k.SCENARIO_TITLE]))
 
     def save_scenario_dialog(self):
         """

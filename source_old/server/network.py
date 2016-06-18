@@ -25,7 +25,7 @@ from PyQt5 import QtCore
 from lib.network import Server
 import lib.utils as u
 import base.constants as c
-from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
+from base.constants import ScenarioProperties as k, NationProperties as kn
 from base.network import NetworkClient
 from server.scenario import Scenario
 
@@ -125,7 +125,7 @@ class ServerManager(QtCore.QObject):
         for scenario_file in scenario_files:
             reader = u.ZipArchiveReader(scenario_file)
             properties = reader.read_as_yaml('properties')
-            scenario_titles.append(properties[k.TITLE])
+            scenario_titles.append(properties[k.SCENARIO_TITLE])
 
         # zip files and titles together
         scenarios = zip(scenario_titles, scenario_files)
@@ -156,7 +156,7 @@ class ServerManager(QtCore.QObject):
         preview = {'scenario': file_name}
 
         # some scenario properties should be copied
-        scenario_copy_keys = [k.MAP_COLUMNS, k.MAP_ROWS, k.TITLE, k.DESCRIPTION]
+        scenario_copy_keys = [k.MAP_COLUMNS, k.MAP_ROWS, k.SCENARIO_TITLE, k.SCENARIO_DESCRIPTION]
         for key in scenario_copy_keys:
             preview[key] = scenario[key]
 

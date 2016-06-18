@@ -4,6 +4,7 @@
 /.idea/dictionaries
 /.idea/vcs.xml
 /.idea/jsLibraryMappings.xml
+/.idea/misc.xml
 
 # python
 
@@ -12,8 +13,6 @@ __pycache__
 # ours
 
 /data/manual
-/tools/imperialism_map_import.py
-/tools/board-content.json.backup
-/prototypes/battle/source/game.log
 /build
+
 

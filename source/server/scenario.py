@@ -26,12 +26,22 @@ import lib.utils as utils
     thin client).
 """
 
+SCENARIO_FILE_PROPERTIES = 'scenario-properties'
+SCENARIO_FILE_MAPS = 'maps'
+SCENARIO_FILE_PROVINCES = 'provines'
+SCENARIO_FILE_NATIONS = 'nations'
 
 # TODO rivers are implemented inefficiently
 
 class Scenario(QtCore.QObject):
     """
         Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
+
+        _properties is a dictionary with keys from constants.ScenarioProperties
+        _provinces is a
+        _nations is a
+        _maps is a dictionary of different maps (terrain, resource)
+        _rules is a dictionary of rules properties
     """
 
     def __init__(self):
@@ -46,91 +56,102 @@ class Scenario(QtCore.QObject):
         """
             Just empty
         """
-        self._properties = {constants.PropertyKeyNames.RIVERS: []}
+        self._properties = {constants.ScenarioProperties.RIVERS: []}
         self._provinces = {}
         self._nations = {}
-        self._map = {}
+        self._maps = {}
+        self._rules = {}
 
-    def create_map(self, columns, rows):
+    def create_empty_map(self, columns, rows):
         """
             Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
         """
-        self._properties[constants.PropertyKeyNames.MAP_COLUMNS] = columns
-        self._properties[constants.PropertyKeyNames.MAP_ROWS] = rows
+        self._properties[constants.ScenarioProperties.MAP_COLUMNS] = columns
+        self._properties[constants.ScenarioProperties.MAP_ROWS] = rows
         number_tiles = columns * rows
-        self._map['terrain'] = [0] * number_tiles
-        self._map['resource'] = [0] * number_tiles
+        self._maps['terrain'] = [0] * number_tiles
+        self._maps['resource'] = [0] * number_tiles
 
     def add_river(self, name, tiles):
         """
             Adds a river with a list of tiles and a name.
+            TODO this is inefficient
         """
         river = {'name': name, 'tiles': tiles}
-        self._properties[constants.PropertyKeyNames.RIVERS].extend([river])
+        self._properties[constants.ScenarioProperties.RIVERS].extend([river])
 
     def set_terrain_at(self, column, row, terrain):
         """
-            Sets the terrain at a given position.
+            Sets the terrain at a given position. No check is performed for valid terrain.
         """
-        self._map['terrain'][self.map_index(column, row)] = terrain
+        self._maps['terrain'][self._map_index(column, row)] = terrain
 
     def terrain_at(self, column, row):
         """
-            Returns the terrain at a given position.
+            Returns the terrain at a given position of the map.
         """
-        return self._map['terrain'][self.map_index(column, row)]
+        return self._maps['terrain'][self._map_index(column, row)]
 
     def set_resource_at(self, column, row, resource):
         """
-            Sets the resource value at a given position.
+            Sets the resource value at a given position. No check is performed for valid resources.
         """
-        self._map['resource'][self.map_index(column, row)] = resource
+        self._maps['resource'][self._map_index(column, row)] = resource
 
     def resource_at(self, column, row):
         """
-            Returns the resource value at a given position from the map.
+            Returns the resource value at a given position of the map.
         """
-        return self._map['resource'][self.map_index(column, row)]
+        return self._maps['resource'][self._map_index(column, row)]
 
     def map_position(self, x, y):
         """
-            Converts a scene position to a map position (or return (-1,-1) if
+            Converts a scene position to a map position (or return (-1,-1) if outside of the possible coordinates.
+
+            A scene position is the position in the QGraphicsScene containing the map view and normalized by
+            the tile size. The reason this conversion is done here is that the knowledge about the direction of the
+            shift of each second row is kept only here at the scenario and not spread out.
+
+            Each second row is shifted right (positive) by one half, starting with the second.
         """
-        column = math.floor(x - (y % 2) / 2)
         row = math.floor(y)
-        if row < 0 or row >= self._properties[constants.PropertyKeyNames.MAP_ROWS] or column < 0 or column >= \
-                self._properties[constants.PropertyKeyNames.MAP_COLUMNS]:
-            return -1, -1
+        column = math.floor(x - (row % 2) / 2)
+        if row < 0 or row >= self._properties[constants.ScenarioProperties.MAP_ROWS] or column < 0 or column >= \
+                self._properties[constants.ScenarioProperties.MAP_COLUMNS]:
+            return (-1, -1)
         return column, row
 
     @staticmethod
     def scene_position(column, row):
         """
-            Converts a map position to a scene position
+            Converts a map position to a scene position. A scene position is the the normalized (by the tile size)
+            position of the upper, left corner of a map tile at position (column, row).
+
+            Each second row is shifted right (positive) by one half, starting with the second.
+            Columns and rows start at zero.
         """
-        # TODO move to client side, has nothing to do with server (or has it?)
         return column + (row % 2) / 2, row
 
-    def map_index(self, column, row):
+    def _map_index(self, column, row):
         """
-            Calculates the index in the linear map for a given 2D position (first row, then column)?
+            Internal function. Calculates the index in the linear map for a given 2D position (first row, then column)?
         """
-        index = row * self._properties[constants.PropertyKeyNames.MAP_COLUMNS] + column
+        index = row * self._properties[constants.ScenarioProperties.MAP_COLUMNS] + column
         return index
 
     def get_neighbor_position(self, column, row, direction):
         """
-            Given a positon (column, row) and a direction (constants.TileDirections) return the position of the next neighbor
-            tile in that direction given our staggered tile layout where the second and all other odd rows are shifted
-            half a tile to the right. Returns None if we would be outside of the map area.
+            Given a position (column, row) and a direction (see constants.TileDirections) return the position of the
+            next neighbour tile in that direction given our staggered tile layout where the second and all other odd
+            rows are shifted half a tile to the right (positive). Returns None if we would be outside of the map area.
         """
-        if direction is constants.TileDirections.West:
+        if direction is constants.TileDirections.WEST:
             # west
             if column > 0:
                 return [column - 1, row]
             else:
                 return None
-        elif direction is constants.TileDirections.NorthWest:
+        elif direction is constants.TileDirections.NORTH_WEST:
             # north-west
             if row > 0:
                 if row % 2 == 0:
@@ -141,7 +162,7 @@ class Scenario(QtCore.QObject):
                     return [column, row - 1]
             else:
                 return None
-        elif direction is constants.TileDirections.NorthEast:
+        elif direction is constants.TileDirections.NORTH_EAST:
             # north-east
             if row > 0:
                 if row % 2 == 0:
@@ -152,15 +173,15 @@ class Scenario(QtCore.QObject):
                     return [column + 1, row - 1]
             else:
                 return None
-        elif direction is constants.TileDirections.East:
+        elif direction is constants.TileDirections.EAST:
             # east
-            if column < self._properties[constants.PropertyKeyNames.MAP_COLUMNS] - 1:
+            if column < self._properties[constants.ScenarioProperties.MAP_COLUMNS] - 1:
                 return [column + 1, row]
             else:
                 return None
-        elif direction is constants.TileDirections.SouthEast:
+        elif direction is constants.TileDirections.SOUTH_EAST:
             # south-east
-            if row < self._properties[constants.PropertyKeyNames.MAP_ROWS] - 1:
+            if row < self._properties[constants.ScenarioProperties.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column, row + 1]
@@ -169,9 +190,9 @@ class Scenario(QtCore.QObject):
                     return [column + 1, row + 1]
             else:
                 return None
-        elif direction is constants.TileDirections.SouthWest:
+        elif direction is constants.TileDirections.SOUTH_WEST:
             # south-west
-            if row < self._properties[constants.PropertyKeyNames.MAP_ROWS] - 1:
+            if row < self._properties[constants.ScenarioProperties.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column - 1, row + 1]
@@ -183,7 +204,8 @@ class Scenario(QtCore.QObject):
 
     def get_neighbored_tiles(self, column, row):
         """
-            For all directions, get all neighbored tiles.
+            For all directions, get all neighbored tiles. Just executes get_neighbor_position() for all possitle
+            TileDirections
         """
         tiles = []
         for direction in constants.TileDirections:
@@ -205,14 +227,15 @@ class Scenario(QtCore.QObject):
         else:
             raise RuntimeError('Unknown property {}.'.format(key))
 
-    def new_province(self):
+    def create_new_province(self):
         """
-            Creates a new (nation-less) province and returns it.
+            Creates a new (nation-less) province and returns the id of it.
         """
-        province = len(self._provinces)  # this always works because we check after loading
+        province = len(self._provinces)  # this always works because we check after loading the integrity of the keys
+        # TODO unless we delete provinces, some more checks might be good here (like first non-used)
         self._provinces[province] = {}
-        self._provinces[province]['tiles'] = []
-        self._provinces[province]['nation'] = None
+        self._provinces[province][constants.ProvinceProperties.TILES] = []
+        self._provinces[province][constants.ProvinceProperties.NATION] = None
         return province
 
     def set_province_property(self, province, key, value):
@@ -226,7 +249,8 @@ class Scenario(QtCore.QObject):
 
     def get_province_property(self, province, key):
         """
-            Gets a province property.
+            Gets a province property. One can only obtain properties that have been set before and only for provinces
+            that exist.
         """
         if province in self._provinces and key in self._provinces[province]:
             return self._provinces[province][key]
@@ -239,7 +263,7 @@ class Scenario(QtCore.QObject):
             TODO we should check that this position is not yet in another province (it should be cleared before). fail fast, fail often
         """
         if province in self._provinces and self.is_valid_position(position):
-            self._provinces[province]['tiles'].append(position)
+            self._provinces[province][constants.ProvinceProperties.TILES].append(position)
 
     def all_nations(self):
         """
@@ -247,14 +271,14 @@ class Scenario(QtCore.QObject):
         """
         return self._nations.keys()
 
-    def new_nation(self):
+    def create_new_nation(self):
         """
             Add a new nation and returns it.
         """
         nation = len(self._nations)  # this always gives a new unique number because we check after loading
+        # TODO as long as we do not delete nations, some more checks here might be good
         self._nations[nation] = {}
-        self._nations[nation]['properties'] = {}
-        self._nations[nation]['provinces'] = []
+        self._nations[nation][constants.NationProperties.PROVINCES] = []
         return nation
 
     def set_nation_property(self, nation, key, value):
@@ -262,16 +286,17 @@ class Scenario(QtCore.QObject):
             Set nation property.
         """
         if nation in self._nations:
-            self._nations[nation]['properties'][key] = value
+            self._nations[nation][key] = value
         else:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
     def get_nation_property(self, nation, key):
         """
-            Gets a nation property.
+            Gets a nation property. One can only obtain properties that have been set before and only for nations
+            that exist.
         """
-        if nation in self._nations and key in self._nations[nation]['properties']:
-            return self._nations[nation]['properties'][key]
+        if nation in self._nations and key in self._nations[nation]:
+            return self._nations[nation][key]
         else:
             raise RuntimeError('Unknown nation {} or property {}.'.format(nation, key))
 
@@ -280,7 +305,7 @@ class Scenario(QtCore.QObject):
             Return ids for all provinces in a nation.
         """
         if nation in self._nations:
-            return self._nations[nation]['provinces']
+            return self._nations[nation][constants.NationProperties.PROVINCES]
         else:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
@@ -290,9 +315,9 @@ class Scenario(QtCore.QObject):
 
             TODO speed up by having a reference in the map. (see also programmers.SE question)
         """
-        position = [column, row]  # internally because of JSON saving we only have []
+        position = [column, row]
         for province in self._provinces:
-            if position in self._provinces[province]['tiles']:
+            if position in self._provinces[province][constants.ProvinceProperties.TILES]:
                 return province
         return None
 
@@ -302,8 +327,8 @@ class Scenario(QtCore.QObject):
         """
         # TODO this is not right yet
         # wire it in both ways
-        self._nations[nation]['provinces'].append(province)
-        self._provinces[province]['nation'] = nation
+        self._nations[nation][constants.NationProperties.PROVINCES].append(province)
+        self._provinces[province][constants.ProvinceProperties.NATION] = nation
 
     def get_terrain_name(self, terrain):
         """
@@ -311,36 +336,39 @@ class Scenario(QtCore.QObject):
 
             TODO move this to a special rules class. Only have rules() and setRules() here.
         """
-        return self._properties['rules']['terrain.names'][terrain]
+        return self._rules['terrain.names'][terrain]
 
     def load(self, file_name):
         """
-            Loads/deserializes all internal variables from a zipped archive via JSON.
+            Load/deserialize all internal variables from a zipped archive via YAML.
         """
+
+        # so we can do that also during game play, we reset
         self.reset()
+
         reader = utils.ZipArchiveReader(file_name)
-        self._properties = reader.read_as_yaml('properties')
-        self._map = reader.read_as_yaml('map')
-        self._provinces = reader.read_as_yaml('provinces')
-        # TODO check all ids are smaller then len()
-        self._nations = reader.read_as_yaml('nations')
-        # TODO check all ids are smaller then len()
-        self.load_rules()
 
-    def load_rules(self):
-        """
+        self._properties = reader.read_as_yaml(SCENARIO_FILE_PROPERTIES)
+        self._maps = reader.read_as_yaml(SCENARIO_FILE_MAPS)
+        self._provinces = reader.read_as_yaml(SCENARIO_FILE_PROVINCES)
+        # TODO check all ids are smaller then len()
 
-        """
-        # read rules
+        self._nations = reader.read_as_yaml(SCENARIO_FILE_NATIONS)
+        # TODO check all ids are smaller then len()
+
+        # read rule file
+        # TODO how to specify which rules file apply
         rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, self._properties['rules'])
-        self._properties['rules'] = utils.read_as_yaml(rule_file)
+        self._rules = utils.read_as_yaml(rule_file)
 
     def save(self, file_name):
         """
-            Saves/serializes all internal variables via JSON into a zipped archive.
+            Saves/serializes all internal variables via YAML into a zipped archive.
         """
         writer = utils.ZipArchiveWriter(file_name)
-        writer.write_as_yaml('properties', self._properties)
-        writer.write_as_yaml('map', self._map)
-        writer.write_as_yaml('provinces', self._provinces)
-        writer.write_as_yaml('nations', self._nations)
+        writer.write_as_yaml(SCENARIO_FILE_PROPERTIES, self._properties)
+        writer.write_as_yaml(SCENARIO_FILE_MAPS, self._maps)
+        writer.write_as_yaml(SCENARIO_FILE_PROVINCES, self._provinces)
+        writer.write_as_yaml(SCENARIO_FILE_NATIONS, self._nations)
+
+        # rules are never updated by this mechanism

@@ -1,3 +1,0 @@
-File format: png
-Dimensions : 600 x 400
-

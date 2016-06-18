@@ -119,34 +119,42 @@ class TileDirections(utils.AutoNumberedEnum):
     """
         Six directions for six neighbored tiles in clockwise order.
     """
-    West = ()
-    NorthWest = ()
-    NorthEast = ()
-    East = ()
-    SouthEast = ()
-    SouthWest = ()
+    WEST = ()
+    NORTH_WEST = ()
+    NORTH_EAST = ()
+    EAST = ()
+    SOUTH_EAST = ()
+    SOUTH_WEST = ()
 
     def __init__(self):
         self.default = None
 
 
-class PropertyKeyNames:
+class ScenarioProperties:
     """
         Key names for general properties of a scenario.
     """
 
-    TITLE = 'scenario.title'
-    DESCRIPTION = 'scenario.description'
+    SCENARIO_TITLE = 'scenario.title'
+    SCENARIO_DESCRIPTION = 'scenario.description'
     MAP_COLUMNS = 'map.columns'
     MAP_ROWS = 'map.rows'
     RIVERS = 'rivers'
 
+class ProvinceProperties:
+    """
 
-class NationPropertyKeyNames:
+    """
+    TILES = 'tiles'
+    NATION = 'nation'
+
+
+
+class NationProperties:
     """
         Key names for nation properties of a scenario.
     """
-
+    PROVINCES = 'provinces'
     COLOR = 'color'
     NAME = 'name'
     DESCRIPTION = 'description'

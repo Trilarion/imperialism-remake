@@ -206,7 +206,7 @@ class Notification(QtCore.QObject):
         # replace content by QLabel if content is a string
         if isinstance(content, str):
             content = QtWidgets.QLabel(content)
-            content.setObjectName('notification')
+            content.setObjectName('notification-label')
 
         # set background
         layout = QtWidgets.QVBoxLayout(self.widget)

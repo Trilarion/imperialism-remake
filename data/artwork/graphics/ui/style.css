@@ -2,12 +2,17 @@
 	Imperialism Remake UI style definition used by the Qt framework (css)
 */
 
+*[background="black"]
+{
+	background-color: #000000;
+}
+
 QWidget#gamedialog
 {
 	border: 1px solid black;
 }
 
-QWidget#titlebar
+QToolBar#gamedialog-titlebar
 {
 	background-color: #9E7921;
 	border: 0px;
@@ -24,12 +29,7 @@ QWidget#titlebar
 	padding: 0px;
 }
 
-*[background="texture"]
-{
-	background-image: url(data/artwork/graphics/ui/background_texture.png);
-}
-
-.QLabel#notification
+.QLabel#notification-label
 {
 	border: 1px solid black;
 	padding: 5px 10px 5px 10px;
@@ -37,18 +37,18 @@ QWidget#titlebar
 	color: white;
 }
 
-.QLabel#infobox
+QWidget#infobox-widget
 {
 	background-color: gray;
 }
 
-.QGraphicsView#minimap
+QWidget#minimap-widget
 {
 	border: 0px;
 	background-color: gray;
 }
 
-QGraphicsView#map
+QGraphicsView#map-view
 {
 			background-color: #191E69;
 			border-style: solid;

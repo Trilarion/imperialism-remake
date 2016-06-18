@@ -45,7 +45,7 @@ class Scenario(QtCore.QObject):
         """
             Just empty
         """
-        self._properties = {c.PropertyKeyNames.RIVERS: []}
+        self._properties = {c.ScenarioProperties.RIVERS: []}
         self._provinces = {}
         self._nations = {}
         self._map = {}
@@ -54,8 +54,8 @@ class Scenario(QtCore.QObject):
         """
             Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
         """
-        self._properties[c.PropertyKeyNames.MAP_COLUMNS] = columns
-        self._properties[c.PropertyKeyNames.MAP_ROWS] = rows
+        self._properties[c.ScenarioProperties.MAP_COLUMNS] = columns
+        self._properties[c.ScenarioProperties.MAP_ROWS] = rows
         number_tiles = columns * rows
         self._map['terrain'] = [0] * number_tiles
         self._map['resource'] = [0] * number_tiles
@@ -68,7 +68,7 @@ class Scenario(QtCore.QObject):
             'name': name,
             'tiles': tiles
         }
-        self._properties[c.PropertyKeyNames.RIVERS].extend([river])
+        self._properties[c.ScenarioProperties.RIVERS].extend([river])
 
     def set_terrain_at(self, column, row, terrain):
         """
@@ -100,8 +100,8 @@ class Scenario(QtCore.QObject):
         """
         column = math.floor(x - (y % 2) / 2)
         row = math.floor(y)
-        if row < 0 or row >= self._properties[c.PropertyKeyNames.MAP_ROWS] or column < 0\
-                or column >= self._properties[c.PropertyKeyNames.MAP_COLUMNS]:
+        if row < 0 or row >= self._properties[c.ScenarioProperties.MAP_ROWS] or column < 0\
+                or column >= self._properties[c.ScenarioProperties.MAP_COLUMNS]:
             return -1, -1
         return column, row
 
@@ -117,7 +117,7 @@ class Scenario(QtCore.QObject):
         """
             Calculates the index in the linear map for a given 2D position (first row, then column)?
         """
-        index = row * self._properties[c.PropertyKeyNames.MAP_COLUMNS] + column
+        index = row * self._properties[c.ScenarioProperties.MAP_COLUMNS] + column
         return index
 
     def get_neighbor_position(self, column, row, direction):
@@ -126,13 +126,13 @@ class Scenario(QtCore.QObject):
             tile in that direction given our staggered tile layout where the second and all other odd rows are shifted
             half a tile to the right. Returns None if we would be outside of the map area.
         """
-        if direction is c.TileDirections.West:
+        if direction is c.TileDirections.WEST:
             # west
             if column > 0:
                 return [column - 1, row]
             else:
                 return None
-        elif direction is c.TileDirections.NorthWest:
+        elif direction is c.TileDirections.NORTH_WEST:
             # north-west
             if row > 0:
                 if row % 2 == 0:
@@ -143,7 +143,7 @@ class Scenario(QtCore.QObject):
                     return [column, row - 1]
             else:
                 return None
-        elif direction is c.TileDirections.NorthEast:
+        elif direction is c.TileDirections.NORTH_EAST:
             # north-east
             if row > 0:
                 if row % 2 == 0:
@@ -154,15 +154,15 @@ class Scenario(QtCore.QObject):
                     return [column + 1, row - 1]
             else:
                 return None
-        elif direction is c.TileDirections.East:
+        elif direction is c.TileDirections.EAST:
             # east
-            if column < self._properties[c.PropertyKeyNames.MAP_COLUMNS] - 1:
+            if column < self._properties[c.ScenarioProperties.MAP_COLUMNS] - 1:
                 return [column + 1, row]
             else:
                 return None
-        elif direction is c.TileDirections.SouthEast:
+        elif direction is c.TileDirections.SOUTH_EAST:
             # south-east
-            if row < self._properties[c.PropertyKeyNames.MAP_ROWS] - 1:
+            if row < self._properties[c.ScenarioProperties.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column, row + 1]
@@ -171,9 +171,9 @@ class Scenario(QtCore.QObject):
                     return [column + 1, row + 1]
             else:
                 return None
-        elif direction is c.TileDirections.SouthWest:
+        elif direction is c.TileDirections.SOUTH_WEST:
             # south-west
-            if row < self._properties[c.PropertyKeyNames.MAP_ROWS] - 1:
+            if row < self._properties[c.ScenarioProperties.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column - 1, row + 1]

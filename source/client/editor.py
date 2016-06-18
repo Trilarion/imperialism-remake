@@ -25,7 +25,6 @@ import base.constants as constants
 import base.tools as tools
 import client.graphics as graphics
 import lib.qt_graphics as qt_graphics
-from base.constants import PropertyKeyNames as k
 from server.scenario import Scenario
 
 """
@@ -37,7 +36,7 @@ from server.scenario import Scenario
 
 # A dictionary with all the default properties of a new scenario.
 # TODO should this rather go to scenario as a static function?
-NEW_SCENARIO_DEFAULT_PROPERTIES = {k.TITLE: 'Unnamed', k.MAP_COLUMNS: 100, k.MAP_ROWS: 60}
+NEW_SCENARIO_DEFAULT_PROPERTIES = {constants.ScenarioProperties.SCENARIO_TITLE: 'Unnamed', constants.ScenarioProperties.MAP_COLUMNS: 100, constants.ScenarioProperties.MAP_ROWS: 60}
 
 
 class EditorScenario(Scenario):
@@ -53,7 +52,7 @@ class EditorScenario(Scenario):
         self.everything_changed.emit()
 
 
-class EditorMiniMap(QtWidgets.QWidget):
+class MiniMap(QtWidgets.QWidget):
     """
         Small overview map
     """
@@ -61,14 +60,14 @@ class EditorMiniMap(QtWidgets.QWidget):
     # Fixed width of 300 pixels
     VIEW_WIDTH = 300
 
-    focus_moved = QtCore.pyqtSignal(float, float)
+    roi_changed = QtCore.pyqtSignal(float, float)
 
     def __init__(self, scenario):
         """
             Sets up the graphics view, the toolbar and the tracker rectangle.
         """
         super().__init__()
-        self.setObjectName('minimap')
+        self.setObjectName('minimap-widget')
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -79,6 +78,7 @@ class EditorMiniMap(QtWidgets.QWidget):
 
         # tracker rectangle that tracks the view of the main map
         self.tracker = QtWidgets.QGraphicsRectItem()
+        print(self.tracker.pen().widthF())
         self.tracker.setCursor(QtCore.Qt.PointingHandCursor)
         self.tracker.setZValue(1000)
         self.tracker.hide()
@@ -132,11 +132,11 @@ class EditorMiniMap(QtWidgets.QWidget):
         """
 
         # adjust view height
-        columns = self.scenario[k.MAP_COLUMNS]
-        rows = self.scenario[k.MAP_ROWS]
+        columns = self.scenario[constants.ScenarioProperties.MAP_COLUMNS]
+        rows = self.scenario[constants.ScenarioProperties.MAP_ROWS]
         view_height = math.floor(rows / columns * self.VIEW_WIDTH)
         self.view.setFixedHeight(view_height)
-        self.scene.setSceneRect(0, 0, 1, 1)
+        self.scene.setSceneRect(0, 0, columns, rows)
         self.view.fitInView(self.scene.sceneRect())  # simple and should work
 
         tile_width = round(1 / (columns + 0.5), 3)
@@ -180,7 +180,7 @@ class EditorMiniMap(QtWidgets.QWidget):
                 path = path.simplified()
                 # create a brush from the color
                 brush = QtGui.QBrush(color)
-                item = self.scene.addPath(path, brush=brush)  # will use the default pen for outline
+                #item = self.scene.addPath(path, brush=brush)  # will use the default pen for outline
                 item.setZValue(1)
                 self.removable_items.extend([item])
 
@@ -212,7 +212,7 @@ class EditorMiniMap(QtWidgets.QWidget):
                 path = paths[t]
                 path = path.simplified()
                 brush = QtGui.QBrush(colors[t])
-                item = self.scene.addPath(path, brush=brush, pen=qt_graphics.TRANSPARENT_PEN)
+                #item = self.scene.addPath(path, brush=brush, pen=qt_graphics.TRANSPARENT_PEN)
                 item.setZValue(1)
                 self.removable_items.extend([item])
 
@@ -256,7 +256,7 @@ class EditorMiniMap(QtWidgets.QWidget):
             # they are different, update stored bounds, tracker and emit signal
             tracker_rect.moveTo(x, y)
             self.tracker.setRect(tracker_rect)
-            self.focus_moved.emit(x, y)
+            self.roi_changed.emit(x, y)
 
     def reset_tracker(self, bounds):
         """
@@ -276,9 +276,9 @@ class EditorMainMap(QtWidgets.QGraphicsView):
     def __init__(self, scenario):
         super().__init__()
 
+        self.setObjectName('map-view')
         self.scene = QtWidgets.QGraphicsScene()
         self.setScene(self.scene)
-        self.setObjectName('map')
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.NoAnchor)
@@ -295,8 +295,8 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         """
         self.scene.clear()
 
-        columns = self.scenario[k.MAP_COLUMNS]
-        rows = self.scenario[k.MAP_ROWS]
+        columns = self.scenario[constants.ScenarioProperties.MAP_COLUMNS]
+        rows = self.scenario[constants.ScenarioProperties.MAP_ROWS]
 
         width = (columns + 0.5) * self.TILE_SIZE
         height = rows * self.TILE_SIZE
@@ -488,7 +488,7 @@ class InfoBox(QtWidgets.QWidget):
             Layout.
         """
         super().__init__()
-        self.setObjectName('infobox')
+        self.setObjectName('infobox-widget')
         layout = QtWidgets.QVBoxLayout(self)
 
         self.text_label = QtWidgets.QLabel()
@@ -566,8 +566,8 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(box)
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
-        edit.setText(self.properties[k.TITLE])
-        self.properties[k.TITLE] = edit
+        edit.setText(self.properties[constants.ScenarioProperties.SCENARIO_TITLE])
+        self.properties[constants.ScenarioProperties.SCENARIO_TITLE] = edit
         layout.addWidget(edit)
         widget_layout.addWidget(box)
 
@@ -579,16 +579,16 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(50)
         edit.setValidator(QtGui.QIntValidator(0, 1000))
-        edit.setText(str(self.properties[k.MAP_COLUMNS]))
-        self.properties[k.MAP_COLUMNS] = edit
+        edit.setText(str(self.properties[constants.ScenarioProperties.MAP_COLUMNS]))
+        self.properties[constants.ScenarioProperties.MAP_COLUMNS] = edit
         layout.addWidget(edit)
 
         layout.addWidget(QtWidgets.QLabel('Height'))
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(50)
         edit.setValidator(QtGui.QIntValidator(0, 1000))
-        edit.setText(str(self.properties[k.MAP_ROWS]))
-        self.properties[k.MAP_ROWS] = edit
+        edit.setText(str(self.properties[constants.ScenarioProperties.MAP_ROWS]))
+        self.properties[constants.ScenarioProperties.MAP_ROWS] = edit
         layout.addWidget(edit)
         layout.addStretch()
 
@@ -611,8 +611,8 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         """
             "Create scenario" is clicked.
         """
-        p = {k.TITLE: self.properties[k.TITLE].text(), k.MAP_COLUMNS: int(self.properties[k.MAP_COLUMNS].text()),
-             k.MAP_ROWS: int(self.properties[k.MAP_ROWS].text())}
+        p = {constants.ScenarioProperties.SCENARIO_TITLE: self.properties[constants.ScenarioProperties.SCENARIO_TITLE].text(), constants.ScenarioProperties.MAP_COLUMNS: int(self.properties[constants.ScenarioProperties.MAP_COLUMNS].text()),
+             constants.ScenarioProperties.MAP_ROWS: int(self.properties[constants.ScenarioProperties.MAP_ROWS].text())}
         # TODO conversion can fail, (ValueError) give error message
         # we close the parent window and emit the appropriate signal
         self.parent().close()
@@ -636,7 +636,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(box)
         self.edit = QtWidgets.QLineEdit()
         self.edit.setFixedWidth(300)
-        self.edit.setText(self.scenario[k.TITLE])
+        self.edit.setText(self.scenario[constants.ScenarioProperties.SCENARIO_TITLE])
         layout.addWidget(self.edit)
 
         widget_layout.addWidget(box)
@@ -647,7 +647,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
         """
             Dialog will be closed, save data.
         """
-        self.scenario[k.TITLE] = self.edit.text()
+        self.scenario[constants.ScenarioProperties.SCENARIO_TITLE] = self.edit.text()
         return True
 
 
@@ -734,8 +734,8 @@ class EditorScreen(QtWidgets.QWidget):
         self.map.tile_at_focus_changed.connect(self.info_box.update_tile_information)
 
         # the mini map
-        self.mini_map = EditorMiniMap(self.scenario)
-        self.mini_map.focus_moved.connect(self.map.set_position)
+        self.mini_map = MiniMap(self.scenario)
+        self.mini_map.roi_changed.connect(self.map.set_position)
 
         layout = QtWidgets.QGridLayout(self)
         layout.addWidget(self.toolbar, 0, 0, 1, 2)
@@ -753,12 +753,12 @@ class EditorScreen(QtWidgets.QWidget):
             Create new scenario (from the create new scenario dialog).
         """
         self.scenario.reset()
-        self.scenario[k.TITLE] = properties[k.TITLE]
-        self.scenario.create_map(properties[k.MAP_COLUMNS], properties[k.MAP_ROWS])
+        self.scenario[constants.ScenarioProperties.SCENARIO_TITLE] = properties[constants.ScenarioProperties.SCENARIO_TITLE]
+        self.scenario.create_empty_map(properties[constants.ScenarioProperties.MAP_COLUMNS], properties[constants.ScenarioProperties.MAP_ROWS])
 
         # standard rules
         self.scenario['rules'] = 'standard.rules'
-        self.scenario.load_rules()
+        #self.scenario.load_rules()
 
         # emit that everything has changed
         self.scenario.everything_changed.emit()
@@ -784,7 +784,7 @@ class EditorScreen(QtWidgets.QWidget):
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
             self.scenario.load(file_name)
-            self.client.schedule_notification('Loaded scenario {}'.format(self.scenario[k.TITLE]))
+            self.client.schedule_notification('Loaded scenario {}'.format(self.scenario[constants.ScenarioProperties.SCENARIO_TITLE]))
 
     def save_scenario_dialog(self):
         """

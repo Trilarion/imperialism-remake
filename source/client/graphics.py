@@ -55,7 +55,7 @@ class GameDialog(QtWidgets.QWidget):
         # title bar
         title_bar = g.DraggableToolBar()
         title_bar.setIconSize(QtCore.QSize(20, 20))
-        title_bar.setObjectName('titlebar')
+        title_bar.setObjectName('gamedialog-titlebar')
         title_bar.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
         title_bar.dragged.connect(lambda delta: self.move(self.pos() + delta))
 

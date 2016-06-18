@@ -85,7 +85,7 @@ class StartScreen(QtWidgets.QWidget):
         super().__init__()
 
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
-        self.setProperty('background', 'texture')
+        self.setProperty('background', 'black')
 
         layout = qt_graphics.RelativeLayout(self)
 

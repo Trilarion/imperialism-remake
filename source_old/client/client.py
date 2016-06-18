@@ -26,7 +26,7 @@ from lib.qt_graphics import BrowserWidget
 import base.tools as t
 import base.constants as c
 import base.network as net
-from base.constants import PropertyKeyNames as k, NationPropertyKeyNames as kn
+from base.constants import ScenarioProperties as k, NationProperties as kn
 from client.graphics import MiniMapNationItem
 import client.graphics as cg
 import client.audio as audio
@@ -361,7 +361,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
         # set the content from the message
-        self.description.setText(message[k.DESCRIPTION])
+        self.description.setText(message[k.SCENARIO_DESCRIPTION])
 
         nations = [[message['nations'][key]['name'], key] for key in message['nations']]
         nations = sorted(nations)  # by first element, which is the name
