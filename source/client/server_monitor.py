@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+import PyQt5.QtCore as QtCore
+import PyQt5.QtWidgets as QtWidgets
 
 """
-    Monitors the server state
+    Monitors the server state and updates it regularly
 """
 
 
@@ -36,10 +37,11 @@ class ServerMonitorWidget(QtWidgets.QWidget):
 
         # set timer for update
         self.timer = QtCore.QTimer()
-        # noinspection PyUnresolvedReferences
+
         self.timer.timeout.connect(self.update_monitor)
         self.timer.setInterval(5000)  # update every 5 seconds
         self.timer.start()
+
         # and one initial update
         self.update_monitor()
 
@@ -47,5 +49,5 @@ class ServerMonitorWidget(QtWidgets.QWidget):
         """
             Regular updates of the server stats
         """
-        text = '{} clients'.format(len(server_manager.server_clients))
-        self.status_label.setText(text)
+        #text = '{} clients'.format(len(server_manager.server_clients))
+        #self.status_label.setText(text)

@@ -15,9 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import zlib
-
 import yaml
-from PyQt5 import QtCore, QtNetwork
+
+import PyQt5.QtCore as QtCore
+import PyQt5.QtNetwork as QtNetwork
 
 """
     Basic general network functionality (client and server) wrapping around QtNetwork.QTcpSocket. Messages are sent using
@@ -30,47 +31,42 @@ SCOPE = {
 }
 
 
-class Client(QtCore.QObject):
+class ExtendedSocket(QtCore.QObject):
     """
         Wrapper around QtNetwork.QTcpSocket (set it from outside via set_socket(..)).
 
         Additionally sends and reads messages via serialization (yaml), compression (zlib) and wrapping (QByteArray).
     """
-    #connected = QtCore.pyqtSignal()
-    disconnected = QtCore.pyqtSignal()
-    error = QtCore.pyqtSignal(QtNetwork.QAbstractSocket.SocketError)
-    received = QtCore.pyqtSignal(object)
+
+    connected = QtCore.pyqtSignal() # connected
+    disconnected = QtCore.pyqtSignal() # disconnected
+    error = QtCore.pyqtSignal(QtNetwork.QAbstractSocket.SocketError) # an error has happened
+    received = QtCore.pyqtSignal(object) # received a message, whole message is emitted
 
     def __init__(self):
         """
             Initially we do not have any socket and no bytes are written.
         """
         super().__init__()
-        self.socket = None
-        self.bytes_written = 0
 
-    def set_socket(self, socket=None):
-        """
-            Set a socket (from outside) and does some wiring. If socket is None, a new one is created.
-        """
-        # only if no socket is set before
-        if self.socket is not None:
-            raise RuntimeError('Socket already set!')
-        # or if none is set, just create one
-        if socket is None:
-            socket = QtNetwork.QTcpSocket()
-        # store in local variable
-        self.socket = socket
-        # new data is handled by receive()
+        # new QTcpSocket()
+        self.socket = QtNetwork.QTcpSocket()
+
+        # some wiring, new data is handled by receive()
         self.socket.readyRead.connect(self.receive)
         self.socket.error.connect(self.error)
         self.socket.connected.connect(self.connected)
         self.socket.disconnected.connect(self.disconnected)
         self.socket.bytesWritten.connect(self.count_bytes_written)
 
-    def connected(self):
-        print('client connected')
-        print('{}, {}'.format(self.socket.peerAddress(), self.socket.peerPort()))
+        self.bytes_written = 0
+
+    def peerAddress(self):
+        """
+            (peer address, peer port)
+            must be connected
+        """
+        return self.socket.peerAddress(), self.socket.peerPort()
 
     def disconnect_from_host(self):
         """
@@ -143,7 +139,7 @@ class Server(QtCore.QObject):
         Wrapper around QtNetwork.QTcpServer and a management of several clients (each a QtNetwork.QTcpSocket).
     """
 
-    new_client = QtCore.pyqtSignal(QtNetwork.QTcpSocket)
+    new_client = QtCore.pyqtSignal(QtNetwork.QTcpSocket) # we get a new client
 
     def __init__(self):
         """
@@ -179,7 +175,7 @@ class Server(QtCore.QObject):
 
     def stop(self):
         """
-            Stopps listening.
+            Stops listening.
         """
         if self.server.isListening():
             self.server.close()

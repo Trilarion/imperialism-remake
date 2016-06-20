@@ -32,26 +32,6 @@ from server.scenario import Scenario
     know anything about the scenario, we put it in the server module.
 """
 
-# TODO in the beginning of the editor just automatically create a new scenario with the default values, to show at least something
-
-# A dictionary with all the default properties of a new scenario.
-# TODO should this rather go to scenario as a static function?
-NEW_SCENARIO_DEFAULT_PROPERTIES = {constants.ScenarioProperties.SCENARIO_TITLE: 'Unnamed', constants.ScenarioProperties.MAP_COLUMNS: 100, constants.ScenarioProperties.MAP_ROWS: 60}
-
-
-class EditorScenario(Scenario):
-    """
-        As a small wrapper this is a Scenario with a everything_changed signal that is emitted, if a new scenario is loaded.
-        TODO Do we really need it or can we call the connected slot(s) also manually after loading?
-    """
-
-    everything_changed = QtCore.pyqtSignal()
-
-    def load(self, file_name):
-        super().load(file_name)
-        self.everything_changed.emit()
-
-
 class MiniMap(QtWidgets.QWidget):
     """
         Small overview map
@@ -122,9 +102,6 @@ class MiniMap(QtWidgets.QWidget):
         # store scenario
         self.scenario = scenario
         self.removable_items = []
-
-        # and switch to political mode
-        action_political.setChecked(True)
 
     def redraw_map(self):
         """
@@ -543,7 +520,6 @@ class InfoBox(QtWidgets.QWidget):
         """
         pass
 
-
 class NewScenarioDialogWidget(QtWidgets.QWidget):
     """
         New scenario dialog.
@@ -552,13 +528,13 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
     """
     create_scenario = QtCore.pyqtSignal(dict)
 
-    def __init__(self, properties):
+    def __init__(self):
         """
             Sets up all the input elements of the create new scenario dialog.
         """
         super().__init__()
-        self.properties = properties
 
+        self.parameters = {}
         widget_layout = QtWidgets.QVBoxLayout(self)
 
         # title box
@@ -566,8 +542,8 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(box)
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
-        edit.setText(self.properties[constants.ScenarioProperties.SCENARIO_TITLE])
-        self.properties[constants.ScenarioProperties.SCENARIO_TITLE] = edit
+        edit.setPlaceholderText('Unnamed')
+        self.parameters[constants.ScenarioProperties.SCENARIO_TITLE] = edit
         layout.addWidget(edit)
         widget_layout.addWidget(box)
 
@@ -578,17 +554,17 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel('Width'))
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(50)
-        edit.setValidator(QtGui.QIntValidator(0, 1000))
-        edit.setText(str(self.properties[constants.ScenarioProperties.MAP_COLUMNS]))
-        self.properties[constants.ScenarioProperties.MAP_COLUMNS] = edit
+        edit.setValidator(QtGui.QIntValidator(1, 1000))
+        edit.setPlaceholderText('100')
+        self.parameters[constants.ScenarioProperties.MAP_COLUMNS] = edit
         layout.addWidget(edit)
 
         layout.addWidget(QtWidgets.QLabel('Height'))
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(50)
-        edit.setValidator(QtGui.QIntValidator(0, 1000))
-        edit.setText(str(self.properties[constants.ScenarioProperties.MAP_ROWS]))
-        self.properties[constants.ScenarioProperties.MAP_ROWS] = edit
+        edit.setValidator(QtGui.QIntValidator(1, 1000))
+        edit.setPlaceholderText('60')
+        self.parameters[constants.ScenarioProperties.MAP_ROWS] = edit
         layout.addWidget(edit)
         layout.addStretch()
 
@@ -611,12 +587,15 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         """
             "Create scenario" is clicked.
         """
-        p = {constants.ScenarioProperties.SCENARIO_TITLE: self.properties[constants.ScenarioProperties.SCENARIO_TITLE].text(), constants.ScenarioProperties.MAP_COLUMNS: int(self.properties[constants.ScenarioProperties.MAP_COLUMNS].text()),
-             constants.ScenarioProperties.MAP_ROWS: int(self.properties[constants.ScenarioProperties.MAP_ROWS].text())}
+
+        self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE] = self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text()
+        self.parameters[constants.constants.ScenarioProperties.MAP_COLUMNS] = int(self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text())
+        self.parameters[constants.constants.ScenarioProperties.MAP_ROWS] = int(self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text())
+
         # TODO conversion can fail, (ValueError) give error message
         # we close the parent window and emit the appropriate signal
         self.parent().close()
-        self.create_scenario.emit(p)
+        self.create_scenario.emit(self.parameters)
 
 
 class GeneralPropertiesWidget(QtWidgets.QWidget):
@@ -683,9 +662,8 @@ class EditorScreen(QtWidgets.QWidget):
 
         self.client = client
 
-        # create a standard scenario
-        self.scenario = EditorScenario()
-        self.create_new_scenario(NEW_SCENARIO_DEFAULT_PROPERTIES)
+        # scenario
+        self.scenario = None
 
         self.toolbar = QtWidgets.QToolBar()
         self.toolbar.setIconSize(QtCore.QSize(32, 32))
@@ -745,9 +723,6 @@ class EditorScreen(QtWidgets.QWidget):
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
 
-        # whenever the scenario changes completely, update the editor
-        self.scenario.everything_changed.connect(self.scenario_change)
-
     def create_new_scenario(self, properties):
         """
             Create new scenario (from the create new scenario dialog).
@@ -767,7 +742,7 @@ class EditorScreen(QtWidgets.QWidget):
         """
             Show the dialog for creation of a new scenario dialog.
         """
-        new_scenario_widget = NewScenarioDialogWidget(NEW_SCENARIO_DEFAULT_PROPERTIES.copy())
+        new_scenario_widget = NewScenarioDialogWidget()
         new_scenario_widget.create_scenario.connect(self.create_new_scenario)
         dialog = graphics.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario',
             delete_on_close=True, help_callback=self.client.show_help_browser)
