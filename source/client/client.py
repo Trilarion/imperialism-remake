@@ -36,6 +36,8 @@ from client.preferences import PreferencesWidget
 """
     Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
 """
+# network_client = net.NetworkClient()
+# network_client.set_socket()
 
 
 class MapItem(QtCore.QObject):
@@ -340,8 +342,23 @@ class Client:
         # close the main window
         self.main_window.close()
 
+def network_start():
+    """
+        Starts the local server and connects the local client to it.
+    """
 
-def start_client_application():
+    start.server_manager.server.start(c.NETWORK_PORT)
+
+    # connect network client of client
+    print('will connect to host')
+    network_client.connect_to_host(c.NETWORK_PORT)
+
+    # TODO must be run at the end before app finishes
+    # disconnect client
+    # client.disconnectFromHost()
+
+
+def start_client():
     """
         Creates the Qt application and shows the main window.
     """
@@ -385,4 +402,6 @@ def start_client_application():
     client.switch_to_start_screen()
 
     tools.log_info('client initialized, start Qt app execution')
+    # TODO is this necessary to run as event?
+    # QtCore.QTimer.singleShot(0, network_start)
     app.exec_()

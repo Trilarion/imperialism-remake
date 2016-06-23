@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtNetwork
 
 from base import constants as c
-from server.network import ServerManager
+from server.server import ServerManager
 from lib.network import Server
 from base.network import Client
 

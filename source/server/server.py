@@ -18,13 +18,13 @@ import random
 import os
 import time
 from multiprocessing import Process
-from threading import Thread
 
 from PyQt5 import QtCore
 
 from lib.network import Server
-import lib.utils as u
-import base.constants as c
+import lib.utils as utils
+import base.constants as constants
+
 from base.constants import ScenarioProperties as k, NationProperties as kn
 from base.network import NetworkClient
 from server.scenario import Scenario
@@ -39,32 +39,16 @@ from server.scenario import Scenario
 
 class ServerProcess(Process):
 
-    def __init__(self, port, child_conn):
+    def __init__(self):
         super().__init__()
-        self.port = port
-        self.child_conn = child_conn
 
     def run(self):
         app = QtCore.QCoreApplication([])
         server_manager = ServerManager()
-        server_manager.server.start(self.port)
-
-        # start thread which listens on the child_connection
-        t = Thread(target=self.listen, args = (app, server_manager))
-        t.start()
+        server_manager.server.start(constants.NETWORK_PORT)
 
         # run event loop of app
         app.exec_()
-        print('end process')
-
-    def listen(self, app, server_manager):
-        while True:
-            message = self.child_conn.recv()
-            print('received message {}'.format(message))
-            if message == 'quit':
-                server_manager.server.stop()
-                app.quit()
-                return
 
 
 class ServerManager(QtCore.QObject):
@@ -101,8 +85,8 @@ class ServerManager(QtCore.QObject):
         print('new client {}'.format(new_id))
 
         # add some general receivers.
-        client.connect_to_channel(c.CH_SCENARIO_PREVIEW, self.scenario_preview)
-        client.connect_to_channel(c.CH_CORE_SCENARIO_TITLES, self.core_scenario_titles)
+        client.connect_to_channel(constants.CH_SCENARIO_PREVIEW, self.scenario_preview)
+        client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, self.core_scenario_titles)
 
         # finally add to list of clients
         self.server_clients.append(client)
@@ -110,20 +94,20 @@ class ServerManager(QtCore.QObject):
     @staticmethod
     def core_scenario_titles(client, message):
         """
-            A server client received a message on the c.CH_CORE_SCENARIO_TITLES channel. Return all available core
+            A server client received a message on the constants.CH_CORE_SCENARIO_TITLES channel. Return all available core
             scenario titles and file names.
         """
         print('receivet core message')
         # get all core scenario files
-        scenario_files = [x for x in os.listdir(c.CORE_SCENARIO_FOLDER) if x.endswith('.scenario')]
+        scenario_files = [x for x in os.listdir(constants.CORE_SCENARIO_FOLDER) if x.endswith('.scenario')]
 
         # joing the path
-        scenario_files = [os.path.join(c.CORE_SCENARIO_FOLDER, x) for x in scenario_files]
+        scenario_files = [os.path.join(constants.CORE_SCENARIO_FOLDER, x) for x in scenario_files]
 
         # read scenario titles
         scenario_titles = []
         for scenario_file in scenario_files:
-            reader = u.ZipArchiveReader(scenario_file)
+            reader = utils.ZipArchiveReader(scenario_file)
             properties = reader.read_as_yaml('properties')
             scenario_titles.append(properties[k.SCENARIO_TITLE])
 
@@ -142,7 +126,7 @@ class ServerManager(QtCore.QObject):
 
     def scenario_preview(self, client, message):
         """
-            A client got a message on the c.CH_SCENARIO_PREVIEW channel. In the message should be a scenario file name
+            A client got a message on the constants.CH_SCENARIO_PREVIEW channel. In the message should be a scenario file name
             (key = 'scenario'). Assemble a preview and send it back.
         """
         t0 = time.clock()
@@ -185,3 +169,6 @@ class ServerManager(QtCore.QObject):
         client.send(message['reply-to'], preview)
 
         print('generating preview took {}s'.format(time.clock() - t0))
+
+def start_server():
+    pass

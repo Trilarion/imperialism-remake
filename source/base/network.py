@@ -16,7 +16,7 @@
 
 from PyQt5 import QtCore
 
-from lib.network import Client
+from lib.network import ExtendedSocket
 
 """
     Using Signals of Qt, we refine on the network Client class in lib/network.py. Channels are introduced which have
@@ -24,7 +24,7 @@ from lib.network import Client
 """
 
 
-class NetworkClient(Client):
+class NetworkClient(ExtendedSocket):
     """
         Extending the Client class (wrapper around QTcpSocket sending and receiving messages) with channels (see Channel
         below) and processing logic, as well as further wrapping the messages (specifying the channel as address).
