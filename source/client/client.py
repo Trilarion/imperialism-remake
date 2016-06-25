@@ -24,10 +24,14 @@ import PyQt5.QtWidgets as QtWidgets
 
 import base.constants as constants
 import base.tools as tools
+import base.network as network
 import client.audio as audio
 import client.graphics as graphics
 import lib.qt_graphics as qt_graphics
 import lib.utils as utils
+
+local_network_client = network.NetworkClient()
+
 from client.editor import EditorScreen
 from client.game_lobby import GameLobbyWidget
 from client.main_screen import GameMainScreen
@@ -36,9 +40,6 @@ from client.preferences import PreferencesWidget
 """
     Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
 """
-# network_client = net.NetworkClient()
-# network_client.set_socket()
-
 
 class MapItem(QtCore.QObject):
     """
@@ -339,23 +340,19 @@ class Client:
         # audio
         audio.soundtrack_player.stop()
 
+        # stop the local server
+        local_network_client.send(constants.CH_SYSTEM, 'shutdown')
+
         # close the main window
         self.main_window.close()
 
-def network_start():
+def local_network_connect():
     """
-        Starts the local server and connects the local client to it.
     """
-
-    start.server_manager.server.start(c.NETWORK_PORT)
 
     # connect network client of client
     print('will connect to host')
-    network_client.connect_to_host(c.NETWORK_PORT)
-
-    # TODO must be run at the end before app finishes
-    # disconnect client
-    # client.disconnectFromHost()
+    local_network_client.connect_to_host(constants.NETWORK_PORT)
 
 
 def start_client():
@@ -403,5 +400,5 @@ def start_client():
 
     tools.log_info('client initialized, start Qt app execution')
     # TODO is this necessary to run as event?
-    # QtCore.QTimer.singleShot(0, network_start)
+    QtCore.QTimer.singleShot(0, local_network_connect)
     app.exec_()

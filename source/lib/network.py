@@ -31,7 +31,7 @@ SCOPE = {
 }
 
 
-class ExtendedSocket(QtCore.QObject):
+class ExtendedTcpSocket(QtCore.QObject):
     """
         Wrapper around QtNetwork.QTcpSocket (set it from outside via set_socket(..)).
 
@@ -43,14 +43,17 @@ class ExtendedSocket(QtCore.QObject):
     error = QtCore.pyqtSignal(QtNetwork.QAbstractSocket.SocketError) # an error has happened
     received = QtCore.pyqtSignal(object) # received a message, whole message is emitted
 
-    def __init__(self):
+    def __init__(self, socket=None):
         """
             Initially we do not have any socket and no bytes are written.
         """
         super().__init__()
 
         # new QTcpSocket()
-        self.socket = QtNetwork.QTcpSocket()
+        if socket is not None:
+            self.socket = socket
+        else:
+            self.socket = QtNetwork.QTcpSocket()
 
         # some wiring, new data is handled by receive()
         self.socket.readyRead.connect(self.receive)
@@ -77,10 +80,12 @@ class ExtendedSocket(QtCore.QObject):
     def connect_to_host(self, port, host='local'):
         """
             If you want to connect
+
+            TODO only if not yet connected
         """
         if host is 'local':
             host = SCOPE['local']
-        print('client connects to {} on port {}'.format(host, port))
+        print('client connects to host={} port={}'.format(host, port))
         self.socket.connectToHost(host, port)
         print(self.socket.waitForConnected(2000))
         print(self.socket.error())
@@ -134,7 +139,7 @@ class ExtendedSocket(QtCore.QObject):
         self.bytes_written += bytes
 
 
-class Server(QtCore.QObject):
+class ExtendedTcpServer(QtCore.QObject):
     """
         Wrapper around QtNetwork.QTcpServer and a management of several clients (each a QtNetwork.QTcpSocket).
     """
@@ -145,9 +150,9 @@ class Server(QtCore.QObject):
         """
         """
         super().__init__()
-        self.server = QtNetwork.QTcpServer(self)
-        self.server.acceptError.connect(self.accept_error)
-        self.server.newConnection.connect(self.new_connection)
+        self.tcp_server = QtNetwork.QTcpServer(self)
+        self.tcp_server.acceptError.connect(self.accept_error)
+        self.tcp_server.newConnection.connect(self.new_connection)
 
     def accept_error(self, socket_error):
         print('accept error {}'.format(socket_error))
@@ -158,18 +163,18 @@ class Server(QtCore.QObject):
             QtNetwork.QHostAddress.Any
         """
         host = SCOPE[scope]
-        print('server listens on {} on port {}'.format(host, port))
-        if not self.server.listen(host, port): # app must run because newconnection is only made when listening
+        print('server listens on host={} port={}'.format(host, port))
+        if not self.tcp_server.listen(host, port):
             raise RuntimeError('Network error: cannot listen')
-        print('is listening {}'.format(self.server.isListening()))
+        print('is listening {}'.format(self.tcp_server.isListening()))
 
     def is_listening(self):
-        return self.server.isListening()
+        return self.tcp_server.isListening()
 
     def scope(self):
         if self.is_listening():
             # TODO is this the easiest way?
-            return SCOPE.keys()[SCOPE.values().index(self.server.serverAddress())]
+            return SCOPE.keys()[SCOPE.values().index(self.tcp_server.serverAddress())]
         else:
             return None
 
@@ -177,16 +182,16 @@ class Server(QtCore.QObject):
         """
             Stops listening.
         """
-        if self.server.isListening():
-            self.server.close()
+        if self.tcp_server.isListening():
+            self.tcp_server.close()
 
     def new_connection(self):
         """
             Zero or more new clients might be available, emit new_client signal for each of them.
         """
         print('new connection')
-        while self.server.hasPendingConnections():
+        while self.tcp_server.hasPendingConnections():
             # returns a new QTcpSocket
-            socket = self.server.nextPendingConnection()
+            socket = self.tcp_server.nextPendingConnection()
             # emit signal
             self.new_client.emit(socket)

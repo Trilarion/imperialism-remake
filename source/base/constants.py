@@ -113,6 +113,7 @@ Opt.SOUNDTRACK_VOLUME.default = 50
 # predefined channel names for network communication
 CH_SCENARIO_PREVIEW = 'general.scenario.preview'
 CH_CORE_SCENARIO_TITLES = 'general.core.scenarios.titles'
+CH_SYSTEM = 'system'
 
 
 class TileDirections(utils.AutoNumberedEnum):

@@ -4,13 +4,13 @@
 
 ## Getting Started
 
-### 1. Access the source code
+### Access the source code
 
 The [source code](https://github.com/Trilarion/Imperialism-Remake) is on GitHub. You can also download a zipped
 [one-time snapshot](https://github.com/Trilarion/imperialism-remake/archive/master.zip). Otherwise just register
 with GitHub and [fork the project](https://github.com/Trilarion/imperialism-remake).
 	
-### 2. Using Git
+### Using Git
 
 [Download Git](http://git-scm.com/downloads) or on Windows install [TortoiseGit](https://code.google.com/p/tortoisegit/)
 which conveniently integrates git with the explorer.
@@ -22,7 +22,12 @@ Git is not easy. Be careful and read some instructions first. I liked this [tuto
 - Programm as usual (commit)
 - When task is done, create pull request.
 
-### 3. Python
+### Documentation
+
+- [Game definition]()
+- [Developer Manual]()
+
+### Python
 
 Download and install latest [Python 3.X](https://www.python.org/downloads/). The [Python documentation](https://docs.python.org/3/) is quite good.
 
@@ -57,24 +62,24 @@ of the underlying C++ Qt 5.X framework is very useful since PyQt5 is almost 100%
 
 Note: The current version cx_Freeze 4.3.4 cannot freeze Python 3.5 applications.
 
-### 4. Start
+### Start
 
 - Execute "./tools/manual_markdown_converter.py" once with working directory "./tools" (all paths relative to repository root).
 - Run file "./source/start.py" with working directory "./".
 - Start with command line parameter "debug" for (more) output on the console.
 - A folder with log files and settings is created under "user folder/Imperialism Remake User Data" where "user folder" is the typical user folder of your system (Windows C:/Users/XXX/).
 
-### 5. IDE
+### IDE
 
 I use [PyCharm Community Edition](http://www.jetbrains.com/pycharm/download/). Since the .idea folder is contained the project
 can probably be opened directly with PyCharm. Another nice IDE is [Spyder](https://code.google.com/p/spyderlib/).
 
-### 6. Tools
+### Tools
 
 - [Inno Setup](http://www.jrsoftware.org/isinfo.php) is needed for the creation of the Windows installer.
 - Many graphics are edited with [Inkscape](http://www.inkscape.org/en/).
 
-### 7. Packaging
+### Packaging
 
 - Run `tools/package_vanilla.py` to create package in the build folder.
 

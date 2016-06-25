@@ -21,7 +21,7 @@ from multiprocessing import Process
 
 from PyQt5 import QtCore
 
-from lib.network import Server
+from lib.network import ExtendedTcpServer
 import lib.utils as utils
 import base.constants as constants
 
@@ -38,14 +38,20 @@ from server.scenario import Scenario
 # TODO ping server clients regularly and throw them out if not reacting
 
 class ServerProcess(Process):
+    """
+        A Process that inside its run method executes a QCoreApplication which runs the server.
+    """
 
     def __init__(self):
         super().__init__()
 
     def run(self):
         app = QtCore.QCoreApplication([])
+
+        # server manager
         server_manager = ServerManager()
-        server_manager.server.start(constants.NETWORK_PORT)
+        server_manager.shutdown = app.quit()
+        QtCore.QTimer.singleShot(0, server_manager.start)
 
         # run event loop of app
         app.exec_()
@@ -62,17 +68,19 @@ class ServerManager(QtCore.QObject):
             We start with a server and an empty list of server clients.
         """
         super().__init__()
-        self.server = Server()
+        self.server = ExtendedTcpServer()
         self.server.new_client.connect(self.new_client)
         self.server_clients = []
+
+    def start(self):
+        self.server.start(constants.NETWORK_PORT)
 
     def new_client(self, socket):
         """
             A new connection to the server. Give an id and add some general receivers to the new server client.
             Finally append new server client to the internal client list.
         """
-        client = NetworkClient()
-        client.set_socket(socket)
+        client = NetworkClient(socket)
 
         # give a new id
         while True:
@@ -88,8 +96,18 @@ class ServerManager(QtCore.QObject):
         client.connect_to_channel(constants.CH_SCENARIO_PREVIEW, self.scenario_preview)
         client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, self.core_scenario_titles)
 
+        # TODO if localhost connection add shutdown
+        client.connect_to_channel(constants.CH_SYSTEM, self.system_messages)
+
         # finally add to list of clients
         self.server_clients.append(client)
+
+    def system_messages(self, client, message):
+        if message is 'shutdown':
+            # self shutdown
+            # TODO disconnect all
+            self.server.stop()
+            self.shutdown()
 
     @staticmethod
     def core_scenario_titles(client, message):
@@ -169,6 +187,3 @@ class ServerManager(QtCore.QObject):
         client.send(message['reply-to'], preview)
 
         print('generating preview took {}s'.format(time.clock() - t0))
-
-def start_server():
-    pass

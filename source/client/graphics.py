@@ -16,8 +16,8 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-import lib.qt_graphics as g
-from base import tools as t
+import lib.qt_graphics as qt_graphics
+import base.tools as tools
 
 """
     Graphics elements that are dependent on the tools and lib.graphics library, but not on any game specific (constants,
@@ -53,7 +53,7 @@ class GameDialog(QtWidgets.QWidget):
             self.setWindowModality(QtCore.Qt.WindowModal)
 
         # title bar
-        title_bar = g.DraggableToolBar()
+        title_bar = qt_graphics.DraggableToolBar()
         title_bar.setIconSize(QtCore.QSize(20, 20))
         title_bar.setObjectName('gamedialog-titlebar')
         title_bar.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
@@ -71,13 +71,13 @@ class GameDialog(QtWidgets.QWidget):
 
         # if help call back is given, add help icon
         if help_callback:
-            help_action = QtWidgets.QAction(t.load_ui_icon('icon.help.png'), 'Help', title_bar)
+            help_action = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Help', title_bar)
             help_action.triggered.connect(help_callback)
             title_bar.addAction(help_action)
 
         self.close_callback = close_callback
         # the close button always calls self.close (but in closeEvent we call the close callback if existing)
-        close_action = QtWidgets.QAction(t.load_ui_icon('icon.close.png'), 'Close', title_bar)
+        close_action = QtWidgets.QAction(tools.load_ui_icon('icon.close.png'), 'Close', title_bar)
         close_action.triggered.connect(self.close)
         title_bar.addAction(close_action)
 
@@ -101,7 +101,7 @@ class GameDialog(QtWidgets.QWidget):
             event.ignore()
 
 
-class MiniMapNationItem(g.ClickablePathItem):
+class MiniMapNationItem(qt_graphics.ClickablePathItem):
     """
         The outline of a nation in any mini map that should be clickable. Has an effect.
     """

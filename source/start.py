@@ -110,24 +110,16 @@ if __name__ == '__main__':
     import multiprocessing
     # multiprocessing.freeze_support()
     multiprocessing.set_start_method('spawn')
-    from server.server import start_server
-    start_server()
+    from server.server import ServerProcess
+    server_process = ServerProcess()
+    server_process.start()
 
-    #from server.network import ServerProcess
-    #from multiprocessing import Pipe
-    #parent_conn, child_conn = Pipe()
-    #server_process = ServerProcess(c.NETWORK_PORT, child_conn)
-    #server_process.start()
     # start client, we will return when the programm finishes
     from client.client import start_client
     start_client()
 
-    # client finished
-    # stop server
-
-    #parent_conn.send('quit')
-    #server_process.join()
-    # server_manager.server.stop()
+    # wait for server
+    server_process.join()
 
     # save options
     tools.save_options(Options_File)

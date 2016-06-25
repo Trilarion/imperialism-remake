@@ -23,7 +23,10 @@ import PyQt5.QtWidgets as QtWidgets
 import base.constants as constants
 import base.tools as tools
 import lib.qt_graphics as qt_graphics
+import lib.utils as utils
+import client.graphics as graphics
 
+from client.client import local_network_client
 
 class GameLobbyWidget(QtWidgets.QWidget):
     """
@@ -188,10 +191,10 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         super().__init__()
 
         # add a channel for us
-        # network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
+        # local_network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
 
         # send a message and ask for preview
-        # network_client.send(constants.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
+        # local_network_client.send(constants.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
 
         self.selected_nation = None
 
@@ -200,7 +203,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             Populates the widget after the network reply comes from the server with the preview.
         """
         # immediately close the channel, we do not want to get this message twice
-        # network_client.remove_channel(self.CH_PREVIEW)
+        # local_network_client.remove_channel(self.CH_PREVIEW)
 
         # fill the widget with useful stuff
         layout = QtWidgets.QGridLayout(self)
@@ -249,7 +252,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
         # set the content from the message
-        self.description.setText(message[k.DESCRIPTION])
+        self.description.setText(message[constants.ScenarioProperties.DESCRIPTION])
 
         nations = [[message['nations'][key]['name'], key] for key in message['nations']]
         nations = sorted(nations)  # by first element, which is the name
@@ -257,8 +260,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.nations_list.addItems(nation_names)
 
         # draw the map
-        columns = message[k.MAP_COLUMNS]
-        rows = message[k.MAP_ROWS]
+        columns = message[constants.ScenarioProperties.MAP_COLUMNS]
+        rows = message[constants.ScenarioProperties.MAP_ROWS]
         self.map_scene.setSceneRect(0, 0, columns, rows)
 
         # fill the ground layer with a neutral color
@@ -294,7 +297,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
                         path.addRect(column, row, 1, 1)
             path = path.simplified()
 
-            item = MiniMapNationItem(path, 1, 2)
+            item = graphics.MiniMapNationItem(path, 1, 2)
             item.signaller.clicked.connect(
                 partial(self.map_selected_nation, utils.index_of_element(nation_names, nation_name)))
             item.signaller.entered.connect(partial(self.change_map_name, nation_name))
@@ -327,8 +330,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         """
         row = self.nations_list.currentRow()
         nation_id = self.nation_ids[row]
-        self.selected_nation = self.preview['nations'][nation_id][kn.NAME]
-        nation_description = self.preview['nations'][nation_id][kn.DESCRIPTION]
+        self.selected_nation = self.preview['nations'][nation_id][constants.NationProperties.NAME]
+        nation_description = self.preview['nations'][nation_id][constants.NationProperties.DESCRIPTION]
         self.nation_info.setText(nation_description)
 
     def start_scenario_clicked(self):
@@ -343,7 +346,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             Interruption. Clean up network channels and the like.
         """
         # network channel might still be open
-        network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
+        local_network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
 
 
 class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
@@ -366,10 +369,10 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
         QtWidgets.QVBoxLayout(self)  # just set a standard layout
 
         # add a channel for us
-        network_client.connect_to_channel(self.CH_TITLES, self.received_titles)
+        local_network_client.connect_to_channel(self.CH_TITLES, self.received_titles)
 
         # send message and ask for scenario titles
-        network_client.send(constants.CH_CORE_SCENARIO_TITLES, {'reply-to': self.CH_TITLES})
+        local_network_client.send(constants.CH_CORE_SCENARIO_TITLES, {'reply-to': self.CH_TITLES})
 
     def received_titles(self, client, message):
         """
@@ -378,7 +381,7 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
         """
 
         # immediately close the channel, we do not want to get this message twice
-        network_client.remove_channel(self.CH_TITLES)
+        local_network_client.remove_channel(self.CH_TITLES)
 
         # unpack message
         scenario_titles, self.scenario_files = zip(*message['scenarios'])
@@ -413,4 +416,4 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
             Interruption. Clean up network channels and the like.
         """
         # network channel might still be open
-        network_client.remove_channel(self.CH_TITLES, ignore_not_existing=True)
+        local_network_client.remove_channel(self.CH_TITLES, ignore_not_existing=True)

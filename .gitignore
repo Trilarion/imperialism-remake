@@ -1,4 +1,4 @@
-# https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
+# PyCharm (see https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore)
 /.idea/workspace.xml
 /.idea/tasks.xml
 /.idea/dictionaries
@@ -6,7 +6,7 @@
 /.idea/jsLibraryMappings.xml
 /.idea/misc.xml
 
-# python
+# Python
 
 __pycache__
 
