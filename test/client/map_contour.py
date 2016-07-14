@@ -1,5 +1,5 @@
 """
-    Calculates the countour of nation maps
+    Calculates the contour of nation maps.
 """
 
 from PyQt5 import QtGui

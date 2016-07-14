@@ -358,8 +358,6 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
 
     title_selected = QtCore.pyqtSignal(str)  # make sure to only connect with QtCore.Qt.QueuedConnection to this signal
 
-    CH_TITLES = 'SP.scenario-selection.titles'
-
     def __init__(self):
         """
 
@@ -369,10 +367,10 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
         QtWidgets.QVBoxLayout(self)  # just set a standard layout
 
         # add a channel for us
-        local_network_client.connect_to_channel(self.CH_TITLES, self.received_titles)
+        local_network_client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, self.received_titles)
 
         # send message and ask for scenario titles
-        local_network_client.send(constants.CH_CORE_SCENARIO_TITLES, {'reply-to': self.CH_TITLES})
+        local_network_client.send(constants.CH_CORE_SCENARIO_TITLES)
 
     def received_titles(self, client, message):
         """
@@ -381,7 +379,7 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
         """
 
         # immediately close the channel, we do not want to get this message twice
-        local_network_client.remove_channel(self.CH_TITLES)
+        local_network_client.remove_channel(constants.CH_CORE_SCENARIO_TITLES)
 
         # unpack message
         scenario_titles, self.scenario_files = zip(*message['scenarios'])

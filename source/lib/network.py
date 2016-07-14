@@ -87,8 +87,7 @@ class ExtendedTcpSocket(QtCore.QObject):
             host = SCOPE['local']
         print('client connects to host={} port={}'.format(host, port))
         self.socket.connectToHost(host, port)
-        print(self.socket.waitForConnected(2000))
-        print(self.socket.error())
+        self.socket.waitForConnected(2000)
 
     def receive(self):
         """
@@ -110,7 +109,7 @@ class ExtendedTcpSocket(QtCore.QObject):
             # decode from utf-8 bytes to unicode and deserialize from yaml
             value = yaml.load(uncompressed.decode())
 
-            print(value)
+            print('socket received {}'.format(value))
 
             # print('connection id {} received {}'.format(self.id, value))
             self.received.emit(value)
@@ -120,7 +119,7 @@ class ExtendedTcpSocket(QtCore.QObject):
             We send a message back to the client.
             We do it by serialization, compressing and writing of a QByteArray to the TCPSocket.
         """
-        print(value)
+        print('socket send {}'.format(value))
         # serialize value to yaml
         serialized = yaml.dump(value, allow_unicode=True)
 
@@ -189,7 +188,7 @@ class ExtendedTcpServer(QtCore.QObject):
         """
             Zero or more new clients might be available, emit new_client signal for each of them.
         """
-        print('new connection')
+        print('new connection on server')
         while self.tcp_server.hasPendingConnections():
             # returns a new QTcpSocket
             socket = self.tcp_server.nextPendingConnection()

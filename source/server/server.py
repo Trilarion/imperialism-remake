@@ -115,7 +115,6 @@ class ServerManager(QtCore.QObject):
             A server client received a message on the constants.CH_CORE_SCENARIO_TITLES channel. Return all available core
             scenario titles and file names.
         """
-        print('receivet core message')
         # get all core scenario files
         scenario_files = [x for x in os.listdir(constants.CORE_SCENARIO_FOLDER) if x.endswith('.scenario')]
 
@@ -139,8 +138,7 @@ class ServerManager(QtCore.QObject):
         titles = {
             'scenarios': scenarios
         }
-        print(scenario_files)
-        client.send(message['reply-to'], titles)
+        client.send(message['channel'], titles)
 
     def scenario_preview(self, client, message):
         """

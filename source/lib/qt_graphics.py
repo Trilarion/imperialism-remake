@@ -659,6 +659,7 @@ class FitSceneInViewGraphicsView(QtWidgets.QGraphicsView):
         self.fitInView(self.sceneRect(), QtCore.Qt.KeepAspectRatio)
         super().showEvent(event)
 
+# TODO export new document title when load finished
 
 class BrowserWidget(QtWidgets.QWidget):
     """
@@ -673,6 +674,7 @@ class BrowserWidget(QtWidgets.QWidget):
 
         # start with empty home url
         self.home_url = None
+        self.clear_history = False
 
         # create and add tool bar on top (non floatable or movable)
         tool_bar = QtWidgets.QToolBar(self)
@@ -699,7 +701,7 @@ class BrowserWidget(QtWidgets.QWidget):
         # create and add web view, also store history
         web_view = QtWebEngineWidgets.QWebEngineView()
         self.web_view = web_view
-        self.web_view.loadFinished.connect(self.validate_forward_backward_actions)
+        self.web_view.loadFinished.connect(self.load_finished)
 
         # wire forward, backward
         action_backward.triggered.connect(self.backward)
@@ -716,9 +718,8 @@ class BrowserWidget(QtWidgets.QWidget):
 
         """
         if self.home_url:
+            self.clear_history = True
             self.web_view.load(self.home_url)
-            self.web_view.history().clear()  # deletes the history
-            # TODO this doesn't work, do it after it is loaded...
 
     def load(self, url):
         self.web_view.load(url)
@@ -735,9 +736,15 @@ class BrowserWidget(QtWidgets.QWidget):
         """
         self.web_view.history().back()
 
-    def validate_forward_backward_actions(self):
+    def load_finished(self):
         """
 
         """
+
+        if self.clear_history:
+            self.web_view.history().clear()  # deletes the history
+            self.clear_history = False
+
+        # enalbes/disables the forward/backward buttons
         self.action_backward.setEnabled(self.web_view.history().canGoBack())
         self.action_forward.setEnabled(self.web_view.history().canGoForward())

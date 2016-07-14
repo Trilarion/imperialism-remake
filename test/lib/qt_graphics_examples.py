@@ -14,8 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+'''
+    Tests some of the generic graphics elements in lib/qt_graphics
+'''
+
 from PyQt5 import QtWidgets
-import lib.qt_graphics as g
+import lib.qt_graphics as qt_graphics
 
 class Window(QtWidgets.QWidget):
     def __init__(self):
@@ -46,7 +50,7 @@ class Window(QtWidgets.QWidget):
 
     def show_notification(self):
         message = 'Test notification'
-        self.notification = g.Notification(self, message, position_constraint=g.RelativeLayoutConstraint().center_horizontal().south(20))
+        self.notification = qt_graphics.Notification(self, message, position_constraint=qt_graphics.RelativeLayoutConstraint().center_horizontal().south(20))
         self.notification.show()
 
 if __name__ == '__main__':

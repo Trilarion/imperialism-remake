@@ -212,6 +212,7 @@ class Client:
 
         # help browser
         self.help_browser_widget = qt_graphics.BrowserWidget(tools.load_ui_icon)
+        self.help_browser_widget = qt_graphics.BrowserWidget(tools.load_ui_icon)
         self.help_browser_widget.home_url = tools.local_url(constants.DOCUMENTATION_INDEX_FILE)
         self.help_browser_widget.home()
         self.help_dialog = graphics.GameDialog(self.main_window, self.help_browser_widget, title='Help')
@@ -351,7 +352,7 @@ def local_network_connect():
     """
 
     # connect network client of client
-    print('will connect to host')
+    print('client tries to connect to server')
     local_network_client.connect_to_host(constants.NETWORK_PORT)
 
 

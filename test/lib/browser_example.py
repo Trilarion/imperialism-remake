@@ -15,19 +15,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Starts the browser
+    Starts the browser. Start with project root as working directory.
 """
 
 import PyQt5.QtWidgets as QtWidgets
-import PyQt5.QtGui as QtGui
 import PyQt5.QtCore as QtCore
-from lib.qt_graphics import BrowserWidget
+import lib.qt_graphics as qt_graphics
+import base.tools as tools
 
 if __name__ == '__main__':
 
     app = QtWidgets.QApplication([])
 
-    widget = BrowserWidget(lambda x: QtGui.QIcon())
+    widget = qt_graphics.BrowserWidget(tools.load_ui_icon)
     widget.home_url = QtCore.QUrl(("http://qt-project.org/"))
     widget.show()
 

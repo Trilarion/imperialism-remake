@@ -58,7 +58,6 @@ class MiniMap(QtWidgets.QWidget):
 
         # tracker rectangle that tracks the view of the main map
         self.tracker = QtWidgets.QGraphicsRectItem()
-        print(self.tracker.pen().widthF())
         self.tracker.setCursor(QtCore.Qt.PointingHandCursor)
         self.tracker.setZValue(1000)
         self.tracker.hide()
@@ -445,13 +444,14 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         """
             The mouse on the view has been moved. Emit signal tile_at_focus_changed if we now hover over a different tile.
         """
-        # get mouse position in scene coordinates
-        scene_position = self.mapToScene(event.pos()) / self.TILE_SIZE
-        column, row = self.scenario.map_position(scene_position.x(), scene_position.y())
-        if column != self.current_column or row != self.current_row:
-            self.current_column = column
-            self.current_row = row
-            self.tile_at_focus_changed.emit(column, row)
+        if self.scenario is not None:
+            # get mouse position in scene coordinates
+            scene_position = self.mapToScene(event.pos()) / self.TILE_SIZE
+            column, row = self.scenario.map_position(scene_position.x(), scene_position.y())
+            if column != self.current_column or row != self.current_row:
+                self.current_column = column
+                self.current_row = row
+                self.tile_at_focus_changed.emit(column, row)
         super().mouseMoveEvent(event)
 
 
@@ -758,6 +758,7 @@ class EditorScreen(QtWidgets.QWidget):
             'Scenario Files (*.scenario)')[0]
         if file_name:
             # TODO what if file name does not exist or is not a valid scenario file
+            self.scenario = Scenario()
             self.scenario.load(file_name)
             self.client.schedule_notification('Loaded scenario {}'.format(self.scenario[constants.ScenarioProperties.SCENARIO_TITLE]))
 
