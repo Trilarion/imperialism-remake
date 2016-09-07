@@ -1,6 +1,21 @@
-# Credits
+**********************
+Development
+**********************
 
-## Release 0.2.2
+
+Contribute
+==========
+
+Volunteers are always welcome. There are plenty of chances to improve
+this project or just to give feedback.
+
+Please visit http://remake.twelvepm.de/home/contribute/ for more information!
+
+Credits
+=======
+
+Release 0.2.2
+---------------------
 
 Date: 2016-05-XX
 
@@ -13,7 +28,8 @@ Contribution
 
 - Programming: Trilarion, [Antoine Spitaels](https://github.com/spitaels), [wkoot](https://github.com/wkoot)
 
-## Release 0.2.1
+Release 0.2.1
+---------------------
 
 Date: 2015-02-15
 
@@ -27,7 +43,8 @@ Contribution
 
 - Programming: Trilarion
 
-## Release 0.2.0
+Release 0.2.0
+---------------------
 
 Date: 2014-09-07
 
@@ -39,10 +56,11 @@ Changes:
 - Music and logging
 
 Contribution
- 
+
 - Programming: Trilarion
 
-## Release 0.1.4
+Release 0.1.4
+---------------------
 
 Date: 2013-07-16
 
@@ -57,9 +75,8 @@ Contribution:
 
 - Programming: Trilarion
 
----
-
-## Release 0.1.3 
+Release 0.1.3
+---------------------
 
 Date: 2013-05-15
 
@@ -73,9 +90,8 @@ Contribution:
 - Programming: Trilarion
 - Artwork: Veneteaou, Creator
 
----
-
-## Release 0.1.2
+Release 0.1.2
+---------------------
 
 Date: 2013-03-06
 
@@ -90,14 +106,13 @@ Changes:
 - Tested in Linux (Ubuntu)
 
 Contribution:
- 
+
 - Programming: Trilarion
 - Artwork: Veneteaou, Creator, Trapets
 - Other: Haxaco
 
----
-
-## Release 0.1.1
+Release 0.1.1
+---------------------
 
 Date: 2013-01-06
 
@@ -109,13 +124,12 @@ Changes:
 - Many general improvement in the underlying structure
 
 Contribution:
- 
+
 - Programming: Trilarion
 - Artwork: Veneteaou
 
----
-
-## Release 0.1.0
+Release 0.1.0
+---------------------
 
 Date: 2012-11-06
 

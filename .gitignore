@@ -10,6 +10,12 @@
 
 __pycache__
 
+# Sphinx Doc
+
+*.doctree
+_build
+environment.pickle
+
 # ours
 
 /data/manual
