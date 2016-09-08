@@ -1,9 +1,9 @@
 import os
 from sphinx.application import Sphinx
 
-# base_directory = os.path.join('..', 'documentation', 'developer manual')
-# base_directory = os.path.join('..', 'documentation', 'game manual new')
-base_directory = os.path.join('..', 'documentation', 'game definition')
+# base_directory = os.path.join('..', 'documentation', 'development')
+# base_directory = os.path.join('..', 'documentation', 'manual')
+base_directory = os.path.join('..', 'documentation', 'definition')
 
 srcdir = base_directory
 confdir = base_directory

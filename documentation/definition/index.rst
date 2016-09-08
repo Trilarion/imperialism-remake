@@ -1,9 +1,9 @@
 Imperialism Remake Game Definition
 ===================================
 
-Contents:
-
 .. toctree::
+    :numbered:
+    :caption: Contents
     :maxdepth: 2
 
     introduction/index
@@ -21,10 +21,10 @@ Contents:
     multiplayer/index
     ui/index
     ideas/index
+    glossary
 
 
 
-* :ref:`genindex`
 * :ref:`search`
 
 Definition build on |today|
