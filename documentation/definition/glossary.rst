@@ -1,5 +1,9 @@
+************************
+Glossary and TODO list
+************************
+
 Glossary
-========
+=============================
 
 .. glossary::
     :sorted:
@@ -48,3 +52,8 @@ Glossary
 
     IY
         Initial year
+
+TODO list
+=============================
+
+.. todolist::

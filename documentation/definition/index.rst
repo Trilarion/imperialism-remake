@@ -23,8 +23,4 @@ Imperialism Remake Game Definition
     ideas/index
     glossary
 
-
-
-* :ref:`search`
-
 Definition build on |today|
