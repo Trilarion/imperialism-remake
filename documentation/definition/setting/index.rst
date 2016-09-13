@@ -20,9 +20,9 @@ Map and Terrain
 Victory Conditions
 =============================
 
-* Military victory: 60% of provinces conquered (including colonies), the game immediately ends, MP or non-MP games
+* **Military victory**: 60% of provinces conquered (including colonies), the game immediately ends, MP or non-MP games
   can be continued if desired
-* Diplomatic victory: Owning less than 60% of the provinces but being so advanced that the world admires you. Can be
+* **Diplomatic victory**: Owning less than 60% of the provinces but being so advanced that the world admires you. Can be
   achieved during a "world congress". Each 10 years after the first 40 years there is such a congress where every
   province has one vote. With 60% or more of the votes a nation can also become winner. Each province votes with 80%
   chance for their owning nation (except provinces of MN). All provinces of MN (and of GP with a 20% chance) vote

@@ -5,10 +5,10 @@ Infrastructure
 Resources
 ========================
 
-* Food Resources orchard (on a plain) delivers apples, farm (on a plain) delivers wheat, cattle farm (on a plain)
+* **Food Resources** orchard (on a plain) delivers apples, farm (on a plain) delivers wheat, cattle farm (on a plain)
   delivers meat, fishing ground (on coastal sea) delivers fish (fish and cattle meat are combined into one quantity
   for transport and further processing: fish&meat, the same goes for grain&apple)
-* Other Resources forest or scrub forest (on a plain) delivers wood, oil sources (in swamps or deserts) deliver oil,
+* **Other Resources** forest or scrub forest (on a plain) delivers wood, oil sources (in swamps or deserts) deliver oil,
   mines (on hills or mountains) deliver ore or coal, silver mines (in mountains) deliver money (still must be
   connected), sheep farms (on hills) deliver wool, cotton farms (on plains) deliver cotton (cotton and wool is
   combined into one quantity for transport and further processing: cotton&wool)

@@ -27,9 +27,13 @@ With the right decisions, based on the actions of your opponents, with an effici
 **Strategizing**
 
 Typical for strategy games is balancing of different goals, making sacrifizes and balancing risks and rewards. Even more, the optimal strategy dynamically depends on the behavior of the competitors thus creating a fascinating circle of strategies and counter-strategies. We therefore want to present to the player decisions that matter:
-* Either create and arm a military now and conquer something or improve infrastructure and industrial base to support higher military later.
-* Either sell goods where they give the highest profit or dominate specific markets and ensure political influence in these regions.
+
+* Either create and arm a military now and conquer something or improve infrastructure and industrial base to
+  support higher military later.
+* Either sell goods where they give the highest profit or dominate specific markets and ensure political influence
+  in these regions.
 * Either invest in science to gain efficiency in military, industry in the future or invest money now.
+
 This means the player has to set constantly monitor and adjust his priorities for selling goods, for production, for research, for improvement of infrastructure and industry.
 
 Game Philosophy
