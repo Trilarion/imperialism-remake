@@ -1,17 +1,44 @@
+"""
+    see also sphinx.main(), sphinx.build_main(), cmdline.main()
+"""
 import os
+import shutil
+import glob
+
 from sphinx.application import Sphinx
 
-# base_directory = os.path.join('..', 'documentation', 'development')
-# base_directory = os.path.join('..', 'documentation', 'manual')
-base_directory = os.path.join('..', 'documentation', 'definition')
+def sphinx_build(directory):
 
-srcdir = base_directory
-confdir = base_directory
-doctreedir = base_directory
-outdir = os.path.join(base_directory, '_build')
-buildername = 'html'
+    print('build directory {}'.format(directory))
 
-app = Sphinx(srcdir, confdir, outdir, doctreedir, buildername)
-app.build()
+    srcdir = directory
+    confdir = directory
+    doctreedir = directory
+    outdir = os.path.join(directory, '_build')
+    buildername = 'html'
 
-# see sphinx.main(), sphinx.build_main(), cmdline.main()
+    # delete files of old build
+    if os.path.exists(outdir):
+        shutil.rmtree(outdir)
+    environment_file = os.path.join(directory, 'environment.pickle')
+    if os.path.exists(environment_file):
+        os.remove(environment_file)
+    for file_name in glob.glob(os.path.join(directory, '*.doctree')):
+        os.remove(file_name)
+    
+    app = Sphinx(srcdir, confdir, outdir, doctreedir, buildername)
+    app.build()
+
+if __name__ == '__main__':
+    
+    # build manual
+    directory = os.path.join('..', 'documentation', 'manual')
+    #sphinx_build(directory)
+    
+    # build definition
+    directory = os.path.join('..', 'documentation', 'definition')
+    #sphinx_build(directory)
+    
+    # build developer manual
+    directory = os.path.join('..', 'documentation', 'development')
+    sphinx_build(directory)

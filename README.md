@@ -2,6 +2,12 @@
 
 **[Home](http://remake.twelvepm.de/) - [Community](http://remake.twelvepm.de/forum/) - [Sources](https://github.com/Trilarion/Imperialism-Remake) - [Download](http://remake.twelvepm.de/home/download/) - [Tasks](http://remake.twelvepm.de/tasks/) - [Contact](http://remake.twelvepm.de/home/contact/)**
 
+## Documentation
+
+- [![Documentation Status](https://readthedocs.org/projects/imperialism-remake/badge/?version=latest)](http://imperialism-remake.readthedocs.io/en/latest/?badge=latest) Player Manual
+- [![Documentation Status](https://readthedocs.org/projects/imperialism-remake-definition/badge/?version=latest)](http://imperialism-remake-definition.readthedocs.io/en/latest/?badge=latest) Game Design
+- [![Documentation Status](https://readthedocs.org/projects/imperialism-remake-developer/badge/?version=latest)](http://imperialism-remake-developer.readthedocs.io/en/latest/?badge=latest) Developer Manual
+
 ## Getting Started
 
 ### Access the source code
@@ -22,11 +28,6 @@ Git is not easy. Be careful and read some instructions first. I liked this [tuto
 - Programm as usual (commit)
 - When task is done, create pull request.
 
-### Documentation
-
-- [Game definition]()
-- [Developer Manual]()
-
 ### Python
 
 Download and install latest [Python 3.X](https://www.python.org/downloads/). The [Python documentation](https://docs.python.org/3/) is quite good.
@@ -39,7 +40,7 @@ Download and install latest [Python 3.X](https://www.python.org/downloads/). The
 
 Only PyQt5 and PyYAML are required for running.
 
-Markdown (and cx_Freeze) are additionally required for developing.
+Sphinx, PyInstaller are additionally required for development.
 
 #### PyQt5
 
@@ -52,19 +53,8 @@ of the underlying C++ Qt 5.X framework is very useful since PyQt5 is almost 100%
 
 [PyYAML](http://pyyaml.org/wiki/PyYAML) is required for running.
 
-#### Markdown
-
-[Markdown](https://pypi.python.org/pypi/Markdown) is used for creating the HTML pages of the manual.  
-
-#### cx_Freeze
-
-[cx_Freeze](http://cx-freeze.sourceforge.net/) is used for packaging Python and creating standalone versions.
-
-Note: The current version cx_Freeze 4.3.4 cannot freeze Python 3.5 applications.
-
 ### Start
 
-- Execute "./tools/manual_markdown_converter.py" once with working directory "./tools" (all paths relative to repository root).
 - Run file "./source/start.py" with working directory "./".
 - Start with command line parameter "debug" for (more) output on the console.
 - A folder with log files and settings is created under "user folder/Imperialism Remake User Data" where "user folder" is the typical user folder of your system (Windows C:/Users/XXX/).
@@ -81,12 +71,4 @@ can probably be opened directly with PyCharm. Another nice IDE is [Spyder](https
 
 ### Packaging
 
-- Run `tools/package_vanilla.py` to create package in the build folder.
-
-#### On Windows
-
-Note: This is not yet updated for Python 3.5.
-
-- Run `tools/package_windows.py`.
-- Download the [VC 2010 x64 redistributable](http://www.microsoft.com/en-us/download/details.aspx?id=13523) and store in folder build.
-- Run `tools/installer_windows.iss` with Inno Setup 
+Under construction.

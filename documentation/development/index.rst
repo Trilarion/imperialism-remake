@@ -9,10 +9,10 @@ Contents:
    :numbered:
    :maxdepth: 2
    
-   coding/index
-   algorithms/index
-   scenario/index
-   network/index
+   coding
+   algorithms
+   scenario
+   network
 
 * :ref:`genindex`
 * :ref:`search`

@@ -8,9 +8,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   tutorial/index
-   user_interface/index
-   development/index
+   tutorial
+   ui
+   about
 
 * :ref:`genindex`
 * :ref:`search`
