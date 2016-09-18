@@ -13,6 +13,8 @@ Contents:
    algorithms
    scenario
    network
+   
+   source/modules
 
 * :ref:`genindex`
 * :ref:`search`

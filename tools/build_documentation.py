@@ -7,6 +7,8 @@ import glob
 
 from sphinx.application import Sphinx
 
+from sphinx import apidoc
+
 def sphinx_build(directory):
 
     print('build directory {}'.format(directory))
@@ -30,6 +32,10 @@ def sphinx_build(directory):
     app.build()
 
 if __name__ == '__main__':
+
+    #source_directory = os.path.join('..', 'source')
+    #out_directory = os.path.join('..', 'documentation', 'development', 'source')
+    #apidoc.main(argv=['', '-o', out_directory, source_directory])
     
     # build manual
     directory = os.path.join('..', 'documentation', 'manual')
