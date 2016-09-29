@@ -14,6 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
+    thin client).
+"""
+
 import math
 
 from PyQt5 import QtCore
@@ -21,15 +26,11 @@ from PyQt5 import QtCore
 import base.constants as constants
 import lib.utils as utils
 
-"""
-    Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
-    thin client).
-"""
-
 SCENARIO_FILE_PROPERTIES = 'scenario-properties'
 SCENARIO_FILE_MAPS = 'maps'
-SCENARIO_FILE_PROVINCES = 'provines'
+SCENARIO_FILE_PROVINCES = 'provinces'
 SCENARIO_FILE_NATIONS = 'nations'
+
 
 # TODO rivers are implemented inefficiently
 
@@ -118,7 +119,7 @@ class Scenario(QtCore.QObject):
         column = math.floor(x - (row % 2) / 2)
         if row < 0 or row >= self._properties[constants.ScenarioProperties.MAP_ROWS] or column < 0 or column >= \
                 self._properties[constants.ScenarioProperties.MAP_COLUMNS]:
-            return (-1, -1)
+            return -1, -1
         return column, row
 
     @staticmethod
@@ -204,7 +205,7 @@ class Scenario(QtCore.QObject):
 
     def get_neighbored_tiles(self, column, row):
         """
-            For all directions, get all neighbored tiles. Just executes get_neighbor_position() for all possitle
+            For all directions, get all neighbored tiles. Just executes get_neighbor_position() for all possible
             TileDirections
         """
         tiles = []

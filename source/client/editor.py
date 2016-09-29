@@ -14,6 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
+    know anything about the scenario, we put it in the server module.
+"""
+
 import math
 import os
 
@@ -27,10 +32,6 @@ import client.graphics as graphics
 import lib.qt_graphics as qt_graphics
 from server.scenario import Scenario
 
-"""
-    GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
-    know anything about the scenario, we put it in the server module.
-"""
 
 class MiniMap(QtWidgets.QWidget):
     """
@@ -47,7 +48,7 @@ class MiniMap(QtWidgets.QWidget):
             Sets up the graphics view, the toolbar and the tracker rectangle.
         """
         super().__init__()
-        self.setObjectName('minimap-widget')
+        self.setObjectName('mini-map-widget')
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -156,7 +157,7 @@ class MiniMap(QtWidgets.QWidget):
                 path = path.simplified()
                 # create a brush from the color
                 brush = QtGui.QBrush(color)
-                #item = self.scene.addPath(path, brush=brush)  # will use the default pen for outline
+                # item = self.scene.addPath(path, brush=brush)  # will use the default pen for outline
                 item.setZValue(1)
                 self.removable_items.extend([item])
 
@@ -183,12 +184,12 @@ class MiniMap(QtWidgets.QWidget):
                         sx, sy = self.scenario.scene_position(column, row)
                         paths[t].addRect(sx * tile_width, sy * tile_height, tile_width, tile_height)
             colors = {1: QtCore.Qt.green, 2: QtCore.Qt.darkGreen, 3: QtCore.Qt.darkGray, 4: QtCore.Qt.white,
-                5: QtCore.Qt.darkYellow, 6: QtCore.Qt.yellow}
+                      5: QtCore.Qt.darkYellow, 6: QtCore.Qt.yellow}
             for t in paths:
                 path = paths[t]
                 path = path.simplified()
                 brush = QtGui.QBrush(colors[t])
-                #item = self.scene.addPath(path, brush=brush, pen=qt_graphics.TRANSPARENT_PEN)
+                # item = self.scene.addPath(path, brush=brush, pen=qt_graphics.TRANSPARENT_PEN)
                 item.setZValue(1)
                 self.removable_items.extend([item])
 
@@ -339,7 +340,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
             item.setZValue(2)
 
         # draw province and nation borders
-        # TODO the whole border drawing is a crude approximiation, implement it the right way
+        # TODO the whole border drawing is a crude approximation, implement it the right way
         province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
         province_border_pen.setWidth(2)
         nation_border_pen = QtGui.QPen()
@@ -465,7 +466,7 @@ class InfoBox(QtWidgets.QWidget):
             Layout.
         """
         super().__init__()
-        self.setObjectName('infobox-widget')
+        self.setObjectName('info-box-widget')
         layout = QtWidgets.QVBoxLayout(self)
 
         self.text_label = QtWidgets.QLabel()
@@ -519,6 +520,7 @@ class InfoBox(QtWidgets.QWidget):
             The change terrain type button has been clicked.
         """
         pass
+
 
 class NewScenarioDialogWidget(QtWidgets.QWidget):
     """
@@ -588,9 +590,12 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
             "Create scenario" is clicked.
         """
 
-        self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE] = self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text()
-        self.parameters[constants.constants.ScenarioProperties.MAP_COLUMNS] = int(self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text())
-        self.parameters[constants.constants.ScenarioProperties.MAP_ROWS] = int(self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text())
+        self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE] = self.parameters[
+            constants.constants.ScenarioProperties.SCENARIO_TITLE].text()
+        self.parameters[constants.constants.ScenarioProperties.MAP_COLUMNS] = int(
+            self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text())
+        self.parameters[constants.constants.ScenarioProperties.MAP_ROWS] = int(
+            self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text())
 
         # TODO conversion can fail, (ValueError) give error message
         # we close the parent window and emit the appropriate signal
@@ -728,12 +733,14 @@ class EditorScreen(QtWidgets.QWidget):
             Create new scenario (from the create new scenario dialog).
         """
         self.scenario.reset()
-        self.scenario[constants.ScenarioProperties.SCENARIO_TITLE] = properties[constants.ScenarioProperties.SCENARIO_TITLE]
-        self.scenario.create_empty_map(properties[constants.ScenarioProperties.MAP_COLUMNS], properties[constants.ScenarioProperties.MAP_ROWS])
+        self.scenario[constants.ScenarioProperties.SCENARIO_TITLE] = properties[
+            constants.ScenarioProperties.SCENARIO_TITLE]
+        self.scenario.create_empty_map(properties[constants.ScenarioProperties.MAP_COLUMNS],
+            properties[constants.ScenarioProperties.MAP_ROWS])
 
         # standard rules
         self.scenario['rules'] = 'standard.rules'
-        #self.scenario.load_rules()
+        # self.scenario.load_rules()
 
         # emit that everything has changed
         self.scenario.everything_changed.emit()
@@ -760,7 +767,8 @@ class EditorScreen(QtWidgets.QWidget):
             # TODO what if file name does not exist or is not a valid scenario file
             self.scenario = Scenario()
             self.scenario.load(file_name)
-            self.client.schedule_notification('Loaded scenario {}'.format(self.scenario[constants.ScenarioProperties.SCENARIO_TITLE]))
+            self.client.schedule_notification(
+                'Loaded scenario {}'.format(self.scenario[constants.ScenarioProperties.SCENARIO_TITLE]))
 
     def save_scenario_dialog(self):
         """
@@ -805,7 +813,7 @@ class EditorScreen(QtWidgets.QWidget):
 
     def show_provinces_dialog(self):
         """
-            Display the modfiy provinces dialog.
+            Display the modify provinces dialog.
         """
         content_widget = ProvincePropertiesWidget()
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Provinces', delete_on_close=True,

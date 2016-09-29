@@ -20,11 +20,11 @@
 """
 
 
-def exception_hook(type, value, tback):
+def exception_hook(type, value, traceback):
     """
         PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
     """
-    sys.__excepthook__(type, value, tback)
+    sys.__excepthook__(type, value, traceback)
 
 
 if __name__ == '__main__':
@@ -95,9 +95,9 @@ if __name__ == '__main__':
     # special case of some desktop environments under Linux where full screen mode does not work well
     if tools.get_option(constants.Opt.FULLSCREEN_SUPPORTED):
         desktop_session = os.environ.get("DESKTOP_SESSION")
-        if desktop_session and (
-                    desktop_session.startswith('ubuntu') or 'xfce' in desktop_session or desktop_session.startswith(
-                'xubuntu') or 'gnome' in desktop_session):
+        if desktop_session and (desktop_session.startswith(
+            'ubuntu') or 'xfce' in desktop_session or desktop_session.startswith(
+            'xubuntu') or 'gnome' in desktop_session):
             tools.set_option(constants.Opt.FULLSCREEN_SUPPORTED, False)
             tools.log_warning(
                 'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
@@ -108,14 +108,17 @@ if __name__ == '__main__':
 
     # start server
     import multiprocessing
+
     # multiprocessing.freeze_support()
     multiprocessing.set_start_method('spawn')
     from server.server import ServerProcess
+
     server_process = ServerProcess()
     server_process.start()
 
-    # start client, we will return when the programm finishes
+    # start client, we will return when the program finishes
     from client.client import start_client
+
     start_client()
 
     # wait for server

@@ -14,6 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Starts the client and delivers most of the code responsible for the main client screen and the diverse dialogs.
+"""
+
 # TODO automatic placement of help dialog depending on if another dialog is open
 
 from functools import partial
@@ -23,23 +27,18 @@ import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
 import base.constants as constants
-import base.tools as tools
 import base.network as network
+import base.tools as tools
 import client.audio as audio
 import client.graphics as graphics
 import lib.qt_graphics as qt_graphics
 import lib.utils as utils
-
-local_network_client = network.NetworkClient()
-
 from client.editor import EditorScreen
 from client.game_lobby import GameLobbyWidget
 from client.main_screen import GameMainScreen
 from client.preferences import PreferencesWidget
 
-"""
-    Starts the client and delivers most of the code reponsible for the main client screen and the diverse dialogs.
-"""
+local_network_client = network.NetworkClient()
 
 class MapItem(QtCore.QObject):
     """
@@ -69,9 +68,15 @@ class MapItem(QtCore.QObject):
         self.item.signaller.left.connect(self.hide_description)
 
     def show_description(self):
+        """
+            Shows the description in the label.
+        """
         self.label.setText('<font color=#ffffff size=6>{}</font>'.format(self.description))
 
     def hide_description(self):
+        """
+            Hides the description from the label.
+        """
         self.label.setText('')
 
 
@@ -113,7 +118,7 @@ class StartScreen(QtWidgets.QWidget):
         layout.addWidget(subtitle)
 
         actions = {'exit': client.quit, 'help': client.show_help_browser, 'lobby': client.show_game_lobby_dialog,
-            'editor': client.switch_to_editor_screen, 'options': client.show_preferences_dialog}
+                   'editor': client.switch_to_editor_screen, 'options': client.show_preferences_dialog}
 
         image_map_file = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.overlay.info')
         image_map = utils.read_as_yaml(image_map_file)
@@ -125,17 +130,17 @@ class StartScreen(QtWidgets.QWidget):
         for k, v in image_map.items():
             # add action from our predefined action dictionary
             pixmap = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER, v['overlay']))
-            mapitem = MapItem(view, pixmap, label=subtitle, description=v['label'])
-            mapitem.item.setZValue(3)
+            map_item = MapItem(view, pixmap, label=subtitle, description=v['label'])
+            map_item.item.setZValue(3)
             offset = v['offset']
-            mapitem.item.setOffset(QtCore.QPointF(offset[0], offset[1]))
-            mapitem.item.signaller.clicked.connect(actions[k])
+            map_item.item.setOffset(QtCore.QPointF(offset[0], offset[1]))
+            map_item.item.signaller.clicked.connect(actions[k])
 
             frame_path = QtGui.QPainterPath()
-            frame_path.addRect(mapitem.item.boundingRect())
+            frame_path.addRect(map_item.item.boundingRect())
             frame_item = scene.addPath(frame_path, StartScreen.frame_pen)
             frame_item.setZValue(4)
-            scene.addItem(mapitem.item)
+            scene.addItem(map_item.item)
 
         version_label = QtWidgets.QLabel(
             '<font color=#ffffff>{}</font>'.format(tools.get_option(constants.Opt.VERSION)))
@@ -268,7 +273,7 @@ class Client:
         """
             Displays the help browser somewhere on screen. Can set a special page if needed.
         """
-        # we sometimes wire signals that send parameters for url (mouseevents for example) which we do not like
+        # we sometimes wire signals that send parameters for url (mouse events for example) which we do not like
         if isinstance(path, str):
             url = tools.local_url(path)
             self.help_browser_widget.load(url)
@@ -326,7 +331,8 @@ class Client:
         """
         preferences_widget = PreferencesWidget()
         dialog = graphics.GameDialog(self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
-            help_callback=partial(self.show_help_browser, path=constants.DOCUMENTATION_PREFERENCES_FILE), close_callback=preferences_widget.close_request)
+            help_callback=partial(self.show_help_browser, path=constants.DOCUMENTATION_PREFERENCES_FILE),
+            close_callback=preferences_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
@@ -347,8 +353,10 @@ class Client:
         # close the main window
         self.main_window.close()
 
+
 def local_network_connect():
     """
+        Connect to a server running locally.
     """
 
     # connect network client of client
@@ -375,14 +383,14 @@ def start_client():
             'Actual screen size below minimal screen size {}.'.format(constants.MINIMAL_SCREEN_SIZE))
         return
 
-    # if no bounds are set, set resonable bounds
+    # if no bounds are set, set reasonable bounds
     if tools.get_option(constants.Opt.MAINWINDOW_BOUNDS) is None:
         tools.set_option(constants.Opt.MAINWINDOW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
         tools.set_option(constants.Opt.MAINWINDOW_MAXIMIZED, True)
         tools.log_info('No previous bounds of the main window stored, start maximized')
 
     # load global stylesheet to app
-    with open(constants.GLOBAL_STYLESHEET_FILE, 'r', encoding='utf-8') as file:
+    with open(constants.GLOBAL_STYLESHEET_FILE, encoding='utf-8') as file:  # open is 'r' by default
         style_sheet = file.read()
     app.setStyleSheet(style_sheet)
 

@@ -14,25 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import random
+"""
+    Server network code. Only deals with the network connection, client connection management and message distribution.
+"""
+
 import os
+import random
 import time
 from multiprocessing import Process
 
 from PyQt5 import QtCore
 
-from lib.network import ExtendedTcpServer
-import lib.utils as utils
 import base.constants as constants
-
+import lib.utils as utils
 from base.constants import ScenarioProperties as k, NationProperties as kn
 from base.network import NetworkClient
+from lib.network import ExtendedTcpServer
 from server.scenario import Scenario
 
-
-"""
-    Server network code. Only deals with the network connection, client connection management and message distribution.
-"""
 
 # TODO start this in its own process
 # TODO ping server clients regularly and throw them out if not reacting
@@ -46,6 +45,9 @@ class ServerProcess(Process):
         super().__init__()
 
     def run(self):
+        """
+            Runs the server process by starting its own QCoreApplication.
+        """
         app = QtCore.QCoreApplication([])
 
         # server manager
@@ -73,6 +75,9 @@ class ServerManager(QtCore.QObject):
         self.server_clients = []
 
     def start(self):
+        """
+            Start the extended TCP server.
+        """
         self.server.start(constants.NETWORK_PORT)
 
     def new_client(self, socket):
@@ -103,6 +108,9 @@ class ServerManager(QtCore.QObject):
         self.server_clients.append(client)
 
     def system_messages(self, client, message):
+        """
+            Handles system messages.
+        """
         if message is 'shutdown':
             # self shutdown
             # TODO disconnect all
@@ -118,7 +126,7 @@ class ServerManager(QtCore.QObject):
         # get all core scenario files
         scenario_files = [x for x in os.listdir(constants.CORE_SCENARIO_FOLDER) if x.endswith('.scenario')]
 
-        # joing the path
+        # join the path
         scenario_files = [os.path.join(constants.CORE_SCENARIO_FOLDER, x) for x in scenario_files]
 
         # read scenario titles
@@ -135,9 +143,7 @@ class ServerManager(QtCore.QObject):
         scenarios = sorted(scenarios)  # default sort order is by first element anyway
 
         # return message
-        titles = {
-            'scenarios': scenarios
-        }
+        titles = {'scenarios': scenarios}
         client.send(message['channel'], titles)
 
     def scenario_preview(self, client, message):

@@ -14,15 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import zipfile
-from enum import Enum
-
-import yaml
-
 """
     General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
     to our project.
 """
+
+import zipfile
+from enum import Enum
+
+import yaml
 
 # use libyaml if available (see http://pyyaml.org/ticket/34)
 if hasattr(yaml, 'CLoader'):
@@ -51,7 +51,7 @@ def read_as_yaml(file_name):
     """
         Read YAML struct from file
     """
-    with open(file_name, 'r') as file:
+    with open(file_name) as file:  # open is 'r' by default
         return yaml.load(file, Loader=Loader)
 
 
@@ -76,7 +76,7 @@ class ZipArchiveReader:
         """
             Open the zip file in read-only mode.
         """
-        self.zip = zipfile.ZipFile(file, mode='r')
+        self.zip = zipfile.ZipFile(file)  # mode is 'r' by default
 
     def read(self, name):
         """
@@ -101,7 +101,7 @@ class ZipArchiveReader:
 
 class ZipArchiveWriter:
     """
-        Ecapsulates a zip file to write files into it or even whole Python objects via JSON.
+        Encapsulates a zip file to write files into it or even whole Python objects via JSON.
     """
 
     def __init__(self, file):
@@ -162,7 +162,7 @@ class List2D:
 
 def index_of_element(sequence, element):
     """
-        Finds the index of a certain element in a list. Returns the index of the first occurence or ValueError if the
+        Finds the index of a certain element in a list. Returns the index of the first occurrence or ValueError if the
         element is not contained in the list. This is a slow operation (O(n)).
     """
     for index, e in enumerate(sequence):

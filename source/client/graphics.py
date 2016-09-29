@@ -14,35 +14,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PyQt5 import QtGui, QtCore, QtWidgets
-
-import lib.qt_graphics as qt_graphics
-import base.tools as tools
-
 """
     Graphics elements that are dependent on the tools and lib.graphics library, but not on any game specific (constants,
     scenario or otherwise) logic. Therefore kind of a intermediate abstraction between the fully independent lib.graphics
     module and the client game specific logic under folder client.
 """
 
+from PyQt5 import QtGui, QtCore, QtWidgets
+
+import base.tools as tools
+import lib.qt_graphics as qt_graphics
+
 
 class GameDialog(QtWidgets.QWidget):
     """
-        Create a dialog (widget) with many preconfigured properties (modality, title, parent, content, help callback, ...
+        Create a dialog (widget) with many pre-configured properties (modality, title, parent, content,
+        help callback, ...
 
-        Main property is the custom window frame that allows dragging around (on the titlebar).
+        Main property is the custom window frame that allows dragging around (on the title bar).
 
-        Reference in stylesheets with 'gamedialog'.
+        Reference in stylesheets with 'game-dialog'.
     """
 
     def __init__(self, parent, content, title=None, modal=True, delete_on_close=False, help_callback=None,
             close_callback=None):
-        # no frame but a standalong window
+        # no frame but a standalone window
         super().__init__(parent, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
 
         # we need this
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
-        self.setObjectName('gamedialog')
+        self.setObjectName('game-dialog')
 
         # should be deleted on close
         if delete_on_close:
@@ -55,13 +56,13 @@ class GameDialog(QtWidgets.QWidget):
         # title bar
         title_bar = qt_graphics.DraggableToolBar()
         title_bar.setIconSize(QtCore.QSize(20, 20))
-        title_bar.setObjectName('gamedialog-titlebar')
+        title_bar.setObjectName('game-dialog-titlebar')
         title_bar.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
         title_bar.dragged.connect(lambda delta: self.move(self.pos() + delta))
 
         # title in titlebar and close icon
         title = QtWidgets.QLabel(title)
-        title.setObjectName('gamedialog-title')
+        title.setObjectName('game-dialog-title')
         title_bar.addWidget(title)
 
         # spacer between titlebar and help/close icons

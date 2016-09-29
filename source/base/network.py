@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PyQt5 import QtCore
-
-from lib.network import ExtendedTcpSocket
-
 """
     Using Signals of Qt, we refine on the network Client class in lib/network.py. Channels are introduced which have
     names and a signal to connect/disconnect to.
 """
+
+from PyQt5 import QtCore
+
+from lib.network import ExtendedTcpSocket
 
 
 class NetworkClient(ExtendedTcpSocket):
@@ -29,7 +29,7 @@ class NetworkClient(ExtendedTcpSocket):
         Extending the Client class (wrapper around QTcpSocket sending and receiving messages) with channels (see Channel
         below) and processing logic, as well as further wrapping the messages (specifying the channel as address).
 
-        The Channel implementation is completely hidden, one just calls the connec/disconnect methods in this class.
+        The Channel implementation is completely hidden, one just calls the connect/disconnect methods in this class.
 
         This is kind of a service-subscription pattern and allows for reducing complexity and decoupling of the message
         transport and message processing.
@@ -106,10 +106,7 @@ class NetworkClient(ExtendedTcpSocket):
             Given a channel name and a message (optional) wraps them in one dict (a letter) and send it.
         """
         # wrap content
-        letter = {
-            'channel': channel_name,
-            'content': message
-        }
+        letter = {'channel': channel_name, 'content': message}
         # send
         super().send(letter)
 

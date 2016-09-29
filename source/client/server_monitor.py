@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtWidgets as QtWidgets
-
 """
     Monitors the server state and updates it regularly
 """
+
+import PyQt5.QtCore as QtCore
+import PyQt5.QtWidgets as QtWidgets
 
 
 class ServerMonitorWidget(QtWidgets.QWidget):
@@ -49,5 +49,5 @@ class ServerMonitorWidget(QtWidgets.QWidget):
         """
             Regular updates of the server stats
         """
-        #text = '{} clients'.format(len(server_manager.server_clients))
-        #self.status_label.setText(text)
+        # text = '{} clients'.format(len(server_manager.server_clients))
+        # self.status_label.setText(text)

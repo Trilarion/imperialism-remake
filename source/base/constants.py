@@ -14,15 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import os
-from enum import unique
-
-import lib.utils as utils
-
 """
     Game specific path locations for artwork, music, ...
     Only static values here.
 """
+
+import os
+from enum import unique
+
+import lib.utils as utils
 
 
 def extend(path, *parts):
@@ -82,19 +82,23 @@ MINIMAL_SCREEN_SIZE = (1024, 768)
 
 @unique
 class Opt(utils.AutoNumberedEnum):
+    """
+        Options as automatically numbered enum. Named Opt, because it is only locally used. The members of it are
+        then the Options.
+    """
     VERSION = ()
     # to be displayed on the start screen
     LS_OPEN = ()
     # local server accepts outside connections
     LS_NAME = ()
     MAINWINDOW_BOUNDS = ()
-    MAINWINDOW_MAXIMIZED = ()   # bool
+    MAINWINDOW_MAXIMIZED = ()  # bool
     FULLSCREEN = ()
-    FULLSCREEN_SUPPORTED = ()   # is full screen supported
+    FULLSCREEN_SUPPORTED = ()  # is full screen supported
 
     # soundtrack
-    SOUNDTRACK_MUTE = ()        # bool
-    SOUNDTRACK_VOLUME = ()      # int from 0 to 100
+    SOUNDTRACK_MUTE = ()  # bool
+    SOUNDTRACK_VOLUME = ()  # int from 0 to 100
 
     def __init__(self):
         self.default = None
@@ -106,7 +110,7 @@ Options = Opt.__members__  # dictionary of name, Enum-value pairs
 Opt.VERSION.default = 'v0.2.2 (2015-??-??)'
 Opt.LS_OPEN.default = False
 Opt.LS_NAME.default = 'server name'
-Opt.FULLSCREEN.default = True               # we start full screen (can be unset by the program for some linux desktop environments
+Opt.FULLSCREEN.default = True  # we start full screen (can be unset by the program for some linux desktop environments
 Opt.SOUNDTRACK_MUTE.default = False
 Opt.SOUNDTRACK_VOLUME.default = 50
 
@@ -142,13 +146,13 @@ class ScenarioProperties:
     MAP_ROWS = 'map.rows'
     RIVERS = 'rivers'
 
+
 class ProvinceProperties:
     """
-
+        Key names of properties of provinces.
     """
     TILES = 'tiles'
     NATION = 'nation'
-
 
 
 class NationProperties:

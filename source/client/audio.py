@@ -34,7 +34,7 @@ def load_soundtrack_playlist():
     """
         Loads the play list of the soundtracks and replaces the file name with the full path.
 
-        A playlist is a list where each entry is a list of two strings: filepath, title
+        A playlist is a list where each entry is a list of two strings: file path, title
     """
     global soundtrack_playlist
 
@@ -55,7 +55,7 @@ def load_soundtrack_playlist():
 
 def setup_soundtrack_player():
     """
-
+        Initializes the singleton soundtrack player.
     """
     global soundtrack_player
     global soundtrack_playlist

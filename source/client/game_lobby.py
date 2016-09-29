@@ -14,6 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Game lobby.
+"""
+
 from functools import partial
 
 import PyQt5.QtCore as QtCore
@@ -22,11 +26,11 @@ import PyQt5.QtWidgets as QtWidgets
 
 import base.constants as constants
 import base.tools as tools
+import client.graphics as graphics
 import lib.qt_graphics as qt_graphics
 import lib.utils as utils
-import client.graphics as graphics
-
 from client.client import local_network_client
+
 
 class GameLobbyWidget(QtWidgets.QWidget):
     """
@@ -138,6 +142,10 @@ class GameLobbyWidget(QtWidgets.QWidget):
 
 
 class ServerLobby(QtWidgets.QWidget):
+    """
+        Server lobby.
+    """
+
     def __init__(self):
         super().__init__()
 

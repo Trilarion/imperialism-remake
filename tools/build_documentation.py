@@ -5,45 +5,44 @@ import os
 import shutil
 import glob
 
-from sphinx.application import Sphinx
-
+import sphinx
 from sphinx import apidoc
 
 def sphinx_build(directory):
 
     print('build directory {}'.format(directory))
 
-    srcdir = directory
-    confdir = directory
-    doctreedir = directory
-    outdir = os.path.join(directory, '_build')
-    buildername = 'html'
+    # output directory and builder name
+    out_directory = os.path.join(directory, '_build')
+    builder_name = 'html'
 
     # delete files of old build
-    if os.path.exists(outdir):
-        shutil.rmtree(outdir)
+    if os.path.exists(out_directory):
+        shutil.rmtree(out_directory)
     environment_file = os.path.join(directory, 'environment.pickle')
     if os.path.exists(environment_file):
         os.remove(environment_file)
     for file_name in glob.glob(os.path.join(directory, '*.doctree')):
         os.remove(file_name)
-    
-    app = Sphinx(srcdir, confdir, outdir, doctreedir, buildername)
-    app.build()
+
+    # call to sphinx
+    sphinx.build_main(argv=['', '-b', builder_name, directory, out_directory])
+
 
 if __name__ == '__main__':
 
-    #source_directory = os.path.join('..', 'source')
-    #out_directory = os.path.join('..', 'documentation', 'development', 'source')
-    #apidoc.main(argv=['', '-o', out_directory, source_directory])
+    source_directory = os.path.join('..', 'source')
+    out_directory = os.path.join('..', 'documentation', 'development', 'source')
+    apidoc.main(argv=['', '-o', out_directory, source_directory])
     
     # build manual
     directory = os.path.join('..', 'documentation', 'manual')
-    #sphinx_build(directory)
+    outdir = os.path.join(directory, '_build')
+    sphinx_build(directory)
     
     # build definition
     directory = os.path.join('..', 'documentation', 'definition')
-    #sphinx_build(directory)
+    sphinx_build(directory)
     
     # build developer manual
     directory = os.path.join('..', 'documentation', 'development')

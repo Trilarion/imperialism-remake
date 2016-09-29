@@ -14,6 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Preferences Widget
+"""
+
 import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
 
@@ -21,10 +25,6 @@ import base.constants as constants
 import base.tools as tools
 import client.audio as audio
 import lib.qt_graphics as qt_graphics
-
-"""
-    Preferences Widget
-"""
 
 
 class PreferencesWidget(QtWidgets.QWidget):
@@ -45,7 +45,8 @@ class PreferencesWidget(QtWidgets.QWidget):
         action_group = QtWidgets.QActionGroup(toolbar)
 
         action_preferences_general = qt_graphics.create_action(tools.load_ui_icon('icon.preferences.general.png'),
-            'Show general preferences', action_group, toggle_connection=self._toggled_action_preferences_general, checkable=True)
+            'Show general preferences', action_group, toggle_connection=self._toggled_action_preferences_general,
+            checkable=True)
         toolbar.addAction(action_preferences_general)
 
         toolbar.addAction(
@@ -153,7 +154,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         self.network_status_label = QtWidgets.QLabel('')
         tab_layout.addWidget(self.network_status_label)
 
-        # remote server groupbox
+        # remote server group box
         l = QtWidgets.QVBoxLayout()
         # remote server address
         l2 = QtWidgets.QHBoxLayout()
@@ -288,7 +289,6 @@ class PreferencesWidget(QtWidgets.QWidget):
         # check if something was changed
         options_modified = any([box.isChecked() is not tools.get_option(option) for (box, option) in self._check_boxes])
         # TODO line edits and sliders
-
 
         if options_modified:
             answer = QtWidgets.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences',

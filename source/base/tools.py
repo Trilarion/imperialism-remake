@@ -14,6 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.
+"""
+
 import datetime
 import os
 import sys
@@ -23,10 +27,6 @@ import PyQt5.QtGui as QtGui
 
 import base.constants as constants
 from lib.utils import read_as_yaml, write_as_yaml
-
-"""
-    Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.
-"""
 
 
 def load_ui_icon(name):
@@ -76,7 +76,7 @@ def log_write_entry(writer, prefix, text, exception=None):
 
 def find_unused_resources():
     """
-        Report on unused ressources.
+        Report on unused resources.
     """
     pass  # TODO not implemented yet
 

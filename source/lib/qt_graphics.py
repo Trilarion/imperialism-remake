@@ -14,18 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+    Graphics (Qt) based objects and algorithms that do not depend specifically on the project but only on Qt.
+
+    Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
+"""
+
 from datetime import datetime
 
 import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWebEngineWidgets as QtWebEngineWidgets
 import PyQt5.QtWidgets as QtWidgets
-
-"""
-    Graphics (Qt) based objects and algorithms that do not depend specifically on the project but only on Qt.
-
-    Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
-"""
 
 
 class RelativeLayoutConstraint:
@@ -81,7 +81,7 @@ class RelativeLayoutConstraint:
 
     def center_vertical(self):
         """
-            Same as center horizontally (centerH) but in the vertical directiokn.
+            Same as center horizontally (centerH) but in the vertical direction.
         """
         self.y = (0.5, -0.5, 0)
         return self
@@ -262,10 +262,10 @@ class FadeAnimation(QtCore.QObject):
             self.effect = QtWidgets.QGraphicsOpacityEffect()
             self.effect.setOpacity(0)
             parent.setGraphicsEffect(self.effect)
-            self.fade = QtCore.QPropertyAnimation(self.effect, 'opacity'.encode('utf-8'))
+            self.fade = QtCore.QPropertyAnimation(self.effect, 'opacity'.encode())  # encode is utf-8 by default
         elif isinstance(parent, QtWidgets.QWidget):
             parent.setWindowOpacity(0)
-            self.fade = QtCore.QPropertyAnimation(parent, 'windowOpacity'.encode('utf-8'))
+            self.fade = QtCore.QPropertyAnimation(parent, 'windowOpacity'.encode())  # encode is utf-8 by default
         else:
             raise RuntimeError('Type of parameter must be QtWidgets.QGraphicsItem or QtWidgets.QWidget.')
 
@@ -420,12 +420,18 @@ def make_widget_clickable(parent):
 
     # noinspection PyPep8Naming
     class ClickableWidgetSubclass(parent):
+        """
+            A widget that emits a clicked signal when the mouse is pressed.
+        """
         clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
         def mousePressEvent(self, event):
+            """
+                Mouse has been pressed, process the event, then emit the signal.
+            """
             super().mousePressEvent(event)
             self.clicked.emit(event)
 
@@ -441,6 +447,9 @@ def make_widget_draggable(parent):
 
     # noinspection PyPep8Naming
     class DraggableWidgetSubclass(parent):
+        """
+            Draggable widget.
+        """
         dragged = QtCore.pyqtSignal(QtCore.QPoint)
 
         def __init__(self, *args, **kwargs):
@@ -469,6 +478,9 @@ def make_widget_draggable(parent):
 
 
 class ClickableGraphicsItemSignaller(QtCore.QObject):
+    """
+        Clickable GraphicsItem, helper object.
+    """
     entered = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
     left = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneHoverEvent)
     clicked = QtCore.pyqtSignal(QtWidgets.QGraphicsSceneMouseEvent)
@@ -488,6 +500,9 @@ def make_GraphicsItem_clickable(parent):
     # class ClickableGraphicsItem(parent, QtCore.QObject):
     # noinspection PyPep8Naming
     class ClickableGraphicsItem(parent):
+        """
+            Clickable GraphicsItem
+        """
         def __init__(self, *args, **kwargs):
             """
                 QGraphicsItems by default do not accept hover events or accept mouse buttons (for performance reasons).
@@ -534,6 +549,9 @@ def make_GraphicsItem_draggable(parent):
 
     # noinspection PyPep8Naming
     class DraggableGraphicsItem(parent, QtCore.QObject):
+        """
+            Draggable GraphicsItem.
+        """
         changed = QtCore.pyqtSignal(object)
 
         def __init__(self, *args, **kwargs):
@@ -611,9 +629,10 @@ def create_action(icon, text, parent, trigger_connection=None, toggle_connection
     action.setCheckable(checkable)
     return action
 
+
 def wrap_in_boxlayout(items, horizontal=True, add_stretch=True):
     """
-
+        Wraps widgets or layouts in a horizontal or vertical QBoxLayout.
     """
     if horizontal:
         layout = QtWidgets.QHBoxLayout()
@@ -627,6 +646,7 @@ def wrap_in_boxlayout(items, horizontal=True, add_stretch=True):
     if add_stretch:
         layout.addStretch()
     return layout
+
 
 def wrap_in_groupbox(item, title):
     """
@@ -658,6 +678,7 @@ class FitSceneInViewGraphicsView(QtWidgets.QGraphicsView):
         """
         self.fitInView(self.sceneRect(), QtCore.Qt.KeepAspectRatio)
         super().showEvent(event)
+
 
 # TODO export new document title when load finished
 
@@ -715,36 +736,39 @@ class BrowserWidget(QtWidgets.QWidget):
 
     def home(self):
         """
-
+            If a home URL is given, load it.
         """
         if self.home_url:
             self.clear_history = True
             self.web_view.load(self.home_url)
 
     def load(self, url):
+        """
+            Load an URL.
+        """
         self.web_view.load(url)
 
     def forward(self):
         """
-
+            Go forward in history.
         """
         self.web_view.history().forward()
 
     def backward(self):
         """
-
+            Go backward in history.
         """
         self.web_view.history().back()
 
     def load_finished(self):
         """
-
+            Called when loading a page is finished. Updates history and forward/backward buttons.
         """
 
         if self.clear_history:
             self.web_view.history().clear()  # deletes the history
             self.clear_history = False
 
-        # enalbes/disables the forward/backward buttons
+        # enables/disables the forward/backward buttons
         self.action_backward.setEnabled(self.web_view.history().canGoBack())
         self.action_forward.setEnabled(self.web_view.history().canGoForward())
