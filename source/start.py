@@ -19,6 +19,7 @@
     Start in project root folder and with 'debug' as parameter if wished.
 """
 
+import sys
 
 def exception_hook(type, value, traceback):
     """
@@ -28,8 +29,6 @@ def exception_hook(type, value, traceback):
 
 
 if __name__ == '__main__':
-
-    import sys
 
     # test for python version
     required_version = (3, 5)
@@ -93,16 +92,16 @@ if __name__ == '__main__':
     tools.log_info('options loaded from user folder ({})'.format(user_folder))
 
     # special case of some desktop environments under Linux where full screen mode does not work well
-    if tools.get_option(constants.Opt.FULLSCREEN_SUPPORTED):
+    if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         desktop_session = os.environ.get("DESKTOP_SESSION")
         if desktop_session and (desktop_session.startswith(
             'ubuntu') or 'xfce' in desktop_session or desktop_session.startswith(
             'xubuntu') or 'gnome' in desktop_session):
-            tools.set_option(constants.Opt.FULLSCREEN_SUPPORTED, False)
+            tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED, False)
             tools.log_warning(
                 'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
-    if not tools.get_option(constants.Opt.FULLSCREEN_SUPPORTED):
-        tools.set_option(constants.Opt.FULLSCREEN, False)
+    if not tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
+        tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN, False)
 
     # now we can safely assume that the environment is good to us
 

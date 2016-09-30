@@ -104,9 +104,9 @@ def load_options(file_name):
             options[key] = constants.Options[key].default
 
     # main window bounding rectangle, convert from list to QRect
-    rect = get_option(constants.Opt.MAINWINDOW_BOUNDS)
+    rect = get_option(constants.Option.MAINWINDOW_BOUNDS)
     if rect is not None:
-        set_option(constants.Opt.MAINWINDOW_BOUNDS, QtCore.QRect(*rect))
+        set_option(constants.Option.MAINWINDOW_BOUNDS, QtCore.QRect(*rect))
 
 
 def get_option(option):
@@ -130,8 +130,8 @@ def save_options(file_name):
     data = options.copy()
 
     # main window bounding rectangle, convert from QRect to list
-    rect = data[constants.Opt.MAINWINDOW_BOUNDS.name]
-    data[constants.Opt.MAINWINDOW_BOUNDS.name] = [rect.x(), rect.y(), rect.width(), rect.height()]
+    rect = data[constants.Option.MAINWINDOW_BOUNDS.name]
+    data[constants.Option.MAINWINDOW_BOUNDS.name] = [rect.x(), rect.y(), rect.width(), rect.height()]
 
     # write to file
     write_as_yaml(file_name, data)

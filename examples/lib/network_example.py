@@ -20,68 +20,104 @@
 
 import sys
 import datetime
-import PyQt5.QtCore as QtCore
-import lib.network as network
 
-def exception_hook(type, value, tback):
-    """
-        PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
-    """
-    sys.__excepthook__(type, value, tback)
+import PyQt5.QtCore as QtCore
+
+import start
+import lib.network as network
 
 PORT = 37846
 
 def now():
+    """
+        Return current time, including fractions of seconds.
+    """
     return datetime.datetime.now().strftime('%H:%M:%S,%f')
 
 def log(message):
+    """
+        Print a log message including the current time.
+    """
     print('{}  {}'.format(now(), message))
 
 def client_connected():
+    """
+        Client has connected.
+    """
     log('client connected')
 
 def client_disconnected():
+    """
+        Client has been disconnected.
+    """
     log('client disconnected')
 
 def client_connect():
+    """
+        Action, client tries to connect.
+    """
     log('client tries to connect')
     client.connect_to_host(PORT)
 
 def client_sends_something():
+    """
+        Action, client tries to send something.
+    """
     log('client tries to send something')
     client.send({'cat': [1, 2, 3]})
 
 def client_received(message):
+    """
+        Client received a message
+    """
     log('client received message: {}'.format(message))
 
 def server_start():
+    """
+        Action, server tries to start.
+    """
     log('server tries to start')
     server.start(PORT)
 
 def server_stop():
+    """
+        Action, server tries to stop.
+    """
     log('server tries to stop')
     server.stop()
 
-sclient = None
+sclient = None # server client
+
 def server_new_client(client):
+    """
+        New client connected to server.
+    """
     global sclient
     sclient = network.ExtendedTcpSocket(client)
     sclient.received.connect(sclient_received)
     log('server has new connection')
 
 def sclient_received(message):
+    """
+        Connected server client received something.
+    """
     log('server-client received message: {}'.format(message))
 
 def server_client_sends_something():
+    """
+        Action, server client tries to send something
+    """
     log('server-client tries to send something')
     sclient.send([1, 2, 'Three'])
 
 if __name__ == '__main__':
 
-    sys.excepthook = exception_hook
+    # because PyQt5 eats exceptions in the event thread this workaround
+    sys.excepthook = start.exception_hook
 
     app = QtCore.QCoreApplication([])
 
+    # create client
     client = network.ExtendedTcpSocket()
     client.connected.connect(client_connected)
     client.disconnected.connect(client_disconnected)
@@ -91,11 +127,15 @@ if __name__ == '__main__':
     server.new_client.connect(server_new_client)
 
     # actions
+    # server stars and client connected
     QtCore.QTimer.singleShot(100, server_start)
     QtCore.QTimer.singleShot(200, client_connect)
+    # they exchange messages
     QtCore.QTimer.singleShot(1000, client_sends_something)
     QtCore.QTimer.singleShot(1100, server_client_sends_something)
+    # server stops, should disconnect the client
     QtCore.QTimer.singleShot(4500, server_stop)
+    # quit the app
     QtCore.QTimer.singleShot(5000, app.quit)
 
     app.exec_()

@@ -302,7 +302,7 @@ class FadeAnimation(QtCore.QObject):
         """
             Depending on the direction emit the appropriate signal.
         """
-        if self.forward is True:
+        if self.forward:
             self.fadein_finished.emit()
         else:
             self.fadeout_finished.emit()

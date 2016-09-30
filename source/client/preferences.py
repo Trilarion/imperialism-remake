@@ -84,7 +84,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         """
             Toolbar button for general preferences toggled.
         """
-        if checked is True:
+        if checked:
             self.stacked_layout.setCurrentWidget(self.tab_general)
 
     def _layout_widget_preferences_general(self):
@@ -113,7 +113,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         """
             Toolbar button for graphical preferences toggled.
         """
-        if checked is True:
+        if checked:
             self.stacked_layout.setCurrentWidget(self.tab_graphics)
 
     def _layout_widget_preferences_graphics(self):
@@ -126,7 +126,7 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # full screen mode
         checkbox = QtWidgets.QCheckBox('Full screen mode')
-        self._register_check_box(checkbox, constants.Opt.FULLSCREEN)
+        self._register_check_box(checkbox, constants.Option.MAINWINDOW_FULLSCREEN)
         tab_layout.addWidget(checkbox)
 
         # vertical stretch
@@ -140,7 +140,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         """
             Toolbar button for network preferences toggled.
         """
-        if checked is True:
+        if checked:
             self.stacked_layout.setCurrentWidget(self.tab_network)
 
     def _layout_widget_preferences_network(self):
@@ -180,7 +180,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         l = QtWidgets.QVBoxLayout()
         # accepts incoming connections checkbox
         checkbox = QtWidgets.QCheckBox('Accepts incoming connections')
-        self._register_check_box(checkbox, constants.Opt.LS_OPEN)
+        self._register_check_box(checkbox, constants.Option.LOCALSERVER_OPEN)
         l.addWidget(checkbox)
         # alias name edit box
         l2 = QtWidgets.QHBoxLayout()
@@ -189,7 +189,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         edit.setFixedWidth(300)
         l2.addWidget(edit)
         l2.addStretch()
-        self._register_line_edit(edit, constants.Opt.LS_NAME)
+        self._register_line_edit(edit, constants.Option.LOCALSERVER_NAME)
         l.addLayout(l2)
         # actions toolbar
         l2 = QtWidgets.QHBoxLayout()
@@ -219,7 +219,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         """
             Toolbar button for music preferences toggled.
         """
-        if checked is True:
+        if checked:
             self.stacked_layout.setCurrentWidget(self.tab_music)
 
     def _layout_widget_preferences_music(self):
@@ -234,7 +234,7 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # mute checkbox
         checkbox = QtWidgets.QCheckBox('Mute soundtrack')
-        self._register_check_box(checkbox, constants.Opt.SOUNDTRACK_MUTE)
+        self._register_check_box(checkbox, constants.Option.SOUNDTRACK_MUTE)
         layout.addWidget(checkbox)
 
         # volume slide
@@ -243,7 +243,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         slider.setTickInterval(25)
         slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         slider.setMaximumWidth(100)
-        self._register_slider(slider, constants.Opt.SOUNDTRACK_VOLUME)
+        self._register_slider(slider, constants.Option.SOUNDTRACK_VOLUME)
         layout.addWidget(slider)
 
         # wrap in group box and add to tab
@@ -298,7 +298,7 @@ class PreferencesWidget(QtWidgets.QWidget):
                 for (box, option) in self._check_boxes:
                     tools.set_option(option, box.isChecked())
                 # start/stop audio player (depending on mute)
-                if tools.get_option(constants.Opt.SOUNDTRACK_MUTE):
+                if tools.get_option(constants.Option.SOUNDTRACK_MUTE):
                     audio.soundtrack_player.stop()
                     pass
                 else:

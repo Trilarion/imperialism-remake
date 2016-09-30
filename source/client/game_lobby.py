@@ -83,7 +83,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
             Because of the Action being part of an ActionGroup, this can only be called if before another action was executed.
         """
 
-        if checked is True:
+        if checked:
             # create new widget
             widget = SinglePlayerScenarioTitleSelection()
             widget.title_selected.connect(self.single_player_scenario_selection_preview, QtCore.Qt.QueuedConnection)
@@ -112,7 +112,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
             Toolbar action switch to single player load a scenario.
         """
 
-        if checked is True:
+        if checked:
 
             # noinspection PyCallByClass
             file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario',
@@ -125,7 +125,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
         """
             Toolbar action switch to server lobby.
         """
-        if checked is True:
+        if checked:
             # create new widget
             widget = ServerLobby()
 
@@ -137,7 +137,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
         """
             Toolbar action switch to multiplayer scenario selection.
         """
-        if checked is True:
+        if checked:
             pass
 
 

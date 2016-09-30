@@ -21,10 +21,12 @@
 import os
 import random
 import time
+import sys
 from multiprocessing import Process
 
 from PyQt5 import QtCore
 
+import start
 import base.constants as constants
 import lib.utils as utils
 from base.constants import ScenarioProperties as k, NationProperties as kn
@@ -48,11 +50,14 @@ class ServerProcess(Process):
         """
             Runs the server process by starting its own QCoreApplication.
         """
+        # because PyQt5 eats exceptions in the event thread this workaround
+        sys.excepthook = start.exception_hook
+
         app = QtCore.QCoreApplication([])
 
         # server manager
         server_manager = ServerManager()
-        server_manager.shutdown = app.quit()
+        server_manager.shutdown.connect(app.quit)
         QtCore.QTimer.singleShot(0, server_manager.start)
 
         # run event loop of app
@@ -64,6 +69,8 @@ class ServerManager(QtCore.QObject):
         Manages the server, the clients on the server and the general services on the server. In particular creates new
         clients on the server (server clients),
     """
+
+    shutdown = QtCore.pyqtSignal()
 
     def __init__(self):
         """
@@ -111,11 +118,12 @@ class ServerManager(QtCore.QObject):
         """
             Handles system messages.
         """
-        if message is 'shutdown':
-            # self shutdown
+        if message == 'shutdown':
+            print('server manager shuts down')
+            # shutdown
             # TODO disconnect all
             self.server.stop()
-            self.shutdown()
+            self.shutdown.emit()
 
     @staticmethod
     def core_scenario_titles(client, message):

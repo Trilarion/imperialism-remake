@@ -118,7 +118,7 @@ class Channel(QtCore.QObject):
         boundaries easily.
     """
 
-    received = QtCore.pyqtSignal(NetworkClient, dict)
+    received = QtCore.pyqtSignal(NetworkClient, object)
 
     def __init__(self):
         super().__init__()

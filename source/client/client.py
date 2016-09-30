@@ -26,6 +26,7 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
+import version as version
 import base.constants as constants
 import base.network as network
 import base.tools as tools
@@ -146,8 +147,7 @@ class StartScreen(QtWidgets.QWidget):
             frame_item.setZValue(4)
             scene.addItem(map_item.item)
 
-        version_label = QtWidgets.QLabel(
-            '<font color=#ffffff>{}</font>'.format(tools.get_option(constants.Opt.VERSION)))
+        version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'.format(version.__version_full__))
         version_label.layout_constraint = qt_graphics.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
@@ -166,7 +166,7 @@ class ClientMainWindowWidget(QtWidgets.QWidget):
         """
         super().__init__()
         # set geometry
-        self.setGeometry(tools.get_option(constants.Opt.MAINWINDOW_BOUNDS))
+        self.setGeometry(tools.get_option(constants.Option.MAINWINDOW_BOUNDS))
         # set icon
         self.setWindowIcon(tools.load_ui_icon('icon.ico'))
         # set title
@@ -178,10 +178,10 @@ class ClientMainWindowWidget(QtWidgets.QWidget):
         self.content = None
 
         # show in full screen, maximized or normal
-        if tools.get_option(constants.Opt.FULLSCREEN):
+        if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN):
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
             self.showFullScreen()
-        elif tools.get_option(constants.Opt.MAINWINDOW_MAXIMIZED):
+        elif tools.get_option(constants.Option.MAINWINDOW_MAXIMIZED):
             self.showMaximized()
         else:
             self.show()
@@ -345,8 +345,8 @@ class Client:
             Cleans up and closes the main window which causes app.exec_() to finish.
         """
         # store state in options
-        tools.set_option(constants.Opt.MAINWINDOW_BOUNDS, self.main_window.normalGeometry())
-        tools.set_option(constants.Opt.MAINWINDOW_MAXIMIZED, self.main_window.isMaximized())
+        tools.set_option(constants.Option.MAINWINDOW_BOUNDS, self.main_window.normalGeometry())
+        tools.set_option(constants.Option.MAINWINDOW_MAXIMIZED, self.main_window.isMaximized())
 
         # audio
         audio.soundtrack_player.stop()
@@ -388,9 +388,9 @@ def start_client():
         return
 
     # if no bounds are set, set reasonable bounds
-    if tools.get_option(constants.Opt.MAINWINDOW_BOUNDS) is None:
-        tools.set_option(constants.Opt.MAINWINDOW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
-        tools.set_option(constants.Opt.MAINWINDOW_MAXIMIZED, True)
+    if tools.get_option(constants.Option.MAINWINDOW_BOUNDS) is None:
+        tools.set_option(constants.Option.MAINWINDOW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
+        tools.set_option(constants.Option.MAINWINDOW_MAXIMIZED, True)
         tools.log_info('No previous bounds of the main window stored, start maximized')
 
     # load global stylesheet to app
@@ -403,7 +403,7 @@ def start_client():
     audio.setup_soundtrack_player()
 
     # start audio player if wished
-    if not tools.get_option(constants.Opt.SOUNDTRACK_MUTE):
+    if not tools.get_option(constants.Option.SOUNDTRACK_MUTE):
         audio.soundtrack_player.play()
     pass
 

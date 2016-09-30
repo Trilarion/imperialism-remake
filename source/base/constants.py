@@ -81,20 +81,17 @@ MINIMAL_SCREEN_SIZE = (1024, 768)
 # options
 
 @unique
-class Opt(utils.AutoNumberedEnum):
+class Option(utils.AutoNumberedEnum):
     """
-        Options as automatically numbered enum. Named Opt, because it is only locally used. The members of it are
-        then the Options.
+        Options as automatically numbered enum. The members of it are then the Options.
     """
-    VERSION = ()
-    # to be displayed on the start screen
-    LS_OPEN = ()
+    LOCALSERVER_OPEN = ()
     # local server accepts outside connections
-    LS_NAME = ()
+    LOCALSERVER_NAME = ()
     MAINWINDOW_BOUNDS = ()
     MAINWINDOW_MAXIMIZED = ()  # bool
-    FULLSCREEN = ()
-    FULLSCREEN_SUPPORTED = ()  # is full screen supported
+    MAINWINDOW_FULLSCREEN = ()
+    MAINWINDOW_FULLSCREEN_SUPPORTED = ()  # is full screen supported
 
     # soundtrack
     SOUNDTRACK_MUTE = ()  # bool
@@ -104,15 +101,14 @@ class Opt(utils.AutoNumberedEnum):
         self.default = None
 
 
-Options = Opt.__members__  # dictionary of name, Enum-value pairs
+Options = Option.__members__  # dictionary of name, Enum-value pairs
 
 # default values for the Options
-Opt.VERSION.default = 'v0.2.2 (2015-??-??)'
-Opt.LS_OPEN.default = False
-Opt.LS_NAME.default = 'server name'
-Opt.FULLSCREEN.default = True  # we start full screen (can be unset by the program for some linux desktop environments
-Opt.SOUNDTRACK_MUTE.default = False
-Opt.SOUNDTRACK_VOLUME.default = 50
+Option.LOCALSERVER_OPEN.default = False
+Option.LOCALSERVER_NAME.default = 'server name'
+Option.MAINWINDOW_FULLSCREEN.default = True  # we start full screen (can be unset by the program for some linux desktop environments
+Option.SOUNDTRACK_MUTE.default = False
+Option.SOUNDTRACK_VOLUME.default = 50
 
 # predefined channel names for network communication
 CH_SCENARIO_PREVIEW = 'general.scenario.preview'

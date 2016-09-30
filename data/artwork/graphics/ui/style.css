@@ -7,24 +7,24 @@
 	background-color: #000000;
 }
 
-QWidget#gamedialog
+QWidget#game-dialog
 {
 	border: 1px solid black;
 }
 
-QToolBar#gamedialog-titlebar
+QToolBar#game-dialog-titlebar
 {
 	background-color: #9E7921;
 	border: 0px;
 }
 
-.QLabel#gamedialog-title
+.QLabel#game-dialog-title
 {
 	font-weight: bold;
 	padding-left: 8 px;
 }
 
-.QPushButton#gamedialog-close
+.QPushButton#game-dialog-close
 {
 	padding: 0px;
 }
@@ -37,12 +37,12 @@ QToolBar#gamedialog-titlebar
 	color: white;
 }
 
-QWidget#infobox-widget
+QWidget#info-box-widget
 {
 	background-color: gray;
 }
 
-QWidget#minimap-widget
+QWidget#mini-map-widget
 {
 	border: 0px;
 	background-color: gray;

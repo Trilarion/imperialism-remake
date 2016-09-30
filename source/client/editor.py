@@ -124,7 +124,7 @@ class MiniMap(QtWidgets.QWidget):
             self.scene.removeItem(item)
         self.removable_items = []
 
-        if self.map_mode is 'political':
+        if self.map_mode == 'political':
 
             # fill the ground layer with a neutral color
             item = self.scene.addRect(0, 0, 1, 1)
@@ -161,7 +161,7 @@ class MiniMap(QtWidgets.QWidget):
                 item.setZValue(1)
                 self.removable_items.extend([item])
 
-        elif self.map_mode is 'geographical':
+        elif self.map_mode == 'geographical':
 
             # fill the background with sea (blue)
             item = self.scene.addRect(0, 0, 1, 1)
@@ -197,7 +197,7 @@ class MiniMap(QtWidgets.QWidget):
         """
             The toolbar button for the political view has been toggled.
         """
-        if checked is True:
+        if checked:
             # self.map_mode should be 'geographical'
             self.map_mode = 'political'
             self.redraw_map()
@@ -206,7 +206,7 @@ class MiniMap(QtWidgets.QWidget):
         """
             The toolbar button for the geographical view has been toggled.
         """
-        if checked is True:
+        if checked:
             # self.map_mode should be 'political'
             self.map_mode = 'geographical'
             self.redraw_map()

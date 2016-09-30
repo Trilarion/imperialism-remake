@@ -46,7 +46,7 @@ class ExtendedTcpSocket(QtCore.QObject):
         """
         super().__init__()
 
-        # new QTcpSocket()
+        # new QTcpSocket() if none is given
         if socket is not None:
             self.socket = socket
         else:
@@ -80,7 +80,7 @@ class ExtendedTcpSocket(QtCore.QObject):
 
             TODO only if not yet connected
         """
-        if host is 'local':
+        if host == 'local':
             host = SCOPE['local']
         print('client connects to host={} port={}'.format(host, port))
         self.socket.connectToHost(host, port)
