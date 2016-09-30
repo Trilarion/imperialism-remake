@@ -15,7 +15,6 @@ __pycache__
 *.doctree
 _build
 environment.pickle
-/documentation/development/source
 
 # ours
 

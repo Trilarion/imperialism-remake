@@ -31,19 +31,23 @@ def sphinx_build(directory):
 
 if __name__ == '__main__':
 
-    source_directory = os.path.join('..', 'source')
-    out_directory = os.path.join('..', 'documentation', 'development', 'source')
+    os.chdir('..')
+
+    source_directory = os.path.join('source')
+    out_directory = os.path.join('documentation', 'development', 'source')
     apidoc.main(argv=['', '-o', out_directory, source_directory])
     
     # build manual
-    directory = os.path.join('..', 'documentation', 'manual')
+    directory = os.path.join('documentation', 'manual')
     outdir = os.path.join(directory, '_build')
     sphinx_build(directory)
+
+    # copy manual to ./data
     
     # build definition
-    directory = os.path.join('..', 'documentation', 'definition')
+    directory = os.path.join('documentation', 'definition')
     sphinx_build(directory)
     
     # build developer manual
-    directory = os.path.join('..', 'documentation', 'development')
+    directory = os.path.join('documentation', 'development')
     sphinx_build(directory)

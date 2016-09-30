@@ -14,26 +14,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-# TODO update to PyQt5
-from PySide import QtGui
+import PyQt5.QtWidgets as QtWidgets
 
-from client import audio
-import lib.qt_graphics as g
+import client.audio as audio
+import lib.qt_graphics as qt_graphics
 
+def playlist_index_changed(position):
+    print('Next song')
+    qt_graphics.Notification(window, 'Next song', positioner=qt_graphics.Relative_Positioner().center_horizontal().south(20))
 
-def show_notification(text):
-    text = 'Playing {}'.format(text)
-    g.Notification(window, text, positioner=g.Relative_Positioner().center_horizontal().south(20))
+if __name__ == '__main__':
 
-app = QtGui.QApplication([])
+    app = QtWidgets.QApplication([])
 
-window = QtGui.QWidget()
-window.show()
+    window = QtWidgets.QWidget()
+    window.show()
 
-playlist = audio.load_soundtrack_playlist()
+    # setup sound system and start playing
+    audio.load_soundtrack_playlist()
+    audio.setup_soundtrack_player()
+    audio.setup_soundtrack_player()
+    audio.soundtrack_playlist.currentIndexChanged.connect(playlist_index_changed)
+    audio.soundtrack_player.play()
 
-player = audio.Player()
-player.next.connect(show_notification)
-player.set_playlist(playlist)
-player.start()
-app.exec_()
+    app.exec_()

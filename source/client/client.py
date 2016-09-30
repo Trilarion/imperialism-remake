@@ -33,12 +33,16 @@ import client.audio as audio
 import client.graphics as graphics
 import lib.qt_graphics as qt_graphics
 import lib.utils as utils
+
+# TODO like in audio, set the network client singleton somewhere else
+local_network_client = network.NetworkClient()
+
 from client.editor import EditorScreen
 from client.game_lobby import GameLobbyWidget
 from client.main_screen import GameMainScreen
 from client.preferences import PreferencesWidget
 
-local_network_client = network.NetworkClient()
+
 
 class MapItem(QtCore.QObject):
     """

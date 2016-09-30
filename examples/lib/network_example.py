@@ -14,9 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-'''
-    Tests ExtendedTcpSocket and ExtendedTcpServer
-'''
+"""
+    Examples for usages of ExtendedTcpSocket and ExtendedTcpServer from lib.network
+"""
 
 import sys
 import datetime
@@ -76,24 +76,26 @@ def server_client_sends_something():
     log('server-client tries to send something')
     sclient.send([1, 2, 'Three'])
 
-sys.excepthook = exception_hook
+if __name__ == '__main__':
 
-app = QtCore.QCoreApplication([])
+    sys.excepthook = exception_hook
 
-client = network.ExtendedTcpSocket()
-client.connected.connect(client_connected)
-client.disconnected.connect(client_disconnected)
-client.received.connect(client_received)
+    app = QtCore.QCoreApplication([])
 
-server = network.ExtendedTcpServer()
-server.new_client.connect(server_new_client)
+    client = network.ExtendedTcpSocket()
+    client.connected.connect(client_connected)
+    client.disconnected.connect(client_disconnected)
+    client.received.connect(client_received)
 
-# actions
-QtCore.QTimer.singleShot(100, server_start)
-QtCore.QTimer.singleShot(200, client_connect)
-QtCore.QTimer.singleShot(1000, client_sends_something)
-QtCore.QTimer.singleShot(1100, server_client_sends_something)
-QtCore.QTimer.singleShot(4500, server_stop)
-QtCore.QTimer.singleShot(5000, app.quit)
+    server = network.ExtendedTcpServer()
+    server.new_client.connect(server_new_client)
 
-app.exec_()
+    # actions
+    QtCore.QTimer.singleShot(100, server_start)
+    QtCore.QTimer.singleShot(200, client_connect)
+    QtCore.QTimer.singleShot(1000, client_sends_something)
+    QtCore.QTimer.singleShot(1100, server_client_sends_something)
+    QtCore.QTimer.singleShot(4500, server_stop)
+    QtCore.QTimer.singleShot(5000, app.quit)
+
+    app.exec_()
