@@ -1,3 +1,2 @@
-ImperialismRemake
 PyYAML>=3.12
 PyQt5>=5.7
