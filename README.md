@@ -8,6 +8,10 @@
 - [![Documentation Status](https://readthedocs.org/projects/imperialism-remake-definition/badge/?version=latest)](http://imperialism-remake-definition.readthedocs.io/en/latest/?badge=latest) Game Design
 - [![Documentation Status](https://readthedocs.org/projects/imperialism-remake-developer/badge/?version=latest)](http://imperialism-remake-developer.readthedocs.io/en/latest/?badge=latest) Developer Manual
 
+## Test
+
+[![Build Status](https://travis-ci.org/Trilarion/imperialism-remake.svg?branch=master)](https://travis-ci.org/Trilarion/imperialism-remake)
+
 ## Getting Started
 
 ### Access the source code
