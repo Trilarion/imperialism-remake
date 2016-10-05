@@ -8,5 +8,6 @@ source
    client
    lib
    server
+   setup
    start
    version

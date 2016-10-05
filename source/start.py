@@ -20,6 +20,7 @@
 """
 
 import sys
+import os
 
 def exception_hook(type, value, traceback):
     """
@@ -27,6 +28,23 @@ def exception_hook(type, value, traceback):
     """
     sys.__excepthook__(type, value, traceback)
 
+def search_home_directory():
+    """
+        If the start directory is above the ./data directory we go down (up to three levels) and search for a data
+        folder, then set it as current directory.
+    """
+    base_path = '.'
+    counter = 0
+    while True:
+        path = os.path.join(base_path, 'data')
+        if os.path.isdir(path):
+            print('home: {}'.format(base_path))
+            os.chdir(base_path)
+            break
+        counter += 1
+        if counter > 3:
+            raise  RuntimeError('Cannot find home directory (containing the data folder)')
+        base_path = os.path.join(base_path, '..')
 
 if __name__ == '__main__':
 

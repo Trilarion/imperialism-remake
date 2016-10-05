@@ -1,0 +1,8 @@
+language: python
+
+python:
+  - "3.5"
+
+install: "pip install -r source/requirements.txt"
+
+script: test/lib/test_utils.py
