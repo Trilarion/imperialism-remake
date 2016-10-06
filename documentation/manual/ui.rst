@@ -2,17 +2,7 @@
 User Interface
 **********************
 
-Preferences
-===========
+.. toctree::
+   :maxdepth: 2
 
-General
-------------
-
-Network
-------------
-
-Graphics
-------------
-
-Music
-------------
+   ui/preferences

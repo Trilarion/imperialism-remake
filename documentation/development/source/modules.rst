@@ -6,8 +6,8 @@ source
 
    base
    client
+   imperialism_remake
    lib
    server
    setup
-   start
    version

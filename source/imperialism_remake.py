@@ -22,13 +22,16 @@
 import sys
 import os
 
+# some global constants
+QtWebEngine_AVAILABLE = True
+
 def exception_hook(type, value, traceback):
     """
         PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
     """
     sys.__excepthook__(type, value, traceback)
 
-def search_home_directory():
+def set_start_directory():
     """
         If the start directory is above the ./data directory we go down (up to three levels) and search for a data
         folder, then set it as current directory.
@@ -59,12 +62,19 @@ if __name__ == '__main__':
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
 
+    # test for existence of PyQt5.QtWebEngine
+    try:
+        from PyQt5 import QtWebEngineWidgets
+    except ImportError:
+        QtWebEngine_AVAILABLE = False
+
     # because PyQt5 eats exceptions in the event thread this workaround
     sys.excepthook = exception_hook
 
-    import os
+    # set start directory
+    set_start_directory()
 
-    # determine home dir
+    # determine user folder
     if os.name == 'posix':
         # Linux / Unix
         user_folder = os.path.join(os.getenv('HOME'), 'Imperialism Remake User Data')

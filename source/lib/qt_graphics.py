@@ -89,8 +89,8 @@ class RelativeLayoutConstraint:
 
 def calculate_relative_position(parent_rect, own_size, constraint):
     """
-        Returns the left, upper corner of an object if the parent_rectangle is given and our own size and a relative
-        layout constraint (see RelativeLayoutConstraint).
+        Returns the left, upper corner of an object if the parent rectangle (QRect) is given and our own size (QSize)
+        and a relative layout constraint (see RelativeLayoutConstraint).
     """
     x = parent_rect.x() + constraint.x[0] * parent_rect.width() + constraint.x[1] * own_size.width() + constraint.x[2]
     y = parent_rect.y() + constraint.y[0] * parent_rect.height() + constraint.y[1] * own_size.height() + constraint.y[2]
@@ -601,12 +601,13 @@ class ClockLabel(QtWidgets.QLabel):
         self.timer.setInterval(60000)
         self.timer.start()
         self.update_clock()
+        self.time_format = '%H:%M'
 
     def update_clock(self):
         """
             We get the time and format as hour:minute and update the label text.
         """
-        text = datetime.now().strftime('%H:%M')
+        text = datetime.now().strftime(self.time_format)
         self.setText(text)
 
 

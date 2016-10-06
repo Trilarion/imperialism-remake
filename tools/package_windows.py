@@ -52,7 +52,7 @@ base = None
 if sys.platform == 'win32':
     base = 'Win32GUI'
 
-executables = [Executable(os.path.join('source', 'start.py'), targetName='ImperialismRemake.exe', base=base)]
+executables = [Executable(os.path.join('source', 'imperialism_remake.py'), targetName='ImperialismRemake.exe', base=base)]
 
 # delete previous build directory completely
 path = os.path.join('build', 'exe.win-amd64-3.5')

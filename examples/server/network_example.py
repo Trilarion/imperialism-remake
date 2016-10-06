@@ -20,7 +20,7 @@
 
 from PyQt5 import QtCore
 
-import start
+import imperialism_remake
 import base.constants as constants
 import base.network as network
 from server.server import ServerManager

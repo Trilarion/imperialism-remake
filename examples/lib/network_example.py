@@ -23,7 +23,7 @@ import datetime
 
 import PyQt5.QtCore as QtCore
 
-import start
+import imperialism_remake
 import lib.network as network
 
 PORT = 37846
@@ -113,7 +113,7 @@ def server_client_sends_something():
 if __name__ == '__main__':
 
     # because PyQt5 eats exceptions in the event thread this workaround
-    sys.excepthook = start.exception_hook
+    sys.excepthook = imperialism_remake.exception_hook
 
     app = QtCore.QCoreApplication([])
 

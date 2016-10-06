@@ -26,7 +26,7 @@ from multiprocessing import Process
 
 from PyQt5 import QtCore
 
-import start
+import imperialism_remake
 import base.constants as constants
 import lib.utils as utils
 from base.constants import ScenarioProperties as k, NationProperties as kn
@@ -51,7 +51,7 @@ class ServerProcess(Process):
             Runs the server process by starting its own QCoreApplication.
         """
         # because PyQt5 eats exceptions in the event thread this workaround
-        sys.excepthook = start.exception_hook
+        sys.excepthook = imperialism_remake.exception_hook
 
         app = QtCore.QCoreApplication([])
 

@@ -9,4 +9,7 @@ install:
   - pip install -r source/requirements.txt
 
 script:
-  - python test/lib/test_utils.py
+  - python test/test_runner.py
+  
+notifications:
+  email: false  
