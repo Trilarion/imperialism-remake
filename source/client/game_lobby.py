@@ -115,8 +115,9 @@ class GameLobbyWidget(QtWidgets.QWidget):
         if checked:
 
             # noinspection PyCallByClass
-            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario',
-                constants.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[0]
+            file_name = \
+            QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', constants.SCENARIO_FOLDER,
+                'Scenario Files (*.scenario)')[0]
             if file_name:
                 # TODO check that it is a valid single player scenario in play
                 pass

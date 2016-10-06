@@ -9,7 +9,8 @@ install:
   - pip install -r source/requirements.txt
 
 script:
-  - python test/test_runner.py
+  - cd test
+  - python test_runner.py
   
 notifications:
   email: false  

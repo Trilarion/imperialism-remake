@@ -16,7 +16,7 @@
 
 """
     General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
-    to our project.
+    to the project.
 """
 
 import zipfile
@@ -37,7 +37,7 @@ else:
 
 class AutoNumberedEnum(Enum):
     """
-        Enum that is automatically numbered with increasing integers.
+    Enum that is automatically numbered with increasing integers.
     """
 
     def __new__(cls):
@@ -49,7 +49,10 @@ class AutoNumberedEnum(Enum):
 
 def read_as_yaml(file_name):
     """
-        Read YAML struct from file
+    Read YAML serialized Python value from file.
+
+    :param file_name: File name
+    :return: Python value
     """
     with open(file_name) as file:  # open is 'r' by default
         return yaml.load(file, Loader=Loader)
@@ -57,36 +60,46 @@ def read_as_yaml(file_name):
 
 def write_as_yaml(file_name, value):
     """
-        Writes YAML struct to a file.
+    Writes Python value as YAML serialization to a file.
+
+    :param file_name: File name.
+    :param value: Python value
     """
     with open(file_name, 'w') as file:
         yaml.dump(value, file, allow_unicode=True, Dumper=Dumper)
+    # TODO are keys of dictionaries in YAML sorted automatically? If not we might want to do that here.
 
-
-# TODO are keys of dictionaries in YAML sorted automatically?
 
 class ZipArchiveReader:
     """
-        Encapsulates a zip file and reads binary files from it, or even converts from JSON to a Python object.
+    Encapsulates a zip file and reads binary files from it, or even converts from JSON to a Python object.
 
-        See also: https://docs.python.org/3.4/library/zipfile.html
+    See also: https://docs.python.org/3.4/library/zipfile.html
     """
 
     def __init__(self, file):
         """
-            Open the zip file in read-only mode.
+        Opens the zip file in read-only mode.
+
+        :param file: File name
         """
         self.zip = zipfile.ZipFile(file)  # mode is 'r' by default
 
     def read(self, name):
         """
-            Just reads a file as byte array.
+        Reads the file name from the zip archive.
+
+        :param name: File name.
+        :return: byte array
         """
         return self.zip.read(name)
 
     def read_as_yaml(self, name):
         """
-            First reads the file as byte array, then convert to UTF-8, then convert by YAML to Python object.
+        Reads the file name from the zip archive and interprets the byte array as UTF-8 YAML.
+
+        :param name: File name.
+        :return: De-serialized Python value.
         """
         data = self.read(name)
         obj = yaml.load(data.decode(), Loader=Loader)
@@ -94,50 +107,63 @@ class ZipArchiveReader:
 
     def __del__(self):
         """
-            Close the zip upon deletion.
+        Closes the zip upon deletion.
         """
         self.zip.close()
 
 
 class ZipArchiveWriter:
     """
-        Encapsulates a zip file to write files into it or even whole Python objects via JSON.
+    Encapsulates a zip file to write files into it or even whole Python objects via YAML.
+
+    See also: https://docs.python.org/3.4/library/zipfile.html
     """
 
     def __init__(self, file):
         """
-            Open the zip file in write mode with standard zlib compression mode.
+        Open the zip file in write mode with standard zlib compression mode.
+
+        :param file: File name
         """
         self.zip = zipfile.ZipFile(file, mode='w', compression=zipfile.ZIP_DEFLATED)
 
     def write(self, name, data):
         """
-            Writes a byte array to an entry in the zip file.
+        Writes a byte array to a file in the archive.
+
+        :param name: File name
+        :param data: byte array
         """
         self.zip.writestr(name, data)
 
     def write_as_yaml(self, name, obj):
         """
-            Write a Python object via YAML into an entry in the zip file.
+        Writes a Python value as UTF-8 YAML into a file in the archive.
+
+        :param name: File name
+        :param obj: Python value
         """
         data = yaml.dump(obj, allow_unicode=True, Dumper=Dumper).encode()
         self.write(name, data)
 
     def __del__(self):
         """
-            Close the zip upon deletion.
+        Closes the zip upon deletion.
         """
         self.zip.close()
 
 
 class List2D:
     """
-        Implements an 2D array with getter and setter for two indices (x,y). Based on list.
+    Implements an 2D array with getter and setter for two indices (x,y). Based on a list but with a mapping of the
+    two-dimensional indices into a one-dimensional index.
     """
 
     def __init__(self, dimension):
         """
-            Creates an empty array with a given dimensions (tuple).
+        Creates an empty array with a given 2D dimension (tuple - width/height).
+
+        :param dimension: Dimension
         """
         # create empty list
         size = dimension[0] * dimension[1]
@@ -147,14 +173,22 @@ class List2D:
 
     def get(self, x, y):
         """
-            Returns the element at position (x,y).
+        Returns the element at position (x,y).
+
+        :param x: x position
+        :param y: y position
+        :return: value
         """
         index = x + self.dimension[0] * y
         return self._array[index]
 
     def set(self, x, y, v):
         """
-            Sets the element at position (x,y).
+        Sets the element at position (x,y).
+
+        :param x: x position
+        :param y: y position
+        :param v: value
         """
         index = x + self.dimension[0] * y
         self._array[index] = v
@@ -162,10 +196,16 @@ class List2D:
 
 def index_of_element(sequence, element):
     """
-        Finds the index of a certain element in a list. Returns the index of the first occurrence or ValueError if the
-        element is not contained in the list. This is a slow operation (O(n)).
+    Finds the index of a certain element in a list. Returns the index of the first occurrence or ValueError if the
+    element is not contained in the list. Raises a ValueError if the element is not contained in the sequence.
+
+    Note: This is a slow operation (O(n)).
+
+    :param sequence: iterable
+    :param element: single element
+    :return: the index of the element
     """
     for index, e in enumerate(sequence):
         if e == element:
             return index
-    return ValueError
+    raise ValueError('element not contained in sequence')

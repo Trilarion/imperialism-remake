@@ -15,8 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Basic general network functionality (client and server) wrapping around QtNetwork.QTcpSocket. Messages are sent using
-    yaml (for serialization) and zlib (for compression).
+Basic general network functionality (client and server) wrapping around QtNetwork.QTcpSocket and QtNetwork.QTcpServer.
+
+Messages are sent using yaml (for serialization) and zlib (for compression).
 """
 
 import zlib
@@ -25,24 +26,32 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtNetwork as QtNetwork
 import yaml
 
+#: shortcut for QtNetwork.QHostAddress.LocalHost/Any
 SCOPE = {'local': QtNetwork.QHostAddress.LocalHost, 'any': QtNetwork.QHostAddress.Any}
 
 
 class ExtendedTcpSocket(QtCore.QObject):
     """
-        Wrapper around QtNetwork.QTcpSocket (set it from outside via set_socket(..)).
-
-        Additionally sends and reads messages via serialization (yaml), compression (zlib) and wrapping (QByteArray).
+    Wrapper around QtNetwork.QTcpSocket. The socket can either be given in the initialization or be created there.
+    Sends and reads messages via serialization (yaml), compression (zlib) and wrapping (QByteArray) as well as
+    un-wrapping, de-compressing and de-serialization on the other side.
     """
 
-    connected = QtCore.pyqtSignal()  # connected
-    disconnected = QtCore.pyqtSignal()  # disconnected
-    error = QtCore.pyqtSignal(QtNetwork.QAbstractSocket.SocketError)  # an error has happened
-    received = QtCore.pyqtSignal(object)  # received a message, whole message is emitted
+    #: signal for socket connected
+    connected = QtCore.pyqtSignal()
+    #: signal for socket disconnected
+    disconnected = QtCore.pyqtSignal()
+    #: signal for a SocketError
+    error = QtCore.pyqtSignal(QtNetwork.QAbstractSocket.SocketError)
+    #: signal for a received message (only whole messages are emitted)
+    received = QtCore.pyqtSignal(object)
 
-    def __init__(self, socket=None):
+    def __init__(self, socket:QtNetwork.QTcpSocket=None):
         """
-            Initially we do not have any socket and no bytes are written.
+        Initializes the extended TCP socket. Either wraps around an existing socket or creates its own and resets
+        the number of bytes written.
+
+        :param socket: An already existing socket or None if none is given.
         """
         super().__init__()
 
@@ -63,23 +72,26 @@ class ExtendedTcpSocket(QtCore.QObject):
 
     def peer_address(self):
         """
-            (peer address, peer port)
-            must be connected
+        Returns the peer address. The socket must be connected first.
+
+        :return: A tuple of the peer address and the peer port
         """
         return self.socket.peerAddress(), self.socket.peerPort()
 
     def disconnect_from_host(self):
         """
-            If you want to disconnect, just call this method which basically just calls the same method on the socket.
+        Attempts to close the underlying socket.
         """
         self.socket.disconnectFromHost()
 
     def connect_to_host(self, port, host='local'):
         """
-            If you want to connect
+        Tries to connect to a host specified by port and host address.
 
-            TODO only if not yet connected
+        :param port: The port number to connect to.
+        :param host: The host address (or 'local' for the local host) to connect to.
         """
+        # TODO only if not yet connected
         if host == 'local':
             host = SCOPE['local']
         print('client connects to host={} port={}'.format(host, port))
@@ -88,8 +100,9 @@ class ExtendedTcpSocket(QtCore.QObject):
 
     def receive(self):
         """
-            While there are messages available read them and process them.
-            Reading is reading of a QByteArray from the TCPSocket, un-compressing and de-serializing.
+        Called by the sockets readyRead signal. Not intended for outside use.
+        While there are messages available read them and process them.
+        Reading is reading of a QByteArray from the TCPSocket, un-compressing and de-serializing.
         """
         while self.socket.bytesAvailable() > 0:
             # read a QByteArray using a data stream
@@ -113,8 +126,9 @@ class ExtendedTcpSocket(QtCore.QObject):
 
     def send(self, value):
         """
-            We send a message back to the client.
-            We do it by serialization, compressing and writing of a QByteArray to the TCPSocket.
+        Sends a message by serializing, compressing and wrapping to a QByteArray, then streaming over the TCP socket.
+
+        :param value: The message to send.
         """
         print('socket send {}'.format(value))
         # serialize value to yaml
@@ -128,26 +142,28 @@ class ExtendedTcpSocket(QtCore.QObject):
 
         # write using a data stream
         writer = QtCore.QDataStream(self.socket)
-        writer.setVersion(QtCore.QDataStream.Qt_4_8)
+        writer.setVersion(QtCore.QDataStream.Qt_5_6)
         writer << bytearray
 
     def count_bytes_written(self, bytes):
         """
-            Keeps track of the written bytes.
+        Called by the sockets bytesWritten signal. Not intended for outside use.
+
+        :param bytes: Number of written bytes.
         """
         self.bytes_written += bytes
 
 
 class ExtendedTcpServer(QtCore.QObject):
     """
-        Wrapper around QtNetwork.QTcpServer and a management of several clients (each a QtNetwork.QTcpSocket).
+        Wrapper around QtNetwork.QTcpServer providing some simple functionality to determine the scope (local/any) and
+        to delegate the acceptError and newConnection signals of the underlying QTcpServer.
     """
 
-    new_client = QtCore.pyqtSignal(QtNetwork.QTcpSocket)  # we get a new client
+    #: signal for a new connected client socket
+    new_client = QtCore.pyqtSignal(QtNetwork.QTcpSocket)
 
     def __init__(self):
-        """
-        """
         super().__init__()
         self.tcp_server = QtNetwork.QTcpServer(self)
         self.tcp_server.acceptError.connect(self.accept_error)
@@ -155,14 +171,18 @@ class ExtendedTcpServer(QtCore.QObject):
 
     def accept_error(self, socket_error):
         """
-            An error occurred.
+        An error occurred.
+
+        :param socket_error: QAbstractSocket::SocketError
         """
         print('accept error {}'.format(socket_error))
 
-    def start(self, port, scope='local'):
+    def start(self, port, scope:SCOPE='local'):
         """
-            Given an address (hostname, port) tries to start listening.
-            QtNetwork.QHostAddress.Any
+            Given a port number and a scope (local/any), starts listening.
+
+        :param port: The port number.
+        :param scope: The scope (local/any).
         """
         host = SCOPE[scope]
         print('server listens on host={} port={}'.format(host, port))
@@ -172,30 +192,21 @@ class ExtendedTcpServer(QtCore.QObject):
 
     def is_listening(self):
         """
-            Is the server listening/active?
+        Is the server listening (active)?
         """
         return self.tcp_server.isListening()
 
-    def scope(self):
-        """
-            ???
-        """
-        if self.is_listening():
-            # TODO is this the easiest way?
-            return SCOPE.keys()[SCOPE.values().index(self.tcp_server.serverAddress())]
-        else:
-            return None
-
     def stop(self):
         """
-            Stops listening.
+        Stops listening/closes the server.
         """
         if self.tcp_server.isListening():
             self.tcp_server.close()
 
     def new_connection(self):
         """
-            Zero or more new clients might be available, emit new_client signal for each of them.
+        Called by the newConnection signal of the QTCPServer.
+        Zero or more new clients might be available, emit new_client signal for each of them.
         """
         print('new connection on server')
         while self.tcp_server.hasPendingConnections():

@@ -26,7 +26,6 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
-import version as version
 import base.constants as constants
 import base.network as network
 import base.tools as tools
@@ -34,6 +33,7 @@ import client.audio as audio
 import client.graphics as graphics
 import lib.qt_graphics as qt_graphics
 import lib.utils as utils
+import version as version
 
 # TODO like in audio, set the network client singleton somewhere else
 local_network_client = network.NetworkClient()
@@ -42,7 +42,6 @@ from client.editor import EditorScreen
 from client.game_lobby import GameLobbyWidget
 from client.main_screen import GameMainScreen
 from client.preferences import PreferencesWidget
-
 
 
 class MapItem(QtCore.QObject):
@@ -413,5 +412,6 @@ def start_client():
 
     tools.log_info('client initialized, start Qt app execution')
     # TODO is this necessary to run as event?
+    # noinspection PyCallByClass
     QtCore.QTimer.singleShot(0, local_network_connect)
     app.exec_()

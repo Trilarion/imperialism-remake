@@ -20,14 +20,14 @@
 
 import os
 import random
-import time
 import sys
+import time
 from multiprocessing import Process
 
 from PyQt5 import QtCore
 
-import imperialism_remake
 import base.constants as constants
+import imperialism_remake
 import lib.utils as utils
 from base.constants import ScenarioProperties as k, NationProperties as kn
 from base.network import NetworkClient
@@ -58,6 +58,7 @@ class ServerProcess(Process):
         # server manager
         server_manager = ServerManager()
         server_manager.shutdown.connect(app.quit)
+        # noinspection PyCallByClass
         QtCore.QTimer.singleShot(0, server_manager.start)
 
         # run event loop of app

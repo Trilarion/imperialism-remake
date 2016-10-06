@@ -503,6 +503,7 @@ def make_GraphicsItem_clickable(parent):
         """
             Clickable GraphicsItem
         """
+
         def __init__(self, *args, **kwargs):
             """
                 QGraphicsItems by default do not accept hover events or accept mouse buttons (for performance reasons).

@@ -101,7 +101,7 @@ class NetworkClient(ExtendedTcpSocket):
 
         # note: channel with name channel_name may now already not be existing anymore (may be removed during processing)
 
-    def send(self, channel_name, message=[]):
+    def send(self, channel_name, message=None):
         """
             Given a channel name and a message (optional) wraps them in one dict (a letter) and send it.
         """

@@ -19,17 +19,19 @@
     Start in project root folder and with 'debug' as parameter if wished.
 """
 
-import sys
 import os
+import sys
 
 # some global constants
 QtWebEngine_AVAILABLE = True
+
 
 def exception_hook(type, value, traceback):
     """
         PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
     """
     sys.__excepthook__(type, value, traceback)
+
 
 def set_start_directory():
     """
@@ -46,8 +48,9 @@ def set_start_directory():
             break
         counter += 1
         if counter > 3:
-            raise  RuntimeError('Cannot find home directory (containing the data folder)')
+            raise RuntimeError('Cannot find home directory (containing the data folder)')
         base_path = os.path.join(base_path, '..')
+
 
 if __name__ == '__main__':
 
@@ -122,9 +125,9 @@ if __name__ == '__main__':
     # special case of some desktop environments under Linux where full screen mode does not work well
     if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         desktop_session = os.environ.get("DESKTOP_SESSION")
-        if desktop_session and (desktop_session.startswith(
-            'ubuntu') or 'xfce' in desktop_session or desktop_session.startswith(
-            'xubuntu') or 'gnome' in desktop_session):
+        if desktop_session and (
+                    desktop_session.startswith('ubuntu') or 'xfce' in desktop_session or desktop_session.startswith(
+                'xubuntu') or 'gnome' in desktop_session):
             tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED, False)
             tools.log_warning(
                 'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
