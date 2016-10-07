@@ -29,7 +29,7 @@ import PyQt5.QtWidgets as QtWidgets
 import base.constants as constants
 import base.tools as tools
 import client.graphics as graphics
-import lib.qt_graphics as qt_graphics
+import lib.qt as qt
 from server.scenario import Scenario
 
 
@@ -82,12 +82,12 @@ class MiniMap(QtWidgets.QWidget):
         # action group (only one of them can be checked at each time)
         action_group = QtWidgets.QActionGroup(self.toolbar)
         # political view in the beginning
-        action_political = qt_graphics.create_action(tools.load_ui_icon('icon.mini.political.png'),
+        action_political = qt.create_action(tools.load_ui_icon('icon.mini.political.png'),
             'Show political view', action_group, toggle_connection=self.toggled_political, checkable=True)
         self.toolbar.addAction(action_political)
         # geographical view
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view',
+            qt.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view',
                 action_group, toggle_connection=self.toggled_geographical, checkable=True))
 
         # wrap tool bar into horizontal layout with stretch
@@ -129,7 +129,7 @@ class MiniMap(QtWidgets.QWidget):
             # fill the ground layer with a neutral color
             item = self.scene.addRect(0, 0, 1, 1)
             item.setBrush(QtCore.Qt.lightGray)
-            item.setPen(qt_graphics.TRANSPARENT_PEN)
+            item.setPen(qt.TRANSPARENT_PEN)
             item.setZValue(0)
             self.removable_items.extend([item])
             self.tracker.setPos(0, 0)
@@ -166,7 +166,7 @@ class MiniMap(QtWidgets.QWidget):
             # fill the background with sea (blue)
             item = self.scene.addRect(0, 0, 1, 1)
             item.setBrush(QtCore.Qt.blue)
-            item.setPen(qt_graphics.TRANSPARENT_PEN)
+            item.setPen(qt.TRANSPARENT_PEN)
             item.setZValue(0)
             self.removable_items.extend([item])
 
@@ -189,7 +189,7 @@ class MiniMap(QtWidgets.QWidget):
                 path = paths[t]
                 path = path.simplified()
                 brush = QtGui.QBrush(colors[t])
-                # item = self.scene.addPath(path, brush=brush, pen=qt_graphics.TRANSPARENT_PEN)
+                # item = self.scene.addPath(path, brush=brush, pen=qt.TRANSPARENT_PEN)
                 item.setZValue(1)
                 self.removable_items.extend([item])
 
@@ -287,7 +287,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
                    6: QtGui.QBrush(QtGui.QColor(222, 222, 0))}
 
         # fill the ground layer with ocean
-        item = self.scene.addRect(0, 0, width, height, brush=brushes[0], pen=qt_graphics.TRANSPARENT_PEN)
+        item = self.scene.addRect(0, 0, width, height, brush=brushes[0], pen=qt.TRANSPARENT_PEN)
         item.setZValue(0)
 
         # fill plains, hills, mountains, tundra, swamp, desert with texture
@@ -306,7 +306,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         for t in paths:
             path = paths[t]
             path = path.simplified()
-            item = self.scene.addPath(path, brush=brushes[t], pen=qt_graphics.TRANSPARENT_PEN)
+            item = self.scene.addPath(path, brush=brushes[t], pen=qt.TRANSPARENT_PEN)
             item.setZValue(1)
 
         # fill the half tiles which are not part of the map
@@ -314,10 +314,10 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         for row in range(0, rows):
             if row % 2 == 0:
                 item = self.scene.addRect(columns * self.TILE_SIZE, row * self.TILE_SIZE, self.TILE_SIZE / 2,
-                    self.TILE_SIZE, pen=qt_graphics.TRANSPARENT_PEN)
+                    self.TILE_SIZE, pen=qt.TRANSPARENT_PEN)
             else:
                 item = self.scene.addRect(0, row * self.TILE_SIZE, self.TILE_SIZE / 2, self.TILE_SIZE,
-                    pen=qt_graphics.TRANSPARENT_PEN)
+                    pen=qt.TRANSPARENT_PEN)
             item.setBrush(brush)
             item.setZValue(1)
 
@@ -386,7 +386,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
                 # display province name below
                 province_name = self.scenario.get_province_property(province, 'name')
                 item = self.scene.addSimpleText(province_name)
-                item.setPen(qt_graphics.TRANSPARENT_PEN)
+                item.setPen(qt.TRANSPARENT_PEN)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.darkRed))
                 x = (sx + 0.5) * self.TILE_SIZE - item.boundingRect().width() / 2
                 y = (sy + 1) * self.TILE_SIZE - item.boundingRect().height()
@@ -399,7 +399,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
                                            item.boundingRect().height() + 2 * by)
                 path = QtGui.QPainterPath()
                 path.addRoundedRect(background, 50, 50)
-                item = self.scene.addPath(path, pen=qt_graphics.TRANSPARENT_PEN,
+                item = self.scene.addPath(path, pen=qt.TRANSPARENT_PEN,
                     brush=QtGui.QBrush(QtGui.QColor(128, 128, 255, 64)))
                 item.setZValue(5)
 
@@ -492,7 +492,7 @@ class InfoBox(QtWidgets.QWidget):
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(20, 20))
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self,
+            qt.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self,
                 self.change_terrain))
 
         layout.addWidget(toolbar)
@@ -579,7 +579,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout()
         toolbar = QtWidgets.QToolBar()
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar,
+            qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar,
                 self.create_scenario_clicked))
         layout.addStretch()
         layout.addWidget(toolbar)
@@ -673,31 +673,31 @@ class EditorScreen(QtWidgets.QWidget):
         self.toolbar = QtWidgets.QToolBar()
         self.toolbar.setIconSize(QtCore.QSize(32, 32))
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
+            qt.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
                 self.show_new_scenario_dialog))
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
+            qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
                 self.load_scenario_dialog))
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self,
+            qt.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self,
                 self.save_scenario_dialog))
 
         self.toolbar.addSeparator()
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit base properties', self,
+            qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit base properties', self,
                 self.show_general_properties_dialog))
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self,
+            qt.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self,
                 self.show_nations_dialog))
         self.toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
+            qt.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
                 self.show_provinces_dialog))
 
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.toolbar.addWidget(spacer)
 
-        clock = qt_graphics.ClockLabel()
+        clock = qt.ClockLabel()
         self.toolbar.addWidget(clock)
 
         action_help = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Show help', self)

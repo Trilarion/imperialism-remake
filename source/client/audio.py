@@ -23,8 +23,8 @@
 
 import PyQt5.QtMultimedia as QtMultimedia
 
-from base import constants, tools
-from lib import utils
+from base import constants
+from lib import utils, qt
 
 soundtrack_player = None
 soundtrack_playlist = None
@@ -48,7 +48,7 @@ def load_soundtrack_playlist():
     # add the soundtrack folder to each file name
     for entry in data:
         file = constants.extend(constants.SOUNDTRACK_FOLDER, entry[0])
-        url = tools.local_url(file)
+        url = qt.local_url(file)
         media = QtMultimedia.QMediaContent(url)
         soundtrack_playlist.addMedia(media)
 

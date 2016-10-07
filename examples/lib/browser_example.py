@@ -20,14 +20,14 @@
 
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtCore as QtCore
-import lib.qt_graphics as qt_graphics
+import lib.qt as qt
 import base.tools as tools
 
 if __name__ == '__main__':
 
     app = QtWidgets.QApplication([])
 
-    widget = qt_graphics.BrowserWidget(tools.load_ui_icon)
+    widget = qt.BrowserWidget(tools.load_ui_icon)
     widget.home_url = QtCore.QUrl(("http://qt-project.org/"))
     widget.show()
 

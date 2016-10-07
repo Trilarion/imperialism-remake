@@ -17,11 +17,11 @@
 import PyQt5.QtWidgets as QtWidgets
 
 import client.audio as audio
-import lib.qt_graphics as qt_graphics
+import lib.qt as qt
 
 def playlist_index_changed(position):
     print('Next song')
-    qt_graphics.Notification(window, 'Next song', positioner=qt_graphics.Relative_Positioner().center_horizontal().south(20))
+    qt.Notification(window, 'Next song', positioner=qt.Relative_Positioner().center_horizontal().south(20))
 
 if __name__ == '__main__':
 

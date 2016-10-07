@@ -12,10 +12,18 @@ lib.network module
     :undoc-members:
     :show-inheritance:
 
-lib.qt_graphics module
-----------------------
+lib.qt module
+-------------
 
-.. automodule:: lib.qt_graphics
+.. automodule:: lib.qt
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+lib.qt_webengine module
+-----------------------
+
+.. automodule:: lib.qt_webengine
     :members:
     :undoc-members:
     :show-inheritance:

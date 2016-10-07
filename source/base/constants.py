@@ -24,6 +24,17 @@ from enum import unique
 
 import lib.utils as utils
 
+#: global switch for DEBUG MODE on (displays errors and info messages on console) and DEBUG MODE off (stores errors
+# in the error log file)
+DEBUG_MODE = True
+
+#: QtWebEngine available
+QtWebEngine_AVAILABLE = True
+try:
+    from PyQt5 import QtWebEngineWidgets
+except ImportError:
+    QtWebEngine_AVAILABLE = False
+
 
 def extend(path, *parts):
     """
@@ -38,32 +49,31 @@ def extend(path, *parts):
     return extended
 
 
-# debug mode and helpers
-DEBUG_MODE = False
+#: helpers
 used_resources = set()
 
-# base folders (do not directly contain data)
+#: base folders (do not directly contain data)
 DATA_FOLDER = extend('.', 'data')
 ARTWORK_FOLDER = extend(DATA_FOLDER, 'artwork')
 
-# scenarios (save games)
+#: scenarios (save games)
 SCENARIO_FOLDER = extend(DATA_FOLDER, 'scenarios')
 CORE_SCENARIO_FOLDER = extend(SCENARIO_FOLDER, 'core')
 SCENARIO_RULESET_FOLDER = extend(SCENARIO_FOLDER, 'rules')
 SCENARIO_RULESET_STANDARD_FILE = extend(SCENARIO_RULESET_FOLDER, 'standard.rules')
-# Saved_Scenario_Folder = extend(SCENARIO_FOLDER, 'saved')
+#: Saved_Scenario_Folder = extend(SCENARIO_FOLDER, 'saved')
 
-# music related folders
+#: music related folders
 MUSIC_FOLDER = extend(ARTWORK_FOLDER, 'music')
 SOUNDTRACK_FOLDER = extend(MUSIC_FOLDER, 'soundtrack')
 SOUNDTRACK_INFO_FILE = extend(SOUNDTRACK_FOLDER, 'soundtrack.info')
 
-# graphics related folders
+#: graphics related folders
 GRAPHICS_FOLDER = extend(ARTWORK_FOLDER, 'graphics')
 GRAPHICS_UI_FOLDER = extend(GRAPHICS_FOLDER, 'ui')
 GRAPHICS_MAP_FOLDER = extend(GRAPHICS_FOLDER, 'map')
 
-# special locations
+#: special locations
 DOCUMENTATION_BASE_FOLDER = extend(DATA_FOLDER, 'manual')
 DOCUMENTATION_INDEX_FILE = extend(DOCUMENTATION_BASE_FOLDER, 'index.html')
 DOCUMENTATION_PREFERENCES_FILE = extend(DOCUMENTATION_BASE_FOLDER, 'ui', 'preferences.html')
@@ -71,10 +81,10 @@ GLOBAL_STYLESHEET_FILE = extend(GRAPHICS_UI_FOLDER, 'style.css')
 
 # other specific constants
 
-# network communication
+#: network communication
 NETWORK_PORT = 42932
 
-# minimal screen resolution
+#: minimal screen resolution
 MINIMAL_SCREEN_SIZE = (1024, 768)
 
 
@@ -103,14 +113,14 @@ class Option(utils.AutoNumberedEnum):
 
 Options = Option.__members__  # dictionary of name, Enum-value pairs
 
-# default values for the Options
+#: default values for the Options
 Option.LOCALSERVER_OPEN.default = False
 Option.LOCALSERVER_NAME.default = 'server name'
 Option.MAINWINDOW_FULLSCREEN.default = True  # we start full screen (can be unset by the program for some linux desktop environments
 Option.SOUNDTRACK_MUTE.default = False
 Option.SOUNDTRACK_VOLUME.default = 50
 
-# predefined channel names for network communication
+#: predefined channel names for network communication
 CH_SCENARIO_PREVIEW = 'general.scenario.preview'
 CH_CORE_SCENARIO_TITLES = 'general.core.scenarios.titles'
 CH_SYSTEM = 'system'
@@ -118,7 +128,7 @@ CH_SYSTEM = 'system'
 
 class TileDirections(utils.AutoNumberedEnum):
     """
-        Six directions for six neighbored tiles in clockwise order.
+    Six directions for six neighbored tiles in clockwise order.
     """
     WEST = ()
     NORTH_WEST = ()
@@ -133,7 +143,7 @@ class TileDirections(utils.AutoNumberedEnum):
 
 class ScenarioProperties:
     """
-        Key names for general properties of a scenario.
+    Key names for general properties of a scenario.
     """
 
     SCENARIO_TITLE = 'scenario.title'
@@ -145,7 +155,7 @@ class ScenarioProperties:
 
 class ProvinceProperties:
     """
-        Key names of properties of provinces.
+    Key names of properties of provinces.
     """
     TILES = 'tiles'
     NATION = 'nation'
@@ -153,7 +163,7 @@ class ProvinceProperties:
 
 class NationProperties:
     """
-        Key names for nation properties of a scenario.
+    Key names for nation properties of a scenario.
     """
     PROVINCES = 'provinces'
     COLOR = 'color'

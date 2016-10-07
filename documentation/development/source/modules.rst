@@ -9,5 +9,4 @@ source
    imperialism_remake
    lib
    server
-   setup
    version

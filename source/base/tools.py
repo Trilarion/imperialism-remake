@@ -15,23 +15,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Non-specific independent helper functions. Do not depend on any other part of the project except on the constants.
+    Non-specific independent helper functions. Do not depend on any other part of the project except on package lib
+    and base.constants and is specifically used by the project.
 """
 
-import datetime
-import os
 import sys
 
 import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 
 import base.constants as constants
-from lib.utils import read_as_yaml, write_as_yaml
-
+import lib.utils as utils
 
 def load_ui_icon(name):
     """
-        Loads an icon from a base icon path.
+    Loads an icon from a base icon path.
+
+    :param name:
+    :return:
     """
     file_name = constants.extend(constants.GRAPHICS_UI_FOLDER, name)
     return QtGui.QIcon(file_name)
@@ -39,44 +40,37 @@ def load_ui_icon(name):
 
 def log_info(text):
     """
-        Prints a INFO message to stdout.
+    Prints a INFO message to stdout.
+
+    :param text:
     """
-    log_write_entry(sys.stdout, "INFO", text)
+    utils.log_write_entry(sys.stdout, "INFO", text)
 
 
 def log_warning(text):
     """
-        Prints a WARNING message to stdout.
+    Prints a WARNING message to stdout.
+
+    :param text:
     """
-    log_write_entry(sys.stdout, "WARNING", text)
+    utils.log_write_entry(sys.stdout, "WARNING", text)
 
 
 def log_error(text, exception=None):
     """
-        Prints a ERROR message and exception to stderr.
+    Prints a ERROR message and exception to stderr.
+
+    :param text:
+    :param exception:
     """
-    log_write_entry(sys.stderr, "ERROR", text, exception)
+    utils.log_write_entry(sys.stderr, "ERROR", text, exception)
     # in case we send to somewhere else also send it to the standard error output (console)
     if sys.stderr is not sys.__stderr__:
-        log_write_entry(sys.__stderr__, "ERROR", text, exception)
-
-
-def log_write_entry(writer, prefix, text, exception=None):
-    """
-        Prints a message of format: date, time, prefix, text, exception to a writer.
-    """
-    now = datetime.datetime.now()
-    header = now.isoformat(" ") + '\t' + prefix + '\t'
-
-    print(header + text, end='\r\n', file=writer)
-
-    if exception is not None:
-        print(header + exception, end='\r\n', file=writer)
-
+        utils.log_write_entry(sys.__stderr__, "ERROR", text, exception)
 
 def find_unused_resources():
     """
-        Report on unused resources.
+    Report on unused resources.
     """
     pass  # TODO not implemented yet
 
@@ -87,11 +81,13 @@ options = {}
 
 def load_options(file_name):
     """
-        Load options from a JSON file and apply some conversions like changing the main window bounding rectangle
-        from list to QtCore.QRect.
+    Load options from a JSON file and apply some conversions like changing the main window bounding rectangle
+    from list to QtCore.QRect.
+
+    :param file_name:
     """
     global options
-    options = read_as_yaml(file_name)
+    options = utils.read_as_yaml(file_name)
 
     # delete entries that are not in Constants.Options
     for key in list(options.keys()):
@@ -111,36 +107,37 @@ def load_options(file_name):
 
 def get_option(option):
     """
-        For an option (OptionEnum in Constants), returns the entry in the options dictionary stored here.
+    For an option (OptionEnum in Constants), returns the entry in the options dictionary stored here.
+
+    :param option:
+    :return:
     """
     return options[option.name]
 
 
 def set_option(option, value):
     """
-        For an option (OptionEnum in Constants), sets the entry of the options dictionary store here to a certain value.
+    For an option (OptionEnum in Constants), sets the entry of the options dictionary store here to a certain value.
+
+    :param option:
+    :param value:
     """
     options[option.name] = value
 
 
 def save_options(file_name):
     """
-        Saves the options into a YAML file after performing some conversions from types like QtCore.QRect to list, ...
+    Saves the options into a YAML file after performing some conversions from types like QtCore.QRect to list, ...
+
+    :param file_name:
     """
     data = options.copy()
 
     # main window bounding rectangle, convert from QRect to list
-    rect = data[constants.Option.MAINWINDOW_BOUNDS.name]
-    data[constants.Option.MAINWINDOW_BOUNDS.name] = [rect.x(), rect.y(), rect.width(), rect.height()]
+    option = constants.Option.MAINWINDOW_BOUNDS.name
+    if option in data:
+        rect = data[option]
+        data[option] = [rect.x(), rect.y(), rect.width(), rect.height()]
 
     # write to file
-    write_as_yaml(file_name, data)
-
-
-def local_url(relative_path):
-    """
-        Some things have problems with URLs with relative paths, that's why we convert to absolute paths before.
-    """
-    absolute_path = os.path.abspath(relative_path)
-    url = QtCore.QUrl.fromLocalFile(absolute_path)
-    return url
+    utils.write_as_yaml(file_name, data)

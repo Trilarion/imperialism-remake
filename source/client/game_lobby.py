@@ -27,7 +27,7 @@ import PyQt5.QtWidgets as QtWidgets
 import base.constants as constants
 import base.tools as tools
 import client.graphics as graphics
-import lib.qt_graphics as qt_graphics
+import lib.qt as qt
 import lib.utils as utils
 from client.client import local_network_client
 
@@ -52,19 +52,19 @@ class GameLobbyWidget(QtWidgets.QWidget):
         toolbar = QtWidgets.QToolBar()
         action_group = QtWidgets.QActionGroup(toolbar)
 
-        toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.lobby.single.new.png'),
+        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.lobby.single.new.png'),
             'Start new single player scenario', action_group,
             toggle_connection=self.toggled_single_player_scenario_selection, checkable=True))
-        toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.lobby.single.load.png'),
+        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.lobby.single.load.png'),
             'Continue saved single player scenario', action_group,
             toggle_connection=self.toggled_single_player_load_scenario, checkable=True))
 
         toolbar.addSeparator()
 
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group,
+            qt.create_action(tools.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group,
                 toggle_connection=self.toggled_server_lobby, checkable=True))
-        toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.lobby.multiplayer-game.png'),
+        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.lobby.multiplayer-game.png'),
             'Start or continue multiplayer scenario', action_group,
             toggle_connection=self.toggled_multiplayer_scenario_selection, checkable=True))
 
@@ -155,7 +155,7 @@ class ServerLobby(QtWidgets.QWidget):
         l2 = QtWidgets.QVBoxLayout()
         edit = QtWidgets.QTextEdit()
         edit.setEnabled(False)
-        box = qt_graphics.wrap_in_groupbox(edit, 'Server')
+        box = qt.wrap_in_groupbox(edit, 'Server')
         box.setFixedSize(200, 150)
         l2.addWidget(box)
 
@@ -165,7 +165,7 @@ class ServerLobby(QtWidgets.QWidget):
         client_list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         client_list.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         client_list.addItems(['Alf', 'Rolf', 'Marcel'])
-        box = qt_graphics.wrap_in_groupbox(client_list, 'Clients')
+        box = qt.wrap_in_groupbox(client_list, 'Clients')
         box.setFixedWidth(200)
         l2.addWidget(box)
 
@@ -174,9 +174,9 @@ class ServerLobby(QtWidgets.QWidget):
         l2 = QtWidgets.QVBoxLayout()
         edit = QtWidgets.QTextEdit()
         edit.setEnabled(False)
-        l2.addWidget(qt_graphics.wrap_in_groupbox(edit, 'Chat log'))
+        l2.addWidget(qt.wrap_in_groupbox(edit, 'Chat log'))
         edit = QtWidgets.QLineEdit()
-        l2.addWidget(qt_graphics.wrap_in_groupbox(edit, 'Chat input'))
+        l2.addWidget(qt.wrap_in_groupbox(edit, 'Chat input'))
 
         l1.addLayout(l2)
 
@@ -222,15 +222,15 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.nations_list.setFixedWidth(200)
         self.nations_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.nations_list.itemSelectionChanged.connect(self.nations_list_selection_changed)
-        layout.addWidget(qt_graphics.wrap_in_groupbox(self.nations_list, 'Nations'), 0, 0)
+        layout.addWidget(qt.wrap_in_groupbox(self.nations_list, 'Nations'), 0, 0)
 
         # map view (no scroll bars)
         self.map_scene = QtWidgets.QGraphicsScene()
-        self.map_view = qt_graphics.FitSceneInViewGraphicsView(self.map_scene)
+        self.map_view = qt.FitSceneInViewGraphicsView(self.map_scene)
         self.map_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
-        layout.addWidget(qt_graphics.wrap_in_groupbox(self.map_view, 'Map'), 0, 1)
+        layout.addWidget(qt.wrap_in_groupbox(self.map_view, 'Map'), 0, 1)
 
         # scenario description
         self.description = QtWidgets.QTextEdit()
@@ -238,7 +238,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.description.setReadOnly(True)
         self.description.setFixedHeight(60)
-        layout.addWidget(qt_graphics.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1,
+        layout.addWidget(qt.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1,
             2)  # goes over two columns
 
         # nation description
@@ -247,7 +247,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.nation_info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.nation_info.setReadOnly(True)
         self.nation_info.setFixedHeight(100)
-        layout.addWidget(qt_graphics.wrap_in_groupbox(self.nation_info, 'Nation Info'), 2, 0, 1, 2)
+        layout.addWidget(qt.wrap_in_groupbox(self.nation_info, 'Nation Info'), 2, 0, 1, 2)
 
         # stretching of the elements
         layout.setRowStretch(0, 1)  # nation list and map get all the available height
@@ -256,7 +256,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         # add the start button
         toolbar = QtWidgets.QToolBar()
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
+            qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
                 trigger_connection=self.start_scenario_clicked))
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
@@ -276,12 +276,12 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         # fill the ground layer with a neutral color
         item = self.map_scene.addRect(0, 0, columns, rows)
         item.setBrush(QtCore.Qt.lightGray)
-        item.setPen(qt_graphics.TRANSPARENT_PEN)
+        item.setPen(qt.TRANSPARENT_PEN)
         item.setZValue(0)
 
         # text display
         self.map_name_item = self.map_scene.addSimpleText('')
-        self.map_name_item.setPen(qt_graphics.TRANSPARENT_PEN)
+        self.map_name_item.setPen(qt.TRANSPARENT_PEN)
         self.map_name_item.setBrush(QtGui.QBrush(QtCore.Qt.darkRed))
         self.map_name_item.setZValue(3)
         self.map_name_item.setPos(0, 0)

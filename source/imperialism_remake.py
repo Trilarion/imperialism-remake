@@ -22,10 +22,6 @@
 import os
 import sys
 
-# some global constants
-QtWebEngine_AVAILABLE = True
-
-
 def exception_hook(type, value, traceback):
     """
         PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
@@ -64,12 +60,6 @@ if __name__ == '__main__':
         from PyQt5 import QtCore
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
-
-    # test for existence of PyQt5.QtWebEngine
-    try:
-        from PyQt5 import QtWebEngineWidgets
-    except ImportError:
-        QtWebEngine_AVAILABLE = False
 
     # because PyQt5 eats exceptions in the event thread this workaround
     sys.excepthook = exception_hook

@@ -31,7 +31,7 @@ import base.network as network
 import base.tools as tools
 import client.audio as audio
 import client.graphics as graphics
-import lib.qt_graphics as qt_graphics
+import lib.qt as qt
 import lib.utils as utils
 import version as version
 
@@ -59,8 +59,8 @@ class MapItem(QtCore.QObject):
         self.description = description
 
         # create clickable pixmap item and create fade animation
-        self.item = qt_graphics.ClickablePixmapItem(pixmap)
-        self.fade = qt_graphics.FadeAnimation(self.item)
+        self.item = qt.ClickablePixmapItem(pixmap)
+        self.fade = qt.FadeAnimation(self.item)
         self.fade.set_duration(300)
 
         # wire to fade in/out
@@ -99,7 +99,7 @@ class StartScreen(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setProperty('background', 'black')
 
-        layout = qt_graphics.RelativeLayout(self)
+        layout = qt.RelativeLayout(self)
 
         start_image = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.background.jpg'))
         start_image_item = QtWidgets.QGraphicsPixmapItem(start_image)
@@ -113,11 +113,11 @@ class StartScreen(QtWidgets.QWidget):
         view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setSceneRect(0, 0, start_image.width(), start_image.height())
-        view.layout_constraint = qt_graphics.RelativeLayoutConstraint().center_horizontal().center_vertical()
+        view.layout_constraint = qt.RelativeLayoutConstraint().center_horizontal().center_vertical()
         layout.addWidget(view)
 
         subtitle = QtWidgets.QLabel('')
-        subtitle.layout_constraint = qt_graphics.RelativeLayoutConstraint((0.5, -0.5, 0),
+        subtitle.layout_constraint = qt.RelativeLayoutConstraint((0.5, -0.5, 0),
             (0.5, -0.5, start_image.height() / 2 + 20))
         layout.addWidget(subtitle)
 
@@ -147,7 +147,7 @@ class StartScreen(QtWidgets.QWidget):
             scene.addItem(map_item.item)
 
         version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'.format(version.__version_full__))
-        version_label.layout_constraint = qt_graphics.RelativeLayoutConstraint().east(20).south(20)
+        version_label.layout_constraint = qt.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
 
@@ -219,15 +219,16 @@ class Client:
         self.main_window = ClientMainWindowWidget()
 
         # help browser
-        self.help_browser_widget = qt_graphics.BrowserWidget(tools.load_ui_icon)
-        self.help_browser_widget = qt_graphics.BrowserWidget(tools.load_ui_icon)
-        self.help_browser_widget.home_url = tools.local_url(constants.DOCUMENTATION_INDEX_FILE)
-        self.help_browser_widget.home()
-        self.help_dialog = graphics.GameDialog(self.main_window, self.help_browser_widget, title='Help')
-        self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
+        # TODO help browser only if
+        #self.help_browser_widget = qt.BrowserWidget(tools.load_ui_icon)
+        #self.help_browser_widget = qt.BrowserWidget(tools.load_ui_icon)
+        #self.help_browser_widget.home_url = tools.local_url(constants.DOCUMENTATION_INDEX_FILE)
+        #self.help_browser_widget.home()
+        #self.help_dialog = graphics.GameDialog(self.main_window, self.help_browser_widget, title='Help')
+        #self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
         # move to lower right border, so that overlap with other windows is not that strong
-        self.help_dialog.move(self.main_window.x() + self.main_window.width() - 800,
-                              self.main_window.y() + self.main_window.height() - 600)
+        #self.help_dialog.move(self.main_window.x() + self.main_window.width() - 800,
+        #                      self.main_window.y() + self.main_window.height() - 600)
 
         # add help browser keyboard shortcut
         action = QtWidgets.QAction(self.main_window)
@@ -243,7 +244,7 @@ class Client:
 
         # for the notifications
         self.pending_notifications = []
-        self.notification_position_constraint = qt_graphics.RelativeLayoutConstraint().center_horizontal().south(20)
+        self.notification_position_constraint = qt.RelativeLayoutConstraint().center_horizontal().south(20)
         self.notification = None
 
         # after the player starts, the main window is not active anymore
@@ -265,7 +266,7 @@ class Client:
         """
         if len(self.pending_notifications) > 0:
             message = self.pending_notifications.pop(0)
-            self.notification = qt_graphics.Notification(self.main_window, message,
+            self.notification = qt.Notification(self.main_window, message,
                 position_constraint=self.notification_position_constraint)
             self.notification.finished.connect(self.show_next_notification)
             self.notification.show()
@@ -278,9 +279,13 @@ class Client:
         """
         # we sometimes wire signals that send parameters for url (mouse events for example) which we do not like
         if isinstance(path, str):
-            url = tools.local_url(path)
-            self.help_browser_widget.load(url)
-        self.help_dialog.show()
+            url = qt.local_url(path)
+            #self.help_browser_widget.load(url)
+            QtGui.QDesktopServices.openUrl(url)
+        else:
+            QtGui.QDesktopServices.openUrl(qt.local_url(constants.DOCUMENTATION_INDEX_FILE))
+        # TODO qtwebengine
+        #self.help_dialog.show()
 
     def show_server_monitor(self):
         """

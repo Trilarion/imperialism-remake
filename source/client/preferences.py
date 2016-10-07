@@ -24,7 +24,7 @@ import PyQt5.QtWidgets as QtWidgets
 import base.constants as constants
 import base.tools as tools
 import client.audio as audio
-import lib.qt_graphics as qt_graphics
+import lib.qt as qt
 
 
 class PreferencesWidget(QtWidgets.QWidget):
@@ -44,19 +44,19 @@ class PreferencesWidget(QtWidgets.QWidget):
         toolbar.setIconSize(QtCore.QSize(32, 32))
         action_group = QtWidgets.QActionGroup(toolbar)
 
-        action_preferences_general = qt_graphics.create_action(tools.load_ui_icon('icon.preferences.general.png'),
+        action_preferences_general = qt.create_action(tools.load_ui_icon('icon.preferences.general.png'),
             'Show general preferences', action_group, toggle_connection=self._toggled_action_preferences_general,
             checkable=True)
         toolbar.addAction(action_preferences_general)
 
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show network preferences',
+            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show network preferences',
                 action_group, toggle_connection=self._toggled_action_preferences_network, checkable=True))
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences',
+            qt.create_action(tools.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences',
                 action_group, toggle_connection=self._toggled_action_preferences_graphics, checkable=True))
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences',
+            qt.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences',
                 action_group, toggle_connection=self._toggled_action_preferences_music, checkable=True))
 
         self.stacked_layout = QtWidgets.QStackedLayout()
@@ -96,11 +96,11 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # reset button
         button = QtWidgets.QPushButton('Restore defaults')
-        tab_layout.addLayout(qt_graphics.wrap_in_boxlayout(button))
+        tab_layout.addLayout(qt.wrap_in_boxlayout(button))
 
         # language
         layout = QtWidgets.QVBoxLayout()
-        tab_layout.addWidget(qt_graphics.wrap_in_groupbox(layout, 'Language'))
+        tab_layout.addWidget(qt.wrap_in_groupbox(layout, 'Language'))
 
         # vertical stretch
         tab_layout.addStretch()
@@ -169,12 +169,12 @@ class PreferencesWidget(QtWidgets.QWidget):
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # connect to remote server
-        toolbar.addAction(qt_graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'),
+        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.preferences.network.png'),
             'Connect/Disconnect to remote server', toolbar, checkable=True))
         l2.addWidget(toolbar)
         l2.addStretch()
         l.addLayout(l2)
-        tab_layout.addWidget(qt_graphics.wrap_in_groupbox(l, 'Remote Server'))
+        tab_layout.addWidget(qt.wrap_in_groupbox(l, 'Remote Server'))
 
         # local server group box
         l = QtWidgets.QVBoxLayout()
@@ -197,16 +197,16 @@ class PreferencesWidget(QtWidgets.QWidget):
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # show local server monitor
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor',
+            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor',
                 toolbar))
         # local server is on/off
         toolbar.addAction(
-            qt_graphics.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Turn local server on/off',
+            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Turn local server on/off',
                 toolbar, checkable=True))
         l2.addWidget(toolbar)
         l2.addStretch()
         l.addLayout(l2)
-        tab_layout.addWidget(qt_graphics.wrap_in_groupbox(l, 'Local Server'))
+        tab_layout.addWidget(qt.wrap_in_groupbox(l, 'Local Server'))
 
         # vertical stretch
         tab_layout.addStretch()
@@ -247,7 +247,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         layout.addWidget(slider)
 
         # wrap in group box and add to tab
-        tab_layout.addWidget(qt_graphics.wrap_in_groupbox(layout, 'Soundtrack'))
+        tab_layout.addWidget(qt.wrap_in_groupbox(layout, 'Soundtrack'))
 
         # vertical stretch
         tab_layout.addStretch()

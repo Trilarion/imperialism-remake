@@ -23,7 +23,7 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 
 import base.tools as tools
-import lib.qt_graphics as qt_graphics
+import lib.qt as qt
 
 
 class GameDialog(QtWidgets.QWidget):
@@ -54,7 +54,7 @@ class GameDialog(QtWidgets.QWidget):
             self.setWindowModality(QtCore.Qt.WindowModal)
 
         # title bar
-        title_bar = qt_graphics.DraggableToolBar()
+        title_bar = qt.DraggableToolBar()
         title_bar.setIconSize(QtCore.QSize(20, 20))
         title_bar.setObjectName('game-dialog-titlebar')
         title_bar.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
@@ -102,7 +102,7 @@ class GameDialog(QtWidgets.QWidget):
             event.ignore()
 
 
-class MiniMapNationItem(qt_graphics.ClickablePathItem):
+class MiniMapNationItem(qt.ClickablePathItem):
     """
         The outline of a nation in any mini map that should be clickable. Has an effect.
     """
