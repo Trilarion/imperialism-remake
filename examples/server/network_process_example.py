@@ -22,11 +22,6 @@ import sys
 
 import PyQt5.QtCore as QtCore
 
-import imperialism_remake
-import base.constants as constants
-import base.network as network
-import server.server as server
-
 def client_connect():
     """
         Client tries to connect.
@@ -45,8 +40,14 @@ def send_shutdown():
 
 if __name__ == '__main__':
 
-    # because PyQt5 eats exceptions in the event thread this workaround
+    import imperialism_remake
+
     sys.excepthook = imperialism_remake.exception_hook
+    imperialism_remake.set_start_directory()
+
+    import base.constants as constants
+    import base.network as network
+    import server.server as server
 
     # create server process and start it
     server_process = server.ServerProcess()

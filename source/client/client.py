@@ -1,5 +1,5 @@
 # Imperialism remake
-# Copyright (C) 2014 Trilarion
+# Copyright (C) 2014-16 Trilarion
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -370,6 +370,7 @@ def local_network_connect():
     # connect network client of client
     print('client tries to connect to server')
     local_network_client.connect_to_host(constants.NETWORK_PORT)
+    # TODO what if this is not possible
 
 
 def start_client():

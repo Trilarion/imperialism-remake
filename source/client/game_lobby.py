@@ -200,10 +200,10 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         super().__init__()
 
         # add a channel for us
-        # local_network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
+        local_network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
 
         # send a message and ask for preview
-        # local_network_client.send(constants.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
+        local_network_client.send(constants.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
 
         self.selected_nation = None
 

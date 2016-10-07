@@ -18,12 +18,9 @@
     Examples for base.network and server.network
 """
 
-from PyQt5 import QtCore
+import sys
 
-import imperialism_remake
-import base.constants as constants
-import base.network as network
-from server.server import ServerManager
+from PyQt5 import QtCore
 
 def client_connect():
     """
@@ -48,6 +45,14 @@ def send():
     client.send(message)
 
 if __name__ == '__main__':
+
+    import imperialism_remake
+
+    sys.excepthook = imperialism_remake.exception_hook
+    imperialism_remake.set_start_directory()
+
+    from base import constants, network
+    from server.server import ServerManager
 
     app = QtCore.QCoreApplication([])
 

@@ -1,2 +1,2 @@
-PyYAML>=3.12
-PyQt5>=5.7
+PyYAML>=3.1
+PyQt5>=5.6
