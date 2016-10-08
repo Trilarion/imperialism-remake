@@ -26,12 +26,6 @@ from PyQt5 import QtCore
 import base.constants as constants
 import lib.utils as utils
 
-SCENARIO_FILE_PROPERTIES = 'scenario-properties'
-SCENARIO_FILE_MAPS = 'maps'
-SCENARIO_FILE_PROVINCES = 'provinces'
-SCENARIO_FILE_NATIONS = 'nations'
-
-
 # TODO rivers are implemented inefficiently
 
 class Scenario(QtCore.QObject):
@@ -349,12 +343,12 @@ class Scenario(QtCore.QObject):
 
         reader = utils.ZipArchiveReader(file_name)
 
-        self._properties = reader.read_as_yaml(SCENARIO_FILE_PROPERTIES)
-        self._maps = reader.read_as_yaml(SCENARIO_FILE_MAPS)
-        self._provinces = reader.read_as_yaml(SCENARIO_FILE_PROVINCES)
+        self._properties = reader.read_as_yaml(constants.SCENARIO_FILE_PROPERTIES)
+        self._maps = reader.read_as_yaml(constants.SCENARIO_FILE_MAPS)
+        self._provinces = reader.read_as_yaml(constants.SCENARIO_FILE_PROVINCES)
         # TODO check all ids are smaller then len()
 
-        self._nations = reader.read_as_yaml(SCENARIO_FILE_NATIONS)
+        self._nations = reader.read_as_yaml(constants.SCENARIO_FILE_NATIONS)
         # TODO check all ids are smaller then len()
 
         # read rule file
@@ -367,9 +361,9 @@ class Scenario(QtCore.QObject):
             Saves/serializes all internal variables via YAML into a zipped archive.
         """
         writer = utils.ZipArchiveWriter(file_name)
-        writer.write_as_yaml(SCENARIO_FILE_PROPERTIES, self._properties)
-        writer.write_as_yaml(SCENARIO_FILE_MAPS, self._maps)
-        writer.write_as_yaml(SCENARIO_FILE_PROVINCES, self._provinces)
-        writer.write_as_yaml(SCENARIO_FILE_NATIONS, self._nations)
+        writer.write_as_yaml(constants.SCENARIO_FILE_PROPERTIES, self._properties)
+        writer.write_as_yaml(constants.SCENARIO_FILE_MAPS, self._maps)
+        writer.write_as_yaml(constants.SCENARIO_FILE_PROVINCES, self._provinces)
+        writer.write_as_yaml(constants.SCENARIO_FILE_NATIONS, self._nations)
 
         # rules are never updated by this mechanism

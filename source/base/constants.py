@@ -28,14 +28,6 @@ import lib.utils as utils
 # in the error log file)
 DEBUG_MODE = True
 
-#: QtWebEngine available
-QtWebEngine_AVAILABLE = True
-try:
-    from PyQt5 import QtWebEngineWidgets
-except ImportError:
-    QtWebEngine_AVAILABLE = False
-
-
 def extend(path, *parts):
     """
         Uses os.path.join to join parts of a path. Also checks for existence and raises an error
@@ -170,3 +162,12 @@ class NationProperties:
     NAME = 'name'
     DESCRIPTION = 'description'
     CAPITAL_PROVINCE = 'capital_province'
+
+#: name of properties file in a zipped scenario file
+SCENARIO_FILE_PROPERTIES = 'scenario-properties'
+#: name of maps file in a zipped scenario file
+SCENARIO_FILE_MAPS = 'maps'
+#: name of provinces file in a zipped scenario file
+SCENARIO_FILE_PROVINCES = 'provinces'
+#: name of nations file in a zipped scenario file
+SCENARIO_FILE_NATIONS = 'nations'

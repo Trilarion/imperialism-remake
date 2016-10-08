@@ -151,7 +151,7 @@ def core_scenario_titles(client, message):
     scenario_titles = []
     for scenario_file in scenario_files:
         reader = utils.ZipArchiveReader(scenario_file)
-        properties = reader.read_as_yaml('properties')
+        properties = reader.read_as_yaml(constants.SCENARIO_FILE_PROPERTIES)
         scenario_titles.append(properties[k.SCENARIO_TITLE])
 
     # zip files and titles together
@@ -162,7 +162,7 @@ def core_scenario_titles(client, message):
 
     # return message
     titles = {'scenarios': scenarios}
-    client.send(message['channel'], titles)
+    client.send(constants.CH_CORE_SCENARIO_TITLES, titles)
 
 def scenario_preview(client, message):
     """

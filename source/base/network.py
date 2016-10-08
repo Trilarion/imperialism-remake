@@ -104,12 +104,12 @@ class NetworkClient(ExtendedTcpSocket):
 
         :param letter: The letter that was received
         """
-        print('server received letter: {}'.format(letter))
+        print('networkclient received letter: {}'.format(letter))
         channel_name = letter['channel']
 
         # do we have receivers in this category
         if channel_name not in self.channels:
-            raise RuntimeError('Channel with this name not existing.')
+            raise RuntimeError('Received message on channel with name {} which is not existing.'.format(channel_name))
 
         # send to channel and increase channel counter
         self.channels[channel_name].message_counter += 1

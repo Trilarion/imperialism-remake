@@ -15,44 +15,37 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Examples for base.network and server.network
+Examples for base.network and server.network
 """
-
-import sys
 
 from PyQt5 import QtCore
 
+import imperialism_remake
+from base import constants, network
+from server.server import ServerManager
+
 def client_connect():
     """
-        Client tries to connect.
+    Client tries to connect.
     """
     client.connect_to_host(constants.NETWORK_PORT)
 
 def send():
     """
-        Client sends two messages.
+    Client sends a message.
     """
-    message = {
-        'channel': constants.CH_SCENARIO_PREVIEW,
-        'content': None
-    }
-    client.send(message)
+    client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, receive)
+    client.send(constants.CH_CORE_SCENARIO_TITLES)
 
-    message = {
-        'channel' : constants.CH_CORE_SCENARIO_TITLES,
-        'content' : 'Hi guys'
-    }
-    client.send(message)
+def receive(client, message):
+    """
+    Receives the answer.
+    """
+    client.disconnect_from_channel(constants.CH_CORE_SCENARIO_TITLES, receive)
+    print('received {}'.format(message))
+
 
 if __name__ == '__main__':
-
-    import imperialism_remake
-
-    sys.excepthook = imperialism_remake.exception_hook
-    imperialism_remake.set_start_directory()
-
-    from base import constants, network
-    from server.server import ServerManager
 
     app = QtCore.QCoreApplication([])
 

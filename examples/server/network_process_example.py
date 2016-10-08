@@ -22,6 +22,10 @@ import sys
 
 import PyQt5.QtCore as QtCore
 
+import imperialism_remake
+from base import constants, network
+from server import server
+
 def client_connect():
     """
         Client tries to connect.
@@ -30,24 +34,25 @@ def client_connect():
 
 def send():
     """
-        Client sends two messages.
+    Client sends a message.
     """
-    client.send(constants.CH_SCENARIO_PREVIEW)
-    client.send(constants.CH_CORE_SCENARIO_TITLES, 'Hi guiys')
+    client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, receive)
+    client.send(constants.CH_CORE_SCENARIO_TITLES)
+
+def receive(client, message):
+    """
+    Receives the answer.
+    """
+    client.disconnect_from_channel(constants.CH_CORE_SCENARIO_TITLES, receive)
+    print('received {}'.format(message))
 
 def send_shutdown():
+    """
+    Send shutdown message.
+    """
     client.send(constants.CH_SYSTEM, 'shutdown')
 
 if __name__ == '__main__':
-
-    import imperialism_remake
-
-    sys.excepthook = imperialism_remake.exception_hook
-    imperialism_remake.set_start_directory()
-
-    import base.constants as constants
-    import base.network as network
-    import server.server as server
 
     # create server process and start it
     server_process = server.ServerProcess()
@@ -60,7 +65,7 @@ if __name__ == '__main__':
 
     # actions
     QtCore.QTimer.singleShot(100, client_connect)
-    #QtCore.QTimer.singleShot(1000, send)
+    QtCore.QTimer.singleShot(1000, send)
     QtCore.QTimer.singleShot(2000, send_shutdown)
     QtCore.QTimer.singleShot(3000, app.quit)
 

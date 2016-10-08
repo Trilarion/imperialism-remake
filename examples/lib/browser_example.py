@@ -20,14 +20,16 @@
 
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtCore as QtCore
-import lib.qt as qt
-import base.tools as tools
+
+import imperialism_remake
+from base import tools
+from lib import qt_webengine
 
 if __name__ == '__main__':
 
     app = QtWidgets.QApplication([])
 
-    widget = qt.BrowserWidget(tools.load_ui_icon)
+    widget = qt_webengine.BrowserWidget(tools.load_ui_icon)
     widget.home_url = QtCore.QUrl(("http://qt-project.org/"))
     widget.show()
 

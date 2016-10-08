@@ -112,9 +112,6 @@ def server_client_sends_something():
 
 if __name__ == '__main__':
 
-    # because PyQt5 eats exceptions in the event thread this workaround
-    sys.excepthook = imperialism_remake.exception_hook
-
     app = QtCore.QCoreApplication([])
 
     # create client

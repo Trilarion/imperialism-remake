@@ -4,7 +4,7 @@
 
 from PyQt5 import QtWidgets
 
-import base.constants as constants
+import imperialism_remake
 from server.scenario import *
 
 if __name__ == '__main__':

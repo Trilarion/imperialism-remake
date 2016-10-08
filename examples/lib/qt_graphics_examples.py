@@ -19,6 +19,8 @@
 '''
 
 from PyQt5 import QtWidgets
+
+import imperialism_remake
 import lib.qt as qt
 
 class Window(QtWidgets.QWidget):

@@ -13,5 +13,10 @@ Coding
 * If chats are conducted, the log will be archived online. Any private information will be deleted before.
 * Everything is conducted in the most simple and straightforward way. If a well supported/mature library is available, which is not too complex or overpowered on it's own, we will always prefer it to coding self.
 * Minor tasks will have minor priority. Top priority is always to make the game running, everything else comes later.
-* We will not sacrifice clarity for a fast hack. A hack that works somehow but cannot be sufficiently explained or a hack that requires cumbersome or unmotivated modifications should be rejected and the code should be redesigned instead. 
+* We will not sacrifice clarity for a fast hack. A hack that works somehow but cannot be sufficiently explained or a hack that requires cumbersome or unmotivated modifications should be rejected and the code should be redesigned instead.
+
+ Notes
+ ==================
+
+ * Do not import QtWebEngineWidgets before importing QtCore, app will not exit properly on Windows with PyQt5
 
