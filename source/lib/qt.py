@@ -694,12 +694,16 @@ class ClockLabel(QtWidgets.QLabel):
         once.
         """
         super().__init__(*args, **kwargs)
+        self.time_format = '%H:%M'
+
+        # initial update
+        self.update_clock()
+
+        # time for all following updates
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_clock)
         self.timer.setInterval(60000)
         self.timer.start()
-        self.update_clock()
-        self.time_format = '%H:%M'
 
     def update_clock(self):
         """

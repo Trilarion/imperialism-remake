@@ -35,8 +35,10 @@ from server.scenario import Scenario
 
 class MiniMap(QtWidgets.QWidget):
     """
-        Small overview map
+    Small overview map
     """
+
+    # TODO fixed width -> make it chosable from outside
 
     # Fixed width of 300 pixels
     VIEW_WIDTH = 300
@@ -45,7 +47,7 @@ class MiniMap(QtWidgets.QWidget):
 
     def __init__(self, scenario):
         """
-            Sets up the graphics view, the toolbar and the tracker rectangle.
+        Sets up the graphics view, the toolbar and the tracker rectangle.
         """
         super().__init__()
         self.setObjectName('mini-map-widget')
@@ -245,7 +247,7 @@ class MiniMap(QtWidgets.QWidget):
 
 class EditorMainMap(QtWidgets.QGraphicsView):
     """
-        The big map holding the game map and everything.
+    The big map holding the game map and everything.
     """
 
     tile_at_focus_changed = QtCore.pyqtSignal(int, int)
@@ -458,7 +460,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
 
 class InfoBox(QtWidgets.QWidget):
     """
-        Info box on the right side of the editor.
+    Info box on the right side of the editor.
     """
 
     def __init__(self, scenario):
@@ -524,15 +526,15 @@ class InfoBox(QtWidgets.QWidget):
 
 class NewScenarioDialogWidget(QtWidgets.QWidget):
     """
-        New scenario dialog.
-
-        Here as in many other dialogs we do not use placeholders because in Qt 4.8 they are not returned by text() afterwards
+    New scenario dialog.
     """
+
+    #:
     create_scenario = QtCore.pyqtSignal(dict)
 
     def __init__(self):
         """
-            Sets up all the input elements of the create new scenario dialog.
+        Sets up all the input elements of the create new scenario dialog.
         """
         super().__init__()
 
@@ -587,25 +589,42 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
 
     def create_scenario_clicked(self):
         """
-            "Create scenario" is clicked.
+        "Create scenario" has been clicked.
         """
+        p = {}
 
-        self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE] = self.parameters[
-            constants.constants.ScenarioProperties.SCENARIO_TITLE].text()
-        self.parameters[constants.constants.ScenarioProperties.MAP_COLUMNS] = int(
-            self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text())
-        self.parameters[constants.constants.ScenarioProperties.MAP_ROWS] = int(
-            self.parameters[constants.constants.ScenarioProperties.SCENARIO_TITLE].text())
+        # title
+        key = constants.ScenarioProperties.SCENARIO_TITLE
+        p[key] = get_text(self.parameters[key])
+
+        # number of columns
+        key = constants.ScenarioProperties.MAP_COLUMNS
+        p[key] = int(get_text(self.parameters[key]))
+
+        # number of rows
+        key = constants.ScenarioProperties.MAP_ROWS
+        p[key] = int(get_text(self.parameters[key]))
 
         # TODO conversion can fail, (ValueError) give error message
         # we close the parent window and emit the appropriate signal
         self.parent().close()
-        self.create_scenario.emit(self.parameters)
+        self.create_scenario.emit(p)
 
+def get_text(edit:QtWidgets.QLineEdit):
+    """
+    Returns the text of a line edit. However, if it is empty, it returns the place holder text (whatever there is).
+
+    :param edit: The line edit
+    :return: The text
+    """
+    if edit.text():
+        return edit.text()
+    else:
+        return edit.placeholderText()
 
 class GeneralPropertiesWidget(QtWidgets.QWidget):
     """
-        Modify general properties of a scenario dialog.
+    Modify general properties of a scenario dialog.
     """
 
     def __init__(self, scenario):
@@ -637,7 +656,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
 
 class NationPropertiesWidget(QtWidgets.QWidget):
     """
-        Modify nation properties dialog.
+    Modify nation properties dialog
     """
 
     def __init__(self):
@@ -646,52 +665,69 @@ class NationPropertiesWidget(QtWidgets.QWidget):
 
 class ProvincePropertiesWidget(QtWidgets.QWidget):
     """
-        Modify provinces properties dialog.
+    Modify provinces properties dialog.
     """
 
     def __init__(self):
         super().__init__()
 
 
+class EditorScenario(QtCore.QObject):
+    """
+    Wrap around the Scenario file to get notified of recreations
+    """
+
+    #: signal, scenario has changed completely
+    new_scenario = QtCore.pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+        self.scenario = None
+
+    def load(self, file_name):
+        # TODO what if file name does not exist or is not a valid scenario file
+        self.scenario = Scenario()
+        self.scenario.load(file_name)
+        self.new_scenario.emit()
+
+#: static single instance of the editor scenario
+editor_scenario = EditorScenario()
+
 class EditorScreen(QtWidgets.QWidget):
     """
-        The screen the contains the whole scenario editor. Is copied into the application main window if the user
-        clicks on the editor pixmap in the client main screen.
+    The screen the contains the whole scenario editor. Is copied into the application main window if the user
+    clicks on the editor pixmap in the client main screen.
     """
 
     def __init__(self, client):
         """
-            Create and setup all the elements.
+        Create and setup all the elements.
         """
         super().__init__()
 
+        # store the client
         self.client = client
 
-        # scenario
-        self.scenario = None
-
+        # toolbar on top of the window
         self.toolbar = QtWidgets.QToolBar()
         self.toolbar.setIconSize(QtCore.QSize(32, 32))
-        self.toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
-                self.show_new_scenario_dialog))
-        self.toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
-                self.load_scenario_dialog))
-        self.toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self,
-                self.save_scenario_dialog))
 
+        # new, load, save scenario actions
+        a = qt.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self, self.show_new_scenario_dialog)
+        self.toolbar.addAction(a)
+        a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, self.load_scenario_dialog)
+        self.toolbar.addAction(a)
+        a = qt.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog)
+        self.toolbar.addAction(a)
         self.toolbar.addSeparator()
-        self.toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit base properties', self,
-                self.show_general_properties_dialog))
-        self.toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self,
-                self.show_nations_dialog))
-        self.toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
-                self.show_provinces_dialog))
+
+        # edit properties (general, nations, provinces) actions
+        a = qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self, self.show_general_properties_dialog)
+        self.toolbar.addAction(a)
+        a = qt.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog)
+        self.toolbar.addAction(a)
+        a = qt.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self, self.show_provinces_dialog)
+        self.toolbar.addAction(a)
 
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -700,26 +736,27 @@ class EditorScreen(QtWidgets.QWidget):
         clock = qt.ClockLabel()
         self.toolbar.addWidget(clock)
 
-        action_help = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Show help', self)
-        action_help.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
-        self.toolbar.addAction(action_help)
-
-        action_quit = QtWidgets.QAction(tools.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
-        action_quit.triggered.connect(client.switch_to_start_screen)
+        # help and exit action
+        a = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Show help', self)
+        a.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
+        self.toolbar.addAction(a)
+        a = QtWidgets.QAction(tools.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
+        a.triggered.connect(client.switch_to_start_screen)
         # TODO ask if something is changed we should save.. (you might loose progress)
-        self.toolbar.addAction(action_quit)
+        self.toolbar.addAction(a)
 
-        # info box
-        self.info_box = InfoBox(self.scenario)
+        # info box widget
+        self.info_box = InfoBox()
 
-        # the main map
-        self.map = EditorMainMap(self.scenario)
+        # main map widget
+        self.map = EditorMainMap()
         self.map.tile_at_focus_changed.connect(self.info_box.update_tile_information)
 
-        # the mini map
-        self.mini_map = MiniMap(self.scenario)
+        # mini map widget
+        self.mini_map = MiniMap()
         self.mini_map.roi_changed.connect(self.map.set_position)
 
+        # layout of widgets and toolbar
         layout = QtWidgets.QGridLayout(self)
         layout.addWidget(self.toolbar, 0, 0, 1, 2)
         layout.addWidget(self.mini_map, 1, 0)
@@ -747,26 +784,23 @@ class EditorScreen(QtWidgets.QWidget):
 
     def show_new_scenario_dialog(self):
         """
-            Show the dialog for creation of a new scenario dialog.
+        Shows the dialog for creation of a new scenario dialog and connect the "create new scenario" signal.
         """
-        new_scenario_widget = NewScenarioDialogWidget()
-        new_scenario_widget.create_scenario.connect(self.create_new_scenario)
-        dialog = graphics.GameDialog(self.client.main_window, new_scenario_widget, title='New Scenario',
+        widget = NewScenarioDialogWidget()
+        widget.create_scenario.connect(self.create_new_scenario)
+        dialog = graphics.GameDialog(self.client.main_window, widget, title='New Scenario',
             delete_on_close=True, help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
 
     def load_scenario_dialog(self):
         """
-            Show the load a scenario dialog. Then loads it if the user has selected one.
+        Show the load a scenario dialog. Then loads it if the user has selected one.
         """
         # noinspection PyCallByClass
         file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', constants.SCENARIO_FOLDER,
             'Scenario Files (*.scenario)')[0]
         if file_name:
-            # TODO what if file name does not exist or is not a valid scenario file
-            self.scenario = Scenario()
-            self.scenario.load(file_name)
             self.client.schedule_notification(
                 'Loaded scenario {}'.format(self.scenario[constants.ScenarioProperties.SCENARIO_TITLE]))
 

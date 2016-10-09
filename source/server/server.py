@@ -84,7 +84,7 @@ class ServerManager(QtCore.QObject):
         """
         super().__init__()
         self.server = ExtendedTcpServer()
-        self.server.new_client.connect(self.new_client)
+        self.server.new_client.connect(self._new_client)
         self.server_clients = []
 
     def start(self):
@@ -94,10 +94,11 @@ class ServerManager(QtCore.QObject):
         print('server starts')
         self.server.start(constants.NETWORK_PORT)
 
-    def new_client(self, socket: QtNetwork.QTcpSocket):
+    def _new_client(self, socket: QtNetwork.QTcpSocket):
         """
         A new connection (QTCPPSocket) to the server occurred. Give it an id and add some general receivers to the new
         server client (wrap the socket into a NetworkClient). Add the new server client to the internal client list.
+        Not intended for outside use.
 
         :param socket: The socket for the new connection
         """
@@ -120,14 +121,14 @@ class ServerManager(QtCore.QObject):
         client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, core_scenario_titles)
 
         # TODO only if localhost connection add the system channel
-        client.connect_to_channel(constants.CH_SYSTEM, self.system_messages)
+        client.connect_to_channel(constants.CH_SYSTEM, self._system_messages)
 
         # finally add to list of clients
         self.server_clients.append(client)
 
-    def system_messages(self, client, message):
+    def _system_messages(self, client, message):
         """
-        Handles system messages of a local client to its local server.
+        Handles system messages of a local client to its local server. Not intended for outside use.
         """
         if message == 'shutdown':
             print('server manager shuts down')

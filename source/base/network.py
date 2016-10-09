@@ -42,7 +42,7 @@ class NetworkClient(ExtendedTcpSocket):
         :param socket: A socket if there is one existing already.
         """
         super().__init__(socket)
-        self.received.connect(self.process)
+        self.received.connect(self._process)
         self.channels = {}
 
     def create_new_channel(self, channel_name):
@@ -94,9 +94,9 @@ class NetworkClient(ExtendedTcpSocket):
             raise RuntimeError('Channel with this name not existing.')
         self.channels[channel_name].received.disconnect(callback)
 
-    def process(self, letter):
+    def _process(self, letter):
         """
-        A letter (a message) was received from the underlying ExtendedTcpSocket framework.
+        A letter (a message) was received from the underlying ExtendedTcpSocket framework. Not indended for outside use.
         Here we assume that it's a dictionary with keys 'channel' and 'content' where the value for key 'channel' is
         the name of the channel and the value of the key 'content' is the message.
 

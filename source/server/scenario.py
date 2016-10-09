@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
-    thin client).
+Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
+thin client).
 """
 
 import math
@@ -30,26 +30,29 @@ import lib.utils as utils
 
 class Scenario(QtCore.QObject):
     """
-        Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
+    Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
 
-        _properties is a dictionary with keys from constants.ScenarioProperties
-        _provinces is a
-        _nations is a
-        _maps is a dictionary of different maps (terrain, resource)
-        _rules is a dictionary of rules properties
+    * _properties is a dictionary with keys from constants.ScenarioProperties
+    * _provinces is a
+    * _nations is a
+    * _maps is a dictionary of different maps (terrain, resource)
+    * _rules is a dictionary of rules properties
     """
 
     def __init__(self):
         """
-            Start with a clean state.
+        Start with a clean state.
         """
         super().__init__()
         self.reset()
 
+    # TODO we could stay more clean by requiring a new scenario for each load, but then we have to wire it again
+    # every time, need to think more about it
+
     # noinspection PyAttributeOutsideInit
     def reset(self):
         """
-            Just empty
+        Clean the scenario.
         """
         self._properties = {constants.ScenarioProperties.RIVERS: []}
         self._provinces = {}
@@ -59,7 +62,10 @@ class Scenario(QtCore.QObject):
 
     def create_empty_map(self, columns, rows):
         """
-            Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
+        Given a size, constructs a map (list of two sub lists with each the number of tiles entries) which is 0.
+
+        :param columns: Number of columns.
+        :param rows: Number of rows.
         """
         self._properties[constants.ScenarioProperties.MAP_COLUMNS] = columns
         self._properties[constants.ScenarioProperties.MAP_ROWS] = rows
@@ -77,27 +83,58 @@ class Scenario(QtCore.QObject):
 
     def set_terrain_at(self, column, row, terrain):
         """
-            Sets the terrain at a given position. No check is performed for valid terrain.
+        Sets the terrain at a given position. Here, no check is performed for valid terrain.
+
+        :param column: Column position
+        :param row: Row position
+        :param terrain: Terrain value
         """
         self._maps['terrain'][self._map_index(column, row)] = terrain
 
     def terrain_at(self, column, row):
         """
-            Returns the terrain at a given position of the map.
+        Returns the terrain at a given position of the map.
+
+        :param column: Column position
+        :param row: Row position
+        :return: Terrain value
         """
         return self._maps['terrain'][self._map_index(column, row)]
 
     def set_resource_at(self, column, row, resource):
         """
-            Sets the resource value at a given position. No check is performed for valid resources.
+        Sets the resource value at a given position. No check is performed for valid resources.
+
+        :param column: Column position
+        :param row: Row position
+        :param resource: Resource value
         """
         self._maps['resource'][self._map_index(column, row)] = resource
 
     def resource_at(self, column, row):
         """
-            Returns the resource value at a given position of the map.
+        Returns the resource value at a given position of the map.
+
+        :param column: Column position
+        :param row: Row position
+        :return: Resource value
         """
         return self._maps['resource'][self._map_index(column, row)]
+
+    @staticmethod
+    def scene_position(column, row):
+        """
+            Converts a map position to a scene position.
+
+            A scene position is the the normalized (by the tile size) position of the upper, left corner of a map tile
+            at position (column, row) in the map.
+
+            Our convention for this is that each second row is shifted right (positive) by one half, starting with the
+            second. Columns and rows start at zero. To not mix this up with other possible ways all the knowledge about
+            the shift of the stagger is in this class in methods scene_position() and map_position().
+        """
+        return column + (row % 2) / 2, row
+
 
     def map_position(self, x, y):
         """
@@ -115,17 +152,6 @@ class Scenario(QtCore.QObject):
                 self._properties[constants.ScenarioProperties.MAP_COLUMNS]:
             return -1, -1
         return column, row
-
-    @staticmethod
-    def scene_position(column, row):
-        """
-            Converts a map position to a scene position. A scene position is the the normalized (by the tile size)
-            position of the upper, left corner of a map tile at position (column, row).
-
-            Each second row is shifted right (positive) by one half, starting with the second.
-            Columns and rows start at zero.
-        """
-        return column + (row % 2) / 2, row
 
     def _map_index(self, column, row):
         """

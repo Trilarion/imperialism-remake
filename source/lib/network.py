@@ -61,8 +61,8 @@ class ExtendedTcpSocket(QtCore.QObject):
         else:
             self.socket = QtNetwork.QTcpSocket()
 
-        # some wiring, new data is handled by receive()
-        self.socket.readyRead.connect(self.receive)
+        # some wiring, new data is handled by _receive()
+        self.socket.readyRead.connect(self._receive)
         self.socket.error.connect(self.error)
         self.socket.connected.connect(self.connected)
         self.socket.disconnected.connect(self.disconnected)
@@ -98,7 +98,7 @@ class ExtendedTcpSocket(QtCore.QObject):
         self.socket.connectToHost(host, port)
         self.socket.waitForConnected(2000)
 
-    def receive(self):
+    def _receive(self):
         """
         Called by the sockets readyRead signal. Not intended for outside use.
         While there are messages available read them and process them.
@@ -167,7 +167,7 @@ class ExtendedTcpServer(QtCore.QObject):
         super().__init__()
         self.tcp_server = QtNetwork.QTcpServer(self)
         self.tcp_server.acceptError.connect(self.accept_error)
-        self.tcp_server.newConnection.connect(self.new_connection)
+        self.tcp_server.newConnection.connect(self._new_connection)
 
     def accept_error(self, socket_error):
         """
@@ -203,9 +203,9 @@ class ExtendedTcpServer(QtCore.QObject):
         if self.tcp_server.isListening():
             self.tcp_server.close()
 
-    def new_connection(self):
+    def _new_connection(self):
         """
-        Called by the newConnection signal of the QTCPServer.
+        Called by the newConnection signal of the QTCPServer. Not intended for outside use.
         Zero or more new clients might be available, emit new_client signal for each of them.
         """
         print('new connection on server')
