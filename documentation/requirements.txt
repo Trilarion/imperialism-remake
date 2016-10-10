@@ -1,0 +1,3 @@
+# unfortunately readthedocs will by default try to install a requirements.txt in the root which in our case fails
+# therefore this fake requirements.txt here and point to it in the readthedocs settings
+# see also: http://stackoverflow.com/questions/37081583/readthedocs-how-to-ignore-requirements-file

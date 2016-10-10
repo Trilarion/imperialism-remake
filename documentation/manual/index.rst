@@ -6,7 +6,7 @@ Current version: 0.2.1 (2015-02-15)
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    tutorial
    ui

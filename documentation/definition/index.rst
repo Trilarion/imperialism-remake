@@ -4,7 +4,7 @@ Imperialism Remake Game Definition
 .. toctree::
     :numbered:
     :caption: Contents
-    :maxdepth: 2
+    :maxdepth: 4
 
     introduction
     setting

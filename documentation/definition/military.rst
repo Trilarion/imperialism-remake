@@ -54,12 +54,15 @@ Land Units
 * speed (IN 2 – 10): movement speed in tiles of the battlefield
 * creation cost ($): amount of money to create from the soldier pool
 * upkeep ($ and FN units of fuel): payment per turn for upkeeping this unit, also including fuel costs
-* experience level (IN 1-5): experience increase efficiency and is gained by taking part in combats, is lowered when the unit is refilled
+* experience level (IN 1-5): experience increase efficiency and is gained by taking part in combats, is lowered when the
+  unit is refilled
 
 **Production and Refilling after combat**
 
-* units can be produced from the soldier pool and need each one unit of soldiers and the indicated creation costs, next turn they are available at the capital province
-* units with less than 100% unit strength can be refilled from the soldier pool without delay but at costs (equal to production costs of such a part of a unit plus a deployment fee ($20)) and experience is reduced
+* units can be produced from the soldier pool and need each one unit of soldiers and the indicated creation costs, next
+  turn they are available at the capital province
+* units with less than 100% unit strength can be refilled from the soldier pool without delay but at costs (equal to
+  production costs of such a part of a unit plus a deployment fee ($20)) and experience is reduced
 * units with less than 30% unit strength are liquidised to manpower pool
 
 Land Units Strengths:
@@ -118,7 +121,7 @@ Navy
 
 * The sea area of a map is divided in sea zones which form a connected network of sea zones.
 * Each sea zone contains all the fleets from different nations in this sea zone as well as all the provinces with
-  borders to this seazone.
+  borders to this sea zone.
 * Information displayed is the approximate amount and change and mission of other ships (with more details depending
   on the amount of your ships).
 

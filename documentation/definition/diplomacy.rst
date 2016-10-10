@@ -1,3 +1,5 @@
+.. _diplomacy:
+
 ************************
 Diplomacy
 ************************
@@ -22,20 +24,21 @@ Allows to trade and to seek other treaties
 
 * Costs $300 to establish
 * Allows to improve relations by trade and removes the trade penalty (20% reduces incomes from trades between these two nations)
-* After prolonged war (6 turns of noninterrupted war) it will be destroyed
+* After prolonged war (6 turns of non-interrupted war) it will be destroyed
 
 **Established Embassy**
 
 * Requires DR ≥ 10 and costs $1000 to establish
 * Allows to negotiate NAPs and Alliances and to improve relations by propaganda
 * Makes the diplomatic states of this nation visible
-* After prolonged war (8 turns of noninterrupted war) it will be destroyed
+* After prolonged war (8 turns of non-interrupted war) it will be destroyed
 
 **Non-Agression Pact**
 
 * Requires DR ≥ 40 and an established embassy
 * Allows an assured time of peace (at least 4 turns) and a compensation payment for immediate breaking later on.
-* During the first 4 turns a certain fond (both nations paying $250 each turn, totaling $2000) is build up. Can then be terminated immediately but then the whole fond is payed immediately to the aggrieved party.
+* During the first 4 turns a certain fond (both nations paying $250 each turn, totaling $2000) is build up. Can then be
+  terminated immediately but then the whole fond is payed immediately to the aggrieved party.
 * Can canceled with a 4 turn delay after turn 4, the fond is then dissolved gradually (reverse to the build up).
 * If automatically canceled if DR falls below 35
 
@@ -45,7 +48,8 @@ Allows to trade and to seek other treaties
 * Includes a Non-Agression Pact
 * Each nation can only be in one alliance at most
 * Gives bonus in trade (+15% revenue) and in technology (-5% costs)
-* Effects are taking place as long as the NAP holds; the alliance is automatically canceled if the NAP is canceled or broken; canceling the alliance is equivalent to canceling the NAP
+* Effects are taking place as long as the NAP holds; the alliance is automatically canceled if the NAP is canceled or broken;
+  canceling the alliance is equivalent to canceling the NAP
 * Is automatically canceled if DR falls below 55
 
 Diplomatic Actions
@@ -117,9 +121,10 @@ Diplomatic Influence
 Role of Minor Nations
 =====================================
 
-They could actively choose sides. They should not react too erratically but also there should be clever tactics that might change their course. Difficult.
+They could actively choose sides. They should not react too erratically but also there should be clever tactics that
+might change their course. Difficult.
 
-Relations
+**Relations**
 
 * improve when extending their infrastructure
 * improve when trading (effectively not only offering)
@@ -127,7 +132,7 @@ Relations
 * improve for treaties like a peace treaty and keeping them
 * worsen if military is large enough and common border or many ships
 
-Peaceful assimilation
+**Peaceful assimilation**
 
 * Relation must be very good over a long history (maybe additive for whole history = trust) by trade or diplomacy
 * No immediate threat: long running peace treaty or far away

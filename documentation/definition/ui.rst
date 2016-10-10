@@ -8,7 +8,7 @@ Conventions
 ===========================
 
 * Style: Water color or pencil drawings
-* Standard graphics format is Portable Network Graphics (png) because of wide adoption, losless compression and transparency
+* Standard graphics format is Portable Network Graphics (png) because of wide adoption, lossless compression and transparency
 * More editable files (PhotoShop, CorelDraw) including all layers can and should be saved too
 
 Screens
@@ -35,7 +35,8 @@ Main Map Screen
 * Menu toolbar (all the different dialogs and help)
 * Transport Dialog
 * All, the dialogs (Transport, Industry, Trade) run in one Frame with top toolbar for other dialogs and help
-* Listing for each commodity currently connected to transport network, slider bar representing the amount of each commodity to transport vs. total amount
+* Listing for each commodity currently connected to transport network, slider bar representing the amount of each commodity
+  to transport vs. total amount
 
 Sound effects
 ===========================
@@ -50,5 +51,5 @@ Various things
   can be turned off if wished.
 * Do we want to have customized mouse cursors? Easy to implement, but is there any real benefit? Mouse cursors should
   indicate possible actions.
-* Savegames should have a screen shown always.
+* Save games should have a pre-view screen shown always.
 * Inbuilt functionality to make a screenshot.

@@ -48,13 +48,6 @@ def set_start_directory():
         base_path = os.path.join(base_path, '..')
 
 
-# because PyQt5 eats exceptions in the event thread this workaround
-sys.excepthook = exception_hook
-
-# set start directory
-set_start_directory()
-
-
 if __name__ == '__main__':
 
     # test for python version
@@ -67,6 +60,12 @@ if __name__ == '__main__':
         from PyQt5 import QtCore
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
+
+    # because PyQt5 eats exceptions in the event thread this workaround
+    sys.excepthook = exception_hook
+
+    # set start directory
+    set_start_directory()
 
     # determine user folder
     if os.name == 'posix':

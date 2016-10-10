@@ -2,6 +2,9 @@
 Coding
 **************
 
+Conventions
+===========
+
 .. note:: Currently only as unordered list. Improve (regarding contribution and origin of material).
 
 * Each (significant) submission will be reviewed by another team member who might modify it further.
@@ -15,8 +18,8 @@ Coding
 * Minor tasks will have minor priority. Top priority is always to make the game running, everything else comes later.
 * We will not sacrifice clarity for a fast hack. A hack that works somehow but cannot be sufficiently explained or a hack that requires cumbersome or unmotivated modifications should be rejected and the code should be redesigned instead.
 
- Wisdom
- ======
+Wisdom
+======
 
- * Do not import QtWebEngineWidgets before importing QtCore, app will not exit properly on Windows with PyQt5
+* Do not import QtWebEngineWidgets before importing QtCore, app will not exit properly on Windows with PyQt5
 

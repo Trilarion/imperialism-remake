@@ -7,7 +7,7 @@ Land combat
 
 **Battlefield**
 
-Province battle board in staggered layout of tiles (as in the main map) with 24 tiles side length, 3 tile (capital is 6 tiles)  wide city
+Province battle board in staggered layout of tiles (as in the main map) with 24 tiles side length, 3 tile (capital is 6 tiles) wide city
 
 **Time**
 
@@ -15,7 +15,7 @@ Province battle board in staggered layout of tiles (as in the main map) with 24 
 * If the city is occupied at any time during the battle, the attacker has won. Battle is over
 * If all attacking units are destroyed or fleeing or the player aborts the attack, the defender has won. Battle is over.
 * Otherwise (city not taken but attacking units are still present), the battle continues the next turn keeping the
-  actual strategic position but with reenforcement possible
+  actual strategic position but with reinforcement possible
 
 **Damage model**
 

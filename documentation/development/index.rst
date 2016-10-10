@@ -7,7 +7,7 @@ Contents:
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
+   :maxdepth: 4
    
    coding
    algorithms

@@ -12,7 +12,7 @@ Resources
   mines (on hills or mountains) deliver ore or coal, silver mines (in mountains) deliver money (still must be
   connected), sheep farms (on hills) deliver wool, cotton farms (on plains) deliver cotton (cotton and wool is
   combined into one quantity for transport and further processing: cotton&wool)
-* Development Every resource deposit exept fish has to be developed to deliver resources every turn (maximal
+* Development Every resource deposit except fish has to be developed to deliver resources every turn (maximal
   development level is three)
 
 Transportation
