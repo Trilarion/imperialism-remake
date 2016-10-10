@@ -138,8 +138,8 @@ class ScenarioProperties:
     Key names for general properties of a scenario.
     """
 
-    SCENARIO_TITLE = 'scenario.title'
-    SCENARIO_DESCRIPTION = 'scenario.description'
+    TITLE = 'scenario.title'
+    DESCRIPTION = 'scenario.description'
     MAP_COLUMNS = 'map.columns'
     MAP_ROWS = 'map.rows'
     RIVERS = 'rivers'

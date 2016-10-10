@@ -43,9 +43,10 @@ class MiniMap(QtWidgets.QWidget):
     # Fixed width of 300 pixels
     VIEW_WIDTH = 300
 
+    #: signal, emitted if the user clicks somewhere in the mini map and the ROI rectangle changes as a result, sends the normalized x and y position of the center of the new ROI
     roi_changed = QtCore.pyqtSignal(float, float)
 
-    def __init__(self, scenario):
+    def __init__(self):
         """
         Sets up the graphics view, the toolbar and the tracker rectangle.
         """
@@ -88,9 +89,8 @@ class MiniMap(QtWidgets.QWidget):
             'Show political view', action_group, toggle_connection=self.toggled_political, checkable=True)
         self.toolbar.addAction(action_political)
         # geographical view
-        self.toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view',
-                action_group, toggle_connection=self.toggled_geographical, checkable=True))
+        a = qt.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group, toggle_connection=self.toggled_geographical, checkable=True)
+        self.toolbar.addAction(a)
 
         # wrap tool bar into horizontal layout with stretch
         l = QtWidgets.QHBoxLayout()
@@ -101,18 +101,17 @@ class MiniMap(QtWidgets.QWidget):
         # add layout containing tool bar
         layout.addLayout(l)
 
-        # store scenario
-        self.scenario = scenario
+        # TODO what is this good for
         self.removable_items = []
 
     def redraw_map(self):
         """
-            The map is not yet drawn or has changed or the mode has changed. Redraw it.
+        The map is not yet drawn or has changed or the mode has changed. Redraw it.
         """
 
         # adjust view height
-        columns = self.scenario[constants.ScenarioProperties.MAP_COLUMNS]
-        rows = self.scenario[constants.ScenarioProperties.MAP_ROWS]
+        columns = editor_scenario.scenario[constants.ScenarioProperties.MAP_COLUMNS]
+        rows = editor_scenario.scenario[constants.ScenarioProperties.MAP_ROWS]
         view_height = math.floor(rows / columns * self.VIEW_WIDTH)
         self.view.setFixedHeight(view_height)
         self.scene.setSceneRect(0, 0, columns, rows)
@@ -139,21 +138,21 @@ class MiniMap(QtWidgets.QWidget):
             # draw the nation borders and content (non-smooth)
 
             # for all nations
-            for nation in self.scenario.all_nations():
+            for nation in editor_scenario.scenario.all_nations():
                 # get nation color
-                color_string = self.scenario.get_nation_property(nation, 'color')
+                color_string = editor_scenario.scenario.get_nation_property(nation, 'color')
                 color = QtGui.QColor()
                 color.setNamedColor(color_string)
                 # get all provinces
-                provinces = self.scenario.get_provinces_of_nation(nation)
+                provinces = editor_scenario.scenario.get_provinces_of_nation(nation)
                 tiles = []
                 # get all tiles
                 for province in provinces:
-                    tiles.extend(self.scenario.get_province_property(province, 'tiles'))
+                    tiles.extend(editor_scenario.scenario.get_province_property(province, 'tiles'))
                 # get rectangular path for each tile
                 path = QtGui.QPainterPath()
                 for tile in tiles:
-                    sx, sy = self.scenario.scene_position(*tile)
+                    sx, sy = editor_scenario.scenario.scene_position(*tile)
                     path.addRect(sx * tile_width, sy * tile_height, tile_width, tile_height)
                 # simply (creates outline)
                 path = path.simplified()
@@ -180,10 +179,10 @@ class MiniMap(QtWidgets.QWidget):
                 paths[t] = QtGui.QPainterPath()
             for column in range(0, columns):
                 for row in range(0, rows):
-                    t = self.scenario.terrain_at(column, row)
+                    t = editor_scenario.scenario.terrain_at(column, row)
                     if t != 0:
                         # not for sea
-                        sx, sy = self.scenario.scene_position(column, row)
+                        sx, sy = editor_scenario.scenario.scene_position(column, row)
                         paths[t].addRect(sx * tile_width, sy * tile_height, tile_width, tile_height)
             colors = {1: QtCore.Qt.green, 2: QtCore.Qt.darkGreen, 3: QtCore.Qt.darkGray, 4: QtCore.Qt.white,
                       5: QtCore.Qt.darkYellow, 6: QtCore.Qt.yellow}
@@ -237,9 +236,11 @@ class MiniMap(QtWidgets.QWidget):
             self.tracker.setRect(tracker_rect)
             self.roi_changed.emit(x, y)
 
-    def reset_tracker(self, bounds):
+    def reset_tracker(self, bounds:QtCore.QRectF):
         """
-            The main map tells us how large its view is (in terms of the game map) and where it is currently.
+        The main map tells us how large its view is (in terms of the game map) and where it is currently.
+
+        :param bounds:
         """
         self.tracker.setRect(bounds)
         self.tracker.show()
@@ -250,9 +251,10 @@ class EditorMainMap(QtWidgets.QGraphicsView):
     The big map holding the game map and everything.
     """
 
+    #: signal, emitted if the tile at the mouse pointer (focus) changes
     tile_at_focus_changed = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, scenario):
+    def __init__(self):
         super().__init__()
 
         self.setObjectName('map-view')
@@ -265,23 +267,24 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         self.setMouseTracking(True)
         self.current_column = -1
         self.current_row = -1
+
+        # TODO hardcore tile size somewhere else (and a bit less hard)
         self.TILE_SIZE = 80
-        self.scenario = scenario
 
     def redraw_map(self):
         """
-            When a scenario is loaded new we need to draw the whole map new.
+        Whenever a scenario is been created or loaded new we need to draw the whole map.
         """
         self.scene.clear()
 
-        columns = self.scenario[constants.ScenarioProperties.MAP_COLUMNS]
-        rows = self.scenario[constants.ScenarioProperties.MAP_ROWS]
+        columns = editor_scenario.scenario[constants.ScenarioProperties.MAP_COLUMNS]
+        rows = editor_scenario.scenario[constants.ScenarioProperties.MAP_ROWS]
 
         width = (columns + 0.5) * self.TILE_SIZE
         height = rows * self.TILE_SIZE
         self.scene.setSceneRect(0, 0, width, height)
 
-        # TODO should load only once and cache (universal cache)
+        # TODO should load only once and cache (universal cache), should be softcoded somewhere
         # load all textures
         brushes = {0: QtGui.QBrush(QtGui.QColor(64, 64, 255)), 1: QtGui.QBrush(QtGui.QColor(64, 255, 64)),
                    2: QtGui.QBrush(QtGui.QColor(64, 255, 64)), 3: QtGui.QBrush(QtGui.QColor(64, 255, 64)),
@@ -300,10 +303,10 @@ class EditorMainMap(QtWidgets.QGraphicsView):
             paths[t] = QtGui.QPainterPath()
         for column in range(0, columns):
             for row in range(0, rows):
-                t = self.scenario.terrain_at(column, row)
+                t = editor_scenario.scenario.terrain_at(column, row)
                 if t != 0:
                     # not for sea
-                    sx, sy = self.scenario.scene_position(column, row)
+                    sx, sy = editor_scenario.scenario.scene_position(column, row)
                     paths[t].addRect(sx * self.TILE_SIZE, sy * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
         for t in paths:
             path = paths[t]
@@ -327,11 +330,11 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         river_pen = QtGui.QPen(QtGui.QColor(64, 64, 255))
         river_pen.setWidth(5)
         # TODO get rivers via a method (generator)
-        for river in self.scenario._properties['rivers']:
+        for river in editor_scenario.scenario._properties['rivers']:
             tiles = river['tiles']
             path = QtGui.QPainterPath()
             for tile in tiles:
-                sx, sy = self.scenario.scene_position(tile[0], tile[1])
+                sx, sy = editor_scenario.scenario.scene_position(tile[0], tile[1])
                 x = (sx + 0.5) * self.TILE_SIZE
                 y = (sy + 0.5) * self.TILE_SIZE
                 if tile == tiles[0]:
@@ -347,20 +350,20 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         province_border_pen.setWidth(2)
         nation_border_pen = QtGui.QPen()
         nation_border_pen.setWidth(4)
-        for nation in self.scenario.all_nations():
+        for nation in editor_scenario.scenario.all_nations():
             # get nation color
-            color = self.scenario.get_nation_property(nation, 'color')
+            color = editor_scenario.scenario.get_nation_property(nation, 'color')
             nation_color = QtGui.QColor()
             nation_color.setNamedColor(color)
             # get all provinces
-            provinces = self.scenario.get_provinces_of_nation(nation)
+            provinces = editor_scenario.scenario.get_provinces_of_nation(nation)
             nation_path = QtGui.QPainterPath()
             # get all tiles
             for province in provinces:
                 province_path = QtGui.QPainterPath()
-                tiles = self.scenario.get_province_property(province, 'tiles')
+                tiles = editor_scenario.scenario.get_province_property(province, 'tiles')
                 for column, row in tiles:
-                    sx, sy = self.scenario.scene_position(column, row)
+                    sx, sy = editor_scenario.scenario.scene_position(column, row)
                     province_path.addRect(sx * self.TILE_SIZE, sy * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
                 province_path = province_path.simplified()
                 item = self.scene.addPath(province_path, pen=province_border_pen)
@@ -373,12 +376,12 @@ class EditorMainMap(QtWidgets.QGraphicsView):
 
         # draw towns and names
         city_pixmap = QtGui.QPixmap(constants.extend(constants.GRAPHICS_MAP_FOLDER, 'city.png'))
-        for nation in self.scenario.all_nations():
+        for nation in editor_scenario.scenario.all_nations():
             # get all provinces of this nation
-            provinces = self.scenario.get_provinces_of_nation(nation)
+            provinces = editor_scenario.scenario.get_provinces_of_nation(nation)
             for province in provinces:
-                column, row = self.scenario.get_province_property(province, 'town_location')
-                sx, sy = self.scenario.scene_position(column, row)
+                column, row = editor_scenario.scenario.get_province_property(province, 'town_location')
+                sx, sy = editor_scenario.scenario.scene_position(column, row)
                 # center city image on center of tile
                 x = (sx + 0.5) * self.TILE_SIZE - city_pixmap.width() / 2
                 y = (sy + 0.5) * self.TILE_SIZE - city_pixmap.height() / 2
@@ -386,7 +389,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
                 item.setOffset(x, y)
                 item.setZValue(6)
                 # display province name below
-                province_name = self.scenario.get_province_property(province, 'name')
+                province_name = editor_scenario.scenario.get_province_property(province, 'name')
                 item = self.scene.addSimpleText(province_name)
                 item.setPen(qt.TRANSPARENT_PEN)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.darkRed))
@@ -408,7 +411,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         # draw the grid and the coordinates
         for column in range(0, columns):
             for row in range(0, rows):
-                sx, sy = self.scenario.scene_position(column, row)
+                sx, sy = editor_scenario.scenario.scene_position(column, row)
                 # item = self.scene.addRect(sx * self.tile_size, sy * self.tile_size,  self.tile_size,  self.tile_size)
                 # item.setZValue(1000)
                 text = '({},{})'.format(column, row)
@@ -418,10 +421,10 @@ class EditorMainMap(QtWidgets.QGraphicsView):
                 item.setZValue(1001)
                 self.scene.addItem(item)
 
-    def get_bounds(self):
+    def visible_rect(self):
         """
-            Returns the visible part of the map view relative to the total scene rectangle as a rectangle (with all
-            values between 0 and 1).
+        Returns the visible part of the map view relative to the total scene rectangle as a rectangle with normalized
+        values between 0 and 1, relative to the total size of the map.
         """
         # total rectangle of the scene (0, 0, width, height)
         s = self.scene.sceneRect()
@@ -431,7 +434,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
 
     def set_position(self, x, y):
         """
-            Changes the visible part of the view.
+        Changes the visible part of the view by centering the map on normalized positions [0,1) (x,y).
         """
         # total rectangle of the scene (0, 0, width, height)
         s = self.scene.sceneRect()
@@ -445,12 +448,12 @@ class EditorMainMap(QtWidgets.QGraphicsView):
 
     def mouseMoveEvent(self, event):
         """
-            The mouse on the view has been moved. Emit signal tile_at_focus_changed if we now hover over a different tile.
+        The mouse on the view has been moved. Emit signal tile_at_focus_changed if we now hover over a different tile.
         """
-        if self.scenario is not None:
+        if editor_scenario.scenario is not None:
             # get mouse position in scene coordinates
             scene_position = self.mapToScene(event.pos()) / self.TILE_SIZE
-            column, row = self.scenario.map_position(scene_position.x(), scene_position.y())
+            column, row = editor_scenario.scenario.map_position(scene_position.x(), scene_position.y())
             if column != self.current_column or row != self.current_row:
                 self.current_column = column
                 self.current_row = row
@@ -463,9 +466,9 @@ class InfoBox(QtWidgets.QWidget):
     Info box on the right side of the editor.
     """
 
-    def __init__(self, scenario):
+    def __init__(self):
         """
-            Layout.
+        Layout.
         """
         super().__init__()
         self.setObjectName('info-box-widget')
@@ -482,44 +485,39 @@ class InfoBox(QtWidgets.QWidget):
         layout.addWidget(self.nation_label)
 
         layout.addStretch()
-        layout.addLayout(self.create_toolbar())
-        self.scenario = scenario
-
-    def create_toolbar(self):
-        """
-            Setup toolbar at the bottom.
-        """
-        layout = QtWidgets.QHBoxLayout()
-
+        
+        # setup toolbar at the bottom
+        l = QtWidgets.QHBoxLayout()
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(20, 20))
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self,
-                self.change_terrain))
-
-        layout.addWidget(toolbar)
-        layout.addStretch()
-
-        return layout
+        a = qt.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self, self.change_terrain)
+        toolbar.addAction(a)
+        l.addWidget(toolbar)
+        l.addStretch()
+        
+        layout.addLayout(l)
 
     def update_tile_information(self, column, row):
         """
-            Displays data of a new tile (hovered or clicked in the main map).
+        Displays data of a new tile (hovered or clicked in the main map).
+        
+        :param column: The tile column. 
+        :param row: The tile row.
         """
         text = 'Position ({}, {})'.format(column, row)
-        terrain = self.scenario.terrain_at(column, row)
-        terrain_name = self.scenario.get_terrain_name(terrain)
+        terrain = editor_scenario.scenario.terrain_at(column, row)
+        terrain_name = editor_scenario.scenario.get_terrain_name(terrain)
         text += '<br>Terrain: {}'.format(terrain_name)
-        province = self.scenario.get_province_at(column, row)
+        province = editor_scenario.scenario.get_province_at(column, row)
         if province is not None:
-            name = self.scenario.get_province_property(province, 'name')
+            name = editor_scenario.scenario.get_province_property(province, 'name')
             text += '<br>Province: {}'.format(name)
 
         self.text_label.setText(text)
 
     def change_terrain(self):
         """
-            The change terrain type button has been clicked.
+        The change terrain type button has been clicked.
         """
         pass
 
@@ -529,8 +527,8 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
     New scenario dialog.
     """
 
-    #:
-    create_scenario = QtCore.pyqtSignal(dict)
+    #: signal, emitted if this dialog finishes successfully and transmits parameters in the dictionary
+    finished = QtCore.pyqtSignal(dict)
 
     def __init__(self):
         """
@@ -547,7 +545,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
         edit.setPlaceholderText('Unnamed')
-        self.parameters[constants.ScenarioProperties.SCENARIO_TITLE] = edit
+        self.parameters[constants.ScenarioProperties.TITLE] = edit
         layout.addWidget(edit)
         widget_layout.addWidget(box)
 
@@ -594,7 +592,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         p = {}
 
         # title
-        key = constants.ScenarioProperties.SCENARIO_TITLE
+        key = constants.ScenarioProperties.TITLE
         p[key] = get_text(self.parameters[key])
 
         # number of columns
@@ -608,7 +606,7 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         # TODO conversion can fail, (ValueError) give error message
         # we close the parent window and emit the appropriate signal
         self.parent().close()
-        self.create_scenario.emit(p)
+        self.finished.emit(p)
 
 def get_text(edit:QtWidgets.QLineEdit):
     """
@@ -629,7 +627,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
 
     def __init__(self, scenario):
         super().__init__()
-        self.scenario = scenario
+        editor_scenario.scenario = scenario
 
         widget_layout = QtWidgets.QVBoxLayout(self)
 
@@ -639,7 +637,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(box)
         self.edit = QtWidgets.QLineEdit()
         self.edit.setFixedWidth(300)
-        self.edit.setText(self.scenario[constants.ScenarioProperties.SCENARIO_TITLE])
+        self.edit.setText(editor_scenario.scenario[constants.ScenarioProperties.TITLE])
         layout.addWidget(self.edit)
 
         widget_layout.addWidget(box)
@@ -650,7 +648,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
         """
             Dialog will be closed, save data.
         """
-        self.scenario[constants.ScenarioProperties.SCENARIO_TITLE] = self.edit.text()
+        editor_scenario.scenario[constants.ScenarioProperties.TITLE] = self.edit.text()
         return True
 
 
@@ -688,6 +686,23 @@ class EditorScenario(QtCore.QObject):
         # TODO what if file name does not exist or is not a valid scenario file
         self.scenario = Scenario()
         self.scenario.load(file_name)
+        self.new_scenario.emit()
+
+    def create(self, properties):
+        """
+        Create new scenario (from the create new scenario dialog).
+        """
+        self.scenario.reset()
+        self.scenario[constants.ScenarioProperties.TITLE] = properties[
+            constants.ScenarioProperties.TITLE]
+        self.scenario.create_empty_map(properties[constants.ScenarioProperties.MAP_COLUMNS],
+            properties[constants.ScenarioProperties.MAP_ROWS])
+
+        # standard rules
+        self.scenario['rules'] = 'standard.rules'
+        # editor_scenario.scenario.load_rules()
+
+        # emit that everything has changed
         self.new_scenario.emit()
 
 #: static single instance of the editor scenario
@@ -765,29 +780,12 @@ class EditorScreen(QtWidgets.QWidget):
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
 
-    def create_new_scenario(self, properties):
-        """
-            Create new scenario (from the create new scenario dialog).
-        """
-        self.scenario.reset()
-        self.scenario[constants.ScenarioProperties.SCENARIO_TITLE] = properties[
-            constants.ScenarioProperties.SCENARIO_TITLE]
-        self.scenario.create_empty_map(properties[constants.ScenarioProperties.MAP_COLUMNS],
-            properties[constants.ScenarioProperties.MAP_ROWS])
-
-        # standard rules
-        self.scenario['rules'] = 'standard.rules'
-        # self.scenario.load_rules()
-
-        # emit that everything has changed
-        self.scenario.everything_changed.emit()
-
     def show_new_scenario_dialog(self):
         """
         Shows the dialog for creation of a new scenario dialog and connect the "create new scenario" signal.
         """
         widget = NewScenarioDialogWidget()
-        widget.create_scenario.connect(self.create_new_scenario)
+        widget.finished.connect(editor_scenario.create)
         dialog = graphics.GameDialog(self.client.main_window, widget, title='New Scenario',
             delete_on_close=True, help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(500, 400))
@@ -802,7 +800,7 @@ class EditorScreen(QtWidgets.QWidget):
             'Scenario Files (*.scenario)')[0]
         if file_name:
             self.client.schedule_notification(
-                'Loaded scenario {}'.format(self.scenario[constants.ScenarioProperties.SCENARIO_TITLE]))
+                'Loaded scenario {}'.format(editor_scenario.scenario[constants.ScenarioProperties.TITLE]))
 
     def save_scenario_dialog(self):
         """
@@ -812,7 +810,7 @@ class EditorScreen(QtWidgets.QWidget):
         file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', constants.SCENARIO_FOLDER,
             'Scenario Files (*.scenario)')[0]
         if file_name:
-            self.scenario.save(file_name)
+            editor_scenario.scenario.save(file_name)
             path, name = os.path.split(file_name)
             self.client.schedule_notification('Saved to {}'.format(name))
 
@@ -822,13 +820,13 @@ class EditorScreen(QtWidgets.QWidget):
         """
         self.map.redraw_map()
         self.mini_map.redraw_map()
-        self.mini_map.reset_tracker(self.map.get_bounds())
+        self.mini_map.reset_tracker(self.map.visible_rect())
 
     def show_general_properties_dialog(self):
         """
             Display the modify general properties dialog.
         """
-        content_widget = GeneralPropertiesWidget(self.scenario)
+        content_widget = GeneralPropertiesWidget(editor_scenario.scenario)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='General Properties',
             delete_on_close=True, help_callback=self.client.show_help_browser,
             close_callback=content_widget.close_request)

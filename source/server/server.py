@@ -153,7 +153,7 @@ def core_scenario_titles(client, message):
     for scenario_file in scenario_files:
         reader = utils.ZipArchiveReader(scenario_file)
         properties = reader.read_as_yaml(constants.SCENARIO_FILE_PROPERTIES)
-        scenario_titles.append(properties[k.SCENARIO_TITLE])
+        scenario_titles.append(properties[k.TITLE])
 
     # zip files and titles together
     scenarios = zip(scenario_titles, scenario_files)
@@ -181,7 +181,7 @@ def scenario_preview(client, message):
     preview = {'scenario': file_name}
 
     # some scenario properties should be copied
-    scenario_copy_keys = [k.MAP_COLUMNS, k.MAP_ROWS, k.SCENARIO_TITLE, k.SCENARIO_DESCRIPTION]
+    scenario_copy_keys = [k.MAP_COLUMNS, k.MAP_ROWS, k.TITLE, k.DESCRIPTION]
     for key in scenario_copy_keys:
         preview[key] = scenario[key]
 
