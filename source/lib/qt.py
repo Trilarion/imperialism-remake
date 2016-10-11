@@ -24,7 +24,6 @@
 import os
 from datetime import datetime
 
-import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
@@ -34,6 +33,7 @@ import PyQt5.QtWidgets as QtWidgets
 from PyQt5 import QtCore as QtCore
 
 TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
+
 
 class RelativeLayoutConstraint:
     """
@@ -48,7 +48,7 @@ class RelativeLayoutConstraint:
         See also calculate_relative_position()
 
         :param x: list of three factors (scaling of parents width, scaling of element width, horizontal offset)
-        :param y: list of three factors (scaling of parents height, scaling of elements heigh, vertical offset)
+        :param y: list of three factors (scaling of parents height, scaling of elements height, vertical offset)
         """
         self.x = x
         self.y = y
@@ -116,7 +116,8 @@ class RelativeLayoutConstraint:
         return self
 
 
-def calculate_relative_position(parent_rect: QtCore.QRect, own_size: QtCore.QSize, constraint: RelativeLayoutConstraint):
+def calculate_relative_position(parent_rect: QtCore.QRect, own_size: QtCore.QSize,
+        constraint: RelativeLayoutConstraint):
     """
     Calculates the position of the element, given its size, the position and size of the parent and a relative layout
     constraint. The position is the position of the parent plus the weighted size of the parent, the weighted size of
@@ -235,8 +236,8 @@ class Notification(QtCore.QObject):
     #: signal, emits when the notification has been clicked
     clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
 
-    def __init__(self, parent:QtWidgets.QWidget, content, fade_duration=2000, stay_duration=2000,
-            position_constraint: RelativeLayoutConstraint=None):
+    def __init__(self, parent: QtWidgets.QWidget, content, fade_duration=2000, stay_duration=2000,
+            position_constraint: RelativeLayoutConstraint = None):
         """
 
         :param parent: parent widget (QWidget)
@@ -378,7 +379,7 @@ class GraphicsItemSet:
     def __init__(self):
         self._content = set()
 
-    def add_item(self, item:QtWidgets.QGraphicsItem):
+    def add_item(self, item: QtWidgets.QGraphicsItem):
         """
         Adds an item to the content list. Should be
 
@@ -411,7 +412,7 @@ class ZStackingManager:
         """
         self._floors = []
 
-    def new_floor(self, floor: GraphicsItemSet=None, above=True):
+    def new_floor(self, floor: GraphicsItemSet = None, above=True):
         """
         Creates a new floor (set of items) and exposes it. Inserts the new floor either at the top (above is True)
         or at the bottom (above is False) or above or below a given floor.
@@ -711,6 +712,7 @@ class ClockLabel(QtWidgets.QLabel):
         """
         text = datetime.now().strftime(self.time_format)
         self.setText(text)
+
 
 def create_action(icon, text, parent, trigger_connection=None, toggle_connection=None, checkable=False):
     """

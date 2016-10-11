@@ -52,12 +52,12 @@ class GameLobbyWidget(QtWidgets.QWidget):
         toolbar = QtWidgets.QToolBar()
         action_group = QtWidgets.QActionGroup(toolbar)
 
-        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.lobby.single.new.png'),
-            'Start new single player scenario', action_group,
-            toggle_connection=self.toggled_single_player_scenario_selection, checkable=True))
-        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.lobby.single.load.png'),
-            'Continue saved single player scenario', action_group,
-            toggle_connection=self.toggled_single_player_load_scenario, checkable=True))
+        toolbar.addAction(
+            qt.create_action(tools.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario',
+                action_group, toggle_connection=self.toggled_single_player_scenario_selection, checkable=True))
+        toolbar.addAction(
+            qt.create_action(tools.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario',
+                action_group, toggle_connection=self.toggled_single_player_load_scenario, checkable=True))
 
         toolbar.addSeparator()
 
@@ -115,9 +115,8 @@ class GameLobbyWidget(QtWidgets.QWidget):
         if checked:
 
             # noinspection PyCallByClass
-            file_name = \
-            QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', constants.SCENARIO_FOLDER,
-                'Scenario Files (*.scenario)')[0]
+            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario',
+                constants.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[0]
             if file_name:
                 # TODO check that it is a valid single player scenario in play
                 pass
@@ -203,7 +202,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         local_network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
 
         # send a message and ask for preview
-        local_network_client.send(constants.CH_SCENARIO_PREVIEW, {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
+        local_network_client.send(constants.CH_SCENARIO_PREVIEW,
+            {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
 
         self.selected_nation = None
 
@@ -238,8 +238,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.description.setReadOnly(True)
         self.description.setFixedHeight(60)
-        layout.addWidget(qt.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1,
-            2)  # goes over two columns
+        layout.addWidget(qt.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1, 2)  # goes over two columns
 
         # nation description
         self.nation_info = QtWidgets.QTextEdit()
@@ -255,9 +254,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
 
         # add the start button
         toolbar = QtWidgets.QToolBar()
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
-                trigger_connection=self.start_scenario_clicked))
+        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
+            trigger_connection=self.start_scenario_clicked))
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
         # set the content from the message

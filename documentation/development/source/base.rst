@@ -20,6 +20,14 @@ base.network module
     :undoc-members:
     :show-inheritance:
 
+base.switches module
+--------------------
+
+.. automodule:: base.switches
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 base.tools module
 -----------------
 

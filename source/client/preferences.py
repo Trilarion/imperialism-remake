@@ -56,8 +56,8 @@ class PreferencesWidget(QtWidgets.QWidget):
             qt.create_action(tools.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences',
                 action_group, toggle_connection=self._toggled_action_preferences_graphics, checkable=True))
         toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences',
-                action_group, toggle_connection=self._toggled_action_preferences_music, checkable=True))
+            qt.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group,
+                toggle_connection=self._toggled_action_preferences_music, checkable=True))
 
         self.stacked_layout = QtWidgets.QStackedLayout()
 
@@ -169,8 +169,9 @@ class PreferencesWidget(QtWidgets.QWidget):
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # connect to remote server
-        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.preferences.network.png'),
-            'Connect/Disconnect to remote server', toolbar, checkable=True))
+        toolbar.addAction(
+            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server',
+                toolbar, checkable=True))
         l2.addWidget(toolbar)
         l2.addStretch()
         l.addLayout(l2)
@@ -197,12 +198,11 @@ class PreferencesWidget(QtWidgets.QWidget):
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # show local server monitor
         toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor',
-                toolbar))
+            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor', toolbar))
         # local server is on/off
         toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Turn local server on/off',
-                toolbar, checkable=True))
+            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Turn local server on/off', toolbar,
+                checkable=True))
         l2.addWidget(toolbar)
         l2.addStretch()
         l.addLayout(l2)

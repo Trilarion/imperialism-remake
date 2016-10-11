@@ -26,19 +26,18 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
-import base.constants as constants
-import base.tools as tools
 import client.graphics as graphics
-import lib.qt as qt
+from base import constants, tools
+from lib import qt, utils
 from server.scenario import Scenario
 
 
-class MiniMap(QtWidgets.QWidget):
+class OverviewMap(QtWidgets.QWidget):
     """
     Small overview map
     """
 
-    # TODO fixed width -> make it chosable from outside
+    # TODO fixed width -> make it selectable from outside
 
     # Fixed width of 300 pixels
     VIEW_WIDTH = 300
@@ -60,7 +59,7 @@ class MiniMap(QtWidgets.QWidget):
         # the content is a scene
         self.scene = QtWidgets.QGraphicsScene()
 
-        # tracker rectangle that tracks the view of the main map
+        # tracker rectangle that tracks the view of the map, initially hidden
         self.tracker = QtWidgets.QGraphicsRectItem()
         self.tracker.setCursor(QtCore.Qt.PointingHandCursor)
         self.tracker.setZValue(1000)
@@ -74,6 +73,7 @@ class MiniMap(QtWidgets.QWidget):
         layout.addWidget(self.view)
 
         # the width and height (fixed width throughout the game)
+        # TODO make this adjustable
         self.view.setFixedWidth(self.VIEW_WIDTH)
         view_height = math.floor(0.6 * self.VIEW_WIDTH)
         self.view.setFixedHeight(view_height)
@@ -85,12 +85,12 @@ class MiniMap(QtWidgets.QWidget):
         # action group (only one of them can be checked at each time)
         action_group = QtWidgets.QActionGroup(self.toolbar)
         # political view in the beginning
-        action_political = qt.create_action(tools.load_ui_icon('icon.mini.political.png'),
-            'Show political view', action_group, toggle_connection=self.toggled_political, checkable=True)
-        self.toolbar.addAction(action_political)
-        # geographical view
-        a = qt.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group, toggle_connection=self.toggled_geographical, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group, toggle_connection=self.switch_to_political_view, checkable=True)
         self.toolbar.addAction(a)
+        # geographical view
+        a = qt.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group, toggle_connection=self.switch_to_geographical_view, checkable=True)
+        self.toolbar.addAction(a)
+        self.mode = constants.OverviewMapMode.POLITICAL
 
         # wrap tool bar into horizontal layout with stretch
         l = QtWidgets.QHBoxLayout()
@@ -101,38 +101,41 @@ class MiniMap(QtWidgets.QWidget):
         # add layout containing tool bar
         layout.addLayout(l)
 
-        # TODO what is this good for
-        self.removable_items = []
+        # graphics items in scene (except the tracker)
+        self.scene_items = []
 
-    def redraw_map(self):
+    def redraw(self):
         """
-        The map is not yet drawn or has changed or the mode has changed. Redraw it.
+        The scenario has changed or the mode has changed. Redraw the overview map.
         """
 
-        # adjust view height
+        # adjust view height for aspect ratio of the scenario map
         columns = editor_scenario.scenario[constants.ScenarioProperties.MAP_COLUMNS]
         rows = editor_scenario.scenario[constants.ScenarioProperties.MAP_ROWS]
-        view_height = math.floor(rows / columns * self.VIEW_WIDTH)
+        view_height = math.floor(rows / columns * self.view.width())
         self.view.setFixedHeight(view_height)
+
+
         self.scene.setSceneRect(0, 0, columns, rows)
         self.view.fitInView(self.scene.sceneRect())  # simple and should work
 
         tile_width = round(1 / (columns + 0.5), 3)
         tile_height = round(1 / rows, 3)
 
-        # remove everything except tracker from the scene
-        for item in self.removable_items:
+        # remove everything except the tracker from the scene
+        for item in self.scene_items:
             self.scene.removeItem(item)
-        self.removable_items = []
+        self.scene_items = []
 
-        if self.map_mode == 'political':
+        if self.mode == constants.OverviewMapMode.POLITICAL:
+            # political mode
 
             # fill the ground layer with a neutral color
             item = self.scene.addRect(0, 0, 1, 1)
             item.setBrush(QtCore.Qt.lightGray)
             item.setPen(qt.TRANSPARENT_PEN)
             item.setZValue(0)
-            self.removable_items.extend([item])
+            self.scene_items.extend([item])
             self.tracker.setPos(0, 0)
 
             # draw the nation borders and content (non-smooth)
@@ -160,16 +163,16 @@ class MiniMap(QtWidgets.QWidget):
                 brush = QtGui.QBrush(color)
                 # item = self.scene.addPath(path, brush=brush)  # will use the default pen for outline
                 item.setZValue(1)
-                self.removable_items.extend([item])
+                self.scene_items.extend([item])
 
-        elif self.map_mode == 'geographical':
+        elif self.mode == constants.OverviewMapMode.GEOGRAPHICAL:
 
             # fill the background with sea (blue)
             item = self.scene.addRect(0, 0, 1, 1)
             item.setBrush(QtCore.Qt.blue)
             item.setPen(qt.TRANSPARENT_PEN)
             item.setZValue(0)
-            self.removable_items.extend([item])
+            self.scene_items.extend([item])
 
             # six terrains left, plains, hills, mountains, tundra, swamp, desert
 
@@ -192,29 +195,29 @@ class MiniMap(QtWidgets.QWidget):
                 brush = QtGui.QBrush(colors[t])
                 # item = self.scene.addPath(path, brush=brush, pen=qt.TRANSPARENT_PEN)
                 item.setZValue(1)
-                self.removable_items.extend([item])
+                self.scene_items.extend([item])
 
-    def toggled_political(self, checked):
+    def switch_to_political_view(self, checked):
         """
             The toolbar button for the political view has been toggled.
         """
         if checked:
-            # self.map_mode should be 'geographical'
-            self.map_mode = 'political'
-            self.redraw_map()
+            # mode should not be political
+            self.mode = constants.OverviewMapMode.POLITICAL
+            self.redraw()
 
-    def toggled_geographical(self, checked):
+    def switch_to_geographical_view(self, checked):
         """
             The toolbar button for the geographical view has been toggled.
         """
         if checked:
-            # self.map_mode should be 'political'
-            self.map_mode = 'geographical'
-            self.redraw_map()
+            # mode should not be geographical
+            self.mode = constants.OverviewMapMode.GEOGRAPHICAL
+            self.redraw()
 
     def mousePressEvent(self, event):
         """
-            The mouse has been pressed inside the view. Center the tracker rectangle.
+        The mouse has been pressed inside the view. Center the tracker rectangle.
         """
         super().mouseMoveEvent(event)
 
@@ -236,7 +239,7 @@ class MiniMap(QtWidgets.QWidget):
             self.tracker.setRect(tracker_rect)
             self.roi_changed.emit(x, y)
 
-    def reset_tracker(self, bounds:QtCore.QRectF):
+    def reset_tracker(self, bounds: QtCore.QRectF):
         """
         The main map tells us how large its view is (in terms of the game map) and where it is currently.
 
@@ -246,13 +249,13 @@ class MiniMap(QtWidgets.QWidget):
         self.tracker.show()
 
 
-class EditorMainMap(QtWidgets.QGraphicsView):
+class EditorMap(QtWidgets.QGraphicsView):
     """
     The big map holding the game map and everything.
     """
 
     #: signal, emitted if the tile at the mouse pointer (focus) changes
-    tile_at_focus_changed = QtCore.pyqtSignal(int, int)
+    focus_changed = QtCore.pyqtSignal(int, int)
 
     def __init__(self):
         super().__init__()
@@ -271,7 +274,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         # TODO hardcore tile size somewhere else (and a bit less hard)
         self.TILE_SIZE = 80
 
-    def redraw_map(self):
+    def redraw(self):
         """
         Whenever a scenario is been created or loaded new we need to draw the whole map.
         """
@@ -284,7 +287,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         height = rows * self.TILE_SIZE
         self.scene.setSceneRect(0, 0, width, height)
 
-        # TODO should load only once and cache (universal cache), should be softcoded somewhere
+        # TODO should load only once and cache (universal cache), should be soft coded somewhere
         # load all textures
         brushes = {0: QtGui.QBrush(QtGui.QColor(64, 64, 255)), 1: QtGui.QBrush(QtGui.QColor(64, 255, 64)),
                    2: QtGui.QBrush(QtGui.QColor(64, 255, 64)), 3: QtGui.QBrush(QtGui.QColor(64, 255, 64)),
@@ -432,7 +435,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
         v = self.mapToScene(self.rect()).boundingRect()
         return QtCore.QRectF(v.x() / s.width(), v.y() / s.height(), v.width() / s.width(), v.height() / s.height())
 
-    def set_position(self, x, y):
+    def set_center_position(self, x, y):
         """
         Changes the visible part of the view by centering the map on normalized positions [0,1) (x,y).
         """
@@ -448,7 +451,7 @@ class EditorMainMap(QtWidgets.QGraphicsView):
 
     def mouseMoveEvent(self, event):
         """
-        The mouse on the view has been moved. Emit signal tile_at_focus_changed if we now hover over a different tile.
+        The mouse on the view has been moved. Emit signal focus_changed if we now hover over a different tile.
         """
         if editor_scenario.scenario is not None:
             # get mouse position in scene coordinates
@@ -457,11 +460,11 @@ class EditorMainMap(QtWidgets.QGraphicsView):
             if column != self.current_column or row != self.current_row:
                 self.current_column = column
                 self.current_row = row
-                self.tile_at_focus_changed.emit(column, row)
+                self.focus_changed.emit(column, row)
         super().mouseMoveEvent(event)
 
 
-class InfoBox(QtWidgets.QWidget):
+class InfoPanel(QtWidgets.QWidget):
     """
     Info box on the right side of the editor.
     """
@@ -474,9 +477,9 @@ class InfoBox(QtWidgets.QWidget):
         self.setObjectName('info-box-widget')
         layout = QtWidgets.QVBoxLayout(self)
 
-        self.text_label = QtWidgets.QLabel()
-        self.text_label.setTextFormat(QtCore.Qt.RichText)
-        layout.addWidget(self.text_label)
+        self.tile_label = QtWidgets.QLabel()
+        self.tile_label.setTextFormat(QtCore.Qt.RichText)
+        layout.addWidget(self.tile_label)
 
         self.province_label = QtWidgets.QLabel()
         layout.addWidget(self.province_label)
@@ -485,19 +488,20 @@ class InfoBox(QtWidgets.QWidget):
         layout.addWidget(self.nation_label)
 
         layout.addStretch()
-        
+
         # setup toolbar at the bottom
         l = QtWidgets.QHBoxLayout()
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(20, 20))
-        a = qt.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self, self.change_terrain)
+        a = qt.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self,
+            self.change_terrain)
         toolbar.addAction(a)
         l.addWidget(toolbar)
         l.addStretch()
-        
+
         layout.addLayout(l)
 
-    def update_tile_information(self, column, row):
+    def update_tile_info(self, column, row):
         """
         Displays data of a new tile (hovered or clicked in the main map).
         
@@ -513,7 +517,7 @@ class InfoBox(QtWidgets.QWidget):
             name = editor_scenario.scenario.get_province_property(province, 'name')
             text += '<br>Province: {}'.format(name)
 
-        self.text_label.setText(text)
+        self.tile_label.setText(text)
 
     def change_terrain(self):
         """
@@ -522,7 +526,7 @@ class InfoBox(QtWidgets.QWidget):
         pass
 
 
-class NewScenarioDialogWidget(QtWidgets.QWidget):
+class NewScenarioWidget(QtWidgets.QWidget):
     """
     New scenario dialog.
     """
@@ -579,13 +583,12 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout()
         toolbar = QtWidgets.QToolBar()
         toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar,
-                self.create_scenario_clicked))
+            qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar, self.on_ok))
         layout.addStretch()
         layout.addWidget(toolbar)
         widget_layout.addLayout(layout)
 
-    def create_scenario_clicked(self):
+    def on_ok(self):
         """
         "Create scenario" has been clicked.
         """
@@ -608,7 +611,8 @@ class NewScenarioDialogWidget(QtWidgets.QWidget):
         self.parent().close()
         self.finished.emit(p)
 
-def get_text(edit:QtWidgets.QLineEdit):
+
+def get_text(edit: QtWidgets.QLineEdit):
     """
     Returns the text of a line edit. However, if it is empty, it returns the place holder text (whatever there is).
 
@@ -619,6 +623,7 @@ def get_text(edit:QtWidgets.QLineEdit):
         return edit.text()
     else:
         return edit.placeholderText()
+
 
 class GeneralPropertiesWidget(QtWidgets.QWidget):
     """
@@ -676,37 +681,46 @@ class EditorScenario(QtCore.QObject):
     """
 
     #: signal, scenario has changed completely
-    new_scenario = QtCore.pyqtSignal()
+    changed = QtCore.pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self.scenario = None
 
     def load(self, file_name):
+        """
+
+        :param file_name:
+        """
         # TODO what if file name does not exist or is not a valid scenario file
-        self.scenario = Scenario()
-        self.scenario.load(file_name)
-        self.new_scenario.emit()
+        self.scenario = Scenario.from_file(file_name)
+        self.changed.emit()
 
     def create(self, properties):
         """
         Create new scenario (from the create new scenario dialog).
+
+        :param properties:
         """
-        self.scenario.reset()
-        self.scenario[constants.ScenarioProperties.TITLE] = properties[
-            constants.ScenarioProperties.TITLE]
+        self.scenario = Scenario()
+        self.scenario[constants.ScenarioProperties.TITLE] = properties[constants.ScenarioProperties.TITLE]
         self.scenario.create_empty_map(properties[constants.ScenarioProperties.MAP_COLUMNS],
             properties[constants.ScenarioProperties.MAP_ROWS])
 
         # standard rules
         self.scenario['rules'] = 'standard.rules'
-        # editor_scenario.scenario.load_rules()
+        # self.scenario.load_rules()
+        # TODO rules as extra?
+        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, self.scenario._properties['rules'])
+        self.scenario._rules = utils.read_as_yaml(rule_file)
 
         # emit that everything has changed
-        self.new_scenario.emit()
+        self.changed.emit()
+
 
 #: static single instance of the editor scenario
 editor_scenario = EditorScenario()
+
 
 class EditorScreen(QtWidgets.QWidget):
     """
@@ -728,20 +742,25 @@ class EditorScreen(QtWidgets.QWidget):
         self.toolbar.setIconSize(QtCore.QSize(32, 32))
 
         # new, load, save scenario actions
-        a = qt.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self, self.show_new_scenario_dialog)
+        a = qt.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
+            self.new_scenario_dialog)
         self.toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self, self.load_scenario_dialog)
+        a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
+            self.load_scenario_dialog)
         self.toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self, self.save_scenario_dialog)
+        a = qt.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self,
+            self.save_scenario_dialog)
         self.toolbar.addAction(a)
         self.toolbar.addSeparator()
 
         # edit properties (general, nations, provinces) actions
-        a = qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self, self.show_general_properties_dialog)
+        a = qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self,
+            self.general_properties_dialog)
         self.toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.show_nations_dialog)
+        a = qt.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.nations_dialog)
         self.toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self, self.show_provinces_dialog)
+        a = qt.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
+            self.provinces_dialog)
         self.toolbar.addAction(a)
 
         spacer = QtWidgets.QWidget()
@@ -761,33 +780,35 @@ class EditorScreen(QtWidgets.QWidget):
         self.toolbar.addAction(a)
 
         # info box widget
-        self.info_box = InfoBox()
+        self.info_panel = InfoPanel()
 
         # main map widget
-        self.map = EditorMainMap()
-        self.map.tile_at_focus_changed.connect(self.info_box.update_tile_information)
+        self.map = EditorMap()
+        self.map.focus_changed.connect(self.info_panel.update_tile_info)
+        editor_scenario.changed.connect(self.map.redraw)
 
         # mini map widget
-        self.mini_map = MiniMap()
-        self.mini_map.roi_changed.connect(self.map.set_position)
+        self.overview = OverviewMap()
+        self.overview.roi_changed.connect(self.map.set_center_position)
+        editor_scenario.changed.connect(self.overview.redraw)
 
         # layout of widgets and toolbar
         layout = QtWidgets.QGridLayout(self)
         layout.addWidget(self.toolbar, 0, 0, 1, 2)
-        layout.addWidget(self.mini_map, 1, 0)
-        layout.addWidget(self.info_box, 2, 0)
+        layout.addWidget(self.overview, 1, 0)
+        layout.addWidget(self.info_panel, 2, 0)
         layout.addWidget(self.map, 1, 1, 2, 1)
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
 
-    def show_new_scenario_dialog(self):
+    def new_scenario_dialog(self):
         """
         Shows the dialog for creation of a new scenario dialog and connect the "create new scenario" signal.
         """
-        widget = NewScenarioDialogWidget()
+        widget = NewScenarioWidget()
         widget.finished.connect(editor_scenario.create)
-        dialog = graphics.GameDialog(self.client.main_window, widget, title='New Scenario',
-            delete_on_close=True, help_callback=self.client.show_help_browser)
+        dialog = graphics.GameDialog(self.client.main_window, widget, title='New Scenario', delete_on_close=True,
+            help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
 
@@ -799,6 +820,7 @@ class EditorScreen(QtWidgets.QWidget):
         file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', constants.SCENARIO_FOLDER,
             'Scenario Files (*.scenario)')[0]
         if file_name:
+            editor_scenario.load(file_name)
             self.client.schedule_notification(
                 'Loaded scenario {}'.format(editor_scenario.scenario[constants.ScenarioProperties.TITLE]))
 
@@ -814,15 +836,7 @@ class EditorScreen(QtWidgets.QWidget):
             path, name = os.path.split(file_name)
             self.client.schedule_notification('Saved to {}'.format(name))
 
-    def scenario_change(self):
-        """
-            Whenever the scenario changes completely (new scenario, scenario loaded, ...)
-        """
-        self.map.redraw_map()
-        self.mini_map.redraw_map()
-        self.mini_map.reset_tracker(self.map.visible_rect())
-
-    def show_general_properties_dialog(self):
+    def general_properties_dialog(self):
         """
             Display the modify general properties dialog.
         """
@@ -833,7 +847,7 @@ class EditorScreen(QtWidgets.QWidget):
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
-    def show_nations_dialog(self):
+    def nations_dialog(self):
         """
             Show the modify nations dialog.
         """
@@ -843,7 +857,7 @@ class EditorScreen(QtWidgets.QWidget):
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
-    def show_provinces_dialog(self):
+    def provinces_dialog(self):
         """
             Display the modify provinces dialog.
         """

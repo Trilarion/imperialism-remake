@@ -15,12 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Starts the application (a client and a server).
-    Start in project root folder and with 'debug' as parameter if wished.
+Starts the application (a client and a server).
+Start in project root folder and with 'debug' as parameter if wished.
 """
 
 import os
 import sys
+
 
 def exception_hook(type, value, traceback):
     """
@@ -83,18 +84,18 @@ if __name__ == '__main__':
         os.mkdir(user_folder)
 
     # determine DEBUG_MODE from runtime arguments
-    import base.constants as constants
+    from base import switches
 
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        constants.DEBUG_MODE = True
-    if constants.DEBUG_MODE:
+        switches.DEBUG_MODE = True
+    if switches.DEBUG_MODE:
         print('debug mode is on')
 
     # redirect output to log files (will be overwritten at each start)
     Log_File = os.path.join(user_folder, 'remake.log')
     Error_File = os.path.join(user_folder, 'remake.error.log')
     # in debug mode print to the console instead
-    if not constants.DEBUG_MODE:
+    if not switches.DEBUG_MODE:
         import codecs
 
         sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
@@ -113,6 +114,8 @@ if __name__ == '__main__':
     tools.log_info('options loaded from user folder ({})'.format(user_folder))
 
     # special case of some desktop environments under Linux where full screen mode does not work well
+    from base import constants
+
     if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         desktop_session = os.environ.get("DESKTOP_SESSION")
         if desktop_session and (
@@ -149,7 +152,7 @@ if __name__ == '__main__':
     tools.log_info('options saved')
 
     # report on unused resources
-    if constants.DEBUG_MODE:
+    if switches.DEBUG_MODE:
         tools.find_unused_resources()
 
     # good bye message

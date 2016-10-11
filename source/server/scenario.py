@@ -26,6 +26,7 @@ from PyQt5 import QtCore
 import base.constants as constants
 import lib.utils as utils
 
+
 # TODO rivers are implemented inefficiently
 
 class Scenario(QtCore.QObject):
@@ -44,21 +45,36 @@ class Scenario(QtCore.QObject):
         Start with a clean state.
         """
         super().__init__()
-        self.reset()
-
-    # TODO we could stay more clean by requiring a new scenario for each load, but then we have to wire it again
-    # every time, need to think more about it
-
-    # noinspection PyAttributeOutsideInit
-    def reset(self):
-        """
-        Clean the scenario.
-        """
         self._properties = {constants.ScenarioProperties.RIVERS: []}
         self._provinces = {}
         self._nations = {}
         self._maps = {}
         self._rules = {}
+
+    @staticmethod
+    def from_file(file_name):
+        """
+        Load/deserialize all internal variables from a zipped archive via YAML.
+        """
+
+        scenario = Scenario()
+
+        reader = utils.ZipArchiveReader(file_name)
+
+        scenario._properties = reader.read_as_yaml(constants.SCENARIO_FILE_PROPERTIES)
+        scenario._maps = reader.read_as_yaml(constants.SCENARIO_FILE_MAPS)
+        scenario._provinces = reader.read_as_yaml(constants.SCENARIO_FILE_PROVINCES)
+        # TODO check all ids are smaller then len()
+
+        scenario._nations = reader.read_as_yaml(constants.SCENARIO_FILE_NATIONS)
+        # TODO check all ids are smaller then len()
+
+        # read rule file
+        # TODO how to specify which rules file apply
+        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, scenario._properties['rules'])
+        scenario._rules = utils.read_as_yaml(rule_file)
+
+        return scenario
 
     def create_empty_map(self, columns, rows):
         """
@@ -134,7 +150,6 @@ class Scenario(QtCore.QObject):
             the shift of the stagger is in this class in methods scene_position() and map_position().
         """
         return column + (row % 2) / 2, row
-
 
     def map_position(self, x, y):
         """
@@ -358,29 +373,6 @@ class Scenario(QtCore.QObject):
             TODO move this to a special rules class. Only have rules() and setRules() here.
         """
         return self._rules['terrain.names'][terrain]
-
-    def load(self, file_name):
-        """
-            Load/deserialize all internal variables from a zipped archive via YAML.
-        """
-
-        # so we can do that also during game play, we reset
-        self.reset()
-
-        reader = utils.ZipArchiveReader(file_name)
-
-        self._properties = reader.read_as_yaml(constants.SCENARIO_FILE_PROPERTIES)
-        self._maps = reader.read_as_yaml(constants.SCENARIO_FILE_MAPS)
-        self._provinces = reader.read_as_yaml(constants.SCENARIO_FILE_PROVINCES)
-        # TODO check all ids are smaller then len()
-
-        self._nations = reader.read_as_yaml(constants.SCENARIO_FILE_NATIONS)
-        # TODO check all ids are smaller then len()
-
-        # read rule file
-        # TODO how to specify which rules file apply
-        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, self._properties['rules'])
-        self._rules = utils.read_as_yaml(rule_file)
 
     def save(self, file_name):
         """

@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Starts the client and delivers most of the code responsible for the main client screen and the diverse dialogs.
+Starts the client and delivers most of the code responsible for the main client screen and the diverse dialogs.
 """
 
 # TODO automatic placement of help dialog depending on if another dialog is open
@@ -220,14 +220,14 @@ class Client:
 
         # help browser
         # TODO help browser only if
-        #self.help_browser_widget = qt.BrowserWidget(tools.load_ui_icon)
-        #self.help_browser_widget = qt.BrowserWidget(tools.load_ui_icon)
-        #self.help_browser_widget.home_url = tools.local_url(constants.DOCUMENTATION_INDEX_FILE)
-        #self.help_browser_widget.home()
-        #self.help_dialog = graphics.GameDialog(self.main_window, self.help_browser_widget, title='Help')
-        #self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
+        # self.help_browser_widget = qt.BrowserWidget(tools.load_ui_icon)
+        # self.help_browser_widget = qt.BrowserWidget(tools.load_ui_icon)
+        # self.help_browser_widget.home_url = tools.local_url(constants.DOCUMENTATION_INDEX_FILE)
+        # self.help_browser_widget.home()
+        # self.help_dialog = graphics.GameDialog(self.main_window, self.help_browser_widget, title='Help')
+        # self.help_dialog.setFixedSize(QtCore.QSize(800, 600))
         # move to lower right border, so that overlap with other windows is not that strong
-        #self.help_dialog.move(self.main_window.x() + self.main_window.width() - 800,
+        # self.help_dialog.move(self.main_window.x() + self.main_window.width() - 800,
         #                      self.main_window.y() + self.main_window.height() - 600)
 
         # add help browser keyboard shortcut
@@ -280,12 +280,12 @@ class Client:
         # we sometimes wire signals that send parameters for url (mouse events for example) which we do not like
         if isinstance(path, str):
             url = qt.local_url(path)
-            #self.help_browser_widget.load(url)
+            # self.help_browser_widget.load(url)
             QtGui.QDesktopServices.openUrl(url)
         else:
             QtGui.QDesktopServices.openUrl(qt.local_url(constants.DOCUMENTATION_INDEX_FILE))
-        # TODO qtwebengine
-        #self.help_dialog.show()
+            # TODO use QtWebEngine instead
+            # self.help_dialog.show()
 
     def show_server_monitor(self):
         """

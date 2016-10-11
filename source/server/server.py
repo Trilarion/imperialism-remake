@@ -18,20 +18,19 @@
     Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
+import multiprocessing
 import os
 import random
 import sys
 import time
-import multiprocessing
 
 import PyQt5.QtCore as QtCore
 import PyQt5.QtNetwork as QtNetwork
 
 import imperialism_remake
 from base import constants
-from lib import utils
-
 from base.network import NetworkClient
+from lib import utils
 from lib.network import ExtendedTcpServer
 from server.scenario import Scenario
 
@@ -137,6 +136,7 @@ class ServerManager(QtCore.QObject):
             self.server.stop()
             self.shutdown.emit()
 
+
 def core_scenario_titles(client, message):
     """
     A server client received a message on the constants.CH_CORE_SCENARIO_TITLES channel. Return all available core
@@ -164,6 +164,7 @@ def core_scenario_titles(client, message):
     # return message
     titles = {'scenarios': scenarios}
     client.send(constants.CH_CORE_SCENARIO_TITLES, titles)
+
 
 def scenario_preview(client, message):
     """

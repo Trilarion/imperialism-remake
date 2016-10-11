@@ -1,5 +1,5 @@
 """
-    Current version (short and full names).
+Current version (short and full names).
 """
 
 __version_short__ = '0.2'

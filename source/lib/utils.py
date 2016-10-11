@@ -67,7 +67,7 @@ def write_as_yaml(file_name, value):
     """
     with open(file_name, 'w') as file:
         yaml.dump(value, file, allow_unicode=True, Dumper=Dumper)
-    # TODO are keys of dictionaries in YAML sorted automatically? If not we might want to do that here.
+        # TODO are keys of dictionaries in YAML sorted automatically? If not we might want to do that here.
 
 
 class ZipArchiveReader:

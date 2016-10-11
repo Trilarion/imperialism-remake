@@ -14,18 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+Generate the default rules.
+"""
+
 import os
 os.chdir('..')
 
-from lib import utils as u
-from base import constants as c
-
-"""
-    Generates the default options.
-"""
+from lib import utils
+from base import constants
 
 rules = {}
 
+# terrain names
 terrain_names = {
     0: 'Sea',
     1: 'Plain',
@@ -38,6 +39,6 @@ terrain_names = {
 rules['terrain.names'] = terrain_names
 
 # save
-file = c.SCENARIO_RULESET_STANDARD_FILE
+file = constants.SCENARIO_RULESET_STANDARD_FILE
 print('write to {}'.format(file))
-u.write_as_yaml(file, rules)
+utils.write_as_yaml(file, rules)

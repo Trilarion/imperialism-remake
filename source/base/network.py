@@ -24,6 +24,7 @@ import PyQt5.QtNetwork as QtNetwork
 
 from lib.network import ExtendedTcpSocket
 
+
 class NetworkClient(ExtendedTcpSocket):
     """
     Extending the Client class (wrapper around QTcpSocket sending and receiving messages) with channels (see Channel)
@@ -35,7 +36,7 @@ class NetworkClient(ExtendedTcpSocket):
     transport and message processing.
     """
 
-    def __init__(self, socket: QtNetwork.QTcpSocket=None):
+    def __init__(self, socket: QtNetwork.QTcpSocket = None):
         """
         We start with an empty channels list.
 
@@ -96,7 +97,7 @@ class NetworkClient(ExtendedTcpSocket):
 
     def _process(self, letter):
         """
-        A letter (a message) was received from the underlying ExtendedTcpSocket framework. Not indended for outside use.
+        A letter (a message) was received from the underlying ExtendedTcpSocket framework. Not intended for outside use.
         Here we assume that it's a dictionary with keys 'channel' and 'content' where the value for key 'channel' is
         the name of the channel and the value of the key 'content' is the message.
 
@@ -104,7 +105,7 @@ class NetworkClient(ExtendedTcpSocket):
 
         :param letter: The letter that was received
         """
-        print('networkclient received letter: {}'.format(letter))
+        print('network client received letter: {}'.format(letter))
         channel_name = letter['channel']
 
         # do we have receivers in this category

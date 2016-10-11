@@ -22,11 +22,9 @@
 import os
 from enum import unique
 
-import lib.utils as utils
+from base import switches
+from lib import utils
 
-#: global switch for DEBUG MODE on (displays errors and info messages on console) and DEBUG MODE off (stores errors
-# in the error log file)
-DEBUG_MODE = True
 
 def extend(path, *parts):
     """
@@ -34,15 +32,12 @@ def extend(path, *parts):
         if the path is not existing.
     """
     extended = os.path.join(path, *parts)
-    if not os.path.exists(extended):
+    if switches.FILE_EXISTENCE_CHECK and not os.path.exists(extended):
         raise RuntimeError('constructed path {} does not exist'.format(extended))
-    if DEBUG_MODE:
-        used_resources.add(extended)
     return extended
 
 
-#: helpers
-used_resources = set()
+# TODO track used resources by the program
 
 #: base folders (do not directly contain data)
 DATA_FOLDER = extend('.', 'data')
@@ -53,7 +48,9 @@ SCENARIO_FOLDER = extend(DATA_FOLDER, 'scenarios')
 CORE_SCENARIO_FOLDER = extend(SCENARIO_FOLDER, 'core')
 SCENARIO_RULESET_FOLDER = extend(SCENARIO_FOLDER, 'rules')
 SCENARIO_RULESET_STANDARD_FILE = extend(SCENARIO_RULESET_FOLDER, 'standard.rules')
-#: Saved_Scenario_Folder = extend(SCENARIO_FOLDER, 'saved')
+SCENARIO_CLIENT_FOLDER = extend(SCENARIO_FOLDER, 'client')
+SCENARIO_CLIENT_STANDARD_FILE = extend(SCENARIO_CLIENT_FOLDER, 'standard.config')
+# Saved_Scenario_Folder = extend(SCENARIO_FOLDER, 'saved')
 
 #: music related folders
 MUSIC_FOLDER = extend(ARTWORK_FOLDER, 'music')
@@ -163,6 +160,7 @@ class NationProperties:
     DESCRIPTION = 'description'
     CAPITAL_PROVINCE = 'capital_province'
 
+
 #: name of properties file in a zipped scenario file
 SCENARIO_FILE_PROPERTIES = 'scenario-properties'
 #: name of maps file in a zipped scenario file
@@ -171,3 +169,19 @@ SCENARIO_FILE_MAPS = 'maps'
 SCENARIO_FILE_PROVINCES = 'provinces'
 #: name of nations file in a zipped scenario file
 SCENARIO_FILE_NATIONS = 'nations'
+
+
+class ClientConfiguration:
+    """
+    Key names for scenario client configuration properties.
+    """
+    OVERVIEW_WIDTH = 'overview.width'
+
+@unique
+class OverviewMapMode(utils.AutoNumberedEnum):
+    """
+    Overview map modes.
+    """
+    POLITICAL = ()
+    # local server accepts outside connections
+    GEOGRAPHICAL = ()

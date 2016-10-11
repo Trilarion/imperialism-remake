@@ -21,6 +21,7 @@
 
 import PyQt5.QtWidgets as QtWidgets
 
+
 # TODO export new document title when load finished
 
 class BrowserWidget(QtWidgets.QWidget):

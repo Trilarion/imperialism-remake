@@ -27,6 +27,7 @@ import PyQt5.QtGui as QtGui
 import base.constants as constants
 import lib.utils as utils
 
+
 def load_ui_icon(name):
     """
     Loads an icon from a base icon path.
@@ -67,6 +68,7 @@ def log_error(text, exception=None):
     # in case we send to somewhere else also send it to the standard error output (console)
     if sys.stderr is not sys.__stderr__:
         utils.log_write_entry(sys.__stderr__, "ERROR", text, exception)
+
 
 def find_unused_resources():
     """

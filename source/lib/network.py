@@ -46,7 +46,7 @@ class ExtendedTcpSocket(QtCore.QObject):
     #: signal for a received message (only whole messages are emitted)
     received = QtCore.pyqtSignal(object)
 
-    def __init__(self, socket: QtNetwork.QTcpSocket=None):
+    def __init__(self, socket: QtNetwork.QTcpSocket = None):
         """
         Initializes the extended TCP socket. Either wraps around an existing socket or creates its own and resets
         the number of bytes written.
@@ -177,7 +177,7 @@ class ExtendedTcpServer(QtCore.QObject):
         """
         print('accept error {}'.format(socket_error))
 
-    def start(self, port, scope:SCOPE='local'):
+    def start(self, port, scope: SCOPE = 'local'):
         """
             Given a port number and a scope (local/any), starts listening.
 
