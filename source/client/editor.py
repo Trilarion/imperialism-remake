@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
-    know anything about the scenario, we put it in the server module.
+GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
+know anything about the scenario, we put it in the server module.
 """
 
 import math
@@ -109,34 +109,39 @@ class OverviewMap(QtWidgets.QWidget):
         The scenario has changed or the mode has changed. Redraw the overview map.
         """
 
-        # adjust view height for aspect ratio of the scenario map
+        # get number of columns and rows from the scenario
         columns = editor_scenario.scenario[constants.ScenarioProperties.MAP_COLUMNS]
         rows = editor_scenario.scenario[constants.ScenarioProperties.MAP_ROWS]
-        view_height = math.floor(rows / columns * self.view.width())
+
+        # compute tile size (we assume square tiles)
+        tile_size = self.view.width() / columns
+
+        # adjust view height for aspect ratio of the scenario map, assuming square tiles
+        view_height = math.floor(tile_size * rows)
         self.view.setFixedHeight(view_height)
-
-
-        self.scene.setSceneRect(0, 0, columns, rows)
-        self.view.fitInView(self.scene.sceneRect())  # simple and should work
-
-        tile_width = round(1 / (columns + 0.5), 3)
-        tile_height = round(1 / rows, 3)
 
         # remove everything except the tracker from the scene
         for item in self.scene_items:
             self.scene.removeItem(item)
         self.scene_items = []
 
+        # set scene rect
+        self.scene.setSceneRect(0, 0, columns * tile_size, rows * tile_size)
+        self.view.fitInView(self.scene.sceneRect())
+        # by design there should be almost no scaling or anything else
+
+        # hide tracker (if still shown)
+        self.tracker.hide()
+
         if self.mode == constants.OverviewMapMode.POLITICAL:
             # political mode
 
             # fill the ground layer with a neutral color
-            item = self.scene.addRect(0, 0, 1, 1)
+            item = self.scene.addRect(0, 0, columns * tile_size, rows * tile_size)
             item.setBrush(QtCore.Qt.lightGray)
             item.setPen(qt.TRANSPARENT_PEN)
             item.setZValue(0)
             self.scene_items.extend([item])
-            self.tracker.setPos(0, 0)
 
             # draw the nation borders and content (non-smooth)
 
@@ -156,19 +161,19 @@ class OverviewMap(QtWidgets.QWidget):
                 path = QtGui.QPainterPath()
                 for tile in tiles:
                     sx, sy = editor_scenario.scenario.scene_position(*tile)
-                    path.addRect(sx * tile_width, sy * tile_height, tile_width, tile_height)
+                    path.addRect(sx * tile_size, sy * tile_size, tile_size, tile_size)
                 # simply (creates outline)
                 path = path.simplified()
                 # create a brush from the color
                 brush = QtGui.QBrush(color)
-                # item = self.scene.addPath(path, brush=brush)  # will use the default pen for outline
+                item = self.scene.addPath(path, brush=brush)  # will use the default pen for outline
                 item.setZValue(1)
                 self.scene_items.extend([item])
 
         elif self.mode == constants.OverviewMapMode.GEOGRAPHICAL:
 
             # fill the background with sea (blue)
-            item = self.scene.addRect(0, 0, 1, 1)
+            item = self.scene.addRect(0, 0, columns * tile_size, rows * tile_size)
             item.setBrush(QtCore.Qt.blue)
             item.setPen(qt.TRANSPARENT_PEN)
             item.setZValue(0)
@@ -186,14 +191,14 @@ class OverviewMap(QtWidgets.QWidget):
                     if t != 0:
                         # not for sea
                         sx, sy = editor_scenario.scenario.scene_position(column, row)
-                        paths[t].addRect(sx * tile_width, sy * tile_height, tile_width, tile_height)
+                        paths[t].addRect(sx * tile_size, sy * tile_size, tile_size, tile_size)
             colors = {1: QtCore.Qt.green, 2: QtCore.Qt.darkGreen, 3: QtCore.Qt.darkGray, 4: QtCore.Qt.white,
                       5: QtCore.Qt.darkYellow, 6: QtCore.Qt.yellow}
             for t in paths:
                 path = paths[t]
                 path = path.simplified()
                 brush = QtGui.QBrush(colors[t])
-                # item = self.scene.addPath(path, brush=brush, pen=qt.TRANSPARENT_PEN)
+                item = self.scene.addPath(path, brush=brush, pen=qt.TRANSPARENT_PEN)
                 item.setZValue(1)
                 self.scene_items.extend([item])
 
@@ -225,26 +230,37 @@ class OverviewMap(QtWidgets.QWidget):
         if not self.tracker.isVisible():
             return
 
-        # get normalized coordinates and subtract half width and length
+        # get coordinates as scene coordinates and subtract half the tracker width and height
         tracker_rect = self.tracker.rect()
-        x = event.x() / self.view.width() - tracker_rect.width() / 2
-        y = event.y() / self.view.height() - tracker_rect.height() / 2
+        x = event.x() - tracker_rect.width() / 2
+        y = event.y() - tracker_rect.height() / 2
+
         # apply min/max to keep inside the map area
-        x = min(max(x, 0), 1 - tracker_rect.width())
-        y = min(max(y, 0), 1 - tracker_rect.height())
-        # check if they are different
+        x = min(max(x, 0), self.scene.width() - tracker_rect.width())
+        y = min(max(y, 0), self.scene.width() - tracker_rect.height())
+
+        # check if position of tracker should change
         if x != tracker_rect.x() or y != tracker_rect.y():
-            # they are different, update stored bounds, tracker and emit signal
+            # it should, move tracker and emit signal
             tracker_rect.moveTo(x, y)
             self.tracker.setRect(tracker_rect)
+            # normalize position before
+            x = x / self.scene.width()
+            y = y / self.scene.height()
             self.roi_changed.emit(x, y)
 
-    def reset_tracker(self, bounds: QtCore.QRectF):
+    def activate_tracker(self, bounds: QtCore.QRectF):
         """
         The main map tells us how large its view is (in terms of the game map) and where it is currently.
 
         :param bounds:
         """
+        # scale to scene width and height
+        w = self.scene.width()
+        h = self.scene.height()
+        bounds = QtCore.QRectF(bounds.x() * w, bounds.y() * h, bounds.width() * w, bounds.height() * h)
+
+        # set bounds of tracker and show
         self.tracker.setRect(bounds)
         self.tracker.show()
 
@@ -424,6 +440,9 @@ class EditorMap(QtWidgets.QGraphicsView):
                 item.setZValue(1001)
                 self.scene.addItem(item)
 
+        # emit focus changed with -1, -1
+        self.focus_changed.emit(-1, -1)
+
     def visible_rect(self):
         """
         Returns the visible part of the map view relative to the total scene rectangle as a rectangle with normalized
@@ -579,11 +598,11 @@ class NewScenarioWidget(QtWidgets.QWidget):
         # vertical stretch
         widget_layout.addStretch()
 
-        # add the button
+        # add confirmation button
         layout = QtWidgets.QHBoxLayout()
         toolbar = QtWidgets.QToolBar()
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar, self.on_ok))
+        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Create new scenario', toolbar, self.on_ok)
+        toolbar.addAction(a)
         layout.addStretch()
         layout.addWidget(toolbar)
         widget_layout.addLayout(layout)
@@ -630,10 +649,8 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
     Modify general properties of a scenario dialog.
     """
 
-    def __init__(self, scenario):
+    def __init__(self):
         super().__init__()
-        editor_scenario.scenario = scenario
-
         widget_layout = QtWidgets.QVBoxLayout(self)
 
         # title box
@@ -647,7 +664,23 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
 
         widget_layout.addWidget(box)
 
+        # vertical stretch
         widget_layout.addStretch()
+
+        # add confirmation button
+        layout = QtWidgets.QHBoxLayout()
+        toolbar = QtWidgets.QToolBar()
+        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Apply changes', toolbar, self.on_ok)
+        toolbar.addAction(a)
+        layout.addStretch()
+        layout.addWidget(toolbar)
+        widget_layout.addLayout(layout)
+
+    def on_ok(self):
+        """
+        We may have changes to apply.
+        """
+        pass
 
     def close_request(self, parent_widget):
         """
@@ -665,6 +698,27 @@ class NationPropertiesWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
+        widget_layout = QtWidgets.QVBoxLayout(self)
+
+        # vertical stretch
+        widget_layout.addStretch()
+
+        # add confirmation button
+        layout = QtWidgets.QHBoxLayout()
+        toolbar = QtWidgets.QToolBar()
+        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Apply changes', toolbar, self.on_ok)
+        toolbar.addAction(a)
+        layout.addStretch()
+        layout.addWidget(toolbar)
+        widget_layout.addLayout(layout)
+
+
+    def on_ok(self):
+        """
+        We may have changes to apply.
+        """
+        pass
+
 
 class ProvincePropertiesWidget(QtWidgets.QWidget):
     """
@@ -674,6 +728,26 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
+        widget_layout = QtWidgets.QVBoxLayout(self)
+
+        # vertical stretch
+        widget_layout.addStretch()
+
+        # add confirmation button
+        layout = QtWidgets.QHBoxLayout()
+        toolbar = QtWidgets.QToolBar()
+        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Apply changes', toolbar, self.on_ok)
+        toolbar.addAction(a)
+        layout.addStretch()
+        layout.addWidget(toolbar)
+        widget_layout.addLayout(layout)
+
+
+    def on_ok(self):
+        """
+        We may have changes to apply.
+        """
+        pass
 
 class EditorScenario(QtCore.QObject):
     """
@@ -782,15 +856,15 @@ class EditorScreen(QtWidgets.QWidget):
         # info box widget
         self.info_panel = InfoPanel()
 
-        # main map widget
+        # main map and overview map widgets
         self.map = EditorMap()
         self.map.focus_changed.connect(self.info_panel.update_tile_info)
-        editor_scenario.changed.connect(self.map.redraw)
 
-        # mini map widget
         self.overview = OverviewMap()
         self.overview.roi_changed.connect(self.map.set_center_position)
-        editor_scenario.changed.connect(self.overview.redraw)
+
+        # connect to editor_scenario
+        editor_scenario.changed.connect(self.scenario_changed)
 
         # layout of widgets and toolbar
         layout = QtWidgets.QGridLayout(self)
@@ -801,13 +875,27 @@ class EditorScreen(QtWidgets.QWidget):
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
 
+    def scenario_changed(self):
+        """
+        Update the GUI in the right order.
+        """
+
+        # first repaint the map
+        self.map.redraw()
+
+        # repaint the overview
+        self.overview.redraw()
+
+        # show the tracker rectangle in the overview with the right size
+        self.overview.activate_tracker(self.map.visible_rect())
+
     def new_scenario_dialog(self):
         """
         Shows the dialog for creation of a new scenario dialog and connect the "create new scenario" signal.
         """
-        widget = NewScenarioWidget()
-        widget.finished.connect(editor_scenario.create)
-        dialog = graphics.GameDialog(self.client.main_window, widget, title='New Scenario', delete_on_close=True,
+        content_widget = NewScenarioWidget()
+        content_widget.finished.connect(editor_scenario.create)
+        dialog = graphics.GameDialog(self.client.main_window, content_widget, title='New Scenario', delete_on_close=True,
             help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(500, 400))
         dialog.show()
@@ -840,7 +928,7 @@ class EditorScreen(QtWidgets.QWidget):
         """
             Display the modify general properties dialog.
         """
-        content_widget = GeneralPropertiesWidget(editor_scenario.scenario)
+        content_widget = GeneralPropertiesWidget()
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='General Properties',
             delete_on_close=True, help_callback=self.client.show_help_browser,
             close_callback=content_widget.close_request)
