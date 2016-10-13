@@ -714,7 +714,7 @@ class ClockLabel(QtWidgets.QLabel):
         self.setText(text)
 
 
-def create_action(icon, text, parent, trigger_connection=None, toggle_connection=None, checkable=False):
+def create_action(icon, text, parent, trigger_connection=None, toggle_connection=None, checkable=False) -> QtWidgets.QAction:
     """
     Shortcut for creation of an action and wiring.
 
@@ -738,14 +738,14 @@ def create_action(icon, text, parent, trigger_connection=None, toggle_connection
     return action
 
 
-def wrap_in_boxlayout(items, horizontal=True, add_stretch=True):
+def wrap_in_boxlayout(items, horizontal=True, add_stretch=True) -> QtWidgets.QBoxLayout:
     """
     Wraps widgets or layouts in a horizontal or vertical QBoxLayout.
 
-    :param items:
-    :param horizontal:
-    :param add_stretch:
-    :return:
+    :param items: Single widgets or list of widgets to wrap.
+    :param horizontal: If True horizontal box layout, otherwise vertical.
+    :param add_stretch: If True adds a stretch at the end.
+    :return: The box layout.
     """
     if horizontal:
         layout = QtWidgets.QHBoxLayout()
@@ -761,13 +761,13 @@ def wrap_in_boxlayout(items, horizontal=True, add_stretch=True):
     return layout
 
 
-def wrap_in_groupbox(item, title):
+def wrap_in_groupbox(item, title) -> QtWidgets.QGroupBox:
     """
     Shortcut for putting a widget or a layout into a QGroupBox (with a title). Returns the group box.
 
-    :param item:
-    :param title:
-    :return:
+    :param item: Widget or Layout to wrap.
+    :param title: Title string of the group box.
+    :return: Group box
     """
     box = QtWidgets.QGroupBox(title)
     if isinstance(item, QtWidgets.QWidget):

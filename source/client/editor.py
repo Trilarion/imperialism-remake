@@ -130,9 +130,6 @@ class OverviewMap(QtWidgets.QWidget):
         self.view.fitInView(self.scene.sceneRect())
         # by design there should be almost no scaling or anything else
 
-        # hide tracker (if still shown)
-        self.tracker.hide()
-
         if self.mode == constants.OverviewMapMode.POLITICAL:
             # political mode
 
@@ -482,6 +479,17 @@ class EditorMap(QtWidgets.QGraphicsView):
                 self.focus_changed.emit(column, row)
         super().mouseMoveEvent(event)
 
+    def contextMenuEvent(self, event):
+        """
+
+        """
+        menu = QtWidgets.QMenu(self)
+        change_terrain = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), '', self)
+        menu.addAction(change_terrain)
+        change_terrain = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), '', self)
+        menu.addAction(change_terrain)
+        menu.exec(event.globalPos())
+
 
 class InfoPanel(QtWidgets.QWidget):
     """
@@ -508,18 +516,6 @@ class InfoPanel(QtWidgets.QWidget):
 
         layout.addStretch()
 
-        # setup toolbar at the bottom
-        l = QtWidgets.QHBoxLayout()
-        toolbar = QtWidgets.QToolBar()
-        toolbar.setIconSize(QtCore.QSize(20, 20))
-        a = qt.create_action(tools.load_ui_icon('icon.editor.info.terrain.png'), 'Change terrain type', self,
-            self.change_terrain)
-        toolbar.addAction(a)
-        l.addWidget(toolbar)
-        l.addStretch()
-
-        layout.addLayout(l)
-
     def update_tile_info(self, column, row):
         """
         Displays data of a new tile (hovered or clicked in the main map).
@@ -537,12 +533,6 @@ class InfoPanel(QtWidgets.QWidget):
             text += '<br>Province: {}'.format(name)
 
         self.tile_label.setText(text)
-
-    def change_terrain(self):
-        """
-        The change terrain type button has been clicked.
-        """
-        pass
 
 
 class NewScenarioWidget(QtWidgets.QWidget):
@@ -837,6 +827,7 @@ class EditorScreen(QtWidgets.QWidget):
             self.provinces_dialog)
         self.toolbar.addAction(a)
 
+        # spacer
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.toolbar.addWidget(spacer)

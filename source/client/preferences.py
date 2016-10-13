@@ -15,28 +15,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Preferences Widget
+Preferences Widget
 """
 
 import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
 
-import base.constants as constants
-import base.tools as tools
-import client.audio as audio
-import lib.qt as qt
+from base import constants, tools
+from client import audio
+from lib import qt
 
 
 class PreferencesWidget(QtWidgets.QWidget):
     """
-        Content widget for the options/preferences dialog window, based on QTabWidget.
-
-        TODO add option to go back to default settings
+    Content widget for the options/preferences dialog window, based on QTabWidget.
     """
+    # TODO add option to go back to default settings
 
     def __init__(self):
         """
-            Create and add all tabs
+        Create and add all tab
         """
         super().__init__()
 
@@ -44,20 +42,31 @@ class PreferencesWidget(QtWidgets.QWidget):
         toolbar.setIconSize(QtCore.QSize(32, 32))
         action_group = QtWidgets.QActionGroup(toolbar)
 
-        action_preferences_general = qt.create_action(tools.load_ui_icon('icon.preferences.general.png'),
-            'Show general preferences', action_group, toggle_connection=self._toggled_action_preferences_general,
-            checkable=True)
-        toolbar.addAction(action_preferences_general)
+        # general preferences
+        action_general = qt.create_action(tools.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, toggle_connection=self._toggled_action_preferences_general, checkable=True)
+        toolbar.addAction(action_general)
 
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show network preferences',
-                action_group, toggle_connection=self._toggled_action_preferences_network, checkable=True))
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences',
-                action_group, toggle_connection=self._toggled_action_preferences_graphics, checkable=True))
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group,
-                toggle_connection=self._toggled_action_preferences_music, checkable=True))
+        # network preferences
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show network preferences', action_group, toggle_connection=self._toggled_action_preferences_network, checkable=True)
+        toolbar.addAction(a)
+
+        # graphics preferences
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group, toggle_connection=self._toggled_action_preferences_graphics, checkable=True)
+        toolbar.addAction(a)
+
+        # music preferences
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, toggle_connection=self._toggled_action_preferences_music, checkable=True)
+        toolbar.addAction(a)
+
+        # spacer
+        spacer = QtWidgets.QWidget()
+        spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        toolbar.addWidget(spacer)
+
+        # reset preferences
+        a = QtWidgets.QAction(tools.load_ui_icon('icon.preferences.reset.png'), 'Reset preferences', self)
+        a.triggered.connect(self.reset_preferences)
+        toolbar.addAction(a)
 
         self.stacked_layout = QtWidgets.QStackedLayout()
 
@@ -77,30 +86,38 @@ class PreferencesWidget(QtWidgets.QWidget):
         self._layout_widget_preferences_music()
         self._layout_widget_preferences_network()
 
-        # show general preferences
-        action_preferences_general.setChecked(True)
+        # initially show general preferences
+        action_general.setChecked(True)
+
+    def reset_preferences(self):
+        """
+        Shows small confirmation dialog, then resets preferences to factory standard.
+        """
+        answer = QtWidgets.QMessageBox.question(self, 'Preferences', 'Restore standard preferences?',
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+        if answer == QtWidgets.QMessageBox.Yes:
+            pass
 
     def _toggled_action_preferences_general(self, checked):
         """
-            Toolbar button for general preferences toggled.
+        Toolbar button for general preferences toggled.
+
+        :param checked: If True, the button is now checked.
         """
         if checked:
             self.stacked_layout.setCurrentWidget(self.tab_general)
 
     def _layout_widget_preferences_general(self):
         """
-            Create general options widget.
+        Create general options widget.
         """
         tab = QtWidgets.QWidget()
         tab_layout = QtWidgets.QVBoxLayout(tab)
 
-        # reset button
-        button = QtWidgets.QPushButton('Restore defaults')
-        tab_layout.addLayout(qt.wrap_in_boxlayout(button))
-
         # language
-        layout = QtWidgets.QVBoxLayout()
-        tab_layout.addWidget(qt.wrap_in_groupbox(layout, 'Language'))
+        label = QtWidgets.QLabel('Choose')
+        combobox = QtWidgets.QComboBox()
+        tab_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, combobox)), 'User Interface Language'))
 
         # vertical stretch
         tab_layout.addStretch()
@@ -118,7 +135,7 @@ class PreferencesWidget(QtWidgets.QWidget):
 
     def _layout_widget_preferences_graphics(self):
         """
-            Create graphical options widget.
+        Create graphical options widget.
         """
 
         tab = QtWidgets.QWidget()
@@ -138,14 +155,16 @@ class PreferencesWidget(QtWidgets.QWidget):
 
     def _toggled_action_preferences_network(self, checked):
         """
-            Toolbar button for network preferences toggled.
+        Toolbar button for network preferences toggled.
+
+        :param checked:
         """
         if checked:
             self.stacked_layout.setCurrentWidget(self.tab_network)
 
     def _layout_widget_preferences_network(self):
         """
-            Create network options widget.
+        Create network options widget.
         """
         tab = QtWidgets.QWidget()
         tab_layout = QtWidgets.QVBoxLayout(tab)
@@ -156,25 +175,20 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # remote server group box
         l = QtWidgets.QVBoxLayout()
+
         # remote server address
-        l2 = QtWidgets.QHBoxLayout()
-        l2.addWidget(QtWidgets.QLabel('Remote IP address'))
+        label = QtWidgets.QLabel('Remote IP address')
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
-        l2.addWidget(edit)
-        l2.addStretch()
-        l.addLayout(l2)
+        l.addLayout(qt.wrap_in_boxlayout((label, edit)))
+
         # actions toolbar
-        l2 = QtWidgets.QHBoxLayout()
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # connect to remote server
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server',
-                toolbar, checkable=True))
-        l2.addWidget(toolbar)
-        l2.addStretch()
-        l.addLayout(l2)
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server', toolbar, checkable=True)
+        toolbar.addAction(a)
+        l.addLayout(qt.wrap_in_boxlayout(toolbar))
         tab_layout.addWidget(qt.wrap_in_groupbox(l, 'Remote Server'))
 
         # local server group box
@@ -183,29 +197,21 @@ class PreferencesWidget(QtWidgets.QWidget):
         checkbox = QtWidgets.QCheckBox('Accepts incoming connections')
         self._register_check_box(checkbox, constants.Option.LOCALSERVER_OPEN)
         l.addWidget(checkbox)
+
         # alias name edit box
-        l2 = QtWidgets.QHBoxLayout()
-        l2.addWidget(QtWidgets.QLabel('Alias'))
+        label = QtWidgets.QLabel('Alias')
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
-        l2.addWidget(edit)
-        l2.addStretch()
         self._register_line_edit(edit, constants.Option.LOCALSERVER_NAME)
-        l.addLayout(l2)
+        l.addLayout(qt.wrap_in_boxlayout((label, edit)))
+
         # actions toolbar
-        l2 = QtWidgets.QHBoxLayout()
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # show local server monitor
         toolbar.addAction(
             qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor', toolbar))
-        # local server is on/off
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Turn local server on/off', toolbar,
-                checkable=True))
-        l2.addWidget(toolbar)
-        l2.addStretch()
-        l.addLayout(l2)
+        l.addLayout(qt.wrap_in_boxlayout(toolbar))
         tab_layout.addWidget(qt.wrap_in_groupbox(l, 'Local Server'))
 
         # vertical stretch
@@ -217,14 +223,16 @@ class PreferencesWidget(QtWidgets.QWidget):
 
     def _toggled_action_preferences_music(self, checked):
         """
-            Toolbar button for music preferences toggled.
+        Toolbar button for music preferences toggled.
+
+        :param checked:
         """
         if checked:
             self.stacked_layout.setCurrentWidget(self.tab_music)
 
     def _layout_widget_preferences_music(self):
         """
-            Create music options widget.
+        Create music options widget.
         """
         tab = QtWidgets.QWidget()
         tab_layout = QtWidgets.QVBoxLayout(tab)
@@ -258,8 +266,11 @@ class PreferencesWidget(QtWidgets.QWidget):
 
     def _register_check_box(self, checkbox, option):
         """
-            Takes an option identifier (str) where the option value must be True/False and sets a checkbox according
-            to the current value. Stores the checkbox, option pair in a list.
+        Takes an option identifier (str) where the option value must be True/False and sets a checkbox according
+        to the current value. Stores the checkbox, option pair in a list.
+
+        :param checkbox:
+        :param option:
         """
         checkbox.setChecked(tools.get_option(option))
         self._check_boxes.append((checkbox, option))
@@ -267,6 +278,8 @@ class PreferencesWidget(QtWidgets.QWidget):
     def _register_slider(self, slider, option):
         """
 
+        :param slider:
+        :param option:
         """
         slider.setValue(tools.get_option(option))
         self._sliders.append((slider, option))
@@ -274,17 +287,22 @@ class PreferencesWidget(QtWidgets.QWidget):
     def _register_line_edit(self, edit, option):
         """
 
+        :param edit:
+        :param option:
         """
         edit.setText(tools.get_option(option))
         self._line_edits.append((edit, option))
 
     def close_request(self, parent_widget):
         """
-            User wants to close the dialog, check if an option has been changed. If an option has been changed, ask for
-            okay from user and update the options.
+        User wants to close the dialog, check if an option has been changed. If an option has been changed, ask for
+        okay from user and update the options.
 
-            Also react on some updated options (others might only take affect after a restart of the application).
-            We immediately : start/stop music (mute option)
+        Also react on some updated options (others might only take affect after a restart of the application).
+        We immediately : start/stop music (mute option)
+
+        :param parent_widget:
+        :return:
         """
         # check if something was changed
         options_modified = any([box.isChecked() is not tools.get_option(option) for (box, option) in self._check_boxes])
