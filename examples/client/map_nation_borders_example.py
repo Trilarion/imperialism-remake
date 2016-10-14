@@ -18,15 +18,15 @@ if __name__ == '__main__':
     columns = scenario[constants.ScenarioProperties.MAP_COLUMNS]
     rows = scenario[constants.ScenarioProperties.MAP_ROWS]
     map = [0] * (columns * rows)
-    for nation in scenario.all_nations():
-        provinces = scenario.get_provinces_of_nation(nation)
+    for nation in scenario.nations():
+        provinces = scenario.provinces_of_nation(nation)
         for province in provinces:
-            tiles = scenario.get_province_property(province, 'tiles')
+            tiles = scenario.province_property(province, 'tiles')
             for column, row in tiles:
                 map[row * columns + column] = nation
 
     # get outlines
-    for nation in scenario.all_nations():
+    for nation in scenario.nations():
         visited = [False] * (columns * rows)
         for i in range(0, columns * rows):
             column = i % columns
@@ -34,7 +34,7 @@ if __name__ == '__main__':
             visited[i] = True
             if map[i] == nation:
                 for direction in constants.TileDirections:
-                    position = scenario.get_neighbor_position(column, row, direction)
+                    position = scenario.neighbor_position(column, row, direction)
                     if position is None or map[position[0] + columns * position[1]] != nation: # outside is automatically seen as border
                         # now that is interesting we are at a border, follow
                         print(position)

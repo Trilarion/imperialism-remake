@@ -143,17 +143,17 @@ class OverviewMap(QtWidgets.QWidget):
             # draw the nation borders and content (non-smooth)
 
             # for all nations
-            for nation in editor_scenario.scenario.all_nations():
+            for nation in editor_scenario.scenario.nations():
                 # get nation color
-                color_string = editor_scenario.scenario.get_nation_property(nation, 'color')
+                color_string = editor_scenario.scenario.nation_property(nation, 'color')
                 color = QtGui.QColor()
                 color.setNamedColor(color_string)
                 # get all provinces
-                provinces = editor_scenario.scenario.get_provinces_of_nation(nation)
+                provinces = editor_scenario.scenario.provinces_of_nation(nation)
                 tiles = []
                 # get all tiles
                 for province in provinces:
-                    tiles.extend(editor_scenario.scenario.get_province_property(province, 'tiles'))
+                    tiles.extend(editor_scenario.scenario.province_property(province, 'tiles'))
                 # get rectangular path for each tile
                 path = QtGui.QPainterPath()
                 for tile in tiles:
@@ -366,18 +366,18 @@ class EditorMap(QtWidgets.QGraphicsView):
         province_border_pen.setWidth(2)
         nation_border_pen = QtGui.QPen()
         nation_border_pen.setWidth(4)
-        for nation in editor_scenario.scenario.all_nations():
+        for nation in editor_scenario.scenario.nations():
             # get nation color
-            color = editor_scenario.scenario.get_nation_property(nation, 'color')
+            color = editor_scenario.scenario.nation_property(nation, 'color')
             nation_color = QtGui.QColor()
             nation_color.setNamedColor(color)
             # get all provinces
-            provinces = editor_scenario.scenario.get_provinces_of_nation(nation)
+            provinces = editor_scenario.scenario.provinces_of_nation(nation)
             nation_path = QtGui.QPainterPath()
             # get all tiles
             for province in provinces:
                 province_path = QtGui.QPainterPath()
-                tiles = editor_scenario.scenario.get_province_property(province, 'tiles')
+                tiles = editor_scenario.scenario.province_property(province, 'tiles')
                 for column, row in tiles:
                     sx, sy = editor_scenario.scenario.scene_position(column, row)
                     province_path.addRect(sx * self.TILE_SIZE, sy * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
@@ -392,11 +392,11 @@ class EditorMap(QtWidgets.QGraphicsView):
 
         # draw towns and names
         city_pixmap = QtGui.QPixmap(constants.extend(constants.GRAPHICS_MAP_FOLDER, 'city.png'))
-        for nation in editor_scenario.scenario.all_nations():
+        for nation in editor_scenario.scenario.nations():
             # get all provinces of this nation
-            provinces = editor_scenario.scenario.get_provinces_of_nation(nation)
+            provinces = editor_scenario.scenario.provinces_of_nation(nation)
             for province in provinces:
-                column, row = editor_scenario.scenario.get_province_property(province, 'town_location')
+                column, row = editor_scenario.scenario.province_property(province, 'town_location')
                 sx, sy = editor_scenario.scenario.scene_position(column, row)
                 # center city image on center of tile
                 x = (sx + 0.5) * self.TILE_SIZE - city_pixmap.width() / 2
@@ -405,7 +405,7 @@ class EditorMap(QtWidgets.QGraphicsView):
                 item.setOffset(x, y)
                 item.setZValue(6)
                 # display province name below
-                province_name = editor_scenario.scenario.get_province_property(province, 'name')
+                province_name = editor_scenario.scenario.province_property(province, 'name')
                 item = self.scene.addSimpleText(province_name)
                 item.setPen(qt.TRANSPARENT_PEN)
                 item.setBrush(QtGui.QBrush(QtCore.Qt.darkRed))
@@ -525,11 +525,11 @@ class InfoPanel(QtWidgets.QWidget):
         """
         text = 'Position ({}, {})'.format(column, row)
         terrain = editor_scenario.scenario.terrain_at(column, row)
-        terrain_name = editor_scenario.scenario.get_terrain_name(terrain)
+        terrain_name = editor_scenario.scenario.terrain_name(terrain)
         text += '<br>Terrain: {}'.format(terrain_name)
-        province = editor_scenario.scenario.get_province_at(column, row)
+        province = editor_scenario.scenario.province_at(column, row)
         if province is not None:
-            name = editor_scenario.scenario.get_province_property(province, 'name')
+            name = editor_scenario.scenario.province_property(province, 'name')
             text += '<br>Province: {}'.format(name)
 
         self.tile_label.setText(text)
@@ -645,26 +645,13 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
 
         # title box
         # TODO validator for title, no empty string
-        box = QtWidgets.QGroupBox('Title')
-        layout = QtWidgets.QVBoxLayout(box)
         self.edit = QtWidgets.QLineEdit()
         self.edit.setFixedWidth(300)
         self.edit.setText(editor_scenario.scenario[constants.ScenarioProperties.TITLE])
-        layout.addWidget(self.edit)
-
-        widget_layout.addWidget(box)
+        widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Title'), self.edit)))
 
         # vertical stretch
         widget_layout.addStretch()
-
-        # add confirmation button
-        layout = QtWidgets.QHBoxLayout()
-        toolbar = QtWidgets.QToolBar()
-        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Apply changes', toolbar, self.on_ok)
-        toolbar.addAction(a)
-        layout.addStretch()
-        layout.addWidget(toolbar)
-        widget_layout.addLayout(layout)
 
     def on_ok(self):
         """
@@ -674,7 +661,7 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
 
     def close_request(self, parent_widget):
         """
-            Dialog will be closed, save data.
+        Dialog will be closed, save data.
         """
         editor_scenario.scenario[constants.ScenarioProperties.TITLE] = self.edit.text()
         return True
@@ -690,25 +677,73 @@ class NationPropertiesWidget(QtWidgets.QWidget):
 
         widget_layout = QtWidgets.QVBoxLayout(self)
 
+        # toolbar
+        toolbar = QtWidgets.QToolBar()
+        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Add nation', toolbar, self.add_nation)
+        toolbar.addAction(a)
+        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Delete nation', toolbar, self.remove_nation)
+        toolbar.addAction(a)
+        widget_layout.addLayout(qt.wrap_in_boxlayout(toolbar))
+
+        # nation selection combo box
+        label = QtWidgets.QLabel('Choose')
+        combobox = QtWidgets.QComboBox()
+        combobox.setFixedWidth(200)
+
+        # get all nation ids
+        nations = editor_scenario.scenario.nations()
+        # get names for all nations
+        name_of_nation = [(editor_scenario.scenario.nation_property(nation, constants.NationProperties.NAME), nation) for nation in nations]
+        name_of_nation = sorted(name_of_nation)  # by first element, which is the name
+        nation_names, self.nations_sorted = zip(*name_of_nation)
+        combobox.addItems(nation_names)
+        widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, combobox)), 'Nations'))
+
+        # nation info panel
+        layout = QtWidgets.QVBoxLayout()
+
+        # name
+        edit = QtWidgets.QLineEdit()
+        edit.setFixedWidth(300)
+        edit.setText('Test')
+        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Name'), edit)))
+
+        # description
+        edit = QtWidgets.QLineEdit()
+        edit.setFixedWidth(300)
+        edit.setText('Test')
+        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Description'), edit)))
+
+        # color
+        # TODO color and color selection
+
+        # capital province
+        combobox = QtWidgets.QComboBox()
+        combobox.setFixedWidth(300)
+        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Capital'), combobox)))
+
+        # all provinces
+        combobox = QtWidgets.QComboBox()
+        combobox.setFixedWidth(300)
+        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Provinces ({})'.format(4)), combobox)))
+
+        widget_layout.addWidget(qt.wrap_in_groupbox(layout, "Info"))
+
         # vertical stretch
         widget_layout.addStretch()
 
-        # add confirmation button
-        layout = QtWidgets.QHBoxLayout()
-        toolbar = QtWidgets.QToolBar()
-        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Apply changes', toolbar, self.on_ok)
-        toolbar.addAction(a)
-        layout.addStretch()
-        layout.addWidget(toolbar)
-        widget_layout.addLayout(layout)
-
-
-    def on_ok(self):
+    def add_nation(self):
         """
-        We may have changes to apply.
+        Adds a nation.
         """
         pass
 
+
+    def remove_nation(self):
+        """
+        Adds a nation.
+        """
+        pass
 
 class ProvincePropertiesWidget(QtWidgets.QWidget):
     """
@@ -720,22 +755,41 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
 
         widget_layout = QtWidgets.QVBoxLayout(self)
 
+        # toolbar
+        toolbar = QtWidgets.QToolBar()
+        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Add province', toolbar, self.add_province)
+        toolbar.addAction(a)
+        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Delete province', toolbar, self.remove_province)
+        toolbar.addAction(a)
+        widget_layout.addLayout(qt.wrap_in_boxlayout(toolbar))
+
+        # provinces selection combo box
+        label = QtWidgets.QLabel('Choose')
+        combobox = QtWidgets.QComboBox()
+        combobox.setFixedWidth(200)
+
+        # get all province ids
+        provinces = editor_scenario.scenario.provinces()
+        # get names for all provinces
+        name_of_province = [(editor_scenario.scenario.province_property(province, constants.ProvinceProperties.NAME), province) for province in provinces]
+        name_of_province = sorted(name_of_province)  # by first element, which is the name
+        province_names, self.provinces_sorted = zip(*name_of_province)
+        combobox.addItems(province_names)
+        widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, combobox)), 'provinces'))
+
         # vertical stretch
         widget_layout.addStretch()
 
-        # add confirmation button
-        layout = QtWidgets.QHBoxLayout()
-        toolbar = QtWidgets.QToolBar()
-        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Apply changes', toolbar, self.on_ok)
-        toolbar.addAction(a)
-        layout.addStretch()
-        layout.addWidget(toolbar)
-        widget_layout.addLayout(layout)
-
-
-    def on_ok(self):
+    def add_province(self):
         """
-        We may have changes to apply.
+
+        """
+        pass
+
+
+    def remove_province(self):
+        """
+
         """
         pass
 
@@ -917,8 +971,11 @@ class EditorScreen(QtWidgets.QWidget):
 
     def general_properties_dialog(self):
         """
-            Display the modify general properties dialog.
+        Display the modify general properties dialog.
         """
+        if not editor_scenario.scenario:
+            return
+
         content_widget = GeneralPropertiesWidget()
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='General Properties',
             delete_on_close=True, help_callback=self.client.show_help_browser,
@@ -928,8 +985,11 @@ class EditorScreen(QtWidgets.QWidget):
 
     def nations_dialog(self):
         """
-            Show the modify nations dialog.
+        Show the modify nations dialog.
         """
+        if not editor_scenario.scenario:
+            return
+
         content_widget = NationPropertiesWidget()
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Nations', delete_on_close=True,
             help_callback=self.client.show_help_browser)

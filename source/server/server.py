@@ -173,10 +173,9 @@ def scenario_preview(client, message):
     """
     t0 = time.clock()
 
-    scenario = Scenario()
     file_name = message['scenario']  # should be the file name
     # TODO existing? can be loaded?
-    scenario.load(file_name)
+    scenario = Scenario.from_file(file_name)
     print('reading the file took {}s'.format(time.clock() - t0))
 
     preview = {'scenario': file_name}
@@ -189,20 +188,20 @@ def scenario_preview(client, message):
     # some nations properties should be copied
     nations = {}
     nation_copy_keys = [kn.COLOR, kn.NAME, kn.DESCRIPTION]
-    for nation in scenario.all_nations():
+    for nation in scenario.nations():
         nations[nation] = {}
         for key in nation_copy_keys:
-            nations[nation][key] = scenario.get_nation_property(nation, key)
+            nations[nation][key] = scenario.nation_property(nation, key)
     preview['nations'] = nations
 
     # assemble a nations map (-1 means no nation)
     columns = scenario[k.MAP_COLUMNS]
     rows = scenario[k.MAP_ROWS]
     nations_map = [-1] * (columns * rows)
-    for nation_id in scenario.all_nations():
-        provinces = scenario.get_provinces_of_nation(nation_id)
+    for nation_id in scenario.nations():
+        provinces = scenario.provinces_of_nation(nation_id)
         for province in provinces:
-            tiles = scenario.get_province_property(province, 'tiles')
+            tiles = scenario.province_property(province, 'tiles')
             for column, row in tiles:
                 nations_map[row * columns + column] = nation_id
     preview['map'] = nations_map

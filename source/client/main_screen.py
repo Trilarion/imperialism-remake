@@ -1,5 +1,5 @@
 # Imperialism remake
-# Copyright (C) 2015 Trilarion
+# Copyright (C) 2015-16 Trilarion
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    The main game screen.
+The main game screen.
 """
 
 from PyQt5 import QtWidgets

@@ -175,7 +175,7 @@ class Scenario(QtCore.QObject):
         index = row * self._properties[constants.ScenarioProperties.MAP_COLUMNS] + column
         return index
 
-    def get_neighbor_position(self, column, row, direction):
+    def neighbor_position(self, column, row, direction):
         """
             Given a position (column, row) and a direction (see constants.TileDirections) return the position of the
             next neighbour tile in that direction given our staggered tile layout where the second and all other odd
@@ -238,14 +238,14 @@ class Scenario(QtCore.QObject):
             else:
                 return None
 
-    def get_neighbored_tiles(self, column, row):
+    def neighbored_tiles(self, column, row):
         """
-            For all directions, get all neighbored tiles. Just executes get_neighbor_position() for all possible
+            For all directions, get all neighbored tiles. Just executes neighbor_position() for all possible
             TileDirections
         """
         tiles = []
         for direction in constants.TileDirections:
-            tiles.append(self.get_neighbor_position(column, row, direction))
+            tiles.append(self.neighbor_position(column, row, direction))
         return tiles
 
     def __setitem__(self, key, value):
@@ -283,7 +283,7 @@ class Scenario(QtCore.QObject):
         else:
             raise RuntimeError('Unknown province {}.'.format(province))
 
-    def get_province_property(self, province, key):
+    def province_property(self, province, key):
         """
             Gets a province property. One can only obtain properties that have been set before and only for provinces
             that exist.
@@ -301,9 +301,9 @@ class Scenario(QtCore.QObject):
         if province in self._provinces and self.is_valid_position(position):
             self._provinces[province][constants.ProvinceProperties.TILES].append(position)
 
-    def all_nations(self):
+    def nations(self):
         """
-            Return a list of ids for all nations.
+        Return a list of ids for all nations. A nation is just an id for us.
         """
         return self._nations.keys()
 
@@ -326,17 +326,23 @@ class Scenario(QtCore.QObject):
         else:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
-    def get_nation_property(self, nation, key):
+    def nation_property(self, nation, key):
         """
-            Gets a nation property. One can only obtain properties that have been set before and only for nations
-            that exist.
+        Gets a nation property. One can only obtain properties that have been set before and only for nations
+        that exist.
         """
         if nation in self._nations and key in self._nations[nation]:
             return self._nations[nation][key]
         else:
             raise RuntimeError('Unknown nation {} or property {}.'.format(nation, key))
 
-    def get_provinces_of_nation(self, nation):
+    def provinces(self):
+        """
+        Return a list of ids for all provinces. A province is just an id for us.
+        """
+        return self._provinces.keys()
+
+    def provinces_of_nation(self, nation):
         """
             Return ids for all provinces in a nation.
         """
@@ -345,7 +351,7 @@ class Scenario(QtCore.QObject):
         else:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
-    def get_province_at(self, column, row):
+    def province_at(self, column, row):
         """
             Given a position (column, row) returns the province.
 
@@ -366,7 +372,7 @@ class Scenario(QtCore.QObject):
         self._nations[nation][constants.NationProperties.PROVINCES].append(province)
         self._provinces[province][constants.ProvinceProperties.NATION] = nation
 
-    def get_terrain_name(self, terrain):
+    def terrain_name(self, terrain):
         """
             Get a special property from the rules.
 

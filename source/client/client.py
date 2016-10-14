@@ -39,7 +39,7 @@ import version as version
 local_network_client = network.NetworkClient()
 
 from client.editor import EditorScreen
-from client.game_lobby import GameLobbyWidget
+from client.lobby import GameLobbyWidget
 from client.main_screen import GameMainScreen
 from client.preferences import PreferencesWidget
 

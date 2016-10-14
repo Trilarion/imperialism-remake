@@ -147,6 +147,7 @@ class ProvinceProperties:
     Key names of properties of provinces.
     """
     TILES = 'tiles'
+    NAME = 'name'
     NATION = 'nation'
 
 

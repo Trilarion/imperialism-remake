@@ -261,7 +261,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         # set the content from the message
         self.description.setText(message[constants.ScenarioProperties.DESCRIPTION])
 
-        nations = [[message['nations'][key]['name'], key] for key in message['nations']]
+        nations = [(message['nations'][key]['name'], key) for key in message['nations']]
         nations = sorted(nations)  # by first element, which is the name
         nation_names, self.nation_ids = zip(*nations)
         self.nations_list.addItems(nation_names)
@@ -319,10 +319,9 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
 
     def change_map_name(self, nation_name, event):
         """
-           Display of hoovered nation name.
-
-            TODO not looking nice so far. Improve, display somewhere else (not in the scene).
+        Display of hoovered nation name.
         """
+        # TODO not looking nice so far. Improve, display somewhere else (not in the scene).
         self.map_name_item.setText(nation_name)
 
     def map_selected_nation(self, nation_row, event):
