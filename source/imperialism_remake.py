@@ -22,13 +22,17 @@ Start in project root folder and with 'debug' as parameter if wished.
 import os
 import sys
 
-
 def exception_hook(type, value, traceback):
     """
-        PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
+    Use sys.__excepthook__, the standard hook.
     """
     sys.__excepthook__(type, value, traceback)
 
+def fix_pyqt5_exception_eating():
+    """
+    PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
+    """
+    sys.excepthook = exception_hook
 
 def set_start_directory():
     """
@@ -62,8 +66,8 @@ if __name__ == '__main__':
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
 
-    # because PyQt5 eats exceptions in the event thread this workaround
-    sys.excepthook = exception_hook
+    # fix PyQt5 exception eating
+    fix_pyqt5_exception_eating()
 
     # set start directory
     set_start_directory()

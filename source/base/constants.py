@@ -20,7 +20,7 @@
 """
 
 import os
-from enum import unique
+from enum import unique, Enum
 
 from base import switches
 from lib import utils
@@ -109,10 +109,34 @@ Option.MAINWINDOW_FULLSCREEN.default = True  # we start full screen (can be unse
 Option.SOUNDTRACK_MUTE.default = False
 Option.SOUNDTRACK_VOLUME.default = 50
 
-#: predefined channel names for network communication
-CH_SCENARIO_PREVIEW = 'general.scenario.preview'
-CH_CORE_SCENARIO_TITLES = 'general.core.scenarios.titles'
-CH_SYSTEM = 'system'
+@unique
+class C(utils.AutoNumberedEnum):
+    """
+    Predefined channels for network communication.
+    """
+
+    GENERAL = ()
+    CHAT = ()
+    SYSTEM = ()
+    LOBBY = ()
+
+@unique
+class M(utils.AutoNumberedEnum):
+    """
+    Predefined network message types.
+    """
+
+    SYSTEM_SHUTDOWN = ()
+
+    CHAT_SUBSCRIBE = ()
+    CHAT_UNSUBSCRIBE = ()
+    CHAT_LOG = ()
+    CHAT_MESSAGE = ()
+
+    GENERAL_NAME = ()
+
+    LOBBY_SCENARIO_CORE_LIST = ()
+    LOBBY_SCENARIO_PREVIEW = ()
 
 
 class TileDirections(utils.AutoNumberedEnum):

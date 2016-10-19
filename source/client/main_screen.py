@@ -63,7 +63,7 @@ class GameMainScreen(QtWidgets.QWidget):
         action_help.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
         self.toolbar.addAction(action_help)
 
-        action_quit = QtWidgets.QAction(tools.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
+        action_quit = QtWidgets.QAction(tools.load_ui_icon('icon.back_to_startscreen.png'), 'Exit to main menu', self)
         action_quit.triggered.connect(client.switch_to_start_screen)
         self.toolbar.addAction(action_quit)
 

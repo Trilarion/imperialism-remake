@@ -679,9 +679,9 @@ class NationPropertiesWidget(QtWidgets.QWidget):
 
         # toolbar
         toolbar = QtWidgets.QToolBar()
-        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Add nation', toolbar, self.add_nation)
+        a = qt.create_action(tools.load_ui_icon('icon.add.png'), 'Add nation', toolbar, self.add_nation)
         toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Delete nation', toolbar, self.remove_nation)
+        a = qt.create_action(tools.load_ui_icon('icon.delete.png'), 'Remove nation', toolbar, self.remove_nation)
         toolbar.addAction(a)
         widget_layout.addLayout(qt.wrap_in_boxlayout(toolbar))
 
@@ -757,9 +757,9 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
 
         # toolbar
         toolbar = QtWidgets.QToolBar()
-        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Add province', toolbar, self.add_province)
+        a = qt.create_action(tools.load_ui_icon('icon.add.png'), 'Add province', toolbar, self.add_province)
         toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Delete province', toolbar, self.remove_province)
+        a = qt.create_action(tools.load_ui_icon('icon.delete.png'), 'Remove province', toolbar, self.remove_province)
         toolbar.addAction(a)
         widget_layout.addLayout(qt.wrap_in_boxlayout(toolbar))
 
@@ -893,7 +893,7 @@ class EditorScreen(QtWidgets.QWidget):
         a = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Show help', self)
         a.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
         self.toolbar.addAction(a)
-        a = QtWidgets.QAction(tools.load_ui_icon('icon.back.startscreen.png'), 'Exit to main menu', self)
+        a = QtWidgets.QAction(tools.load_ui_icon('icon.back_to_startscreen.png'), 'Exit to main menu', self)
         a.triggered.connect(client.switch_to_start_screen)
         # TODO ask if something is changed we should save.. (you might loose progress)
         self.toolbar.addAction(a)

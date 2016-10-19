@@ -40,7 +40,7 @@ print('start building')
 # set options
 options = {'build_exe': {
     'optimize': 2,
-    'icon': os.path.join('data', 'artwork', 'graphics', 'ui', 'icon.ico'),
+    'icon': os.path.join('data', 'artwork', 'graphics', 'ui', 'window.icon.ico'),
     'compressed': True,
     'include_in_shared_zip': True,
     'include_msvcr': False,

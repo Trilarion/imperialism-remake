@@ -15,10 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Examples for base.network and server.network using ServerProcess
+Examples for base.network and server.network using ServerProcess
 """
-
-import sys
 
 import PyQt5.QtCore as QtCore
 
@@ -36,23 +34,25 @@ def send():
     """
     Client sends a message.
     """
-    client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, receive)
-    client.send(constants.CH_CORE_SCENARIO_TITLES)
+    client.connect_to_channel(constants.C.LOBBY, receive)
+    client.send(constants.C.LOBBY, constants.M.LOBBY_SCENARIO_CORE_LIST)
 
-def receive(client, message):
+def receive(client, channel, action, content):
     """
     Receives the answer.
     """
-    client.disconnect_from_channel(constants.CH_CORE_SCENARIO_TITLES, receive)
-    print('received {}'.format(message))
+    client.disconnect_from_channel(channel, receive)
+    print('received on channel {} with action {} and content {}'.format(channel, action, content))
 
 def send_shutdown():
     """
     Send shutdown message.
     """
-    client.send(constants.CH_SYSTEM, 'shutdown')
+    client.send(constants.C.SYSTEM, constants.M.SYSTEM_SHUTDOWN)
 
 if __name__ == '__main__':
+    imperialism_remake.fix_pyqt5_exception_eating()
+    imperialism_remake.set_start_directory()
 
     # create server process and start it
     server_process = server.ServerProcess()

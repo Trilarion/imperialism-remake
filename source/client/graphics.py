@@ -15,29 +15,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Graphics elements that are dependent on the tools and lib.graphics library, but not on any game specific (constants,
-    scenario or otherwise) logic. Therefore kind of a intermediate abstraction between the fully independent lib.graphics
-    module and the client game specific logic under folder client.
+Graphics elements that are dependent on the tools and lib.graphics library, but not on any game specific (constants,
+scenario or otherwise) logic. Therefore kind of a intermediate abstraction between the fully independent lib.graphics
+module and the client game specific logic under folder client.
 """
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-import base.tools as tools
-import lib.qt as qt
+from base import tools
+from lib import qt
 
 
 class GameDialog(QtWidgets.QWidget):
     """
-        Create a dialog (widget) with many pre-configured properties (modality, title, parent, content,
-        help callback, ...
+    Create a dialog (widget) with many pre-configured properties (modality, title, parent, content, help callback, ...
+    Main property is the custom window frame that allows dragging around (on the title bar).
 
-        Main property is the custom window frame that allows dragging around (on the title bar).
-
-        Reference in stylesheets with 'game-dialog'.
+    Reference it in stylesheets with 'game-dialog'.
     """
 
-    def __init__(self, parent, content, title=None, modal=True, delete_on_close=False, help_callback=None,
-            close_callback=None):
+    def __init__(self, parent, content, title=None, modal=True, delete_on_close=False, help_callback=None, close_callback=None):
         # no frame but a standalone window
         super().__init__(parent, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
 
@@ -94,9 +91,11 @@ class GameDialog(QtWidgets.QWidget):
         self.layout.addWidget(title_bar)
         self.layout.addWidget(content)
 
-    def closeEvent(self, event):
+    def closeEvent(self, event:QtGui.QCloseEvent):
         """
-            To prevent Alt+F4 or other automatic closes.
+        Can be used to prevent Alt+F4 or other automatic closes.
+
+        :param event: The close event
         """
         if self.close_callback and not self.close_callback(self):
             event.ignore()
@@ -104,35 +103,38 @@ class GameDialog(QtWidgets.QWidget):
 
 class MiniMapNationItem(qt.ClickablePathItem):
     """
-        The outline of a nation in any mini map that should be clickable. Has an effect.
+    The outline of a nation in any mini map that should be clickable. Has an effect.
     """
 
-    def __init__(self, path, z_left, z_entered):
+    def __init__(self, path, z_left=1, z_entered=2):
         """
-            Adds a QGraphicsDropShadowEffect when hovering over the item. Otherwise it is just a clickable
-            QGraphicsPathItem.
+        Adds a QGraphicsDropShadowEffect when hovering over the item. Otherwise it is just a clickable QGraphicsPathItem.
         """
         super().__init__(path)
+
         self.z_entered = z_entered
         self.z_left = z_left
+
         self.signaller.entered.connect(self.entered_item)
         self.signaller.left.connect(self.left_item)
+
         self.hover_effect = QtWidgets.QGraphicsDropShadowEffect()
         self.hover_effect.setOffset(4, 4)
         self.setGraphicsEffect(self.hover_effect)
+
         # the graphics effect is enabled initially, disable by calling left_item
         self.left_item()
 
     def entered_item(self):
         """
-            Set z value and enables the hover effect.
+        Set z value and enables the hover effect.
         """
         self.setZValue(self.z_entered)
         self.hover_effect.setEnabled(True)
 
     def left_item(self):
         """
-            Set the z value and disables the hover effect.
+        Set the z value and disables the hover effect.
         """
         self.hover_effect.setEnabled(False)
         self.setZValue(self.z_left)

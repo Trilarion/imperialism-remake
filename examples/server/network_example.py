@@ -34,18 +34,20 @@ def send():
     """
     Client sends a message.
     """
-    client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, receive)
-    client.send(constants.CH_CORE_SCENARIO_TITLES)
+    client.connect_to_channel(constants.C.LOBBY, receive)
+    client.send(constants.C.LOBBY, constants.M.LOBBY_SCENARIO_CORE_LIST)
 
-def receive(client, message):
+def receive(client, channel, action, content):
     """
     Receives the answer.
     """
-    client.disconnect_from_channel(constants.CH_CORE_SCENARIO_TITLES, receive)
-    print('received {}'.format(message))
+    client.disconnect_from_channel(channel, receive)
+    print('received on channel {} with action {} and content {}'.format(channel, action, content))
 
 
 if __name__ == '__main__':
+    imperialism_remake.fix_pyqt5_exception_eating()
+    imperialism_remake.set_start_directory()
 
     app = QtCore.QCoreApplication([])
 

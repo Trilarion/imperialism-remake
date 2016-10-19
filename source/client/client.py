@@ -22,26 +22,22 @@ Starts the client and delivers most of the code responsible for the main client 
 
 from functools import partial
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtGui as QtGui
-import PyQt5.QtWidgets as QtWidgets
-
-import base.constants as constants
-import base.network as network
-import base.tools as tools
-import client.audio as audio
-import client.graphics as graphics
-import lib.qt as qt
-import lib.utils as utils
-import version as version
+from PyQt5 import QtCore, QtGui, QtWidgets
+from base import constants, tools
+import base.network
+from client import audio
+import client.graphics
+from lib import qt, utils
+import version
 
 # TODO like in audio, set the network client singleton somewhere else
-local_network_client = network.NetworkClient()
+local_network_client = base.network.NetworkClient()
 
 from client.editor import EditorScreen
 from client.lobby import GameLobbyWidget
 from client.main_screen import GameMainScreen
 from client.preferences import PreferencesWidget
+from client.server_monitor import ServerMonitorWidget
 
 
 class MapItem(QtCore.QObject):
@@ -167,7 +163,7 @@ class ClientMainWindowWidget(QtWidgets.QWidget):
         # set geometry
         self.setGeometry(tools.get_option(constants.Option.MAINWINDOW_BOUNDS))
         # set icon
-        self.setWindowIcon(tools.load_ui_icon('icon.ico'))
+        self.setWindowIcon(tools.load_ui_icon('window.icon.ico'))
         # set title
         self.setWindowTitle('Imperialism Remake')
 
@@ -196,7 +192,7 @@ class ClientMainWindowWidget(QtWidgets.QWidget):
 
     def change_content_widget(self, widget):
         """
-            Another screen shall be displayed. Exchange the content widget with a new one.
+        Another screen shall be displayed. Exchange the content widget with a new one.
         """
         if self.content:
             self.layout.removeWidget(self.content)
@@ -295,10 +291,10 @@ class Client:
 
             Is invoked when pressing F2.
         """
-        # monitor_widget = ServerMonitorWidget()
-        # dialog = graphics.GameDialog(self.main_window, monitor_widget, delete_on_close=True, title='Server Monitor')
-        # dialog.setFixedSize(QtCore.QSize(800, 600))
-        # dialog.show()
+        monitor_widget = ServerMonitorWidget()
+        dialog = client.graphics.GameDialog(self.main_window, monitor_widget, modal=False, delete_on_close=True, title='Server Monitor', help_callback=self.show_help_browser)
+        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.show()
 
     def switch_to_start_screen(self):
         """
@@ -312,8 +308,7 @@ class Client:
             Shows the game lobby dialog.
         """
         lobby_widget = GameLobbyWidget()
-        dialog = graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby',
-            help_callback=self.show_help_browser)
+        dialog = client.graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby', help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         lobby_widget.single_player_start.connect(partial(self.single_player_start, dialog))
         dialog.show()
@@ -338,7 +333,7 @@ class Client:
             Shows the preferences dialog.
         """
         preferences_widget = PreferencesWidget()
-        dialog = graphics.GameDialog(self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
+        dialog = client.graphics.GameDialog(self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
             help_callback=partial(self.show_help_browser, path=constants.DOCUMENTATION_PREFERENCES_FILE),
             close_callback=preferences_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(800, 600))
@@ -356,7 +351,7 @@ class Client:
         audio.soundtrack_player.stop()
 
         # stop the local server
-        local_network_client.send(constants.CH_SYSTEM, 'shutdown')
+        local_network_client.send(constants.C.SYSTEM, constants.M.SYSTEM_SHUTDOWN)
 
         # close the main window
         self.main_window.close()

@@ -20,6 +20,7 @@ Preferences Widget
 
 import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
+import PyQt5.QtNetwork as QtNetwork
 
 from base import constants, tools
 from client import audio
@@ -193,6 +194,8 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # local server group box
         l = QtWidgets.QVBoxLayout()
+        local_ip = [x.toString() for x in QtNetwork.QNetworkInterface.allAddresses() if not x.isLoopback() and x.protocol() == QtNetwork.QAbstractSocket.IPv4Protocol][0]
+        l.addWidget(QtWidgets.QLabel('Local IP address: {}'.format(local_ip)))
         # accepts incoming connections checkbox
         checkbox = QtWidgets.QCheckBox('Accepts incoming connections')
         self._register_check_box(checkbox, constants.Option.LOCALSERVER_OPEN)

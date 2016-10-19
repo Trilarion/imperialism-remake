@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Game lobby.
+Game lobby. Place for starting/loading games.
 """
 
 from functools import partial
@@ -24,24 +24,22 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
-import base.constants as constants
-import base.tools as tools
+from base import constants, tools
 import client.graphics as graphics
-import lib.qt as qt
-import lib.utils as utils
+from lib import qt, utils
 from client.client import local_network_client
 
 
 class GameLobbyWidget(QtWidgets.QWidget):
     """
-        Content widget for the game lobby.
+    Content widget for the game lobby.
     """
 
     single_player_start = QtCore.pyqtSignal(str, str)
 
     def __init__(self):
         """
-            Create toolbar and invoke pressing of first tab.
+        Create toolbar.
         """
         super().__init__()
 
@@ -52,111 +50,120 @@ class GameLobbyWidget(QtWidgets.QWidget):
         toolbar = QtWidgets.QToolBar()
         action_group = QtWidgets.QActionGroup(toolbar)
 
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario',
-                action_group, toggle_connection=self.toggled_single_player_scenario_selection, checkable=True))
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario',
-                action_group, toggle_connection=self.toggled_single_player_load_scenario, checkable=True))
+        # actions single player new/load
+        a = qt.create_action(tools.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario', action_group, toggle_connection=self.toggled_single_player_scenario_selection, checkable=True)
+        toolbar.addAction(a)
+        a = qt.create_action(tools.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario', action_group, toggle_connection=self.toggled_single_player_load_scenario, checkable=True)
+        toolbar.addAction(a)
 
         toolbar.addSeparator()
 
-        toolbar.addAction(
-            qt.create_action(tools.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group,
-                toggle_connection=self.toggled_server_lobby, checkable=True))
-        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.lobby.multiplayer-game.png'),
-            'Start or continue multiplayer scenario', action_group,
-            toggle_connection=self.toggled_multiplayer_scenario_selection, checkable=True))
+        # actions multi player
+        a = qt.create_action(tools.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group, toggle_connection=self.toggled_server_lobby, checkable=True)
+        toolbar.addAction(a)
+        a = qt.create_action(tools.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario', action_group, toggle_connection=self.toggled_multiplayer_scenario_selection, checkable=True)
+        toolbar.addAction(a)
 
         layout.addWidget(toolbar)
 
-        content = QtWidgets.QWidget()
-        self.content_layout = QtWidgets.QVBoxLayout(content)
-        self.content_layout.setContentsMargins(0, 0, 0, 0)
+        # container widget and layout
+        self.container_widget = QtWidgets.QWidget()
+        self.layout = QtWidgets.QVBoxLayout(self.container_widget)
+        layout.addWidget(self.container_widget)
 
-        layout.addWidget(content)
+        # content widget
+        self.content = None
+
+    def change_content_widget(self, widget):
+        """
+        Another screen shall be displayed. Exchange the content widget with a new one.
+        """
+        if self.content:
+            self.layout.removeWidget(self.content)
+            self.content.deleteLater()
+
+        self.content = widget
+
+        if self.content:
+            self.layout.addWidget(widget)
+
+            # set alignment
+            index = self.layout.indexOf(self.content)
+            item = self.layout.itemAt(index)
+            item.setAlignment(QtCore.Qt.AlignCenter)
 
     def toggled_single_player_scenario_selection(self, checked):
         """
-            Toolbar action switch to single player scenario selection.
-
-            Because of the Action being part of an ActionGroup, this can only be called if before another action was executed.
+        Toolbar action switch to single player scenario selection.
         """
 
         if checked:
-            # create new widget
+            # create single player scenario title selection widget
             widget = SinglePlayerScenarioTitleSelection()
             widget.title_selected.connect(self.single_player_scenario_selection_preview, QtCore.Qt.QueuedConnection)
 
-            # add to layout
-            self.content_layout.addWidget(widget)
-            self.content_layout.itemAt(0).setAlignment(QtCore.Qt.AlignCenter)
-
-    def single_player_scenario_selection_preview(self, scenario_file):
-        """
-            Single player scenario selection, a scenario title was selected, show preview.
-        """
-
-        # remove SinglePlayerScenarioTitleSelection widget
-        item = self.content_layout.takeAt(0)  # QLayoutItem we know it's only one
-        widget = item.widget()  # widget from item
-        widget.setParent(None)  # no parent
-
-        # create new widget
-        widget = SinglePlayerScenarioPreview(scenario_file)
-        widget.nation_selected.connect(partial(self.single_player_start.emit, scenario_file))
-        self.content_layout.addWidget(widget)
+            # change content widget
+            self.change_content_widget(widget)
 
     def toggled_single_player_load_scenario(self, checked):
         """
-            Toolbar action switch to single player load a scenario.
+        Toolbar action switch to single player load a scenario.
         """
 
         if checked:
-
             # noinspection PyCallByClass
-            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario',
-                constants.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[0]
+            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', constants.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[0]
             if file_name:
                 # TODO check that it is a valid single player scenario in play
                 pass
 
     def toggled_server_lobby(self, checked):
         """
-            Toolbar action switch to server lobby.
+        Toolbar action switch to server lobby.
         """
         if checked:
             # create new widget
             widget = ServerLobby()
 
-            # add to layout
-            self.content_layout.addWidget(widget)
-            self.content_layout.itemAt(0).setAlignment(QtCore.Qt.AlignCenter)
+            # change content widget
+            self.change_content_widget(widget)
+
 
     def toggled_multiplayer_scenario_selection(self, checked):
         """
-            Toolbar action switch to multiplayer scenario selection.
+        Toolbar action switch to multiplayer scenario selection.
         """
         if checked:
             pass
 
 
+    def single_player_scenario_selection_preview(self, scenario_file):
+        """
+        Single player scenario selection, a scenario title was selected, show preview.
+        """
+
+        # create single player scenario preview widget
+        widget = SinglePlayerScenarioPreview(scenario_file)
+        widget.nation_selected.connect(partial(self.single_player_start.emit, scenario_file))
+
+        # change content widget
+        self.change_content_widget(widget)
+
+
 class ServerLobby(QtWidgets.QWidget):
     """
-        Server lobby.
+    Server lobby.
     """
 
     def __init__(self):
         super().__init__()
 
-        l1 = QtWidgets.QHBoxLayout(self)
+        layout = QtWidgets.QHBoxLayout(self)
 
-        l2 = QtWidgets.QVBoxLayout()
         edit = QtWidgets.QTextEdit()
         edit.setEnabled(False)
-        box = qt.wrap_in_groupbox(edit, 'Server')
-        box.setFixedSize(200, 150)
-        l2.addWidget(box)
+        server_group = qt.wrap_in_groupbox(edit, 'Server')
+        server_group.setFixedSize(200, 150)
 
         client_list = QtWidgets.QListWidget()
         # list.itemSelectionChanged.connect(self.selection_changed)
@@ -164,30 +171,27 @@ class ServerLobby(QtWidgets.QWidget):
         client_list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         client_list.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         client_list.addItems(['Alf', 'Rolf', 'Marcel'])
-        box = qt.wrap_in_groupbox(client_list, 'Clients')
-        box.setFixedWidth(200)
-        l2.addWidget(box)
+        clients_group = qt.wrap_in_groupbox(client_list, 'Clients')
+        clients_group.setFixedWidth(200)
 
-        l1.addLayout(l2)
+        layout.addLayout(qt.wrap_in_boxlayout((server_group, clients_group), horizontal=False))
 
-        l2 = QtWidgets.QVBoxLayout()
         edit = QtWidgets.QTextEdit()
+        edit.setFixedHeight(800)
         edit.setEnabled(False)
-        l2.addWidget(qt.wrap_in_groupbox(edit, 'Chat log'))
+        chat_log_group = qt.wrap_in_groupbox(edit, 'Chat log')
         edit = QtWidgets.QLineEdit()
-        l2.addWidget(qt.wrap_in_groupbox(edit, 'Chat input'))
+        chat_input_group = qt.wrap_in_groupbox(edit, 'Chat input')
 
-        l1.addLayout(l2)
+        layout.addLayout(qt.wrap_in_boxlayout((chat_log_group, chat_input_group), horizontal=False))
 
 
 class SinglePlayerScenarioPreview(QtWidgets.QWidget):
     """
-        Displays the preview of a single player scenario in the game lobby.
+    Displays the preview of a single player scenario in the game lobby.
 
-        If a nation is selected the nation_selected signal is emitted with the nation name.
+    If a nation is selected the nation_selected signal is emitted with the nation name.
     """
-
-    CH_PREVIEW = 'SP.scenario-selection.preview'
 
     nation_selected = QtCore.pyqtSignal(str)
 
@@ -199,15 +203,14 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         super().__init__()
 
         # add a channel for us
-        local_network_client.connect_to_channel(self.CH_PREVIEW, self.received_preview)
+        local_network_client.connect_to_channel(constants.C.LOBBY, self.received_preview)
 
         # send a message and ask for preview
-        local_network_client.send(constants.CH_SCENARIO_PREVIEW,
-            {'scenario': scenario_file, 'reply-to': self.CH_PREVIEW})
+        local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_SCENARIO_PREVIEW, scenario_file)
 
         self.selected_nation = None
 
-    def received_preview(self, client, message):
+    def received_preview(self, client, channel, action, message):
         """
             Populates the widget after the network reply comes from the server with the preview.
         """
@@ -304,7 +307,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
                         path.addRect(column, row, 1, 1)
             path = path.simplified()
 
-            item = graphics.MiniMapNationItem(path, 1, 2)
+            item = graphics.MiniMapNationItem(path)
             item.signaller.clicked.connect(
                 partial(self.map_selected_nation, utils.index_of_element(nation_names, nation_name)))
             item.signaller.entered.connect(partial(self.change_map_name, nation_name))
@@ -357,9 +360,9 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
 
 class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
     """
-        Displays a widget with all available scenario titles for starting new single player scenarios.
+    Displays a widget with all available scenario titles for starting new single player scenarios.
 
-        If a title is selected, emits the title_selected signal.
+    If a title is selected, emits the title_selected signal.
     """
 
     title_selected = QtCore.pyqtSignal(str)  # make sure to only connect with QtCore.Qt.QueuedConnection to this signal
@@ -373,22 +376,22 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
         QtWidgets.QVBoxLayout(self)  # just set a standard layout
 
         # add a channel for us
-        local_network_client.connect_to_channel(constants.CH_CORE_SCENARIO_TITLES, self.received_titles)
+        local_network_client.connect_to_channel(constants.C.LOBBY, self.received_titles)
 
         # send message and ask for scenario titles
-        local_network_client.send(constants.CH_CORE_SCENARIO_TITLES)
+        local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_SCENARIO_CORE_LIST)
 
-    def received_titles(self, client, message):
+    def received_titles(self, client, channel, action, content):
         """
             Received all available scenario titles as a list together with the file names
             which act as unique identifiers. The list is sorted by title.
         """
 
-        # immediately close the channel, we do not want to get this message twice
-        local_network_client.remove_channel(constants.CH_CORE_SCENARIO_TITLES)
+        # immediately close the channel, we do not want to get this content twice
+        client.remove_channel(channel)
 
-        # unpack message
-        scenario_titles, self.scenario_files = zip(*message['scenarios'])
+        # unpack content
+        scenario_titles, self.scenario_files = zip(*content)
 
         # create list widget
         self.list = QtWidgets.QListWidget()

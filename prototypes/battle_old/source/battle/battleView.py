@@ -60,7 +60,7 @@ class MainQGraphicsScene(QGraphicsScene):
 class BattleView(QObject):
     def __init__(self, battle_window, parent=None):
         super().__init__(parent)
-        self.battleWindow = battle_window  # MainBattleWindow container
+        self.battleWindow = battle_window  # MainBattleWindow container_widget
 
         if len(self.battleWindow.config.errors) != 0:
             # noinspection PyArgumentList

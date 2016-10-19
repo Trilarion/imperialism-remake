@@ -98,6 +98,13 @@ class ExtendedTcpSocket(QtCore.QObject):
         self.socket.connectToHost(host, port)
         self.socket.waitForConnected(2000)
 
+    def is_connected(self):
+        """
+
+        :return: True if it is connected
+        """
+        return self.socket.connected()
+
     def _receive(self):
         """
         Called by the sockets readyRead signal. Not intended for outside use.
