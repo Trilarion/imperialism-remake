@@ -127,6 +127,7 @@ class M(utils.AutoNumberedEnum):
     """
 
     SYSTEM_SHUTDOWN = ()
+    SYSTEM_MONITOR_UPDATE = ()
 
     CHAT_SUBSCRIBE = ()
     CHAT_UNSUBSCRIBE = ()
@@ -138,7 +139,7 @@ class M(utils.AutoNumberedEnum):
     LOBBY_SCENARIO_CORE_LIST = ()
     LOBBY_SCENARIO_PREVIEW = ()
 
-
+@unique
 class TileDirections(utils.AutoNumberedEnum):
     """
     Six directions for six neighbored tiles in clockwise order.
@@ -154,37 +155,39 @@ class TileDirections(utils.AutoNumberedEnum):
         self.default = None
 
 
-class ScenarioProperties:
+@unique
+class ScenarioProperty(utils.AutoNumberedEnum):
     """
-    Key names for general properties of a scenario.
+    Keys for general properties of a scenario.
     """
 
-    TITLE = 'scenario.title'
-    DESCRIPTION = 'scenario.description'
-    MAP_COLUMNS = 'map.columns'
-    MAP_ROWS = 'map.rows'
-    RIVERS = 'rivers'
+    TITLE = ()
+    DESCRIPTION = ()
+    MAP_COLUMNS = ()
+    MAP_ROWS = ()
+    RIVERS = ()
+    RULES = ()
 
-
-class ProvinceProperties:
+@unique
+class NationProperty(utils.AutoNumberedEnum):
     """
-    Key names of properties of provinces.
+    Keys for nation properties of a scenario.
     """
-    TILES = 'tiles'
-    NAME = 'name'
-    NATION = 'nation'
+    PROVINCES = ()
+    COLOR = ()
+    NAME = ()
+    DESCRIPTION = ()
+    CAPITAL_PROVINCE = ()
 
-
-class NationProperties:
+@unique
+class ProvinceProperty(utils.AutoNumberedEnum):
     """
-    Key names for nation properties of a scenario.
+    Keys for properties of provinces.
     """
-    PROVINCES = 'provinces'
-    COLOR = 'color'
-    NAME = 'name'
-    DESCRIPTION = 'description'
-    CAPITAL_PROVINCE = 'capital_province'
-
+    TILES = ()
+    NAME = ()
+    NATION = ()
+    TOWN_LOCATION = ()
 
 #: name of properties file in a zipped scenario file
 SCENARIO_FILE_PROPERTIES = 'scenario-properties'

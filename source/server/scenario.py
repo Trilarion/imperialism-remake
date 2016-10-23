@@ -38,6 +38,11 @@ class Scenario(QtCore.QObject):
     * _nations is a
     * _maps is a dictionary of different maps (terrain, resource)
     * _rules is a dictionary of rules properties
+
+    Notes:
+    * See also constants.ScenarioProperties, constants.NationProperties, constants.ProvinceProperties
+    * Each province has nation id stored.
+    * Each nation has province ids stored.
     """
 
     def __init__(self):
@@ -45,7 +50,7 @@ class Scenario(QtCore.QObject):
         Start with a clean state.
         """
         super().__init__()
-        self._properties = {constants.ScenarioProperties.RIVERS: []}
+        self._properties = {constants.ScenarioProperty.RIVERS: []}
         self._provinces = {}
         self._nations = {}
         self._maps = {}
@@ -71,7 +76,7 @@ class Scenario(QtCore.QObject):
 
         # read rule file
         # TODO how to specify which rules file apply
-        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, scenario._properties['rules'])
+        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, scenario[constants.ScenarioProperty.RULES])
         scenario._rules = utils.read_as_yaml(rule_file)
 
         return scenario
@@ -83,8 +88,8 @@ class Scenario(QtCore.QObject):
         :param columns: Number of columns.
         :param rows: Number of rows.
         """
-        self._properties[constants.ScenarioProperties.MAP_COLUMNS] = columns
-        self._properties[constants.ScenarioProperties.MAP_ROWS] = rows
+        self._properties[constants.ScenarioProperty.MAP_COLUMNS] = columns
+        self._properties[constants.ScenarioProperty.MAP_ROWS] = rows
         number_tiles = columns * rows
         self._maps['terrain'] = [0] * number_tiles
         self._maps['resource'] = [0] * number_tiles
@@ -95,7 +100,7 @@ class Scenario(QtCore.QObject):
             TODO this is inefficient
         """
         river = {'name': name, 'tiles': tiles}
-        self._properties[constants.ScenarioProperties.RIVERS].extend([river])
+        self._properties[constants.ScenarioProperty.RIVERS].extend([river])
 
     def set_terrain_at(self, column, row, terrain):
         """
@@ -116,6 +121,13 @@ class Scenario(QtCore.QObject):
         :return: Terrain value
         """
         return self._maps['terrain'][self._map_index(column, row)]
+
+    def terrain_name(self, terrain):
+        """
+        Get a special property from the rules.
+        """
+        # TODO move this to a special rules class. Only have rules() and setRules() here.
+        return self._rules['terrain.names'][terrain]
 
     def set_resource_at(self, column, row, resource):
         """
@@ -163,8 +175,8 @@ class Scenario(QtCore.QObject):
         """
         row = math.floor(y)
         column = math.floor(x - (row % 2) / 2)
-        if row < 0 or row >= self._properties[constants.ScenarioProperties.MAP_ROWS] or column < 0 or column >= \
-                self._properties[constants.ScenarioProperties.MAP_COLUMNS]:
+        if row < 0 or row >= self._properties[constants.ScenarioProperty.MAP_ROWS] or column < 0 or column >= \
+                self._properties[constants.ScenarioProperty.MAP_COLUMNS]:
             return -1, -1
         return column, row
 
@@ -172,7 +184,7 @@ class Scenario(QtCore.QObject):
         """
             Internal function. Calculates the index in the linear map for a given 2D position (first row, then column)?
         """
-        index = row * self._properties[constants.ScenarioProperties.MAP_COLUMNS] + column
+        index = row * self._properties[constants.ScenarioProperty.MAP_COLUMNS] + column
         return index
 
     def neighbor_position(self, column, row, direction):
@@ -211,13 +223,13 @@ class Scenario(QtCore.QObject):
                 return None
         elif direction is constants.TileDirections.EAST:
             # east
-            if column < self._properties[constants.ScenarioProperties.MAP_COLUMNS] - 1:
+            if column < self._properties[constants.ScenarioProperty.MAP_COLUMNS] - 1:
                 return [column + 1, row]
             else:
                 return None
         elif direction is constants.TileDirections.SOUTH_EAST:
             # south-east
-            if row < self._properties[constants.ScenarioProperties.MAP_ROWS] - 1:
+            if row < self._properties[constants.ScenarioProperty.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column, row + 1]
@@ -228,7 +240,7 @@ class Scenario(QtCore.QObject):
                 return None
         elif direction is constants.TileDirections.SOUTH_WEST:
             # south-west
-            if row < self._properties[constants.ScenarioProperties.MAP_ROWS] - 1:
+            if row < self._properties[constants.ScenarioProperty.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column - 1, row + 1]
@@ -250,38 +262,55 @@ class Scenario(QtCore.QObject):
 
     def __setitem__(self, key, value):
         """
-            Given a key and a value, sets a scenario property.
+        Given a key and a value, sets a scenario property.
+
+        :param key:
+        :param value:
         """
+        if key not in constants.ScenarioProperty.__members__.values():
+            raise RuntimeError('Not a valid ScenarioProperty: {}.'.format(key))
         self._properties[key] = value
 
     def __getitem__(self, key):
         """
-            Given a key, returns a scenario property. One can only obtain properties that have been set before.
-        """
-        if key in self._properties:
-            return self._properties[key]
-        else:
-            raise RuntimeError('Unknown property {}.'.format(key))
+        Given a key, returns a scenario property. One can only obtain properties that have been set before.
 
-    def create_new_province(self):
+        :param key: The key
+        :return: The value
         """
-            Creates a new (nation-less) province and returns the id of it.
+        if key not in self._properties:
+            raise RuntimeError('Unknown property {}.'.format(key))
+        return self._properties[key]
+
+    def add_province(self):
+        """
+        Creates a new (nation-less) province and returns the id of it.
         """
         province = len(self._provinces)  # this always works because we check after loading the integrity of the keys
         # TODO unless we delete provinces, some more checks might be good here (like first non-used)
-        self._provinces[province] = {}
-        self._provinces[province][constants.ProvinceProperties.TILES] = []
-        self._provinces[province][constants.ProvinceProperties.NATION] = None
+        self._provinces[province] = {
+            constants.ProvinceProperty.TILES: [],
+            constants.ProvinceProperty.NATION: None
+        }
         return province
+
+    def remove_province(self, province):
+        """
+
+        :param province:
+        """
+        if province not in self._provinces:
+            raise RuntimeError('Unknown province {}.'.format(province))
 
     def set_province_property(self, province, key, value):
         """
             Sets a province property.
         """
-        if province in self._provinces:
-            self._provinces[province][key] = value
-        else:
+        if province not in self._provinces:
             raise RuntimeError('Unknown province {}.'.format(province))
+        if key not in constants.ProvinceProperty.__members__.values():
+            raise RuntimeError('Not a valid ProvinceProperty: {}.'.format(key))
+        self._provinces[province][key] = value
 
     def province_property(self, province, key):
         """
@@ -299,42 +328,7 @@ class Scenario(QtCore.QObject):
             TODO we should check that this position is not yet in another province (it should be cleared before). fail fast, fail often
         """
         if province in self._provinces and self.is_valid_position(position):
-            self._provinces[province][constants.ProvinceProperties.TILES].append(position)
-
-    def nations(self):
-        """
-        Return a list of ids for all nations. A nation is just an id for us.
-        """
-        return self._nations.keys()
-
-    def create_new_nation(self):
-        """
-            Add a new nation and returns it.
-        """
-        nation = len(self._nations)  # this always gives a new unique number because we check after loading
-        # TODO as long as we do not delete nations, some more checks here might be good
-        self._nations[nation] = {}
-        self._nations[nation][constants.NationProperties.PROVINCES] = []
-        return nation
-
-    def set_nation_property(self, nation, key, value):
-        """
-            Set nation property.
-        """
-        if nation in self._nations:
-            self._nations[nation][key] = value
-        else:
-            raise RuntimeError('Unknown nation {}.'.format(nation))
-
-    def nation_property(self, nation, key):
-        """
-        Gets a nation property. One can only obtain properties that have been set before and only for nations
-        that exist.
-        """
-        if nation in self._nations and key in self._nations[nation]:
-            return self._nations[nation][key]
-        else:
-            raise RuntimeError('Unknown nation {} or property {}.'.format(nation, key))
+            self._provinces[province][constants.ProvinceProperty.TILES].append(position)
 
     def provinces(self):
         """
@@ -347,7 +341,7 @@ class Scenario(QtCore.QObject):
             Return ids for all provinces in a nation.
         """
         if nation in self._nations:
-            return self._nations[nation][constants.NationProperties.PROVINCES]
+            return self._nations[nation][constants.NationProperty.PROVINCES]
         else:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
@@ -359,7 +353,7 @@ class Scenario(QtCore.QObject):
         """
         position = [column, row]
         for province in self._provinces:
-            if position in self._provinces[province][constants.ProvinceProperties.TILES]:
+            if position in self._provinces[province][constants.ProvinceProperty.TILES]:
                 return province
         return None
 
@@ -369,16 +363,65 @@ class Scenario(QtCore.QObject):
         """
         # TODO this is not right yet
         # wire it in both ways
-        self._nations[nation][constants.NationProperties.PROVINCES].append(province)
-        self._provinces[province][constants.ProvinceProperties.NATION] = nation
+        self._nations[nation][constants.NationProperty.PROVINCES].append(province)
+        self._provinces[province][constants.ProvinceProperty.NATION] = nation
 
-    def terrain_name(self, terrain):
+    def nations(self):
         """
-            Get a special property from the rules.
+        Return a list of ids for all nations. A nation is just an id for us.
+        """
+        return self._nations.keys()
 
-            TODO move this to a special rules class. Only have rules() and setRules() here.
+    def add_nation(self):
         """
-        return self._rules['terrain.names'][terrain]
+        Add a new nation and returns it.
+        """
+        nation = len(self._nations)  # this always gives a new unique number because we check after loading
+        # TODO as long as we do not delete nations, some more checks here might be good
+        self._nations[nation] = {
+            constants.NationProperty.PROVINCES: [],
+        }
+        return nation
+
+    def remove_nation(self, nation):
+        """
+        Removes a nation. Call from editor. This can have very far reaching consequences.
+
+        :param nation: nation
+        """
+        if nation not in self._nations:
+            raise RuntimeError('Unknown nation {}.'.format(nation))
+
+        for province in self._nations[nation][constants.NationProperty.PROVINCES]:
+            self.set_province_property(province, constants.ProvinceProperty.NATION, None)
+
+        del self._nations[nation]
+
+    def set_nation_property(self, nation, key, value):
+        """
+        Set nation property.
+
+        :param nation:
+        :param key:
+        :param value:
+        :return:
+        """
+        if nation not in self._nations:
+            raise RuntimeError('Unknown nation {}.'.format(nation))
+        if key not in constants.NationProperty.__members__.values():
+            raise RuntimeError('Not a valid NationProperty: {}.'.format(key))
+
+        self._nations[nation][key] = value
+
+    def nation_property(self, nation, key):
+        """
+        Gets a nation property. One can only obtain properties that have been set before and only for nations
+        that exist.
+        """
+        if nation in self._nations and key in self._nations[nation]:
+            return self._nations[nation][key]
+        else:
+            raise RuntimeError('Unknown nation {} or property {}.'.format(nation, key))
 
     def save(self, file_name):
         """

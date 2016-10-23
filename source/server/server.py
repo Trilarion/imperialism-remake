@@ -23,9 +23,9 @@ import os
 import random
 import sys
 import time
+from datetime import datetime
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtNetwork as QtNetwork
+from PyQt5 import QtCore, QtNetwork
 
 import imperialism_remake
 from base import constants
@@ -35,7 +35,7 @@ import lib.network
 from server.scenario import Scenario
 
 # TODO change this
-from base.constants import ScenarioProperties as k, NationProperties as kn
+from base.constants import ScenarioProperty as k, NationProperty as kn
 
 
 # TODO start this in its own process
@@ -167,7 +167,8 @@ class ServerManager(QtCore.QObject):
             # new chat message from this client, log and distribute
 
             # format message
-            chat_message = '{}: {}'.format(client.name, content)
+            now = datetime.now().strftime('%H:%M:%S')
+            chat_message = '{}: {} - {}'.format(now, client.name, content)
 
             # append to chat log
             self.chat_log.append(chat_message)
@@ -194,6 +195,14 @@ class ServerManager(QtCore.QObject):
             # TODO disconnect all server clients, clean up, ...
             self.server.stop()
             self.shutdown.emit()
+
+        elif action == constants.M.SYSTEM_MONITOR_UPDATE:
+
+            # assemble monitor update
+            update = {
+                'number_connected_clients': len(self.server_clients)
+            }
+            client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE, update)
 
 def general_messages(client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
     """
@@ -286,7 +295,7 @@ def scenario_preview(scenario_file_name):
     for nation_id in scenario.nations():
         provinces = scenario.provinces_of_nation(nation_id)
         for province in provinces:
-            tiles = scenario.province_property(province, 'tiles')
+            tiles = scenario.province_property(province, constants.ProvinceProperty.TILES)
             for column, row in tiles:
                 nations_map[row * columns + column] = nation_id
     preview['map'] = nations_map

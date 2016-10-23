@@ -20,7 +20,6 @@
     Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
 """
 
-# TODO rename to qt
 import os
 from datetime import datetime
 
@@ -695,12 +694,14 @@ class ClockLabel(QtWidgets.QLabel):
         once.
         """
         super().__init__(*args, **kwargs)
+
+        # customize format if desired (https://docs.python.org/3.5/library/datetime.html#strftime-strptime-behavior)
         self.time_format = '%H:%M'
 
         # initial update
         self.update_clock()
 
-        # time for all following updates
+        # create and start timer for all following updates
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_clock)
         self.timer.setInterval(60000)
@@ -708,13 +709,13 @@ class ClockLabel(QtWidgets.QLabel):
 
     def update_clock(self):
         """
-        We get the time and format as hour:minute and update the label text.
+        We get the time, format it and update the label text.
         """
         text = datetime.now().strftime(self.time_format)
         self.setText(text)
 
 
-def create_action(icon, text, parent, trigger_connection=None, toggle_connection=None, checkable=False) -> QtWidgets.QAction:
+def create_action(icon:QtGui.QIcon, text, parent:QtWidgets.QWidget, trigger_connection=None, toggle_connection=None, checkable=False) -> QtWidgets.QAction:
     """
     Shortcut for creation of an action and wiring.
 
@@ -727,7 +728,7 @@ def create_action(icon, text, parent, trigger_connection=None, toggle_connection
     :param trigger_connection:
     :param toggle_connection:
     :param checkable:
-    :return:
+    :return: The action
     """
     action = QtWidgets.QAction(icon, text, parent)
     if trigger_connection is not None:

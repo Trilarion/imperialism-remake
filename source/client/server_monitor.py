@@ -15,39 +15,64 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Monitors the server state and updates it regularly
+Monitors the server state and updates it regularly
 """
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtWidgets as QtWidgets
+from datetime import datetime
 
+from PyQt5 import QtCore, QtWidgets
+
+from base import constants
+import base.network
+from client.client import local_network_client
 
 class ServerMonitorWidget(QtWidgets.QWidget):
     """
-        Displays server stats
+    Displays server stats
     """
 
     def __init__(self):
         super().__init__()
 
-        layout = QtWidgets.QGridLayout(self)
+        self.layout = QtWidgets.QVBoxLayout(self)
 
-        self.status_label = QtWidgets.QLabel()
-        layout.addWidget(self.status_label, 0, 0)
+        self.status = QtWidgets.QLabel('No information yet.')
+        self.layout.addWidget(self.status)
+        self.layout.addStretch()
 
-        # set timer for update
+        local_network_client.connect_to_channel(constants.C.SYSTEM, self.update_monitor)
+
+        # one initial update
+        self.request_update()
+
+        # set timer for following updates
         self.timer = QtCore.QTimer()
-
-        self.timer.timeout.connect(self.update_monitor)
-        self.timer.setInterval(5000)  # update every 5 seconds
+        self.timer.timeout.connect(self.request_update)
+        self.timer.setInterval(10000)
         self.timer.start()
 
-        # and one initial update
-        self.update_monitor()
+    def request_update(self):
+        """
 
-    def update_monitor(self):
         """
-            Regular updates of the server stats
+        local_network_client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE)
+
+    def update_monitor(self, client:base.network.NetworkClient, channel:constants.C, action:constants.M, content):
         """
-        # text = '{} clients'.format(len(server_manager.server_clients))
-        # self.status_label.setText(text)
+        Regular updates of the server stats
+        """
+        # get time and format it
+        now = datetime.now().strftime('%H:%M:%S')
+
+        text = 'Last update: {} - {} connected clients'.format(now, content['number_connected_clients'])
+        self.status.setText(text)
+
+
+    def cleanup(self, parent_widget):
+        """
+        User wants to close the dialog
+
+        :param parent_widget:
+        """
+        local_network_client.disconnect_from_channel(constants.C.SYSTEM, self.request_update)
+        return True

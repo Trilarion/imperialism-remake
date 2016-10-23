@@ -18,7 +18,7 @@
     General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
     to the project.
 """
-import datetime
+from datetime import datetime
 import zipfile
 from enum import Enum
 
@@ -220,8 +220,8 @@ def log_write_entry(writer, prefix, text, exception=None):
     :param text:
     :param exception:
     """
-    now = datetime.datetime.now()
-    header = now.isoformat(" ") + '\t' + prefix + '\t'
+    now = datetime.now().isoformat(' ')
+    header = now + '\t' + prefix + '\t'
 
     print(header + text, end='\r\n', file=writer)
 

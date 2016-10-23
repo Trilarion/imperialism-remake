@@ -312,8 +312,7 @@ class PreferencesWidget(QtWidgets.QWidget):
         # TODO line edits and sliders
 
         if options_modified:
-            answer = QtWidgets.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences',
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
+            answer = QtWidgets.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences', QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
             if answer == QtWidgets.QMessageBox.Yes:
                 # all _check_boxes
                 for (box, option) in self._check_boxes:

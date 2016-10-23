@@ -15,8 +15,8 @@ if __name__ == '__main__':
     scenario.load(constants.extend(constants.CORE_SCENARIO_FOLDER, 'Europe1814.scenario'))
 
     # nation map
-    columns = scenario[constants.ScenarioProperties.MAP_COLUMNS]
-    rows = scenario[constants.ScenarioProperties.MAP_ROWS]
+    columns = scenario[constants.ScenarioProperty.MAP_COLUMNS]
+    rows = scenario[constants.ScenarioProperty.MAP_ROWS]
     map = [0] * (columns * rows)
     for nation in scenario.nations():
         provinces = scenario.provinces_of_nation(nation)

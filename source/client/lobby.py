@@ -257,12 +257,11 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
 
         # add the start button
         toolbar = QtWidgets.QToolBar()
-        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
-            trigger_connection=self.start_scenario_clicked))
+        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar, trigger_connection=self.start_scenario_clicked))
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
         # set the content from the message
-        self.description.setText(message[constants.ScenarioProperties.DESCRIPTION])
+        self.description.setText(message[constants.ScenarioProperty.DESCRIPTION])
 
         nations = [(message['nations'][key]['name'], key) for key in message['nations']]
         nations = sorted(nations)  # by first element, which is the name
@@ -270,8 +269,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.nations_list.addItems(nation_names)
 
         # draw the map
-        columns = message[constants.ScenarioProperties.MAP_COLUMNS]
-        rows = message[constants.ScenarioProperties.MAP_ROWS]
+        columns = message[constants.ScenarioProperty.MAP_COLUMNS]
+        rows = message[constants.ScenarioProperty.MAP_ROWS]
         self.map_scene.setSceneRect(0, 0, columns, rows)
 
         # fill the ground layer with a neutral color
@@ -339,8 +338,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         """
         row = self.nations_list.currentRow()
         nation_id = self.nation_ids[row]
-        self.selected_nation = self.preview['nations'][nation_id][constants.NationProperties.NAME]
-        nation_description = self.preview['nations'][nation_id][constants.NationProperties.DESCRIPTION]
+        self.selected_nation = self.preview['nations'][nation_id][constants.NationProperty.NAME]
+        nation_description = self.preview['nations'][nation_id][constants.NationProperty.DESCRIPTION]
         self.nation_info.setText(nation_description)
 
     def start_scenario_clicked(self):
