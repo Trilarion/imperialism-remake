@@ -63,7 +63,7 @@ class ServerProcess(multiprocessing.Process):
         server_manager = ServerManager()
         server_manager.shutdown.connect(app.quit)
         # noinspection PyCallByClass
-        QtCore.QTimer.singleShot(0, server_manager.start)
+        QtCore.QTimer.singleShot(100, server_manager.start)
 
         # run event loop of app
         app.exec_()
@@ -130,7 +130,7 @@ class ServerManager(QtCore.QObject):
 
         # add some general channels and receivers
         # TODO the receivers should be in another module eventually
-        client.connect_to_channel(constants.C.LOBBY, lobby_messages)
+        client.connect_to_channel(constants.C.LOBBY, self._lobby_messages)
         client.connect_to_channel(constants.C.GENERAL, general_messages)
 
         # TODO only if localhost connection add the system channel
@@ -178,7 +178,6 @@ class ServerManager(QtCore.QObject):
                 if client.subscribed_to_chat:
                     client.send(constants.C.CHAT, constants.M.CHAT_MESSAGE, chat_message)
 
-
     def _system_messages(self, client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
         """
         Handles system messages of a local client to its local server. Not intended for outside use.
@@ -204,6 +203,29 @@ class ServerManager(QtCore.QObject):
             }
             client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE, update)
 
+    def _lobby_messages(self, client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
+        """
+
+        :param client:
+        :param channel:
+        :param action:
+        :param content:
+        """
+        if action == constants.M.LOBBY_SCENARIO_CORE_LIST:
+            # get list of scenarios and send it back
+            scenarios = scenario_core_titles()
+            client.send(channel, action, scenarios)
+
+        elif action == constants.M.LOBBY_SCENARIO_PREVIEW:
+            # get preview and send it back
+            preview = scenario_preview(content)
+            client.send(channel, action, preview)
+
+        elif action == constants.M.LOBBY_CONNECTED_CLIENTS:
+            # get list of connected clients and send it back
+            connected_clients = [c.name for c in self.server_clients]
+            client.send(channel, action, connected_clients)
+
 def general_messages(client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
     """
 
@@ -215,24 +237,6 @@ def general_messages(client:ServerNetworkClient, channel:constants.C, action:con
 
     if action == constants.M.GENERAL_NAME:
         client.name = content
-
-def lobby_messages(client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
-    """
-
-    :param client:
-    :param channel:
-    :param action:
-    :param content:
-    """
-    if action == constants.M.LOBBY_SCENARIO_CORE_LIST:
-        # get list and return
-        scenarios = scenario_core_titles()
-        client.send(channel, action, scenarios)
-
-    elif action == constants.M.LOBBY_SCENARIO_PREVIEW:
-        # get preview and send it
-        preview = scenario_preview(content)
-        client.send(channel, action, preview)
 
 def scenario_core_titles():
     """

@@ -552,7 +552,7 @@ class InfoPanel(QtWidgets.QWidget):
         text += '<br>Terrain: {}'.format(terrain_name)
         province = editor_scenario.scenario.province_at(column, row)
         if province is not None:
-            name = editor_scenario.scenario.province_property(province, 'name')
+            name = editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME)
             text += '<br>Province: {}'.format(name)
 
         self.tile_label.setText(text)
@@ -657,21 +657,38 @@ def get_text(edit: QtWidgets.QLineEdit):
         return edit.placeholderText()
 
 
-class GeneralPropertiesWidget(QtWidgets.QWidget):
+class ScenarioPropertiesWidget(QtWidgets.QWidget):
     """
     Modify general properties of a scenario dialog.
     """
 
+    # TODO same mechanism like for preferences?
     def __init__(self):
         super().__init__()
         widget_layout = QtWidgets.QVBoxLayout(self)
 
-        # title box
+        # title
         # TODO validator for title, no empty string
-        self.edit = QtWidgets.QLineEdit()
-        self.edit.setFixedWidth(300)
-        self.edit.setText(editor_scenario.scenario[constants.ScenarioProperty.TITLE])
-        widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Title'), self.edit)))
+        self.title_edit = QtWidgets.QLineEdit()
+        self.title_edit.setFixedWidth(300)
+        self.title_edit.setText(editor_scenario.scenario[constants.ScenarioProperty.TITLE])
+        widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Title'), self.title_edit)))
+
+        # description
+        self.description_edit = QtWidgets.QLineEdit()
+        self.description_edit.setFixedWidth(300)
+        self.description_edit.setText(editor_scenario.scenario[constants.ScenarioProperty.DESCRIPTION])
+        widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Description'), self.description_edit)))
+
+        # game years
+        range = editor_scenario.scenario[constants.ScenarioProperty.GAME_YEAR_RANGE]
+        self.game_year_from = QtWidgets.QLineEdit()
+        self.game_year_from.setFixedWidth(100)
+        self.game_year_from.setText(str(range[0]))
+        self.game_year_to = QtWidgets.QLineEdit()
+        self.game_year_to.setFixedWidth(100)
+        self.game_year_to.setText(str(range[1]))
+        widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Time range from'), self.game_year_from, QtWidgets.QLabel('to'), self.game_year_to)))
 
         # vertical stretch
         widget_layout.addStretch()
@@ -686,7 +703,9 @@ class GeneralPropertiesWidget(QtWidgets.QWidget):
         """
         Dialog will be closed, save data.
         """
-        editor_scenario.scenario[constants.ScenarioProperty.TITLE] = self.edit.text()
+        editor_scenario.scenario[constants.ScenarioProperty.TITLE] = self.title_edit.text()
+        editor_scenario.scenario[constants.ScenarioProperty.DESCRIPTION] = self.description_edit.text()
+
         return True
 
 
@@ -1006,7 +1025,7 @@ class EditorScreen(QtWidgets.QWidget):
         if not editor_scenario.scenario:
             return
 
-        content_widget = GeneralPropertiesWidget()
+        content_widget = ScenarioPropertiesWidget()
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='General Properties',
             delete_on_close=True, help_callback=self.client.show_help_browser,
             close_callback=content_widget.close_request)

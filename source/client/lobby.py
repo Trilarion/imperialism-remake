@@ -25,6 +25,7 @@ import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
 from base import constants, tools
+import base.network
 import client.graphics as graphics
 from lib import qt, utils
 from client.client import local_network_client
@@ -160,31 +161,81 @@ class ServerLobby(QtWidgets.QWidget):
 
         layout = QtWidgets.QHBoxLayout(self)
 
-        edit = QtWidgets.QTextEdit()
-        edit.setEnabled(False)
-        server_group = qt.wrap_in_groupbox(edit, 'Server')
-        server_group.setFixedSize(200, 150)
-
-        client_list = QtWidgets.QListWidget()
+        self.client_list_widget = QtWidgets.QListWidget()
         # list.itemSelectionChanged.connect(self.selection_changed)
         # list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
-        client_list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        client_list.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
-        client_list.addItems(['Alf', 'Rolf', 'Marcel'])
-        clients_group = qt.wrap_in_groupbox(client_list, 'Clients')
-        clients_group.setFixedWidth(200)
+        self.client_list_widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.client_list_widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.client_list_widget.setFixedWidth(200)
+        layout.addLayout(qt.wrap_in_boxlayout(self.client_list_widget, 'Players'))
 
-        layout.addLayout(qt.wrap_in_boxlayout((server_group, clients_group), horizontal=False))
+        self.chat_log_text_edit = QtWidgets.QTextEdit()
+        self.chat_log_text_edit.setEnabled(False)
+        chat_log_group = qt.wrap_in_groupbox(self.chat_log_text_edit, 'Chat log')
 
-        edit = QtWidgets.QTextEdit()
-        edit.setFixedHeight(800)
-        edit.setEnabled(False)
-        chat_log_group = qt.wrap_in_groupbox(edit, 'Chat log')
-        edit = QtWidgets.QLineEdit()
-        chat_input_group = qt.wrap_in_groupbox(edit, 'Chat input')
+        self.chat_input_edit = QtWidgets.QLineEdit()
+        self.chat_input_edit.returnPressed.connect(self.send_chat_message)
+        chat_input_group = qt.wrap_in_groupbox(self.chat_input_edit, 'Chat input')
+        layout.addLayout(qt.wrap_in_boxlayout((chat_log_group, chat_input_group), horizontal=False, add_stretch=False))
 
-        layout.addLayout(qt.wrap_in_boxlayout((chat_log_group, chat_input_group), horizontal=False))
+        # connection to server
 
+        # chat messages
+        local_network_client.connect_to_channel(constants.C.CHAT, self.receive_chat_messages)
+        local_network_client.send(constants.C.CHAT, constants.M.CHAT_SUBSCRIBE)
+
+        # LOBBY
+        local_network_client.connect_to_channel(constants.C.LOBBY, self.receive_lobby_messages)
+        self.request_updated_client_clist()
+
+        # set timer for connected client updates
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.request_updated_client_clist)
+        self.timer.setInterval(5000)
+        self.timer.start()
+
+
+    def send_chat_message(self):
+        """
+
+        """
+        chat_message = self.chat_input_edit.text()
+        local_network_client.send(constants.C.CHAT, constants.M.CHAT_MESSAGE, chat_message)
+        self.chat_input_edit.setText('')
+
+    def receive_chat_messages(self, client:base.network.NetworkClient, channel:constants.C, action:constants.M, content):
+        """
+
+        """
+        if action == constants.M.CHAT_MESSAGE:
+            self.chat_log_text_edit.append(content)
+
+    def request_updated_client_clist(self):
+        """
+
+        """
+        local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_CONNECTED_CLIENTS)
+
+    def receive_lobby_messages(self, client:base.network.NetworkClient, channel:constants.C, action:constants.M, content):
+        """
+
+        """
+        if action == constants.M.LOBBY_CONNECTED_CLIENTS:
+            self.client_list_widget.clear()
+            self.client_list_widget.addItems(content)
+
+    def cleanup(self, parent_widget):
+        """
+        User wants to close the dialog
+
+        :param parent_widget:
+        """
+        local_network_client.send(constants.C.CHAT, constants.M.CHAT_UNSUBSCRIBE)
+        local_network_client.disconnect_from_channel(constants.C.CHAT, self.receive_chat_messages)
+
+        local_network_client.disconnect_from_channel(constants.C.LOBBY, self.receive_lobby_messages)
+
+        return True
 
 class SinglePlayerScenarioPreview(QtWidgets.QWidget):
     """
@@ -263,7 +314,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         # set the content from the message
         self.description.setText(message[constants.ScenarioProperty.DESCRIPTION])
 
-        nations = [(message['nations'][key]['name'], key) for key in message['nations']]
+        nations = [(message['nations'][key][constants.NationProperty.NAME], key) for key in message['nations']]
         nations = sorted(nations)  # by first element, which is the name
         nation_names, self.nation_ids = zip(*nations)
         self.nations_list.addItems(nation_names)
@@ -290,12 +341,12 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         for nation_id, nation in message['nations'].items():
 
             # get nation color
-            color_string = nation['color']
+            color_string = nation[constants.NationProperty.COLOR]
             color = QtGui.QColor()
             color.setNamedColor(color_string)
 
             # get nation name
-            nation_name = nation['name']
+            nation_name = nation[constants.NationProperty.NAME]
 
             # get nation outline
             path = QtGui.QPainterPath()

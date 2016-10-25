@@ -87,6 +87,7 @@ class Option(utils.AutoNumberedEnum):
     LOCALSERVER_OPEN = ()
     # local server accepts outside connections
     LOCALSERVER_NAME = ()
+    LOCALCLIENT_NAME = ()
     MAINWINDOW_BOUNDS = ()
     MAINWINDOW_MAXIMIZED = ()  # bool
     MAINWINDOW_FULLSCREEN = ()
@@ -104,7 +105,8 @@ Options = Option.__members__  # dictionary of name, Enum-value pairs
 
 #: default values for the Options
 Option.LOCALSERVER_OPEN.default = False
-Option.LOCALSERVER_NAME.default = 'server name'
+Option.LOCALSERVER_NAME.default = 'Alice'
+Option.LOCALCLIENT_NAME.default = 'Bob'
 Option.MAINWINDOW_FULLSCREEN.default = True  # we start full screen (can be unset by the program for some linux desktop environments
 Option.SOUNDTRACK_MUTE.default = False
 Option.SOUNDTRACK_VOLUME.default = 50
@@ -138,6 +140,7 @@ class M(utils.AutoNumberedEnum):
 
     LOBBY_SCENARIO_CORE_LIST = ()
     LOBBY_SCENARIO_PREVIEW = ()
+    LOBBY_CONNECTED_CLIENTS = ()
 
 @unique
 class TileDirections(utils.AutoNumberedEnum):
@@ -167,6 +170,7 @@ class ScenarioProperty(utils.AutoNumberedEnum):
     MAP_ROWS = ()
     RIVERS = ()
     RULES = ()
+    GAME_YEAR_RANGE = ()
 
 @unique
 class NationProperty(utils.AutoNumberedEnum):

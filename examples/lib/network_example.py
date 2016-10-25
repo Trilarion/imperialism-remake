@@ -95,6 +95,7 @@ def server_new_client(client):
     global sclient
     sclient = network.ExtendedTcpSocket(client)
     sclient.received.connect(sclient_received)
+    sclient.error.connect(print)
     log('server has new connection')
 
 def sclient_received(message):
@@ -119,6 +120,7 @@ if __name__ == '__main__':
     client.connected.connect(client_connected)
     client.disconnected.connect(client_disconnected)
     client.received.connect(client_received)
+    client.error.connect(print)
 
     server = network.ExtendedTcpServer()
     server.new_client.connect(server_new_client)

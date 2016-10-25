@@ -352,6 +352,8 @@ class Client:
 
         # stop the local server
         local_network_client.send(constants.C.SYSTEM, constants.M.SYSTEM_SHUTDOWN)
+        # TODO is this okay, is there a better way
+        local_network_client.socket.flush()
 
         # close the main window
         self.main_window.close()
@@ -366,6 +368,9 @@ def local_network_connect():
     print('client tries to connect to server')
     local_network_client.connect_to_host(constants.NETWORK_PORT)
     # TODO what if this is not possible
+
+    # tell name
+    local_network_client.send(constants.C.GENERAL, constants.M.GENERAL_NAME, tools.get_option(constants.Option.LOCALCLIENT_NAME))
 
 
 def start_client():

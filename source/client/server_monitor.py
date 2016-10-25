@@ -67,7 +67,6 @@ class ServerMonitorWidget(QtWidgets.QWidget):
         text = 'Last update: {} - {} connected clients'.format(now, content['number_connected_clients'])
         self.status.setText(text)
 
-
     def cleanup(self, parent_widget):
         """
         User wants to close the dialog

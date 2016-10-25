@@ -25,6 +25,7 @@ import PyQt5.QtNetwork as QtNetwork
 from base import constants, tools
 from client import audio
 from lib import qt
+from client.client import local_network_client
 
 
 class PreferencesWidget(QtWidgets.QWidget):
@@ -170,52 +171,60 @@ class PreferencesWidget(QtWidgets.QWidget):
         tab = QtWidgets.QWidget()
         tab_layout = QtWidgets.QVBoxLayout(tab)
 
-        # status label
-        self.network_status_label = QtWidgets.QLabel('')
-        tab_layout.addWidget(self.network_status_label)
-
-        # remote server group box
-        l = QtWidgets.QVBoxLayout()
-
-        # remote server address
-        label = QtWidgets.QLabel('Remote IP address')
+        # client
+        layout = QtWidgets.QVBoxLayout()
+        if local_network_client.is_connected():
+            peer_address, peer_port = local_network_client.peer_address()
+            status = 'Connected to {}:{}'.format(peer_address.toString(), peer_port)
+        else:
+            status = 'Disconnected'
+        layout.addWidget(QtWidgets.QLabel(status))
+        tab_layout.addWidget(qt.wrap_in_groupbox(layout, 'Client'))
+        # alias name edit box
+        label = QtWidgets.QLabel('Alias')
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
-        l.addLayout(qt.wrap_in_boxlayout((label, edit)))
-
-        # actions toolbar
-        toolbar = QtWidgets.QToolBar()
-        toolbar.setIconSize(QtCore.QSize(24, 24))
-        # connect to remote server
-        a = qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server', toolbar, checkable=True)
-        toolbar.addAction(a)
-        l.addLayout(qt.wrap_in_boxlayout(toolbar))
-        tab_layout.addWidget(qt.wrap_in_groupbox(l, 'Remote Server'))
+        self._register_line_edit(edit, constants.Option.LOCALCLIENT_NAME)
+        layout.addLayout(qt.wrap_in_boxlayout((label, edit)))
 
         # local server group box
-        l = QtWidgets.QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         local_ip = [x.toString() for x in QtNetwork.QNetworkInterface.allAddresses() if not x.isLoopback() and x.protocol() == QtNetwork.QAbstractSocket.IPv4Protocol][0]
-        l.addWidget(QtWidgets.QLabel('Local IP address: {}'.format(local_ip)))
+        layout.addWidget(QtWidgets.QLabel('Local IP address: {}'.format(local_ip)))
         # accepts incoming connections checkbox
         checkbox = QtWidgets.QCheckBox('Accepts incoming connections')
         self._register_check_box(checkbox, constants.Option.LOCALSERVER_OPEN)
-        l.addWidget(checkbox)
-
+        layout.addWidget(checkbox)
         # alias name edit box
         label = QtWidgets.QLabel('Alias')
         edit = QtWidgets.QLineEdit()
         edit.setFixedWidth(300)
         self._register_line_edit(edit, constants.Option.LOCALSERVER_NAME)
-        l.addLayout(qt.wrap_in_boxlayout((label, edit)))
-
+        layout.addLayout(qt.wrap_in_boxlayout((label, edit)))
         # actions toolbar
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # show local server monitor
         toolbar.addAction(
             qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show local server monitor', toolbar))
-        l.addLayout(qt.wrap_in_boxlayout(toolbar))
-        tab_layout.addWidget(qt.wrap_in_groupbox(l, 'Local Server'))
+        layout.addLayout(qt.wrap_in_boxlayout(toolbar))
+        tab_layout.addWidget(qt.wrap_in_groupbox(layout, 'Local Server'))
+
+        # remote server group box
+        layout = QtWidgets.QVBoxLayout()
+        # remote server address
+        label = QtWidgets.QLabel('Remote IP address')
+        edit = QtWidgets.QLineEdit()
+        edit.setFixedWidth(300)
+        layout.addLayout(qt.wrap_in_boxlayout((label, edit)))
+        # actions toolbar
+        toolbar = QtWidgets.QToolBar()
+        toolbar.setIconSize(QtCore.QSize(24, 24))
+        # connect to remote server
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server', toolbar, checkable=True)
+        toolbar.addAction(a)
+        layout.addLayout(qt.wrap_in_boxlayout(toolbar))
+        tab_layout.addWidget(qt.wrap_in_groupbox(layout, 'Remote Server'))
 
         # vertical stretch
         tab_layout.addStretch()

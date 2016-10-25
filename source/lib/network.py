@@ -103,7 +103,7 @@ class ExtendedTcpSocket(QtCore.QObject):
 
         :return: True if it is connected
         """
-        return self.socket.connected()
+        return self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState
 
     def _receive(self):
         """
@@ -112,6 +112,7 @@ class ExtendedTcpSocket(QtCore.QObject):
         Reading is reading of a QByteArray from the TCPSocket, un-compressing and de-serializing.
         """
         while self.socket.bytesAvailable() > 0:
+            print('socket will receive')
             # read a QByteArray using a data stream
             reader = QtCore.QDataStream(self.socket)
             bytearray = QtCore.QByteArray()
@@ -137,6 +138,9 @@ class ExtendedTcpSocket(QtCore.QObject):
 
         :param value: The message to send.
         """
+        if not self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+            raise RuntimeError('Try to send on unconnected socket.')
+
         print('socket send {}'.format(value))
         # serialize value to yaml
         serialized = yaml.dump(value, allow_unicode=True)
@@ -151,6 +155,7 @@ class ExtendedTcpSocket(QtCore.QObject):
         writer = QtCore.QDataStream(self.socket)
         writer.setVersion(QtCore.QDataStream.Qt_5_6)
         writer << bytearray
+
 
     def count_bytes_written(self, bytes):
         """
