@@ -1,7 +1,7 @@
 Imperialism Remake Game Manual
 ===================================
 
-Current version: 0.2.1 (2015-02-15)
+Current version: 0.2.2 (2016-xx-xx)
 
 Contents:
 
@@ -10,6 +10,7 @@ Contents:
 
    tutorial
    ui
+   faq
    about
 
 * :ref:`genindex`

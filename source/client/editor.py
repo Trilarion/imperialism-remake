@@ -731,68 +731,102 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         label = QtWidgets.QLabel('Choose')
         self.nation_combobox = QtWidgets.QComboBox()
         self.nation_combobox.setFixedWidth(200)
-
-        # get all nation ids
-        nations = editor_scenario.scenario.nations()
-        # get names for all nations
-        name_of_nation = [(editor_scenario.scenario.nation_property(nation, constants.NationProperty.NAME), nation) for nation in nations]
-        name_of_nation = sorted(name_of_nation)  # by first element, which is the name
-        nation_names, self.nations = zip(*name_of_nation)
-        self.nation_combobox.addItems(nation_names)
+        self.nation_combobox.currentIndexChanged.connect(self.nation_selected)
         widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, self.nation_combobox)), 'Nations'))
 
         # nation info panel
         layout = QtWidgets.QVBoxLayout()
 
-        # name
-        edit = QtWidgets.QLineEdit()
-        edit.setFixedWidth(300)
-        edit.setText('Test')
-        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Name'), edit)))
-
         # description
-        edit = QtWidgets.QLineEdit()
-        edit.setFixedWidth(300)
-        edit.setText('Test')
-        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Description'), edit)))
+        self.description_edit = QtWidgets.QLineEdit()
+        self.description_edit.setFixedWidth(300)
+        self.description_edit.setText('Test')
+        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Description'), self.description_edit)))
 
         # color
         # TODO color and color selection
 
         # capital province
-        combobox = QtWidgets.QComboBox()
-        combobox.setFixedWidth(300)
-        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Capital'), combobox)))
+        self.capital_province_edit = QtWidgets.QLineEdit()
+        self.capital_province_edit.setFixedWidth(300)
+        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Capital'), self.capital_province_edit)))
 
         # all provinces
-        combobox = QtWidgets.QComboBox()
-        combobox.setFixedWidth(300)
-        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Provinces ({})'.format(4)), combobox)))
+        self.provinces_combobox = QtWidgets.QComboBox()
+        self.provinces_combobox.setFixedWidth(300)
+        self.number_provinces_label = QtWidgets.QLabel()
+        layout.addLayout(qt.wrap_in_boxlayout((self.number_provinces_label, self.provinces_combobox)))
 
         widget_layout.addWidget(qt.wrap_in_groupbox(layout, "Info"))
 
         # vertical stretch
         widget_layout.addStretch()
 
+        # reset content
+        self.reset_content()
+
+    def reset_content(self):
+        """
+        With data.
+
+        """
+        # get all nation ids
+        nations = editor_scenario.scenario.nations()
+        # get names for all nations
+        name_of_nation = [(editor_scenario.scenario.nation_property(nation, constants.NationProperty.NAME), nation) for
+                          nation in nations]
+        if name_of_nation:
+            name_of_nation = sorted(name_of_nation)  # by first element, which is the name
+            nation_names, self.nations = zip(*name_of_nation)
+        else:
+            nation_names = []
+            self.nations = []
+        self.nation_combobox.clear()
+        self.nation_combobox.addItems(nation_names)
+
+    def nation_selected(self, index):
+        """
+
+        """
+        nation = self.nations[index]
+        self.description_edit.setText(editor_scenario.scenario.nation_property(nation, constants.NationProperty.DESCRIPTION))
+
+        province = editor_scenario.scenario.nation_property(nation, constants.NationProperty.CAPITAL_PROVINCE)
+        self.capital_province_edit.setText(editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME))#
+
+        provinces = editor_scenario.scenario.nation_property(nation, constants.NationProperty.PROVINCES)
+        provinces_names = [editor_scenario.scenario.province_property(p, constants.ProvinceProperty.NAME) for p in provinces]
+        self.number_provinces_label.setText('Provinces ({})'.format(len(provinces)))
+        self.provinces_combobox.clear()
+        self.provinces_combobox.addItems(provinces_names)
+
     def add_nation(self):
         """
         Adds a nation.
         """
         name, ok = QtWidgets.QInputDialog.getText(self, 'Add Nation', 'Name')
-
-        print(name, ok)
+        if ok:
+            # TODO what if nation with the same name already exists
+            # TODO check for sanity of name (no special letters, minimal number of letters)
+            nation = editor_scenario.scenario.add_nation()
+            editor_scenario.scenario.set_nation_property(nation, constants.NationProperty.NAME, name)
+            # reset content
+            self.reset_content()
 
 
     def remove_nation(self):
         """
         Removes a nation.
         """
-        row = self.nation_combobox.currentIndex()
+        index = self.nation_combobox.currentIndex()
         name = self.nation_combobox.currentText()
         answer = QtWidgets.QMessageBox.question(self, 'Warning', 'Remove {}'.format(name), QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
         if answer == QtWidgets.QMessageBox.Yes:
-            nation = self.nations[row]
-            editor_scenario.scenario.re
+            nation = self.nations[index]
+            editor_scenario.scenario.remove_nation(nation) # there is no going back on this one
+
+            # reset content
+            self.reset_content()
 
 class ProvincePropertiesWidget(QtWidgets.QWidget):
     """
@@ -814,33 +848,64 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
 
         # provinces selection combo box
         label = QtWidgets.QLabel('Choose')
-        combobox = QtWidgets.QComboBox()
-        combobox.setFixedWidth(200)
+        self.provinces_combobox = QtWidgets.QComboBox()
+        self.provinces_combobox.setFixedWidth(200)
 
-        # get all province ids
-        provinces = editor_scenario.scenario.provinces()
-        # get names for all provinces
-        name_of_province = [(editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME), province) for province in provinces]
-        name_of_province = sorted(name_of_province)  # by first element, which is the name
-        province_names, self.provinces_sorted = zip(*name_of_province)
-        combobox.addItems(province_names)
-        widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, combobox)), 'provinces'))
+        widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, self.provinces_combobox)), 'provinces'))
 
         # vertical stretch
         widget_layout.addStretch()
 
-    def add_province(self):
+        # reset content
+        self.reset_content()
+
+    def reset_content(self):
         """
 
         """
-        pass
+
+        # get all province ids
+        provinces = editor_scenario.scenario.provinces()
+        # get names for all provinces
+        name_of_province = [
+            (editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME), province) for province
+            in provinces]
+        if name_of_province:
+            name_of_province = sorted(name_of_province)  # by first element, which is the name
+            province_names, self.provinces = zip(*name_of_province)
+        else:
+            province_names = []
+            self.provinces = []
+        self.provinces_combobox.addItems(province_names)
+
+    def add_province(self):
+        """
+        Adds a province.
+        """
+        name, ok = QtWidgets.QInputDialog.getText(self, 'Add Province', 'Name')
+        if ok:
+            # TODO what if province with the same name already exists
+            # TODO check for sanity of name (no special letters, minimal number of letters)
+            province = editor_scenario.scenario.add_province()
+            editor_scenario.scenario.set_province_property(province, constants.ProvinceProperty.NAME, name)
+            # reset content
+            self.reset_content()
 
 
     def remove_province(self):
         """
-
+        Removes a province.
         """
-        pass
+        index = self.provinces_combobox.currentIndex()
+        name = self.provinces_combobox.currentText()
+        answer = QtWidgets.QMessageBox.question(self, 'Warning', 'Remove {}'.format(name),
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
+        if answer == QtWidgets.QMessageBox.Yes:
+            province = self.provinces[index]
+            editor_scenario.scenario.remove_province(province)  # there is no going back on this one
+
+            # reset content
+            self.reset_content()
 
 class EditorScenario(QtCore.QObject):
     """
@@ -875,10 +940,10 @@ class EditorScenario(QtCore.QObject):
             properties[constants.ScenarioProperty.MAP_ROWS])
 
         # standard rules
-        self.scenario['rules'] = 'standard.rules'
+        self.scenario[constants.ScenarioProperty.RULES] = 'standard.rules'
         # self.scenario.load_rules()
         # TODO rules as extra?
-        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, self.scenario._properties['rules'])
+        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, self.scenario[constants.ScenarioProperty.RULES])
         self.scenario._rules = utils.read_as_yaml(rule_file)
 
         # emit that everything has changed

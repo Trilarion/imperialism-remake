@@ -28,18 +28,18 @@ client.editor module
     :undoc-members:
     :show-inheritance:
 
-client.game_lobby module
-------------------------
-
-.. automodule:: client.game_lobby
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 client.graphics module
 ----------------------
 
 .. automodule:: client.graphics
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+client.lobby module
+-------------------
+
+.. automodule:: client.lobby
     :members:
     :undoc-members:
     :show-inheritance:

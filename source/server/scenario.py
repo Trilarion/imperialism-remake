@@ -340,6 +340,7 @@ class Scenario(QtCore.QObject):
         """
             Return ids for all provinces in a nation.
         """
+        # TODO not needed, replace
         if nation in self._nations:
             return self._nations[nation][constants.NationProperty.PROVINCES]
         else:
@@ -385,16 +386,18 @@ class Scenario(QtCore.QObject):
 
     def remove_nation(self, nation):
         """
-        Removes a nation. Call from editor. This can have very far reaching consequences.
+        Removes a nation. Call from editor. This has irreversible and very far reaching consequences!
 
         :param nation: nation
         """
         if nation not in self._nations:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
+        # delete refernce to nation in provinces
         for province in self._nations[nation][constants.NationProperty.PROVINCES]:
             self.set_province_property(province, constants.ProvinceProperty.NATION, None)
 
+        # delete nation
         del self._nations[nation]
 
     def set_nation_property(self, nation, key, value):
