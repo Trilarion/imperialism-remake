@@ -151,15 +151,14 @@ class ClientMainWindowWidget(QtWidgets.QWidget):
     """
         The main window (widget) which is the top level window of the application. It can be full screen or not and hold
         a single widget in a margin-less layout.
-
-        TODO should we make this as small as possible, used only once put in Client
     """
+    # TODO should we make this as small as possible, used only once put in Client
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
-            All the necessary initializations. Is shown at the end.
+        All the necessary initializations. Is shown at the end.
         """
-        super().__init__()
+        super().__init__(*args, **kwargs)
         # set geometry
         self.setGeometry(tools.get_option(constants.Option.MAINWINDOW_BOUNDS))
         # set icon

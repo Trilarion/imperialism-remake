@@ -38,11 +38,11 @@ class GameLobbyWidget(QtWidgets.QWidget):
 
     single_player_start = QtCore.pyqtSignal(str, str)
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Create toolbar.
         """
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -129,14 +129,12 @@ class GameLobbyWidget(QtWidgets.QWidget):
             # change content widget
             self.change_content_widget(widget)
 
-
     def toggled_multiplayer_scenario_selection(self, checked):
         """
         Toolbar action switch to multiplayer scenario selection.
         """
         if checked:
             pass
-
 
     def single_player_scenario_selection_preview(self, scenario_file):
         """
@@ -156,8 +154,8 @@ class ServerLobby(QtWidgets.QWidget):
     Server lobby.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         layout = QtWidgets.QHBoxLayout(self)
 
@@ -186,39 +184,48 @@ class ServerLobby(QtWidgets.QWidget):
 
         # LOBBY
         local_network_client.connect_to_channel(constants.C.LOBBY, self.receive_lobby_messages)
-        self.request_updated_client_clist()
+        self.request_updated_client_list()
 
         # set timer for connected client updates
         self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.request_updated_client_clist)
+        self.timer.timeout.connect(self.request_updated_client_list)
         self.timer.setInterval(5000)
         self.timer.start()
 
-
     def send_chat_message(self):
         """
-
+        Sends a chat message.
         """
         chat_message = self.chat_input_edit.text()
         local_network_client.send(constants.C.CHAT, constants.M.CHAT_MESSAGE, chat_message)
         self.chat_input_edit.setText('')
 
-    def receive_chat_messages(self, client:base.network.NetworkClient, channel:constants.C, action:constants.M, content):
+    def receive_chat_messages(self, client: base.network.NetworkClient, channel: constants.C, action: constants.M, content):
         """
+        Receives a chat message. Adds it to the chat log.
 
+        :param client:
+        :param channel:
+        :param action:
+        :param content:
         """
         if action == constants.M.CHAT_MESSAGE:
             self.chat_log_text_edit.append(content)
 
-    def request_updated_client_clist(self):
+    def request_updated_client_list(self):
         """
-
+        Sends a request to get an updated connected client list.
         """
         local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_CONNECTED_CLIENTS)
 
-    def receive_lobby_messages(self, client:base.network.NetworkClient, channel:constants.C, action:constants.M, content):
+    def receive_lobby_messages(self, client: base.network.NetworkClient, channel: constants.C, action: constants.M, content):
         """
+        Handles all received lobby messages.
 
+        :param client:
+        :param channel:
+        :param action:
+        :param content:
         """
         if action == constants.M.LOBBY_CONNECTED_CLIENTS:
             self.client_list_widget.clear()

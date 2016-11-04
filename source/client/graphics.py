@@ -91,7 +91,7 @@ class GameDialog(QtWidgets.QWidget):
         self.layout.addWidget(title_bar)
         self.layout.addWidget(content)
 
-    def closeEvent(self, event:QtGui.QCloseEvent):
+    def closeEvent(self, event: QtGui.QCloseEvent):
         """
         Can be used to prevent Alt+F4 or other automatic closes.
 

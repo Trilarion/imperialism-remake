@@ -715,7 +715,7 @@ class ClockLabel(QtWidgets.QLabel):
         self.setText(text)
 
 
-def create_action(icon:QtGui.QIcon, text, parent:QtWidgets.QWidget, trigger_connection=None, toggle_connection=None, checkable=False) -> QtWidgets.QAction:
+def create_action(icon: QtGui.QIcon, text, parent: QtWidgets.QWidget, trigger_connection=None, toggle_connection=None, checkable=False) -> QtWidgets.QAction:
     """
     Shortcut for creation of an action and wiring.
 

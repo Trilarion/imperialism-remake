@@ -20,7 +20,7 @@
 """
 
 import os
-from enum import unique, Enum
+from enum import unique
 
 from base import switches
 from lib import utils

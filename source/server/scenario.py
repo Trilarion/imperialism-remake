@@ -296,11 +296,19 @@ class Scenario(QtCore.QObject):
 
     def remove_province(self, province):
         """
+        Removes a province. Call from editor. This has irreversible and very far reaching consequences.
 
-        :param province:
+        :param province: Province
         """
         if province not in self._provinces:
             raise RuntimeError('Unknown province {}.'.format(province))
+
+        # delete reference to province in nation
+        nation = self._provinces[province][constants.ProvinceProperty.NATION]
+        self._nations[nation][constants.NationProperty.PROVINCES].remove(province)
+
+        # delete province
+        del self._provinces[province]
 
     def set_province_property(self, province, key, value):
         """
@@ -324,9 +332,13 @@ class Scenario(QtCore.QObject):
 
     def add_province_map_tile(self, province, position):
         """
-            Adds a position to a province.
-            TODO we should check that this position is not yet in another province (it should be cleared before). fail fast, fail often
+        Adds a position to a province.
+
+        :param province:
+        :param position:
+        :return:
         """
+        # TODO TODO we should check that this position is not yet in another province (it should be cleared before). fail fast, fail often
         if province in self._provinces and self.is_valid_position(position):
             self._provinces[province][constants.ProvinceProperty.TILES].append(position)
 
@@ -348,10 +360,13 @@ class Scenario(QtCore.QObject):
 
     def province_at(self, column, row):
         """
-            Given a position (column, row) returns the province.
+        Given a position (column, row) returns the province.
 
-            TODO speed up by having a reference in the map. (see also programmers.SE question)
+        :param column: Map column
+        :param row: Map row
+        :return: Province
         """
+        #  TODO speed up by having a reference in the map. (see also programmers.SE question)
         position = [column, row]
         for province in self._provinces:
             if position in self._provinces[province][constants.ProvinceProperty.TILES]:
@@ -386,14 +401,14 @@ class Scenario(QtCore.QObject):
 
     def remove_nation(self, nation):
         """
-        Removes a nation. Call from editor. This has irreversible and very far reaching consequences!
+        Removes a nation. Call from editor. This has irreversible and very far reaching consequences.
 
-        :param nation: nation
+        :param nation: Nation
         """
         if nation not in self._nations:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
-        # delete refernce to nation in provinces
+        # delete reference to nation in provinces
         for province in self._nations[nation][constants.NationProperty.PROVINCES]:
             self.set_province_property(province, constants.ProvinceProperty.NATION, None)
 

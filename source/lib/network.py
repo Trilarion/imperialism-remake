@@ -156,7 +156,6 @@ class ExtendedTcpSocket(QtCore.QObject):
         writer.setVersion(QtCore.QDataStream.Qt_5_6)
         writer << bytearray
 
-
     def count_bytes_written(self, bytes):
         """
         Called by the sockets bytesWritten signal. Not intended for outside use.

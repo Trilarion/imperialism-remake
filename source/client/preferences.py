@@ -32,13 +32,12 @@ class PreferencesWidget(QtWidgets.QWidget):
     """
     Content widget for the options/preferences dialog window, based on QTabWidget.
     """
-    # TODO add option to go back to default settings
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Create and add all tab
         """
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(32, 32))

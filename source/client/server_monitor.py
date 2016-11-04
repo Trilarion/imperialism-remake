@@ -31,8 +31,8 @@ class ServerMonitorWidget(QtWidgets.QWidget):
     Displays server stats
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.layout = QtWidgets.QVBoxLayout(self)
 
@@ -43,21 +43,21 @@ class ServerMonitorWidget(QtWidgets.QWidget):
         local_network_client.connect_to_channel(constants.C.SYSTEM, self.update_monitor)
 
         # one initial update
-        self.request_update()
+        self.request_monitor_update()
 
         # set timer for following updates
         self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.request_update)
+        self.timer.timeout.connect(self.request_monitor_update)
         self.timer.setInterval(10000)
         self.timer.start()
 
-    def request_update(self):
+    def request_monitor_update(self):
         """
-
+        Sends a request for an update of the system monitor.
         """
         local_network_client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE)
 
-    def update_monitor(self, client:base.network.NetworkClient, channel:constants.C, action:constants.M, content):
+    def update_monitor(self, client: base.network.NetworkClient, channel: constants.C, action: constants.M, content):
         """
         Regular updates of the server stats
         """
@@ -73,5 +73,5 @@ class ServerMonitorWidget(QtWidgets.QWidget):
 
         :param parent_widget:
         """
-        local_network_client.disconnect_from_channel(constants.C.SYSTEM, self.request_update)
+        local_network_client.disconnect_from_channel(constants.C.SYSTEM, self.request_monitor_update)
         return True

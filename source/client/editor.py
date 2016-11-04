@@ -46,11 +46,11 @@ class OverviewMap(QtWidgets.QWidget):
     #: signal, emitted if the user clicks somewhere in the mini map and the ROI rectangle changes as a result, sends the normalized x and y position of the center of the new ROI
     roi_changed = QtCore.pyqtSignal(float, float)
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Sets up the graphics view, the toolbar and the tracker rectangle.
         """
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.setObjectName('mini-map-widget')
 
         layout = QtWidgets.QVBoxLayout(self)
@@ -270,6 +270,15 @@ class EditorMap(QtWidgets.QGraphicsView):
 
     #: signal, emitted if the tile at the mouse pointer (focus) changes
     focus_changed = QtCore.pyqtSignal(int, int)
+
+    #: signal, emitted if the change terrain context menu action is called on a terrain
+    change_terrain = QtCore.pyqtSignal(int, int)
+
+    #: signal, emitted if a province info is requested
+    province_info = QtCore.pyqtSignal(int)
+
+    #: signal, emitted if a nation info is requested
+    nation_info = QtCore.pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -493,26 +502,53 @@ class EditorMap(QtWidgets.QGraphicsView):
         menu = QtWidgets.QMenu(self)
 
         # change terrain
-        a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain.png'), 'Set terrain', self, partial(self.change_terrain, column, row))
+        a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain.png'), 'Set terrain', self, partial(self.change_terrain.emit, column, row))
         menu.addAction(a)
 
+        # is there a province
+        province = editor_scenario.scenario.province_at(column, row)
+        if province:
+            a = qt.create_action(tools.load_ui_icon('icon.editor.province_info.png'), 'Province info', self, partial(self.province_info.emit, province))
+            menu.addAction(a)
+
+            # is there also nation
+            nation = editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NATION)
+            if nation:
+                a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Nation info', self, partial(self.nation_info.emit, nation))
+                menu.addAction(a)
 
         menu.exec(event.globalPos())
 
-    def change_terrain(self, column, row):
-        """
 
-        :param column:
-        :param row:
-        """
-        pass
+class ChangeTerrainWidget(QtWidgets.QGraphicsView):
+    """
 
+    """
 
-class ChangeTerrainWidget(QtWidgets.QWidget):
+    #: signal, if emitted a new terrain has been chosen
+    terrain_selected = QtCore.pyqtSignal(int)
 
-    def __init__(self):
+    def __init__(self, column, row):
         super().__init__()
 
+        self.scene = QtWidgets.QGraphicsScene()
+        self.setScene(self.scene)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+        # TODO see EditorMap redraw
+        brushes = {0: QtGui.QBrush(QtGui.QColor(64, 64, 255)), 1: QtGui.QBrush(QtGui.QColor(64, 255, 64)),
+                   2: QtGui.QBrush(QtGui.QColor(64, 255, 64)), 3: QtGui.QBrush(QtGui.QColor(64, 255, 64)),
+                   4: QtGui.QBrush(QtGui.QColor(222, 222, 222)), 5: QtGui.QBrush(QtGui.QColor(0, 128, 0)),
+                   6: QtGui.QBrush(QtGui.QColor(222, 222, 0))}
+
+        # TODO hardcore tile size somewhere else (and a bit less hard)
+        self.TILE_SIZE = 80
+
+        for i in range(0, 6):
+            y = i // 4
+            x = i % 4
+            self.scene.addRect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE, brush=brushes[i], pen=qt.TRANSPARENT_PEN)
 
 class InfoPanel(QtWidgets.QWidget):
     """
@@ -566,11 +602,11 @@ class NewScenarioWidget(QtWidgets.QWidget):
     #: signal, emitted if this dialog finishes successfully and transmits parameters in the dictionary
     finished = QtCore.pyqtSignal(dict)
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Sets up all the input elements of the create new scenario dialog.
         """
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         self.parameters = {}
         widget_layout = QtWidgets.QVBoxLayout(self)
@@ -663,8 +699,8 @@ class ScenarioPropertiesWidget(QtWidgets.QWidget):
     """
 
     # TODO same mechanism like for preferences?
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         widget_layout = QtWidgets.QVBoxLayout(self)
 
         # title
@@ -681,13 +717,13 @@ class ScenarioPropertiesWidget(QtWidgets.QWidget):
         widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Description'), self.description_edit)))
 
         # game years
-        range = editor_scenario.scenario[constants.ScenarioProperty.GAME_YEAR_RANGE]
+        game_range = editor_scenario.scenario[constants.ScenarioProperty.GAME_YEAR_RANGE]
         self.game_year_from = QtWidgets.QLineEdit()
         self.game_year_from.setFixedWidth(100)
-        self.game_year_from.setText(str(range[0]))
+        self.game_year_from.setText(str(game_range[0]))
         self.game_year_to = QtWidgets.QLineEdit()
         self.game_year_to.setFixedWidth(100)
-        self.game_year_to.setText(str(range[1]))
+        self.game_year_to.setText(str(game_range[1]))
         widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Time range from'), self.game_year_from, QtWidgets.QLabel('to'), self.game_year_to)))
 
         # vertical stretch
@@ -714,7 +750,7 @@ class NationPropertiesWidget(QtWidgets.QWidget):
     Modify nation properties dialog
     """
 
-    def __init__(self):
+    def __init__(self, initial_nation=None):
         super().__init__()
 
         widget_layout = QtWidgets.QVBoxLayout(self)
@@ -757,13 +793,18 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         self.number_provinces_label = QtWidgets.QLabel()
         layout.addLayout(qt.wrap_in_boxlayout((self.number_provinces_label, self.provinces_combobox)))
 
-        widget_layout.addWidget(qt.wrap_in_groupbox(layout, "Info"))
+        widget_layout.addWidget(qt.wrap_in_groupbox(layout, 'Info'))
 
         # vertical stretch
         widget_layout.addStretch()
 
         # reset content
         self.reset_content()
+
+        # select initial nation if given
+        if initial_nation:
+            index = utils.index_of_element(self.nations, initial_nation)
+            self.nation_combobox.setCurrentIndex(index)
 
     def reset_content(self):
         """
@@ -786,13 +827,15 @@ class NationPropertiesWidget(QtWidgets.QWidget):
 
     def nation_selected(self, index):
         """
+        A nation is selected
 
+        :param index:
         """
         nation = self.nations[index]
         self.description_edit.setText(editor_scenario.scenario.nation_property(nation, constants.NationProperty.DESCRIPTION))
 
         province = editor_scenario.scenario.nation_property(nation, constants.NationProperty.CAPITAL_PROVINCE)
-        self.capital_province_edit.setText(editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME))#
+        self.capital_province_edit.setText(editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME))
 
         provinces = editor_scenario.scenario.nation_property(nation, constants.NationProperty.PROVINCES)
         provinces_names = [editor_scenario.scenario.province_property(p, constants.ProvinceProperty.NAME) for p in provinces]
@@ -813,7 +856,6 @@ class NationPropertiesWidget(QtWidgets.QWidget):
             # reset content
             self.reset_content()
 
-
     def remove_nation(self):
         """
         Removes a nation.
@@ -823,7 +865,9 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         answer = QtWidgets.QMessageBox.question(self, 'Warning', 'Remove {}'.format(name), QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
         if answer == QtWidgets.QMessageBox.Yes:
             nation = self.nations[index]
-            editor_scenario.scenario.remove_nation(nation) # there is no going back on this one
+
+            # there is no going back on this one
+            editor_scenario.scenario.remove_nation(nation)
 
             # reset content
             self.reset_content()
@@ -833,7 +877,7 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
     Modify provinces properties dialog.
     """
 
-    def __init__(self):
+    def __init__(self, initial_province=None):
         super().__init__()
 
         widget_layout = QtWidgets.QVBoxLayout(self)
@@ -850,8 +894,17 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
         label = QtWidgets.QLabel('Choose')
         self.provinces_combobox = QtWidgets.QComboBox()
         self.provinces_combobox.setFixedWidth(200)
-
+        self.provinces_combobox.currentIndexChanged.connect(self.province_combobox_index_changed)
         widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, self.provinces_combobox)), 'provinces'))
+
+        # province info panel
+        layout = QtWidgets.QVBoxLayout()
+
+        # nation
+        self.nation_label = QtWidgets.QLabel('Nation')
+        layout.addWidget(self.nation_label)
+
+        widget_layout.addWidget(qt.wrap_in_groupbox(layout, 'Info'))
 
         # vertical stretch
         widget_layout.addStretch()
@@ -859,9 +912,14 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
         # reset content
         self.reset_content()
 
+        # if province is given, select it
+        if initial_province:
+            index = utils.index_of_element(self.provinces, initial_province)
+            self.provinces_combobox.setCurrentIndex(index)
+
     def reset_content(self):
         """
-
+        Resets the content.
         """
 
         # get all province ids
@@ -876,7 +934,20 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
         else:
             province_names = []
             self.provinces = []
+        self.provinces_combobox.clear()
         self.provinces_combobox.addItems(province_names)
+
+    def province_combobox_index_changed(self, index):
+        """
+
+        :param index:
+        """
+        province = self.provinces[index]
+        nation = editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NATION)
+        if nation:
+            self.nation_label.setText(editor_scenario.scenario.nation_property(nation, constants.NationProperty.NAME))
+        else:
+            self.nation_label.setText('None')
 
     def add_province(self):
         """
@@ -888,9 +959,9 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
             # TODO check for sanity of name (no special letters, minimal number of letters)
             province = editor_scenario.scenario.add_province()
             editor_scenario.scenario.set_province_property(province, constants.ProvinceProperty.NAME, name)
+
             # reset content
             self.reset_content()
-
 
     def remove_province(self):
         """
@@ -1018,6 +1089,9 @@ class EditorScreen(QtWidgets.QWidget):
         # main map and overview map widgets
         self.map = EditorMap()
         self.map.focus_changed.connect(self.info_panel.update_tile_info)
+        self.map.change_terrain.connect(self.map_change_terrain)
+        self.map.province_info.connect(self.provinces_dialog)
+        self.map.nation_info.connect(self.nations_dialog)
 
         self.overview = OverviewMap()
         self.overview.roi_changed.connect(self.map.set_center_position)
@@ -1033,6 +1107,18 @@ class EditorScreen(QtWidgets.QWidget):
         layout.addWidget(self.map, 1, 1, 2, 1)
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
+
+    def map_change_terrain(self, column, row):
+        """
+
+        :param column:
+        :param row:
+        """
+        content_widget = ChangeTerrainWidget(column, row)
+        dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Change terrain', delete_on_close=True,
+            help_callback=self.client.show_help_browser)
+        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.show()
 
     def scenario_changed(self):
         """
@@ -1097,24 +1183,27 @@ class EditorScreen(QtWidgets.QWidget):
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
-    def nations_dialog(self):
+    def nations_dialog(self, nation=None):
         """
         Show the modify nations dialog.
         """
         if not editor_scenario.scenario:
             return
 
-        content_widget = NationPropertiesWidget()
+        content_widget = NationPropertiesWidget(nation)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Nations', delete_on_close=True,
             help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))
         dialog.show()
 
-    def provinces_dialog(self):
+    def provinces_dialog(self, province=None):
         """
             Display the modify provinces dialog.
         """
-        content_widget = ProvincePropertiesWidget()
+        if not editor_scenario.scenario:
+            return
+
+        content_widget = ProvincePropertiesWidget(province)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Provinces', delete_on_close=True,
             help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(800, 600))

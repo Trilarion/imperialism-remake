@@ -28,8 +28,8 @@ class MiniMap(QtWidgets.QWidget):
         Mini map on the left upper side.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class MainMap(QtWidgets.QGraphicsView):
@@ -43,11 +43,11 @@ class MainMap(QtWidgets.QGraphicsView):
 
 class InfoBox(QtWidgets.QWidget):
     """
-        Info box on the left lower side.
+    Info box on the left lower side.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 
 class GameMainScreen(QtWidgets.QWidget):

@@ -47,7 +47,7 @@ class NetworkClient(lib.network.ExtendedTcpSocket):
         self.received.connect(self._process)
         self.channels = {}
 
-    def create_new_channel(self, channel:constants.C):
+    def create_new_channel(self, channel: constants.C):
         """
         Given a new channel name (cannot already exist, otherwise an error will be thrown) creates a channel of
         this name.
@@ -58,7 +58,7 @@ class NetworkClient(lib.network.ExtendedTcpSocket):
             raise RuntimeError('Channel with this name already existing.')
         self.channels[channel] = Channel()
 
-    def remove_channel(self, channel:constants.C, ignore_not_existing=False):
+    def remove_channel(self, channel: constants.C, ignore_not_existing=False):
         """
         Given a channel name, removes this channel if it is existing. Raises an error if not existing and
         ignore_not_existing is not True.
@@ -71,7 +71,7 @@ class NetworkClient(lib.network.ExtendedTcpSocket):
         elif not ignore_not_existing:
             raise RuntimeError('Channel with this name not existing.')
 
-    def connect_to_channel(self, channel:constants.C, callback: callable):
+    def connect_to_channel(self, channel: constants.C, callback: callable):
         """
         Connect a callback to a channel with a specific name.
 
@@ -84,7 +84,7 @@ class NetworkClient(lib.network.ExtendedTcpSocket):
             self.create_new_channel(channel)
         self.channels[channel].received.connect(callback)
 
-    def disconnect_from_channel(self, channel:constants.C, callback: callable):
+    def disconnect_from_channel(self, channel: constants.C, callback: callable):
         """
         Given a channel name (which must exist, otherwise an error is raised) disconnects a callback from this
         channel.
@@ -119,7 +119,7 @@ class NetworkClient(lib.network.ExtendedTcpSocket):
 
         # note: channel with name channel_name may now already not be existing anymore (may be removed during processing)
 
-    def send(self, channel:constants.C, action:constants.M, content=None):
+    def send(self, channel: constants.C, action: constants.M, content=None):
         """
         Given a channel and a action id and optionally a message content wraps them in one dict (a letter) and sends it.
 

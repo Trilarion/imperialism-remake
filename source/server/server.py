@@ -34,10 +34,6 @@ from lib import utils
 import lib.network
 from server.scenario import Scenario
 
-# TODO change this
-from base.constants import ScenarioProperty as k, NationProperty as kn
-
-
 # TODO start this in its own process
 # TODO ping server clients regularly and throw them out if not reacting
 # TODO wait for a name but only change it once during a session
@@ -125,6 +121,7 @@ class ServerManager(QtCore.QObject):
             if not any([new_id == client.client_id for client in self.server_clients]):
                 # not any == none
                 break
+        # noinspection PyUnboundLocalVariable
         client.client_id = new_id
         print('new client with id {}'.format(new_id))
 
@@ -142,7 +139,7 @@ class ServerManager(QtCore.QObject):
         # finally add to list of clients
         self.server_clients.append(client)
 
-    def _chat_system(self, client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
+    def _chat_system(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
         """
 
         :param client:
@@ -178,7 +175,7 @@ class ServerManager(QtCore.QObject):
                 if client.subscribed_to_chat:
                     client.send(constants.C.CHAT, constants.M.CHAT_MESSAGE, chat_message)
 
-    def _system_messages(self, client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
+    def _system_messages(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
         """
         Handles system messages of a local client to its local server. Not intended for outside use.
 
@@ -203,7 +200,7 @@ class ServerManager(QtCore.QObject):
             }
             client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE, update)
 
-    def _lobby_messages(self, client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
+    def _lobby_messages(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
         """
 
         :param client:
@@ -226,7 +223,7 @@ class ServerManager(QtCore.QObject):
             connected_clients = [c.name for c in self.server_clients]
             client.send(channel, action, connected_clients)
 
-def general_messages(client:ServerNetworkClient, channel:constants.C, action:constants.M, content):
+def general_messages(client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
     """
 
     :param client:
@@ -254,7 +251,7 @@ def scenario_core_titles():
     for scenario_file in scenario_files:
         reader = utils.ZipArchiveReader(scenario_file)
         properties = reader.read_as_yaml(constants.SCENARIO_FILE_PROPERTIES)
-        scenario_titles.append(properties[k.TITLE])
+        scenario_titles.append(properties[constants.ScenarioProperty.TITLE])
 
     # zip files and titles together
     scenarios = zip(scenario_titles, scenario_files)
@@ -279,13 +276,13 @@ def scenario_preview(scenario_file_name):
     preview = {'scenario': scenario_file_name}
 
     # some scenario properties should be copied
-    scenario_copy_keys = [k.MAP_COLUMNS, k.MAP_ROWS, k.TITLE, k.DESCRIPTION]
+    scenario_copy_keys = [constants.ScenarioProperty.MAP_COLUMNS, constants.ScenarioProperty.MAP_ROWS, constants.ScenarioProperty.TITLE, constants.ScenarioProperty.DESCRIPTION]
     for key in scenario_copy_keys:
         preview[key] = scenario[key]
 
     # some nations properties should be copied
     nations = {}
-    nation_copy_keys = [kn.COLOR, kn.NAME, kn.DESCRIPTION]
+    nation_copy_keys = [constants.NationProperty.COLOR, constants.NationProperty.NAME, constants.NationProperty.DESCRIPTION]
     for nation in scenario.nations():
         nations[nation] = {}
         for key in nation_copy_keys:
@@ -293,8 +290,8 @@ def scenario_preview(scenario_file_name):
     preview['nations'] = nations
 
     # assemble a nations map (-1 means no nation)
-    columns = scenario[k.MAP_COLUMNS]
-    rows = scenario[k.MAP_ROWS]
+    columns = scenario[constants.ScenarioProperty.MAP_COLUMNS]
+    rows = scenario[constants.ScenarioProperty.MAP_ROWS]
     nations_map = [-1] * (columns * rows)
     for nation_id in scenario.nations():
         provinces = scenario.provinces_of_nation(nation_id)
