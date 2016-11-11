@@ -772,6 +772,7 @@ def wrap_in_groupbox(item, title) -> QtWidgets.QGroupBox:
     """
     box = QtWidgets.QGroupBox(title)
     if isinstance(item, QtWidgets.QWidget):
+        # we use a standard BoxLayout
         layout = QtWidgets.QVBoxLayout(box)
         layout.addWidget(item)
     elif isinstance(item, QtWidgets.QLayout):
@@ -789,13 +790,15 @@ class FitSceneInViewGraphicsView(QtWidgets.QGraphicsView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def showEvent(self, event):
+    def resizeEvent(self, event: QtGui.QResizeEvent):
         """
-        The view is shown (and therefore has correct size). We fit the scene rectangle into the view without
-        distorting the scene proportions.
+        The view is resized. We need to fit the scene rectangle into the view without distorting the scene proportions.
+        We also need to center on the center in order to keep the scene centered.
         """
-        self.fitInView(self.sceneRect(), QtCore.Qt.KeepAspectRatio)
-        super().showEvent(event)
+        super().resizeEvent(event)
+        scene_rect = self.sceneRect()
+        self.fitInView(scene_rect, QtCore.Qt.KeepAspectRatio)
+        self.centerOn(scene_rect.center())
 
 
 def local_url(relative_path):

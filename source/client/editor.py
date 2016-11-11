@@ -749,6 +749,7 @@ class NationPropertiesWidget(QtWidgets.QWidget):
     """
     Modify nation properties dialog
     """
+    # TODO when exiting redraw the big map
 
     def __init__(self, initial_nation=None):
         super().__init__()
@@ -780,7 +781,10 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Description'), self.description_edit)))
 
         # color
-        # TODO color and color selection
+        self.color_picker = QtWidgets.QPushButton()
+        self.color_picker.setFixedSize(24, 24)
+        self.color_picker.clicked.connect(self.show_color_picker)
+        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Color'), self.color_picker)))
 
         # capital province
         self.capital_province_edit = QtWidgets.QLineEdit()
@@ -805,6 +809,20 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         if initial_nation:
             index = utils.index_of_element(self.nations, initial_nation)
             self.nation_combobox.setCurrentIndex(index)
+
+    def show_color_picker(self):
+        """
+        Selects a color
+        """
+        new_color = QtWidgets.QColorDialog.getColor(self.color, parent=self)
+        # isValid() returns True if dialog wasn't cancelled
+        if new_color.isValid():
+
+            index = self.nation_combobox.currentIndex()
+            nation = self.nations[index]
+            editor_scenario.scenario.set_nation_property(nation, constants.NationProperty.COLOR, new_color.name())
+
+            self.nation_selected(index)
 
     def reset_content(self):
         """
@@ -836,6 +854,12 @@ class NationPropertiesWidget(QtWidgets.QWidget):
 
         province = editor_scenario.scenario.nation_property(nation, constants.NationProperty.CAPITAL_PROVINCE)
         self.capital_province_edit.setText(editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME))
+
+        # color
+        color_name = editor_scenario.scenario.nation_property(nation, constants.NationProperty.COLOR)
+        self.color = QtGui.QColor(color_name)
+        self.color_picker.setStyleSheet('QPushButton { background-color: ' + color_name + '; }')
+
 
         provinces = editor_scenario.scenario.nation_property(nation, constants.NationProperty.PROVINCES)
         provinces_names = [editor_scenario.scenario.province_property(p, constants.ProvinceProperty.NAME) for p in provinces]
@@ -1117,7 +1141,7 @@ class EditorScreen(QtWidgets.QWidget):
         content_widget = ChangeTerrainWidget(column, row)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Change terrain', delete_on_close=True,
             help_callback=self.client.show_help_browser)
-        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
     def scenario_changed(self):
@@ -1142,7 +1166,7 @@ class EditorScreen(QtWidgets.QWidget):
         content_widget.finished.connect(editor_scenario.create)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='New Scenario', delete_on_close=True,
             help_callback=self.client.show_help_browser)
-        dialog.setFixedSize(QtCore.QSize(500, 400))
+        dialog.setFixedSize(QtCore.QSize(600, 400))
         dialog.show()
 
     def load_scenario_dialog(self):
@@ -1180,7 +1204,8 @@ class EditorScreen(QtWidgets.QWidget):
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='General Properties',
             delete_on_close=True, help_callback=self.client.show_help_browser,
             close_callback=content_widget.close_request)
-        dialog.setFixedSize(QtCore.QSize(800, 600))
+        # TODO derive meaningful size depending on screen size
+        dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
     def nations_dialog(self, nation=None):
@@ -1193,7 +1218,7 @@ class EditorScreen(QtWidgets.QWidget):
         content_widget = NationPropertiesWidget(nation)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Nations', delete_on_close=True,
             help_callback=self.client.show_help_browser)
-        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
     def provinces_dialog(self, province=None):
@@ -1206,5 +1231,5 @@ class EditorScreen(QtWidgets.QWidget):
         content_widget = ProvincePropertiesWidget(province)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Provinces', delete_on_close=True,
             help_callback=self.client.show_help_browser)
-        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()

@@ -292,7 +292,7 @@ class Client:
         """
         monitor_widget = ServerMonitorWidget()
         dialog = client.graphics.GameDialog(self.main_window, monitor_widget, modal=False, delete_on_close=True, title='Server Monitor', help_callback=self.show_help_browser)
-        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
     def switch_to_start_screen(self):
@@ -308,7 +308,7 @@ class Client:
         """
         lobby_widget = GameLobbyWidget()
         dialog = client.graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby', help_callback=self.show_help_browser)
-        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.setFixedSize(QtCore.QSize(900, 700))
         lobby_widget.single_player_start.connect(partial(self.single_player_start, dialog))
         dialog.show()
 
@@ -335,7 +335,7 @@ class Client:
         dialog = client.graphics.GameDialog(self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
             help_callback=partial(self.show_help_browser, path=constants.DOCUMENTATION_PREFERENCES_FILE),
             close_callback=preferences_widget.close_request)
-        dialog.setFixedSize(QtCore.QSize(800, 600))
+        dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
     def quit(self):
