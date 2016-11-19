@@ -33,7 +33,7 @@ from lib import qt, utils
 from server.scenario import Scenario
 
 
-class OverviewMap(QtWidgets.QWidget):
+class MiniMap(QtWidgets.QWidget):
     """
     Small overview map
     """
@@ -263,7 +263,7 @@ class OverviewMap(QtWidgets.QWidget):
         self.tracker.show()
 
 
-class EditorMap(QtWidgets.QGraphicsView):
+class MainMap(QtWidgets.QGraphicsView):
     """
     The big map holding the game map and everything.
     """
@@ -1110,15 +1110,16 @@ class EditorScreen(QtWidgets.QWidget):
         # info box widget
         self.info_panel = InfoPanel()
 
-        # main map and overview map widgets
-        self.map = EditorMap()
-        self.map.focus_changed.connect(self.info_panel.update_tile_info)
-        self.map.change_terrain.connect(self.map_change_terrain)
-        self.map.province_info.connect(self.provinces_dialog)
-        self.map.nation_info.connect(self.nations_dialog)
+        # main map
+        self.main_map = MainMap()
+        self.main_map.focus_changed.connect(self.info_panel.update_tile_info)
+        self.main_map.change_terrain.connect(self.map_change_terrain)
+        self.main_map.province_info.connect(self.provinces_dialog)
+        self.main_map.nation_info.connect(self.nations_dialog)
 
-        self.overview = OverviewMap()
-        self.overview.roi_changed.connect(self.map.set_center_position)
+        # mini map
+        self.mini_map = MiniMap()
+        self.mini_map.roi_changed.connect(self.main_map.set_center_position)
 
         # connect to editor_scenario
         editor_scenario.changed.connect(self.scenario_changed)
@@ -1126,11 +1127,11 @@ class EditorScreen(QtWidgets.QWidget):
         # layout of widgets and toolbar
         layout = QtWidgets.QGridLayout(self)
         layout.addWidget(self.toolbar, 0, 0, 1, 2)
-        layout.addWidget(self.overview, 1, 0)
+        layout.addWidget(self.mini_map, 1, 0)
         layout.addWidget(self.info_panel, 2, 0)
-        layout.addWidget(self.map, 1, 1, 2, 1)
+        layout.addWidget(self.main_map, 1, 1, 2, 1)
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
-        layout.setColumnStretch(1, 1)  # the map will take all horizontal space left
+        layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
 
     def map_change_terrain(self, column, row):
         """
@@ -1150,13 +1151,13 @@ class EditorScreen(QtWidgets.QWidget):
         """
 
         # first repaint the map
-        self.map.redraw()
+        self.main_map.redraw()
 
         # repaint the overview
-        self.overview.redraw()
+        self.mini_map.redraw()
 
         # show the tracker rectangle in the overview with the right size
-        self.overview.activate_tracker(self.map.visible_rect())
+        self.mini_map.activate_tracker(self.main_map.visible_rect())
 
     def new_scenario_dialog(self):
         """

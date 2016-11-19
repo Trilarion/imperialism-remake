@@ -35,7 +35,7 @@ local_network_client = base.network.NetworkClient()
 
 from client.editor import EditorScreen
 from client.lobby import GameLobbyWidget
-from client.main_screen import GameMainScreen
+from client.game import GameMainScreen
 from client.preferences import PreferencesWidget
 from client.server_monitor import ServerMonitorWidget
 
