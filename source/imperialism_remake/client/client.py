@@ -309,14 +309,14 @@ class Client:
         lobby_widget = GameLobbyWidget()
         dialog = client.graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby', help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
-        lobby_widget.single_player_start.connect(partial(self.single_player_start, dialog))
+        lobby_widget.single_player_start.connect(self.single_player_start)
         dialog.show()
 
-    def single_player_start(self, lobby_dialog, scenario_file, selected_nation):
+    def single_player_start(self, scenario_file, selected_nation):
         """
             Shows the main game screen which will start a scenario file and a selected nation.
         """
-        lobby_dialog.close()
+        #lobby_dialog.close()
         widget = GameMainScreen(self)
         self.main_window.change_content_widget(widget)
 

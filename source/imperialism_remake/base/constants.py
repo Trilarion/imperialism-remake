@@ -101,7 +101,7 @@ class Option(utils.AutoNumberedEnum):
         self.default = None
 
 
-Options = Option.__members__  # dictionary of name, Enum-value pairs
+Options = list(Option)
 
 #: default values for the Options
 Option.LOCALSERVER_OPEN.default = False

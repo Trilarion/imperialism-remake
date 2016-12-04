@@ -139,6 +139,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
         # create single player scenario preview widget
         widget = SinglePlayerScenarioPreview(scenario_file)
         widget.nation_selected.connect(partial(self.single_player_start.emit, scenario_file))
+        #widget.nation_selected.connect(
 
         # change content widget
         self.change_content_widget(widget)
@@ -247,7 +248,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
     """
 
     #: signal, emitted if a nation is selected and the start button is presed
-    nation_selected = QtCore.pyqtSignal(str)
+    nation_selected = QtCore.pyqtSignal(int)
 
     def __init__(self, scenario_file):
         """
@@ -328,8 +329,6 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar, trigger_connection=self.start_scenario_clicked))
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
-
-
         # draw the map
         columns = message[constants.ScenarioProperty.MAP_COLUMNS]
         rows = message[constants.ScenarioProperty.MAP_ROWS]
@@ -400,7 +399,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         """
         row = self.nations_list.currentRow()
         nation_id = self.nation_ids[row]
-        self.selected_nation = self.preview['nations'][nation_id][constants.NationProperty.NAME]
+        # self.selected_nation = self.preview['nations'][nation_id][constants.NationProperty.NAME]
+        self.selected_nation = nation_id
         nation_description = self.preview['nations'][nation_id][constants.NationProperty.DESCRIPTION]
         self.nation_info.setPlainText(nation_description)
 

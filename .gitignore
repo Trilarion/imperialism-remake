@@ -9,6 +9,7 @@
 # Python
 
 __pycache__
+*.egg-info
 
 # Sphinx Doc
 

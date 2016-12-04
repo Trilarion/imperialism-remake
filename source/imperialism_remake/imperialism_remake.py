@@ -53,8 +53,11 @@ def set_start_directory():
         base_path = os.path.join(base_path, '..')
 
 
-if __name__ == '__main__':
 
+def main():
+    """
+    Main entry point. Called from the script generated in setup.py and called when running this module with python.
+    """
     # test for python version
     required_version = (3, 5)
     if sys.version_info < required_version:
@@ -161,3 +164,6 @@ if __name__ == '__main__':
 
     # good bye message
     tools.log_info('will exit soon - good bye')
+
+if __name__ == '__main__':
+    main()

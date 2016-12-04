@@ -91,21 +91,19 @@ def load_options(file_name):
     global options
     options = utils.read_as_yaml(file_name)
 
+    # if for some reason no dict, make it a dict
+    if type(options) is not dict:
+        options = {}
+
     # delete entries that are not in Constants.Options
-    for key in list(options.keys()):
-        if key not in constants.Options:
-            del options[key]
+    for option in options.keys():
+        if option not in constants.Options:
+            del options[option]
 
     # copy values that are in Constants.Options but not here
-    for key in constants.Options:
-        if key not in options:
-            options[key] = constants.Options[key].default
-
-    # main window bounding rectangle, convert from list to QRect
-    rect = get_option(constants.Option.MAINWINDOW_BOUNDS)
-    if rect is not None:
-        set_option(constants.Option.MAINWINDOW_BOUNDS, QtCore.QRect(*rect))
-
+    for option in constants.Options:
+        if option not in options:
+            options[option] = option.default
 
 def get_option(option):
     """
@@ -114,7 +112,8 @@ def get_option(option):
     :param option:
     :return:
     """
-    return options[option.name]
+
+    return options[option]
 
 
 def set_option(option, value):
@@ -124,7 +123,8 @@ def set_option(option, value):
     :param option:
     :param value:
     """
-    options[option.name] = value
+
+    options[option] = value
 
 
 def save_options(file_name):
@@ -133,13 +133,6 @@ def save_options(file_name):
 
     :param file_name:
     """
-    data = options.copy()
-
-    # main window bounding rectangle, convert from QRect to list
-    option = constants.Option.MAINWINDOW_BOUNDS.name
-    if option in data:
-        rect = data[option]
-        data[option] = [rect.x(), rect.y(), rect.width(), rect.height()]
 
     # write to file
-    utils.write_as_yaml(file_name, data)
+    utils.write_as_yaml(file_name, options)
