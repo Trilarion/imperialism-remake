@@ -23,8 +23,8 @@
 
 import PyQt5.QtMultimedia as QtMultimedia
 
-from base import constants
-from lib import utils, qt
+from imperialism_remake.base import constants
+from imperialism_remake.lib import utils, qt
 
 soundtrack_player = None
 soundtrack_playlist = None

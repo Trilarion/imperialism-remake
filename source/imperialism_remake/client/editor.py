@@ -27,10 +27,10 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
-import client.graphics as graphics
-from base import constants, tools
-from lib import qt, utils
-from server.scenario import Scenario
+import imperialism_remake.client.graphics as graphics
+from imperialism_remake.base import constants, tools
+from imperialism_remake.lib import qt, utils
+from imperialism_remake.server.scenario import Scenario
 
 
 class MiniMap(QtWidgets.QWidget):

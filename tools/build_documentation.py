@@ -1,5 +1,7 @@
 """
-    see also sphinx.main(), sphinx.build_main(), cmdline.main()
+Builds the documentation.
+
+See also sphinx.main(), sphinx.build_main(), cmdline.main()
 """
 
 import os
@@ -8,8 +10,6 @@ import glob
 
 import sphinx
 from sphinx import apidoc
-
-from imperialism_remake import set_start_directory
 
 def sphinx_build(directory):
     """
@@ -68,7 +68,8 @@ def copy_manual(source, target):
 
 if __name__ == '__main__':
 
-    set_start_directory()
+    # start with directory one down
+    os.chdir('..')
 
     # sphinx api build
     source_directory = 'source'
@@ -80,7 +81,7 @@ if __name__ == '__main__':
     sphinx_build(manual_rst_directory)
 
     # copy manual to ./data
-    manual_data_directory = os.path.join('data', 'manual')
+    manual_data_directory = os.path.join('source', 'imperialism_remake', 'data', 'manual')
     manual_build_directory = os.path.join(manual_rst_directory, '_build')
     copy_manual(manual_build_directory, manual_data_directory)
     

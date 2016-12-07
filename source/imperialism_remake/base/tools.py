@@ -20,12 +20,10 @@
 """
 
 import sys
-
-import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 
-import base.constants as constants
-import lib.utils as utils
+import imperialism_remake.base.constants as constants
+import imperialism_remake.lib.utils as utils
 
 
 def load_ui_icon(name):
@@ -96,14 +94,14 @@ def load_options(file_name):
         options = {}
 
     # delete entries that are not in Constants.Options
-    for option in options.keys():
-        if option not in constants.Options:
-            del options[option]
+    remove = [o for o in options.keys() if o not in constants.Options]
+    for o in remove:
+        del options[o]
 
     # copy values that are in Constants.Options but not here
     for option in constants.Options:
-        if option not in options:
-            options[option] = option.default
+        if option not in options and hasattr(option, 'default'):
+                options[option] = option.default
 
 def get_option(option):
     """

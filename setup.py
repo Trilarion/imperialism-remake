@@ -59,7 +59,7 @@ if __name__ == "__main__":
         package_dir={'':'source'},
         packages=find_packages(where=os.path.join(HERE, 'source')),
         install_requires=['PyYAML>=3.1', 'PyQt5>=5.6'],
-        #data_files=get_data_files(),
+        data_files=get_data_files(),
         package_data={'imperialism_remake': 'data'},
         entry_points={'console_scripts': ['imperialism_remake_start=imperialism_remake.imperialism_remake:main']},
         zip_safe=False)

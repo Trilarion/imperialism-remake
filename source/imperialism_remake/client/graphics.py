@@ -22,8 +22,8 @@ module and the client game specific logic under folder client.
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-from base import tools
-from lib import qt
+from imperialism_remake.base import tools
+from imperialism_remake.lib import qt
 
 
 class GameDialog(QtWidgets.QWidget):

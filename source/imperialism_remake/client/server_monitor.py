@@ -22,9 +22,9 @@ from datetime import datetime
 
 from PyQt5 import QtCore, QtWidgets
 
-from base import constants
-import base.network
-from client.client import local_network_client
+from imperialism_remake.base import constants
+import imperialism_remake.base.network as base_network
+from imperialism_remake.client.client import local_network_client
 
 class ServerMonitorWidget(QtWidgets.QWidget):
     """
@@ -57,7 +57,7 @@ class ServerMonitorWidget(QtWidgets.QWidget):
         """
         local_network_client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE)
 
-    def update_monitor(self, client: base.network.NetworkClient, channel: constants.C, action: constants.M, content):
+    def update_monitor(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M, content):
         """
         Regular updates of the server stats
         """

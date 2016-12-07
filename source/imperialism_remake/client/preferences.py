@@ -22,10 +22,10 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtNetwork as QtNetwork
 
-from base import constants, tools
-from client import audio
-from lib import qt
-from client.client import local_network_client
+from imperialism_remake.base import constants, tools
+from imperialism_remake.client import audio
+from imperialism_remake.lib import qt
+from imperialism_remake.client.client import local_network_client
 
 
 class PreferencesWidget(QtWidgets.QWidget):

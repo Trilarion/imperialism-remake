@@ -91,7 +91,7 @@ def main():
         os.mkdir(user_folder)
 
     # determine DEBUG_MODE from runtime arguments
-    from base import switches
+    from imperialism_remake.base import switches
 
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         switches.DEBUG_MODE = True
@@ -109,7 +109,7 @@ def main():
         sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
 
     # import some base libraries
-    import base.tools as tools
+    import imperialism_remake.base.tools as tools
 
     # search for existing options file, if not existing, save it once (should just save an empty dictionary)
     Options_File = os.path.join(user_folder, 'options.info')
@@ -121,16 +121,15 @@ def main():
     tools.log_info('options loaded from user folder ({})'.format(user_folder))
 
     # special case of some desktop environments under Linux where full screen mode does not work well
-    from base import constants
+    from imperialism_remake.base import constants
 
+    # full screen support
     if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
-        desktop_session = os.environ.get("DESKTOP_SESSION")
-        if desktop_session and (
-                    desktop_session.startswith('ubuntu') or 'xfce' in desktop_session or desktop_session.startswith(
-                'xubuntu') or 'gnome' in desktop_session):
+        session = os.environ.get("DESKTOP_SESSION")
+        if session and (session.startswith('ubuntu') or 'xfce' in session or session.startswith('xubuntu') or 'gnome' in session):
             tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED, False)
-            tools.log_warning(
-                'Desktop environment {} has problems with full screen mode. Will turn if off.'.format(desktop_session))
+            tools.log_warning('Desktop environment {} has problems with full screen mode. Will turn if off.'.format(session))
+    # we cannot have full screen without support
     if not tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN, False)
 
@@ -141,13 +140,13 @@ def main():
 
     # multiprocessing.freeze_support()
     multiprocessing.set_start_method('spawn')
-    from server.server import ServerProcess
+    from imperialism_remake.server.server import ServerProcess
 
     server_process = ServerProcess()
     server_process.start()
 
     # start client, we will return when the program finishes
-    from client.client import start_client
+    from imperialism_remake.client.client import start_client
 
     start_client()
 

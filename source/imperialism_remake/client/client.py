@@ -21,23 +21,23 @@ Starts the client and delivers most of the code responsible for the main client 
 # TODO automatic placement of help dialog depending on if another dialog is open
 
 from functools import partial
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-from base import constants, tools
-import base.network
-from client import audio
-import client.graphics
-from lib import qt, utils
-import version
+
+from imperialism_remake.base import constants, tools
+import imperialism_remake.base.network as base_network
+from imperialism_remake.client import audio
+import imperialism_remake.client.graphics as graphics
+from imperialism_remake.lib import qt, utils
+import imperialism_remake.version as version
 
 # TODO like in audio, set the network client singleton somewhere else
-local_network_client = base.network.NetworkClient()
+local_network_client = base_network.NetworkClient()
 
-from client.editor import EditorScreen
-from client.lobby import GameLobbyWidget
-from client.game import GameMainScreen
-from client.preferences import PreferencesWidget
-from client.server_monitor import ServerMonitorWidget
+from imperialism_remake.client.editor import EditorScreen
+from imperialism_remake.client.lobby import GameLobbyWidget
+from imperialism_remake.client.game import GameMainScreen
+from imperialism_remake.client.preferences import PreferencesWidget
+from imperialism_remake.client.server_monitor import ServerMonitorWidget
 
 
 class MapItem(QtCore.QObject):
@@ -291,7 +291,7 @@ class Client:
             Is invoked when pressing F2.
         """
         monitor_widget = ServerMonitorWidget()
-        dialog = client.graphics.GameDialog(self.main_window, monitor_widget, modal=False, delete_on_close=True, title='Server Monitor', help_callback=self.show_help_browser)
+        dialog = graphics.GameDialog(self.main_window, monitor_widget, modal=False, delete_on_close=True, title='Server Monitor', help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
@@ -307,7 +307,7 @@ class Client:
             Shows the game lobby dialog.
         """
         lobby_widget = GameLobbyWidget()
-        dialog = client.graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby', help_callback=self.show_help_browser)
+        dialog = graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby', help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         lobby_widget.single_player_start.connect(self.single_player_start)
         dialog.show()
@@ -332,7 +332,7 @@ class Client:
             Shows the preferences dialog.
         """
         preferences_widget = PreferencesWidget()
-        dialog = client.graphics.GameDialog(self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
+        dialog = graphics.GameDialog(self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
             help_callback=partial(self.show_help_browser, path=constants.DOCUMENTATION_PREFERENCES_FILE),
             close_callback=preferences_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(900, 700))

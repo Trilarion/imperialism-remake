@@ -23,7 +23,7 @@ import os
 from enum import unique
 
 from base import switches
-from lib import utils
+from imperialism_remake.lib import utils
 
 
 def extend(path, *parts):
@@ -97,17 +97,15 @@ class Option(utils.AutoNumberedEnum):
     SOUNDTRACK_MUTE = ()  # bool
     SOUNDTRACK_VOLUME = ()  # int from 0 to 100
 
-    def __init__(self):
-        self.default = None
-
-
 Options = list(Option)
 
 #: default values for the Options
 Option.LOCALSERVER_OPEN.default = False
 Option.LOCALSERVER_NAME.default = 'Alice'
 Option.LOCALCLIENT_NAME.default = 'Bob'
+Option.MAINWINDOW_BOUNDS.default = None # no bounds
 Option.MAINWINDOW_FULLSCREEN.default = True  # we start full screen (can be unset by the program for some linux desktop environments
+Option.MAINWINDOW_FULLSCREEN_SUPPORTED.default = True # we assume it is until we detect it isn't
 Option.SOUNDTRACK_MUTE.default = False
 Option.SOUNDTRACK_VOLUME.default = 50
 

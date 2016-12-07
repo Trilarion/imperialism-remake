@@ -27,12 +27,12 @@ from datetime import datetime
 
 from PyQt5 import QtCore, QtNetwork
 
-import imperialism_remake
-from base import constants
-import base.network
-from lib import utils
-import lib.network
-from server.scenario import Scenario
+import imperialism_remake.start as start
+from imperialism_remake.base import constants
+import imperialism_remake.base.network as base_network
+from imperialism_remake.lib import utils
+import imperialism_remake.lib.network as lib_network
+from imperialism_remake.server.scenario import Scenario
 
 # TODO start this in its own process
 # TODO ping server clients regularly and throw them out if not reacting
@@ -51,7 +51,7 @@ class ServerProcess(multiprocessing.Process):
         Runs the server process by starting its own QCoreApplication.
         """
         # because PyQt5 eats exceptions in the event thread this workaround
-        sys.excepthook = imperialism_remake.exception_hook
+        sys.excepthook = start.exception_hook
 
         app = QtCore.QCoreApplication([])
 
@@ -64,7 +64,7 @@ class ServerProcess(multiprocessing.Process):
         # run event loop of app
         app.exec_()
 
-class ServerNetworkClient(base.network.NetworkClient):
+class ServerNetworkClient(base_network.NetworkClient):
     """
     Server network client.
     """
@@ -91,7 +91,7 @@ class ServerManager(QtCore.QObject):
         We start with a server (ExtendedTcpServer) and an empty list of server clients (NetworkClient).
         """
         super().__init__()
-        self.server = lib.network.ExtendedTcpServer()
+        self.server = lib_network.ExtendedTcpServer()
         self.server.new_client.connect(self._new_client)
         self.server_clients = []
         self.chat_log = []

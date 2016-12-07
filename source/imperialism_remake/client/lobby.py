@@ -24,11 +24,11 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
 
-from base import constants, tools
-import base.network
-import client.graphics as graphics
-from lib import qt, utils
-from client.client import local_network_client
+from imperialism_remake.base import constants, tools
+import imperialism_remake.base.network as base_network
+import imperialism_remake.client.graphics as graphics
+from imperialism_remake.lib import qt, utils
+from imperialism_remake.client.client import local_network_client
 
 
 class GameLobbyWidget(QtWidgets.QWidget):
@@ -196,7 +196,7 @@ class ServerLobby(QtWidgets.QWidget):
         local_network_client.send(constants.C.CHAT, constants.M.CHAT_MESSAGE, chat_message)
         self.chat_input_edit.setText('')
 
-    def receive_chat_messages(self, client: base.network.NetworkClient, channel: constants.C, action: constants.M, content):
+    def receive_chat_messages(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M, content):
         """
         Receives a chat message. Adds it to the chat log.
 
@@ -214,7 +214,7 @@ class ServerLobby(QtWidgets.QWidget):
         """
         local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_CONNECTED_CLIENTS)
 
-    def receive_lobby_messages(self, client: base.network.NetworkClient, channel: constants.C, action: constants.M, content):
+    def receive_lobby_messages(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M, content):
         """
         Handles all received lobby messages.
 

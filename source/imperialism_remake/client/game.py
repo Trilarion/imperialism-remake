@@ -20,9 +20,9 @@ The main game screen.
 
 import math
 from PyQt5 import QtWidgets, QtCore
-from base import tools, constants
-from lib import qt
 
+from imperialism_remake.base import tools, constants
+from imperialism_remake.lib import qt
 
 # TODO merge with minimap of the editor
 class MiniMap(QtWidgets.QWidget):

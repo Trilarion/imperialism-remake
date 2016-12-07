@@ -22,11 +22,11 @@
 import PyQt5.QtCore as QtCore
 import PyQt5.QtNetwork as QtNetwork
 
-from base import constants
-import lib.network
+from imperialism_remake.base import constants
+import imperialism_remake.lib.network as lib_network
 
 
-class NetworkClient(lib.network.ExtendedTcpSocket):
+class NetworkClient(lib_network.ExtendedTcpSocket):
     """
     Extending the Client class (wrapper around QTcpSocket sending and receiving messages) with channels (see Channel)
     and processing logic, as well as further wrapping the messages (specifying the channel as address).
