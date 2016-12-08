@@ -24,26 +24,17 @@ def get_long_description():
     with open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
         return f.read()
 
-def get_data_files():
+def get_package_data_files():
     """
     Get the list of data files (full content of data directory).
     """
     data_files = []
-    for dirpath, dirnames, filenames in os.walk(os.path.join(HERE, 'data')):
-        if filenames:
-            destination = os.path.relpath(dirpath, HERE)
-            names = [os.path.join(destination, name) for name in filenames]
-            data_files.append((destination,names))
-    return data_files
-
-def get_data_files2():
-    data_files = []
-    for dirpath, dirnames, filenames in os.walk(os.path.join(HERE, 'data')):
-        if filenames:
-            destination = os.path.relpath(dirpath, HERE)
-            names = [os.path.join(destination, name) for name in filenames]
-            data_files.append(names)
-    return data_files
+    basepath = os.path.join(HERE, 'source', 'imperialism_remake')
+    for dirpath, dirnames, filenames in os.walk(os.path.join(basepath, 'data')):
+        relpath = os.path.relpath(dirpath, basepath)
+        names = [os.path.join(relpath, name) for name in filenames]
+        data_files.extend(names)
+    return {'imperialism_remake': data_files}
 
 if __name__ == "__main__":
     setup(name='imperialism_remake',
@@ -59,7 +50,6 @@ if __name__ == "__main__":
         package_dir={'':'source'},
         packages=find_packages(where=os.path.join(HERE, 'source')),
         install_requires=['PyYAML>=3.1', 'PyQt5>=5.6'],
-        data_files=get_data_files(),
-        package_data={'imperialism_remake': 'data'},
-        entry_points={'console_scripts': ['imperialism_remake_start=imperialism_remake.imperialism_remake:main']},
+        package_data=get_package_data_files(),
+        entry_points={'console_scripts': ['imperialism_remake_start=imperialism_remake.start:main']},
         zip_safe=False)
