@@ -19,10 +19,9 @@ Examples for base.network and server.network using ServerProcess
 """
 
 import PyQt5.QtCore as QtCore
-
-import imperialism_remake
-from base import constants, network
-from server import server
+from imperialism_remake import start
+from imperialism_remake.base import constants, network
+from imperialism_remake.server import server
 
 def client_connect():
     """
@@ -38,8 +37,8 @@ def send_shutdown():
     client.socket.flush()
 
 if __name__ == '__main__':
-    imperialism_remake.fix_pyqt5_exception_eating()
-    imperialism_remake.set_start_directory()
+    start.fix_pyqt5_exception_eating()
+    start.set_start_directory()
 
     # create server process and start it
     server_process = server.ServerProcess()

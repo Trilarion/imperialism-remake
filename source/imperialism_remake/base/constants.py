@@ -22,7 +22,7 @@
 import os
 from enum import unique
 
-from base import switches
+from imperialism_remake.base import switches
 from imperialism_remake.lib import utils
 
 

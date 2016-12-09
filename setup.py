@@ -43,7 +43,7 @@ if __name__ == "__main__":
         long_description=get_long_description(),
         url='http://remake.twelvepm.de/',
         author='Trilarion',
-        author_email='pypi@twelvepm.de',
+        author_email='imperialism_remake@twelvepm.de',
         license='GPL',
         classifiers=CLASSIFIERS,
         keywords=KEYWORDS,
