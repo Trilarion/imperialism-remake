@@ -7,19 +7,17 @@
 /.idea/misc.xml
 
 # Python
-
 __pycache__
 *.egg-info
 
-# Sphinx Doc
+# vim
+.*.swp
 
+# Sphinx Doc
 *.doctree
 _build
 environment.pickle
 
 # ours
-
 /data/manual
 /build
-
-
