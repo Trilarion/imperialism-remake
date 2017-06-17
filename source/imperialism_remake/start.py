@@ -148,6 +148,7 @@ def main():
     # full screen support
     if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         session = os.environ.get("DESKTOP_SESSION")
+        # TODO: what exactly is the problem and how can we detect it (without guessing)?
         if session and (session.startswith('ubuntu') or 'xfce' in session or session.startswith('xubuntu') or 'gnome' in session):
             tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED, False)
             logger.warning('Desktop environment %s has problems with full screen mode. Will turn if off.', session)
