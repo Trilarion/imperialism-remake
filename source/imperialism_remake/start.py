@@ -40,7 +40,7 @@ def fix_pyqt5_exception_eating():
     """
     sys.excepthook = exception_hook
 
-def set_start_directory():
+def set_start_directory(logger):
     """
     Just take current package.
     """
@@ -54,6 +54,33 @@ def get_arguments():
     parser.add_argument('--debug', dest='debug', action='store_true',
                         help='enable detailed debug logging')
     return parser.parse_args()
+
+
+def get_configured_logger(user_folder, is_debug):
+    log_level = logging.DEBUG if is_debug else logging.INFO
+    logger = logging.getLogger()
+    logger.setLevel(log_level)
+    log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    log_console_handler = logging.StreamHandler()
+    log_console_handler.setFormatter(log_formatter)
+    logger.addHandler(log_console_handler)
+    if is_debug:
+        logger.info('debug mode is on')
+
+    # redirect output to log files (will be overwritten at each start)
+    log_filename = os.path.join(user_folder, 'remake.log')
+    log_details_handler = logging.FileHandler(log_filename, mode='w', encoding='utf-8')
+    log_details_handler.setFormatter(log_formatter)
+    logger.addHandler(log_details_handler)
+    logger.info('writing detailed log messages to %s', log_filename)
+
+    error_filename = os.path.join(user_folder, 'remake.error.log')
+    log_error_handler = logging.FileHandler(error_filename, mode='w', encoding='utf-8')
+    log_error_handler.setFormatter(log_formatter)
+    log_error_handler.setLevel(logging.ERROR)
+    logger.addHandler(log_error_handler)
+    logger.info('writing error log messages to %s', error_filename)
+    return logger
 
 
 def main():
@@ -80,9 +107,6 @@ def main():
     # directory is not part of Python's search path by default.
     sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-    # set start directory
-    set_start_directory()
-
     # determine user folder
     if os.name == 'posix':
         # Linux / Unix
@@ -95,40 +119,20 @@ def main():
         user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
     else:
         user_folder = 'User Data'
-    print('user data stored in: {}'.format(user_folder))
+
+    # determine DEBUG_MODE from runtime arguments
+    from imperialism_remake.base import switches
+    args = get_arguments()
+    switches.DEBUG_MODE = args.debug
+    logger = get_configured_logger(user_folder, switches.DEBUG_MODE)
+    logger.info('user data stored in: {}'.format(user_folder))
+
+    # set start directory
+    set_start_directory(logger)
 
     # if not exist, create user folder
     if not os.path.isdir(user_folder):
         os.mkdir(user_folder)
-
-    # determine DEBUG_MODE from runtime arguments
-    from imperialism_remake.base import switches
-
-    args = get_arguments()
-    log_level = logging.DEBUG if args.debug else logging.INFO
-    logger = logging.getLogger()
-    logger.setLevel(log_level)
-    log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    log_console_handler = logging.StreamHandler()
-    log_console_handler.setFormatter(log_formatter)
-    logger.addHandler(log_console_handler)
-    switches.DEBUG_MODE = args.debug
-    if switches.DEBUG_MODE:
-        logger.info('debug mode is on')
-
-    # redirect output to log files (will be overwritten at each start)
-    log_filename = os.path.join(user_folder, 'remake.log')
-    log_details_handler = logging.FileHandler(log_filename, mode='w', encoding='utf-8')
-    log_details_handler.setFormatter(log_formatter)
-    logger.addHandler(log_details_handler)
-    logger.info('writing detailed log messages to %s', log_filename)
-
-    error_filename = os.path.join(user_folder, 'remake.error.log')
-    log_error_handler = logging.FileHandler(error_filename, mode='w', encoding='utf-8')
-    log_error_handler.setFormatter(log_formatter)
-    log_error_handler.setLevel(logging.ERROR)
-    logger.addHandler(log_error_handler)
-    logger.info('writing error log messages to %s', error_filename)
 
     # import some base libraries
     import imperialism_remake.base.tools as tools
