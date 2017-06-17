@@ -88,8 +88,7 @@ def main():
     # determine DEBUG_MODE from runtime arguments
     from imperialism_remake.base import switches
 
-    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        switches.DEBUG_MODE = True
+    switches.DEBUG_MODE = (len(sys.argv) > 1) and (sys.argv[1] == 'debug')
     if switches.DEBUG_MODE:
         print('debug mode is on')
 
