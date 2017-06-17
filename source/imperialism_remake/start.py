@@ -61,7 +61,7 @@ def get_user_directory():
         # MS Windows
         user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
     else:
-        user_folder = 'User Data'
+        user_folder = os.path.join(os.path.expanduser('~'), 'Imperialism Remake User Data')
     return os.path.abspath(user_folder)
 
 
