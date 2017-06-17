@@ -22,6 +22,10 @@ Start in project root folder and with 'debug' as parameter if wished.
 import os
 import sys
 
+
+APPLICATION_NAME = 'imperialism_remake'
+
+
 def exception_hook(type, value, traceback):
     """
     Use sys.__excepthook__, the standard hook.
@@ -66,7 +70,10 @@ def main():
     # determine user folder
     if os.name == 'posix':
         # Linux / Unix
-        user_folder = os.path.join(os.getenv('HOME'), 'Imperialism Remake User Data')
+        # see 'XDG_CONFIG_HOME' in https://specifications.freedesktop.org/basedir-spec/
+        config_basedir = os.getenv('XDG_CONFIG_HOME',
+                                   os.path.join(os.path.expanduser('~'), '.config'))
+        user_folder = os.path.join(config_basedir, APPLICATION_NAME)
     elif (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
         # MS Windows
         user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
