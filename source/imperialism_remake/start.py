@@ -117,14 +117,18 @@ def main():
         logger.info('debug mode is on')
 
     # redirect output to log files (will be overwritten at each start)
-    Log_File = os.path.join(user_folder, 'remake.log')
-    Error_File = os.path.join(user_folder, 'remake.error.log')
-    # in debug mode print to the console instead
-    if not switches.DEBUG_MODE:
-        import codecs
+    log_filename = os.path.join(user_folder, 'remake.log')
+    log_details_handler = logging.FileHandler(log_filename, mode='w', encoding='utf-8')
+    log_details_handler.setFormatter(log_formatter)
+    logger.addHandler(log_details_handler)
+    logger.info('writing detailed log messages to %s', log_filename)
 
-        sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
-        sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
+    error_filename = os.path.join(user_folder, 'remake.error.log')
+    log_error_handler = logging.FileHandler(error_filename, mode='w', encoding='utf-8')
+    log_error_handler.setFormatter(log_formatter)
+    log_error_handler.setLevel(logging.ERROR)
+    logger.addHandler(log_error_handler)
+    logger.info('writing error log messages to %s', error_filename)
 
     # import some base libraries
     import imperialism_remake.base.tools as tools
