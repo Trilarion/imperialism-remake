@@ -49,6 +49,22 @@ def set_start_directory(logger):
     os.chdir(package_path)
 
 
+def get_user_directory():
+    # determine user folder
+    if os.name == 'posix':
+        # Linux / Unix
+        # see 'XDG_CONFIG_HOME' in https://specifications.freedesktop.org/basedir-spec/
+        config_basedir = os.getenv('XDG_CONFIG_HOME',
+                                   os.path.join(os.path.expanduser('~'), '.config'))
+        user_folder = os.path.join(config_basedir, APPLICATION_NAME)
+    elif (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
+        # MS Windows
+        user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
+    else:
+        user_folder = 'User Data'
+    return user_folder
+
+
 def get_arguments():
     parser = argparse.ArgumentParser(prog=APPLICATION_NAME)
     parser.add_argument('--debug', dest='debug', action='store_true',
@@ -107,18 +123,7 @@ def main():
     # directory is not part of Python's search path by default.
     sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-    # determine user folder
-    if os.name == 'posix':
-        # Linux / Unix
-        # see 'XDG_CONFIG_HOME' in https://specifications.freedesktop.org/basedir-spec/
-        config_basedir = os.getenv('XDG_CONFIG_HOME',
-                                   os.path.join(os.path.expanduser('~'), '.config'))
-        user_folder = os.path.join(config_basedir, APPLICATION_NAME)
-    elif (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
-        # MS Windows
-        user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
-    else:
-        user_folder = 'User Data'
+    user_folder = get_user_directory()
 
     # determine DEBUG_MODE from runtime arguments
     from imperialism_remake.base import switches
