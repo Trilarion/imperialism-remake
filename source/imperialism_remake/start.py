@@ -20,6 +20,7 @@ Start in project root folder and with '--debug' as parameter if wished.
 """
 
 import argparse
+import logging
 import os
 import sys
 
@@ -104,9 +105,11 @@ def main():
     from imperialism_remake.base import switches
 
     args = get_arguments()
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=log_level)
     switches.DEBUG_MODE = args.debug
     if switches.DEBUG_MODE:
-        print('debug mode is on')
+        logging.info('debug mode is on')
 
     # redirect output to log files (will be overwritten at each start)
     Log_File = os.path.join(user_folder, 'remake.log')
