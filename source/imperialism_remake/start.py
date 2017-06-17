@@ -73,6 +73,12 @@ def main():
     # fix PyQt5 exception eating
     fix_pyqt5_exception_eating()
 
+    # Add the parent directory of the package directory to Python's search path.
+    # This allows the import of the 'imperialism_remake' modules.
+    # This is required at least for Linux distributions of Python3, since the current working
+    # directory is not part of Python's search path by default.
+    sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
     # set start directory
     set_start_directory()
 
