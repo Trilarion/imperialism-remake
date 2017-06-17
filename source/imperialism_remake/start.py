@@ -16,9 +16,10 @@
 
 """
 Starts the application (a client and a server).
-Start in project root folder and with 'debug' as parameter if wished.
+Start in project root folder and with '--debug' as parameter if wished.
 """
 
+import argparse
 import os
 import sys
 
@@ -45,6 +46,14 @@ def set_start_directory():
     package_path = os.path.dirname(__file__)
     print(package_path)
     os.chdir(package_path)
+
+
+def get_arguments():
+    parser = argparse.ArgumentParser(prog=APPLICATION_NAME)
+    parser.add_argument('--debug', dest='debug', action='store_true',
+                        help='enable detailed debug logging')
+    return parser.parse_args()
+
 
 def main():
     """
@@ -88,7 +97,8 @@ def main():
     # determine DEBUG_MODE from runtime arguments
     from imperialism_remake.base import switches
 
-    switches.DEBUG_MODE = (len(sys.argv) > 1) and (sys.argv[1] == 'debug')
+    args = get_arguments()
+    switches.DEBUG_MODE = args.debug
     if switches.DEBUG_MODE:
         print('debug mode is on')
 

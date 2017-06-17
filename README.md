@@ -60,7 +60,7 @@ of the underlying C++ Qt 5.X framework is very useful since PyQt5 is almost 100%
 ### Start
 
 - Run file "./source/start.py" with working directory "./".
-- Start with command line parameter "debug" for (more) output on the console.
+- Start with command line parameter "--debug" for (more) output on the console.
 - A folder with log files and settings is created under "user folder/Imperialism Remake User Data" where "user folder" is the typical user folder of your system (Windows C:/Users/XXX/).
 
 ### IDE
