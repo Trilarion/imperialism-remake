@@ -62,7 +62,7 @@ def get_user_directory():
         user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
     else:
         user_folder = 'User Data'
-    return user_folder
+    return os.path.abspath(user_folder)
 
 
 def get_arguments():
