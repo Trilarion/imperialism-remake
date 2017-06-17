@@ -20,6 +20,7 @@
 
 from datetime import datetime
 import logging
+import logging.handlers
 import multiprocessing
 import os
 import random
@@ -43,18 +44,23 @@ logger = logging.getLogger(__name__)
 # TODO ping server clients regularly and throw them out if not reacting
 # TODO wait for a name but only change it once during a session
 
+
 class ServerProcess(multiprocessing.Process):
     """
     A Process that inside its run method executes a QCoreApplication which runs the server.
     """
 
-    def __init__(self):
+    def __init__(self, log_queue, log_formatter, log_level):
         super().__init__()
+        self._log_queue = log_queue
+        self._log_formatter = log_formatter
+        self._log_level = log_level
 
     def run(self):
         """
         Runs the server process by starting its own QCoreApplication.
         """
+        self._configure_forked_logger()
         # because PyQt5 eats exceptions in the event thread this workaround
         sys.excepthook = start.exception_hook
 
@@ -68,6 +74,23 @@ class ServerProcess(multiprocessing.Process):
 
         # run event loop of app
         app.exec_()
+
+    def _configure_forked_logger(self):
+        """ create a new logging handler that will inject its records into a queue
+
+        The listener of this queue runs in the main process (that opened the log files and stdout)
+        as a thread and will output all incoming log records via its configured handlers.
+        """
+        log_queue_handler = logging.handlers.QueueHandler(self._log_queue)
+        log_queue_handler.setFormatter(self._log_formatter)
+        root = logging.getLogger()
+        root.setLevel(self._log_level)
+        # remove all possibly inherited handlers - we only need our new queue logger
+        for handler in root.handlers:
+            root.removeHandler(handler)
+        root.addHandler(log_queue_handler)
+        logger = logging.getLogger(__name__)
+        logger.info("created a multiprocess logger (pid=%d)", os.getpid())
 
 
 class ServerNetworkClient(base_network.NetworkClient):
@@ -97,6 +120,7 @@ class ServerManager(QtCore.QObject):
         We start with a server (ExtendedTcpServer) and an empty list of server clients (NetworkClient).
         """
         super().__init__()
+        logger.info("ServerManager started")
         self.server = lib_network.ExtendedTcpServer()
         self.server.new_client.connect(self._new_client)
         self.server_clients = []
@@ -106,7 +130,7 @@ class ServerManager(QtCore.QObject):
         """
         Start the extended TCP server with a local scope.
         """
-        logger.info('server starts')
+        logger.info('server starts (pid=%d)', os.getpid())
         self.server.start(constants.NETWORK_PORT)
 
     def _new_client(self, socket: QtNetwork.QTcpSocket):

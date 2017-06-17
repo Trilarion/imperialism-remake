@@ -21,8 +21,10 @@ Start in project root folder and with '--debug' as parameter if wished.
 
 import argparse
 import logging
+import multiprocessing
 import os
 import sys
+import threading
 
 
 APPLICATION_NAME = 'imperialism_remake'
@@ -98,13 +100,46 @@ def get_configured_logger(user_folder, is_debug):
     log_error_handler.setLevel(logging.ERROR)
     logger.addHandler(log_error_handler)
     logger.info('writing error log messages to %s', error_filename)
-    return logger
+
+    # the "log_queue" can be used by forked processes (e.g. ServerProcess) for log delivery
+    log_queue = multiprocessing.Queue()
+
+    def run_logger_thread(log_queue, logging=logging):
+        """ listen to a queue waiting for new log records
+
+        This queue can be filled by other processes (e.g. ServerProcess). Each sending process should configure its
+        own log handler (logging.handlers.QueueHandler) connected to this queue.
+        """
+        logger = logging.getLogger(__name__)
+        logger.info("created log receiver thread (pid=%d)", os.getpid())
+        while True:
+            record = log_queue.get()
+            if record is None:
+                break
+            logger = logging.getLogger(record.name)
+            logger.handle(record)
+
+    logger_thread = threading.Thread(target=run_logger_thread, args=(log_queue,))
+    logger_thread.start()
+
+    def logger_thread_cleanup(log_queue=log_queue, logger_thread=logger_thread):
+        """ the logger thread will exit as soon as he receives None in the log_queue
+
+        This function should be called immediately before exiting.
+        """
+        log_queue.put(None)
+        logger_thread.join()
+
+    return logger, log_queue, log_formatter, log_level, logger_thread_cleanup
 
 
 def main():
     """
     Main entry point. Called from the script generated in setup.py and called when running this module with python.
     """
+#   multiprocessing.freeze_support()
+    multiprocessing.set_start_method('spawn')
+
     # test for python version
     required_version = (3, 5)
     if sys.version_info < required_version:
@@ -131,7 +166,8 @@ def main():
     from imperialism_remake.base import switches
     args = get_arguments()
     switches.DEBUG_MODE = args.debug
-    logger = get_configured_logger(user_folder, switches.DEBUG_MODE)
+    logger, log_queue, log_formatter, log_level, logger_cleanup = get_configured_logger(user_folder,
+                                                                                        switches.DEBUG_MODE)
     logger.info('user data stored in: {}'.format(user_folder))
 
     # set start directory
@@ -172,14 +208,9 @@ def main():
 
     # now we can safely assume that the environment is good to us
 
-    # start server
-    import multiprocessing
-
-    # multiprocessing.freeze_support()
-    multiprocessing.set_start_method('spawn')
     from imperialism_remake.server.server import ServerProcess
 
-    server_process = ServerProcess()
+    server_process = ServerProcess(log_queue, log_formatter, log_level)
     server_process.start()
 
     # start client, we will return when the program finishes
@@ -200,6 +231,8 @@ def main():
 
     # good bye message
     logger.info('will exit soon - good bye')
+
+    logger_cleanup()
 
 
 if __name__ == '__main__':
