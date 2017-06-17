@@ -106,10 +106,15 @@ def main():
 
     args = get_arguments()
     log_level = logging.DEBUG if args.debug else logging.INFO
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=log_level)
+    logger = logging.getLogger()
+    logger.setLevel(log_level)
+    log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    log_console_handler = logging.StreamHandler()
+    log_console_handler.setFormatter(log_formatter)
+    logger.addHandler(log_console_handler)
     switches.DEBUG_MODE = args.debug
     if switches.DEBUG_MODE:
-        logging.info('debug mode is on')
+        logger.info('debug mode is on')
 
     # redirect output to log files (will be overwritten at each start)
     Log_File = os.path.join(user_folder, 'remake.log')
