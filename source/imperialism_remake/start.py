@@ -67,7 +67,7 @@ def main():
     if os.name == 'posix':
         # Linux / Unix
         user_folder = os.path.join(os.getenv('HOME'), 'Imperialism Remake User Data')
-    if (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
+    elif (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
         # MS Windows
         user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
     else:
