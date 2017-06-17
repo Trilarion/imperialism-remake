@@ -338,7 +338,8 @@ class Scenario(QtCore.QObject):
         :param position:
         :return:
         """
-        # TODO TODO we should check that this position is not yet in another province (it should be cleared before). fail fast, fail often
+        # TODO TODO we should check that this position is not yet in another province (it should be cleared before).
+        #     fail fast, fail often
         if province in self._provinces and self.is_valid_position(position):
             self._provinces[province][constants.ProvinceProperty.TILES].append(position)
 

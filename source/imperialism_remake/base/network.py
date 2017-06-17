@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Using Signals of Qt, we refine on the network Client class in lib/network.py. Channels are introduced which have
-    names and a signal to connect/disconnect to.
+    Using Signals of Qt, we refine on the network Client class in lib/network.py. Channels are
+    introduced which have names and a signal to connect/disconnect to.
 """
 
 import logging
@@ -33,13 +33,15 @@ logger = logging.getLogger(__name__)
 
 class NetworkClient(lib_network.ExtendedTcpSocket):
     """
-    Extending the Client class (wrapper around QTcpSocket sending and receiving messages) with channels (see Channel)
-    and processing logic, as well as further wrapping the messages (specifying the channel as address).
+    Extending the Client class (wrapper around QTcpSocket sending and receiving messages) with
+    channels (see Channel) and processing logic, as well as further wrapping the messages
+    (specifying the channel as address).
 
-    The Channel implementation is completely hidden, one just calls the connect/disconnect methods in this class.
+    The Channel implementation is completely hidden, one just calls the connect/disconnect methods
+    in this class.
 
-    This is kind of a service-subscription pattern and allows for reducing complexity and decoupling of the message
-    transport and message processing.
+    This is kind of a service-subscription pattern and allows for reducing complexity and
+    decoupling of the message transport and message processing.
     """
 
     def __init__(self, socket: QtNetwork.QTcpSocket = None):
@@ -54,8 +56,8 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
 
     def create_new_channel(self, channel: constants.C):
         """
-        Given a new channel name (cannot already exist, otherwise an error will be thrown) creates a channel of
-        this name.
+        Given a new channel name (cannot already exist, otherwise an error will be thrown) creates
+        a channel of this name.
 
         :param channel: Name of the channel.
         """
@@ -65,11 +67,12 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
 
     def remove_channel(self, channel: constants.C, ignore_not_existing=False):
         """
-        Given a channel name, removes this channel if it is existing. Raises an error if not existing and
-        ignore_not_existing is not True.
+        Given a channel name, removes this channel if it is existing. Raises an error if not
+        existing and ignore_not_existing is not True.
 
         :param channel: Name of the channel
-        :param ignore_not_existing: If True does not raise an error if channel with this name is already existing.
+        :param ignore_not_existing: If True does not raise an error if channel with this name is
+            already existing.
         """
         if channel in self.channels:
             del self.channels[channel]
@@ -80,7 +83,8 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
         """
         Connect a callback to a channel with a specific name.
 
-        As a convenience shortcut, if a channel of this name is not yet existing, creates a new one before.
+        As a convenience shortcut, if a channel of this name is not yet existing, creates a new one
+        before.
 
         :param channel: Name of the channel
         :param callback: A callable
@@ -91,8 +95,8 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
 
     def disconnect_from_channel(self, channel: constants.C, callback: callable):
         """
-        Given a channel name (which must exist, otherwise an error is raised) disconnects a callback from this
-        channel.
+        Given a channel name (which must exist, otherwise an error is raised) disconnects a
+        callback from this channel.
 
         :param channel: Name of the channel
         :param callback: A callable
@@ -103,9 +107,11 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
 
     def _process(self, letter):
         """
-        A letter (a message) was received from the underlying ExtendedTcpSocket framework. Not intended for outside use.
-        Here we assume that it's a dictionary with keys 'channel' and 'content' where the value for key 'channel' is
-        the name of the channel and the value of the key 'content' is the message.
+        A letter (a message) was received from the underlying ExtendedTcpSocket framework.
+
+        Not intended for outside use.  Here we assume that it's a dictionary with keys 'channel'
+        and 'content' where the value for key 'channel' is the name of the channel and the value of
+        the key 'content' is the message.
 
         We get the corresponding Channel object and emit its received signal.
 
@@ -116,17 +122,20 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
 
         # do we have receivers in this category
         if channel not in self.channels:
-            raise RuntimeError('Received message on channel {} which is not existing.'.format(channel))
+            raise RuntimeError('Received message on channel {} which is not existing.'
+                               .format(channel))
 
         # send to channel and increase channel counter
         self.channels[channel].message_counter += 1
         self.channels[channel].received.emit(self, channel, letter['action'], letter['content'])
 
-        # note: channel with name channel_name may now already not be existing anymore (may be removed during processing)
+        # note: channel with name channel_name may now already not be existing anymore (may be
+        # removed during processing)
 
     def send(self, channel: constants.C, action: constants.M, content=None):
         """
-        Given a channel and a action id and optionally a message content wraps them in one dict (a letter) and sends it.
+        Given a channel and a action id and optionally a message content wraps them in one dict
+        (a letter) and sends it.
 
         :param channel: Channel id
         :param action: action id
@@ -141,9 +150,9 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
 
 class Channel(QtCore.QObject):
     """
-    Just contains a single signal you can connect/disconnect to/from and which sends a client and a value (the message)
-    when emitted. This way many outside parts can subscribe to this channel and using Qt also we can cross thread
-    boundaries easily.
+    Just contains a single signal you can connect/disconnect to/from and which sends a client and a
+    value (the message) when emitted. This way many outside parts can subscribe to this channel and
+    using Qt also we can cross thread boundaries easily.
     """
 
     #: signal

@@ -22,6 +22,7 @@ Starts the client and delivers most of the code responsible for the main client 
 
 from functools import partial
 import logging
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake.base import constants, tools
@@ -46,7 +47,8 @@ logger = logging.getLogger(__name__)
 
 class MapItem(QtCore.QObject):
     """
-        Holds together a clickable QPixmapItem, a description text and a reference to a label that shows the text
+        Holds together a clickable QPixmapItem, a description text and a reference to a label that
+        shows the text
 
         TODO use signals to show the text instead
     """
@@ -101,7 +103,8 @@ class StartScreen(QtWidgets.QWidget):
 
         layout = qt.RelativeLayout(self)
 
-        start_image = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.background.jpg'))
+        start_image = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER,
+                                                     'start.background.jpg'))
         start_image_item = QtWidgets.QGraphicsPixmapItem(start_image)
         start_image_item.setZValue(1)
 
@@ -113,23 +116,28 @@ class StartScreen(QtWidgets.QWidget):
         view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         view.setSceneRect(0, 0, start_image.width(), start_image.height())
-        view.layout_constraint = qt.RelativeLayoutConstraint().center_horizontal().center_vertical()
+        view.layout_constraint = qt.RelativeLayoutConstraint().center_horizontal()\
+            .center_vertical()
         layout.addWidget(view)
 
         subtitle = QtWidgets.QLabel('')
-        subtitle.layout_constraint = qt.RelativeLayoutConstraint((0.5, -0.5, 0),
-            (0.5, -0.5, start_image.height() / 2 + 20))
+        subtitle.layout_constraint = qt.RelativeLayoutConstraint(
+            (0.5, -0.5, 0), (0.5, -0.5, start_image.height() / 2 + 20))
         layout.addWidget(subtitle)
 
-        actions = {'exit': client.quit, 'help': client.show_help_browser, 'lobby': client.show_game_lobby_dialog,
-                   'editor': client.switch_to_editor_screen, 'options': client.show_preferences_dialog}
+        actions = {'exit': client.quit,
+                   'help': client.show_help_browser,
+                   'lobby': client.show_game_lobby_dialog,
+                   'editor': client.switch_to_editor_screen,
+                   'options': client.show_preferences_dialog}
 
         image_map_file = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.overlay.info')
         image_map = utils.read_as_yaml(image_map_file)
 
         # security check, they have to be the same
         if actions.keys() != image_map.keys():
-            raise RuntimeError('Start screen hot map info file ({}) corrupt.'.format(image_map_file))
+            raise RuntimeError('Start screen hot map info file ({}) corrupt.'
+                               .format(image_map_file))
 
         for k, v in image_map.items():
             # add action from our predefined action dictionary
@@ -146,15 +154,16 @@ class StartScreen(QtWidgets.QWidget):
             frame_item.setZValue(4)
             scene.addItem(map_item.item)
 
-        version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'.format(version.__version_full__))
+        version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'
+                                         .format(version.__version_full__))
         version_label.layout_constraint = qt.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
 
 class ClientMainWindowWidget(QtWidgets.QWidget):
     """
-        The main window (widget) which is the top level window of the application. It can be full screen or not and hold
-        a single widget in a margin-less layout.
+        The main window (widget) which is the top level window of the application. It can be full
+        screen or not and hold a single widget in a margin-less layout.
     """
     # TODO should we make this as small as possible, used only once put in Client
 
@@ -186,9 +195,11 @@ class ClientMainWindowWidget(QtWidgets.QWidget):
 
         # loading animation
         # TODO animation right and start, stop in client
-        self.animation = QtGui.QMovie(constants.extend(constants.GRAPHICS_UI_FOLDER, 'loading.gif'))
-        # self.animation.start()
-        self.loading_label = QtWidgets.QLabel(self, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
+        self.animation = QtGui.QMovie(constants.extend(constants.GRAPHICS_UI_FOLDER,
+                                                       'loading.gif'))
+#       self.animation.start()
+        self.loading_label = QtWidgets.QLabel(
+            self, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
         self.loading_label.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.loading_label.setMovie(self.animation)
         # self.loading_label.show()
@@ -206,8 +217,8 @@ class ClientMainWindowWidget(QtWidgets.QWidget):
 
 class Client:
     """
-        Main class of the client, holds the help browser, the main window (full screen or not), the content of the main
-        window, the audio player
+        Main class of the client, holds the help browser, the main window (full screen or not), the
+        content of the main window, the audio player
     """
 
     def __init__(self):
@@ -243,7 +254,8 @@ class Client:
 
         # for the notifications
         self.pending_notifications = []
-        self.notification_position_constraint = qt.RelativeLayoutConstraint().center_horizontal().south(20)
+        self.notification_position_constraint = qt.RelativeLayoutConstraint().center_horizontal()\
+            .south(20)
         self.notification = None
 
         # after the player starts, the main window is not active anymore
@@ -252,8 +264,9 @@ class Client:
 
     def schedule_notification(self, text):
         """
-            Generic scheduling of a notification. Will be shown immediately if no other notification is shown, otherwise
-            it will be shown as soon at the of the current list of notifications to be shown.
+            Generic scheduling of a notification. Will be shown immediately if no other
+            notification is shown, otherwise it will be shown as soon at the of the current list of
+            notifications to be shown.
         """
         self.pending_notifications.append(text)
         if self.notification is None:
@@ -261,11 +274,13 @@ class Client:
 
     def show_next_notification(self):
         """
-            Will be called whenever a notification is shown and was cleared. Tries to show the next one if there is one.
+            Will be called whenever a notification is shown and was cleared. Tries to show the next
+            one if there is one.
         """
         if len(self.pending_notifications) > 0:
             message = self.pending_notifications.pop(0)
-            self.notification = qt.Notification(self.main_window, message,
+            self.notification = qt.Notification(
+                self.main_window, message,
                 position_constraint=self.notification_position_constraint)
             self.notification.finished.connect(self.show_next_notification)
             self.notification.show()
@@ -276,7 +291,8 @@ class Client:
         """
             Displays the help browser somewhere on screen. Can set a special page if needed.
         """
-        # we sometimes wire signals that send parameters for url (mouse events for example) which we do not like
+        # we sometimes wire signals that send parameters for url (mouse events for example) which
+        # we do not like
         if isinstance(path, str):
             url = qt.local_url(path)
             # self.help_browser_widget.load(url)
@@ -295,7 +311,9 @@ class Client:
             Is invoked when pressing F2.
         """
         monitor_widget = ServerMonitorWidget()
-        dialog = graphics.GameDialog(self.main_window, monitor_widget, modal=False, delete_on_close=True, title='Server Monitor', help_callback=self.show_help_browser)
+        dialog = graphics.GameDialog(self.main_window, monitor_widget, modal=False,
+                                     delete_on_close=True, title='Server Monitor',
+                                     help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
@@ -311,7 +329,8 @@ class Client:
             Shows the game lobby dialog.
         """
         lobby_widget = GameLobbyWidget()
-        dialog = graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True, title='Game Lobby', help_callback=self.show_help_browser)
+        dialog = graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True,
+                                     title='Game Lobby', help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         lobby_widget.single_player_start.connect(self.single_player_start)
         dialog.show()
@@ -320,7 +339,7 @@ class Client:
         """
             Shows the main game screen which will start a scenario file and a selected nation.
         """
-        #lobby_dialog.close()
+#       lobby_dialog.close()
         widget = GameMainScreen(self)
         self.main_window.change_content_widget(widget)
 
@@ -336,8 +355,10 @@ class Client:
             Shows the preferences dialog.
         """
         preferences_widget = PreferencesWidget()
-        dialog = graphics.GameDialog(self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
-            help_callback=partial(self.show_help_browser, path=constants.DOCUMENTATION_PREFERENCES_FILE),
+        dialog = graphics.GameDialog(
+            self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
+            help_callback=partial(self.show_help_browser,
+                                  path=constants.DOCUMENTATION_PREFERENCES_FILE),
             close_callback=preferences_widget.close_request)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
@@ -373,7 +394,8 @@ def local_network_connect():
     # TODO what if this is not possible
 
     # tell name
-    local_network_client.send(constants.C.GENERAL, constants.M.GENERAL_NAME, tools.get_option(constants.Option.LOCALCLIENT_NAME))
+    local_network_client.send(constants.C.GENERAL, constants.M.GENERAL_NAME,
+                              tools.get_option(constants.Option.LOCALCLIENT_NAME))
 
 
 def start_client():
@@ -389,20 +411,24 @@ def start_client():
     # test for desktop availability
     desktop = app.desktop()
     rect = desktop.screenGeometry()
-    if rect.width() < constants.MINIMAL_SCREEN_SIZE[0] or rect.height() < constants.MINIMAL_SCREEN_SIZE[1]:
+    if ((rect.width() < constants.MINIMAL_SCREEN_SIZE[0])
+            or (rect.height() < constants.MINIMAL_SCREEN_SIZE[1])):
         # noinspection PyTypeChecker
         QtWidgets.QMessageBox.warning(None, 'Warning',
-            'Actual screen size below minimal screen size {}.'.format(constants.MINIMAL_SCREEN_SIZE))
+                                      'Actual screen size below minimal screen size {}.'
+                                      .format(constants.MINIMAL_SCREEN_SIZE))
         return
 
     # if no bounds are set, set reasonable bounds
     if tools.get_option(constants.Option.MAINWINDOW_BOUNDS) is None:
-        tools.set_option(constants.Option.MAINWINDOW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
+        tools.set_option(constants.Option.MAINWINDOW_BOUNDS,
+                         desktop.availableGeometry().adjusted(50, 50, -100, -100))
         tools.set_option(constants.Option.MAINWINDOW_MAXIMIZED, True)
         logger.info('No previous bounds of the main window stored, start maximized')
 
     # load global stylesheet to app
-    with open(constants.GLOBAL_STYLESHEET_FILE, encoding='utf-8') as file:  # open is 'r' by default
+    # open is 'r' by default
+    with open(constants.GLOBAL_STYLESHEET_FILE, encoding='utf-8') as file:
         style_sheet = file.read()
     app.setStyleSheet(style_sheet)
 

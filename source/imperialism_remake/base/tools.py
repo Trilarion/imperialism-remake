@@ -19,7 +19,6 @@
     and base.constants and is specifically used by the project.
 """
 
-import sys
 import PyQt5.QtGui as QtGui
 
 import imperialism_remake.base.constants as constants
@@ -70,7 +69,8 @@ def load_options(file_name):
     # copy values that are in Constants.Options but not here
     for option in constants.Options:
         if option not in options and hasattr(option, 'default'):
-                options[option] = option.default
+            options[option] = option.default
+
 
 def get_option(option):
     """

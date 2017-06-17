@@ -18,22 +18,22 @@
     Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
+from datetime import datetime
 import logging
 import multiprocessing
 import os
 import random
 import sys
 import time
-from datetime import datetime
 
 from PyQt5 import QtCore, QtNetwork
 
-import imperialism_remake.start as start
 from imperialism_remake.base import constants
 import imperialism_remake.base.network as base_network
 from imperialism_remake.lib import utils
 import imperialism_remake.lib.network as lib_network
 from imperialism_remake.server.scenario import Scenario
+import imperialism_remake.start as start
 
 
 logger = logging.getLogger(__name__)
@@ -68,6 +68,7 @@ class ServerProcess(multiprocessing.Process):
 
         # run event loop of app
         app.exec_()
+
 
 class ServerNetworkClient(base_network.NetworkClient):
     """
@@ -228,6 +229,7 @@ class ServerManager(QtCore.QObject):
             connected_clients = [c.name for c in self.server_clients]
             client.send(channel, action, connected_clients)
 
+
 def general_messages(client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
     """
 
@@ -239,6 +241,7 @@ def general_messages(client: ServerNetworkClient, channel: constants.C, action: 
 
     if action == constants.M.GENERAL_NAME:
         client.name = content
+
 
 def scenario_core_titles():
     """
@@ -281,13 +284,18 @@ def scenario_preview(scenario_file_name):
     preview = {'scenario': scenario_file_name}
 
     # some scenario properties should be copied
-    scenario_copy_keys = [constants.ScenarioProperty.MAP_COLUMNS, constants.ScenarioProperty.MAP_ROWS, constants.ScenarioProperty.TITLE, constants.ScenarioProperty.DESCRIPTION]
+    scenario_copy_keys = [constants.ScenarioProperty.MAP_COLUMNS,
+                          constants.ScenarioProperty.MAP_ROWS,
+                          constants.ScenarioProperty.TITLE,
+                          constants.ScenarioProperty.DESCRIPTION]
     for key in scenario_copy_keys:
         preview[key] = scenario[key]
 
     # some nations properties should be copied
     nations = {}
-    nation_copy_keys = [constants.NationProperty.COLOR, constants.NationProperty.NAME, constants.NationProperty.DESCRIPTION]
+    nation_copy_keys = [constants.NationProperty.COLOR,
+                        constants.NationProperty.NAME,
+                        constants.NationProperty.DESCRIPTION]
     for nation in scenario.nations():
         nations[nation] = {}
         for key in nation_copy_keys:

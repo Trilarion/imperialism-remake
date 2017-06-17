@@ -19,8 +19,8 @@
     Only static values here.
 """
 
-import os
 from enum import unique
+import os
 
 from imperialism_remake.base import switches
 from imperialism_remake.lib import utils
@@ -97,17 +97,22 @@ class Option(utils.AutoNumberedEnum):
     SOUNDTRACK_MUTE = ()  # bool
     SOUNDTRACK_VOLUME = ()  # int from 0 to 100
 
+
 Options = list(Option)
 
 #: default values for the Options
 Option.LOCALSERVER_OPEN.default = False
 Option.LOCALSERVER_NAME.default = 'Alice'
 Option.LOCALCLIENT_NAME.default = 'Bob'
-Option.MAINWINDOW_BOUNDS.default = None # no bounds
-Option.MAINWINDOW_FULLSCREEN.default = True  # we start full screen (can be unset by the program for some linux desktop environments
-Option.MAINWINDOW_FULLSCREEN_SUPPORTED.default = True # we assume it is until we detect it isn't
+# no bounds
+Option.MAINWINDOW_BOUNDS.default = None
+# we start full screen (can be unset by the program for some linux desktop environments)
+Option.MAINWINDOW_FULLSCREEN.default = True
+# we assume it is until we detect it isn't
+Option.MAINWINDOW_FULLSCREEN_SUPPORTED.default = True
 Option.SOUNDTRACK_MUTE.default = False
 Option.SOUNDTRACK_VOLUME.default = 50
+
 
 @unique
 class C(utils.AutoNumberedEnum):
@@ -119,6 +124,7 @@ class C(utils.AutoNumberedEnum):
     CHAT = ()
     SYSTEM = ()
     LOBBY = ()
+
 
 @unique
 class M(utils.AutoNumberedEnum):
@@ -139,6 +145,7 @@ class M(utils.AutoNumberedEnum):
     LOBBY_SCENARIO_CORE_LIST = ()
     LOBBY_SCENARIO_PREVIEW = ()
     LOBBY_CONNECTED_CLIENTS = ()
+
 
 @unique
 class TileDirections(utils.AutoNumberedEnum):
@@ -170,6 +177,7 @@ class ScenarioProperty(utils.AutoNumberedEnum):
     RULES = ()
     GAME_YEAR_RANGE = ()
 
+
 @unique
 class NationProperty(utils.AutoNumberedEnum):
     """
@@ -181,6 +189,7 @@ class NationProperty(utils.AutoNumberedEnum):
     DESCRIPTION = ()
     CAPITAL_PROVINCE = ()
 
+
 @unique
 class ProvinceProperty(utils.AutoNumberedEnum):
     """
@@ -190,6 +199,7 @@ class ProvinceProperty(utils.AutoNumberedEnum):
     NAME = ()
     NATION = ()
     TOWN_LOCATION = ()
+
 
 #: name of properties file in a zipped scenario file
 SCENARIO_FILE_PROPERTIES = 'scenario-properties'
@@ -206,6 +216,7 @@ class ClientConfiguration:
     Key names for scenario client configuration properties.
     """
     OVERVIEW_WIDTH = 'overview.width'
+
 
 @unique
 class OverviewMapMode(utils.AutoNumberedEnum):

@@ -34,11 +34,13 @@ def exception_hook(type, value, traceback):
     """
     sys.__excepthook__(type, value, traceback)
 
+
 def fix_pyqt5_exception_eating():
     """
     PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
     """
     sys.excepthook = exception_hook
+
 
 def set_start_directory(logger):
     """
@@ -110,7 +112,7 @@ def main():
 
     # test for existence of PyQt5
     try:
-        from PyQt5 import QtCore
+        from PyQt5 import QtCore  # noqa: F401
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
 
@@ -143,12 +145,12 @@ def main():
     import imperialism_remake.base.tools as tools
 
     # search for existing options file, if not existing, save it once (should just save an empty dictionary)
-    Options_File = os.path.join(user_folder, 'options.info')
-    if not os.path.exists(Options_File):
-        tools.save_options(Options_File)
+    options_file = os.path.join(user_folder, 'options.info')
+    if not os.path.exists(options_file):
+        tools.save_options(options_file)
 
     # create single options object, load options and send a log message
-    tools.load_options(Options_File)
+    tools.load_options(options_file)
     logger.info('options loaded from user folder (%s)', user_folder)
 
     # special case of some desktop environments under Linux where full screen mode does not work well
@@ -158,7 +160,10 @@ def main():
     if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         session = os.environ.get("DESKTOP_SESSION")
         # TODO: what exactly is the problem and how can we detect it (without guessing)?
-        if session and (session.startswith('ubuntu') or 'xfce' in session or session.startswith('xubuntu') or 'gnome' in session):
+        if (session and (session.startswith('ubuntu')
+                         or ('xfce' in session)
+                         or session.startswith('xubuntu')
+                         or ('gnome' in session))):
             tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED, False)
             logger.warning('Desktop environment %s has problems with full screen mode. Will turn if off.', session)
     # we cannot have full screen without support
@@ -186,8 +191,8 @@ def main():
     server_process.join()
 
     # save options
-    tools.save_options(Options_File)
-    logger.info('options saved to file %s', Options_File)
+    tools.save_options(options_file)
+    logger.info('options saved to file %s', options_file)
 
     # report on unused resources
     if switches.DEBUG_MODE:
@@ -195,6 +200,7 @@ def main():
 
     # good bye message
     logger.info('will exit soon - good bye')
+
 
 if __name__ == '__main__':
     main()

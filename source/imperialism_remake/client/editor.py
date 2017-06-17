@@ -43,7 +43,8 @@ class MiniMap(QtWidgets.QWidget):
     # Fixed width of 300 pixels
     VIEW_WIDTH = 300
 
-    #: signal, emitted if the user clicks somewhere in the mini map and the ROI rectangle changes as a result, sends the normalized x and y position of the center of the new ROI
+    #: signal, emitted if the user clicks somewhere in the mini map and the ROI rectangle changes as a result, sends
+    #    the normalized x and y position of the center of the new ROI
     roi_changed = QtCore.pyqtSignal(float, float)
 
     def __init__(self, *args, **kwargs):
@@ -86,10 +87,12 @@ class MiniMap(QtWidgets.QWidget):
         # action group (only one of them can be checked at each time)
         action_group = QtWidgets.QActionGroup(self.toolbar)
         # political view in the beginning
-        a = qt.create_action(tools.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group, toggle_connection=self.switch_to_political_view, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group,
+                             toggle_connection=self.switch_to_political_view, checkable=True)
         self.toolbar.addAction(a)
         # geographical view
-        a = qt.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group, toggle_connection=self.switch_to_geographical_view, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group,
+                             toggle_connection=self.switch_to_geographical_view, checkable=True)
         self.toolbar.addAction(a)
         self.mode = constants.OverviewMapMode.POLITICAL
 
@@ -154,7 +157,8 @@ class MiniMap(QtWidgets.QWidget):
                 tiles = []
                 # get all tiles
                 for province in provinces:
-                    tiles.extend(editor_scenario.scenario.province_property(province, constants.ProvinceProperty.TILES))
+                    tiles.extend(editor_scenario.scenario.province_property(province,
+                                                                            constants.ProvinceProperty.TILES))
                 # get rectangular path for each tile
                 path = QtGui.QPainterPath()
                 for tile in tiles:
@@ -218,7 +222,7 @@ class MiniMap(QtWidgets.QWidget):
             self.mode = constants.OverviewMapMode.GEOGRAPHICAL
             self.redraw()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event):  # noqa: N802
         """
         The mouse has been pressed inside the view. Center the tracker rectangle.
         """
@@ -345,10 +349,10 @@ class MainMap(QtWidgets.QGraphicsView):
         for row in range(0, rows):
             if row % 2 == 0:
                 item = self.scene.addRect(columns * self.TILE_SIZE, row * self.TILE_SIZE, self.TILE_SIZE / 2,
-                    self.TILE_SIZE, pen=qt.TRANSPARENT_PEN)
+                                          self.TILE_SIZE, pen=qt.TRANSPARENT_PEN)
             else:
                 item = self.scene.addRect(0, row * self.TILE_SIZE, self.TILE_SIZE / 2, self.TILE_SIZE,
-                    pen=qt.TRANSPARENT_PEN)
+                                          pen=qt.TRANSPARENT_PEN)
             item.setBrush(brush)
             item.setZValue(1)
 
@@ -406,7 +410,8 @@ class MainMap(QtWidgets.QGraphicsView):
             # get all provinces of this nation
             provinces = editor_scenario.scenario.provinces_of_nation(nation)
             for province in provinces:
-                column, row = editor_scenario.scenario.province_property(province, constants.ProvinceProperty.TOWN_LOCATION)
+                column, row = editor_scenario.scenario.province_property(province,
+                                                                         constants.ProvinceProperty.TOWN_LOCATION)
                 sx, sy = editor_scenario.scenario.scene_position(column, row)
                 # center city image on center of tile
                 x = (sx + 0.5) * self.TILE_SIZE - city_pixmap.width() / 2
@@ -426,11 +431,13 @@ class MainMap(QtWidgets.QGraphicsView):
                 # display rounded rectangle below province name
                 bx = 8
                 by = 4
-                background = QtCore.QRectF(x - bx, y - by, item.boundingRect().width() + 2 * bx, item.boundingRect().height() + 2 * by)
+                background = QtCore.QRectF(x - bx, y - by,
+                                           item.boundingRect().width() + 2 * bx,
+                                           item.boundingRect().height() + 2 * by)
                 path = QtGui.QPainterPath()
                 path.addRoundedRect(background, 50, 50)
                 item = self.scene.addPath(path, pen=qt.TRANSPARENT_PEN,
-                    brush=QtGui.QBrush(QtGui.QColor(128, 128, 255, 64)))
+                                          brush=QtGui.QBrush(QtGui.QColor(128, 128, 255, 64)))
                 item.setZValue(5)
 
         # draw the grid and the coordinates
@@ -474,7 +481,7 @@ class MainMap(QtWidgets.QGraphicsView):
         # center on it
         self.centerOn(x, y)
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event):  # noqa: N802
         """
         The mouse on the view has been moved. Emit signal focus_changed if we now hover over a different tile.
         """
@@ -489,7 +496,7 @@ class MainMap(QtWidgets.QGraphicsView):
                 self.focus_changed.emit(column, row)
         super().mouseMoveEvent(event)
 
-    def contextMenuEvent(self, event):
+    def contextMenuEvent(self, event):  # noqa: N802
         """
         Right click (context click) on a tile. Shows the context menu, depending on the tile position
         """
@@ -502,19 +509,22 @@ class MainMap(QtWidgets.QGraphicsView):
         menu = QtWidgets.QMenu(self)
 
         # change terrain
-        a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain.png'), 'Set terrain', self, partial(self.change_terrain.emit, column, row))
+        a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain.png'), 'Set terrain', self,
+                             partial(self.change_terrain.emit, column, row))
         menu.addAction(a)
 
         # is there a province
         province = editor_scenario.scenario.province_at(column, row)
         if province:
-            a = qt.create_action(tools.load_ui_icon('icon.editor.province_info.png'), 'Province info', self, partial(self.province_info.emit, province))
+            a = qt.create_action(tools.load_ui_icon('icon.editor.province_info.png'), 'Province info', self,
+                                 partial(self.province_info.emit, province))
             menu.addAction(a)
 
             # is there also nation
             nation = editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NATION)
             if nation:
-                a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Nation info', self, partial(self.nation_info.emit, nation))
+                a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Nation info', self,
+                                     partial(self.nation_info.emit, nation))
                 menu.addAction(a)
 
         menu.exec(event.globalPos())
@@ -548,7 +558,9 @@ class ChangeTerrainWidget(QtWidgets.QGraphicsView):
         for i in range(0, 6):
             y = i // 4
             x = i % 4
-            self.scene.addRect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE, brush=brushes[i], pen=qt.TRANSPARENT_PEN)
+            self.scene.addRect(x * self.TILE_SIZE, y * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE,
+                               brush=brushes[i], pen=qt.TRANSPARENT_PEN)
+
 
 class InfoPanel(QtWidgets.QWidget):
     """
@@ -578,8 +590,8 @@ class InfoPanel(QtWidgets.QWidget):
     def update_tile_info(self, column, row):
         """
         Displays data of a new tile (hovered or clicked in the main map).
-        
-        :param column: The tile column. 
+
+        :param column: The tile column.
         :param row: The tile row.
         """
         text = 'Position ({}, {})'.format(column, row)
@@ -724,7 +736,8 @@ class ScenarioPropertiesWidget(QtWidgets.QWidget):
         self.game_year_to = QtWidgets.QLineEdit()
         self.game_year_to.setFixedWidth(100)
         self.game_year_to.setText(str(game_range[1]))
-        widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Time range from'), self.game_year_from, QtWidgets.QLabel('to'), self.game_year_to)))
+        widget_layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Time range from'), self.game_year_from,
+                                                      QtWidgets.QLabel('to'), self.game_year_to)))
 
         # vertical stretch
         widget_layout.addStretch()
@@ -832,8 +845,8 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         # get all nation ids
         nations = editor_scenario.scenario.nations()
         # get names for all nations
-        name_of_nation = [(editor_scenario.scenario.nation_property(nation, constants.NationProperty.NAME), nation) for
-                          nation in nations]
+        name_of_nation = [(editor_scenario.scenario.nation_property(nation, constants.NationProperty.NAME), nation)
+                          for nation in nations]
         if name_of_nation:
             name_of_nation = sorted(name_of_nation)  # by first element, which is the name
             nation_names, self.nations = zip(*name_of_nation)
@@ -850,19 +863,21 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         :param index:
         """
         nation = self.nations[index]
-        self.description_edit.setText(editor_scenario.scenario.nation_property(nation, constants.NationProperty.DESCRIPTION))
+        self.description_edit.setText(editor_scenario.scenario.nation_property(nation,
+                                                                               constants.NationProperty.DESCRIPTION))
 
         province = editor_scenario.scenario.nation_property(nation, constants.NationProperty.CAPITAL_PROVINCE)
-        self.capital_province_edit.setText(editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME))
+        self.capital_province_edit.setText(editor_scenario.scenario.province_property(province,
+                                                                                      constants.ProvinceProperty.NAME))
 
         # color
         color_name = editor_scenario.scenario.nation_property(nation, constants.NationProperty.COLOR)
         self.color = QtGui.QColor(color_name)
         self.color_picker.setStyleSheet('QPushButton { background-color: ' + color_name + '; }')
 
-
         provinces = editor_scenario.scenario.nation_property(nation, constants.NationProperty.PROVINCES)
-        provinces_names = [editor_scenario.scenario.province_property(p, constants.ProvinceProperty.NAME) for p in provinces]
+        provinces_names = [editor_scenario.scenario.province_property(p, constants.ProvinceProperty.NAME)
+                           for p in provinces]
         self.number_provinces_label.setText('Provinces ({})'.format(len(provinces)))
         self.provinces_combobox.clear()
         self.provinces_combobox.addItems(provinces_names)
@@ -886,7 +901,9 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         """
         index = self.nation_combobox.currentIndex()
         name = self.nation_combobox.currentText()
-        answer = QtWidgets.QMessageBox.question(self, 'Warning', 'Remove {}'.format(name), QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
+        answer = QtWidgets.QMessageBox.question(self, 'Warning', 'Remove {}'.format(name),
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                QtWidgets.QMessageBox.Yes)
         if answer == QtWidgets.QMessageBox.Yes:
             nation = self.nations[index]
 
@@ -895,6 +912,7 @@ class NationPropertiesWidget(QtWidgets.QWidget):
 
             # reset content
             self.reset_content()
+
 
 class ProvincePropertiesWidget(QtWidgets.QWidget):
     """
@@ -919,7 +937,8 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
         self.provinces_combobox = QtWidgets.QComboBox()
         self.provinces_combobox.setFixedWidth(200)
         self.provinces_combobox.currentIndexChanged.connect(self.province_combobox_index_changed)
-        widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, self.provinces_combobox)), 'provinces'))
+        widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, self.provinces_combobox)),
+                                                    'provinces'))
 
         # province info panel
         layout = QtWidgets.QVBoxLayout()
@@ -950,8 +969,8 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
         provinces = editor_scenario.scenario.provinces()
         # get names for all provinces
         name_of_province = [
-            (editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME), province) for province
-            in provinces]
+            (editor_scenario.scenario.province_property(province, constants.ProvinceProperty.NAME), province)
+            for province in provinces]
         if name_of_province:
             name_of_province = sorted(name_of_province)  # by first element, which is the name
             province_names, self.provinces = zip(*name_of_province)
@@ -994,13 +1013,15 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
         index = self.provinces_combobox.currentIndex()
         name = self.provinces_combobox.currentText()
         answer = QtWidgets.QMessageBox.question(self, 'Warning', 'Remove {}'.format(name),
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                QtWidgets.QMessageBox.Yes)
         if answer == QtWidgets.QMessageBox.Yes:
             province = self.provinces[index]
             editor_scenario.scenario.remove_province(province)  # there is no going back on this one
 
             # reset content
             self.reset_content()
+
 
 class EditorScenario(QtCore.QObject):
     """
@@ -1032,13 +1053,14 @@ class EditorScenario(QtCore.QObject):
         self.scenario = Scenario()
         self.scenario[constants.ScenarioProperty.TITLE] = properties[constants.ScenarioProperty.TITLE]
         self.scenario.create_empty_map(properties[constants.ScenarioProperty.MAP_COLUMNS],
-            properties[constants.ScenarioProperty.MAP_ROWS])
+                                       properties[constants.ScenarioProperty.MAP_ROWS])
 
         # standard rules
         self.scenario[constants.ScenarioProperty.RULES] = 'standard.rules'
         # self.scenario.load_rules()
         # TODO rules as extra?
-        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, self.scenario[constants.ScenarioProperty.RULES])
+        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER,
+                                     self.scenario[constants.ScenarioProperty.RULES])
         self.scenario._rules = utils.read_as_yaml(rule_file)
 
         # emit that everything has changed
@@ -1070,24 +1092,24 @@ class EditorScreen(QtWidgets.QWidget):
 
         # new, load, save scenario actions
         a = qt.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
-            self.new_scenario_dialog)
+                             self.new_scenario_dialog)
         self.toolbar.addAction(a)
         a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
-            self.load_scenario_dialog)
+                             self.load_scenario_dialog)
         self.toolbar.addAction(a)
         a = qt.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self,
-            self.save_scenario_dialog)
+                             self.save_scenario_dialog)
         self.toolbar.addAction(a)
         self.toolbar.addSeparator()
 
         # edit properties (general, nations, provinces) actions
         a = qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self,
-            self.general_properties_dialog)
+                             self.general_properties_dialog)
         self.toolbar.addAction(a)
         a = qt.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.nations_dialog)
         self.toolbar.addAction(a)
         a = qt.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
-            self.provinces_dialog)
+                             self.provinces_dialog)
         self.toolbar.addAction(a)
 
         # spacer
@@ -1140,8 +1162,8 @@ class EditorScreen(QtWidgets.QWidget):
         :param row:
         """
         content_widget = ChangeTerrainWidget(column, row)
-        dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Change terrain', delete_on_close=True,
-            help_callback=self.client.show_help_browser)
+        dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Change terrain',
+                                     delete_on_close=True, help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
@@ -1165,8 +1187,8 @@ class EditorScreen(QtWidgets.QWidget):
         """
         content_widget = NewScenarioWidget()
         content_widget.finished.connect(editor_scenario.create)
-        dialog = graphics.GameDialog(self.client.main_window, content_widget, title='New Scenario', delete_on_close=True,
-            help_callback=self.client.show_help_browser)
+        dialog = graphics.GameDialog(self.client.main_window, content_widget, title='New Scenario',
+                                     delete_on_close=True, help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(600, 400))
         dialog.show()
 
@@ -1176,11 +1198,11 @@ class EditorScreen(QtWidgets.QWidget):
         """
         # noinspection PyCallByClass
         file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', constants.SCENARIO_FOLDER,
-            'Scenario Files (*.scenario)')[0]
+                                                          'Scenario Files (*.scenario)')[0]
         if file_name:
             editor_scenario.load(file_name)
-            self.client.schedule_notification(
-                'Loaded scenario {}'.format(editor_scenario.scenario[constants.ScenarioProperty.TITLE]))
+            self.client.schedule_notification('Loaded scenario {}'
+                                              .format(editor_scenario.scenario[constants.ScenarioProperty.TITLE]))
 
     def save_scenario_dialog(self):
         """
@@ -1188,7 +1210,7 @@ class EditorScreen(QtWidgets.QWidget):
         """
         # noinspection PyCallByClass
         file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', constants.SCENARIO_FOLDER,
-            'Scenario Files (*.scenario)')[0]
+                                                          'Scenario Files (*.scenario)')[0]
         if file_name:
             editor_scenario.scenario.save(file_name)
             path, name = os.path.split(file_name)
@@ -1203,8 +1225,8 @@ class EditorScreen(QtWidgets.QWidget):
 
         content_widget = ScenarioPropertiesWidget()
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='General Properties',
-            delete_on_close=True, help_callback=self.client.show_help_browser,
-            close_callback=content_widget.close_request)
+                                     delete_on_close=True, help_callback=self.client.show_help_browser,
+                                     close_callback=content_widget.close_request)
         # TODO derive meaningful size depending on screen size
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
@@ -1218,7 +1240,7 @@ class EditorScreen(QtWidgets.QWidget):
 
         content_widget = NationPropertiesWidget(nation)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Nations', delete_on_close=True,
-            help_callback=self.client.show_help_browser)
+                                     help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
@@ -1231,6 +1253,6 @@ class EditorScreen(QtWidgets.QWidget):
 
         content_widget = ProvincePropertiesWidget(province)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Provinces', delete_on_close=True,
-            help_callback=self.client.show_help_browser)
+                                     help_callback=self.client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()

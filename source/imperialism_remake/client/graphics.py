@@ -34,7 +34,8 @@ class GameDialog(QtWidgets.QWidget):
     Reference it in stylesheets with 'game-dialog'.
     """
 
-    def __init__(self, parent, content, title=None, modal=True, delete_on_close=False, help_callback=None, close_callback=None):
+    def __init__(self, parent, content, title=None, modal=True, delete_on_close=False, help_callback=None,
+                 close_callback=None):
         # no frame but a standalone window
         super().__init__(parent, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
 
@@ -91,7 +92,7 @@ class GameDialog(QtWidgets.QWidget):
         self.layout.addWidget(title_bar)
         self.layout.addWidget(content)
 
-    def closeEvent(self, event: QtGui.QCloseEvent):
+    def closeEvent(self, event: QtGui.QCloseEvent):  # noqa: N802
         """
         Can be used to prevent Alt+F4 or other automatic closes.
 
@@ -108,7 +109,8 @@ class MiniMapNationItem(qt.ClickablePathItem):
 
     def __init__(self, path, z_left=1, z_entered=2):
         """
-        Adds a QGraphicsDropShadowEffect when hovering over the item. Otherwise it is just a clickable QGraphicsPathItem.
+        Adds a QGraphicsDropShadowEffect when hovering over the item. Otherwise it is just a clickable
+        QGraphicsPathItem.
         """
         super().__init__(path)
 

@@ -19,10 +19,12 @@ The main game screen.
 """
 
 import math
+
 from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import tools, constants
 from imperialism_remake.lib import qt
+
 
 # TODO merge with minimap of the editor
 class MiniMap(QtWidgets.QWidget):
@@ -33,7 +35,8 @@ class MiniMap(QtWidgets.QWidget):
     # Fixed width of 300 pixels
     VIEW_WIDTH = 300
 
-    #: signal, emitted if the user clicks somewhere in the mini map and the ROI rectangle changes as a result, sends the normalized x and y position of the center of the new ROI
+    #: signal, emitted if the user clicks somewhere in the mini map and the ROI rectangle changes as a result, sends
+    #    the normalized x and y position of the center of the new ROI
     roi_changed = QtCore.pyqtSignal(float, float)
 
     def __init__(self, *args, **kwargs):
@@ -77,11 +80,11 @@ class MiniMap(QtWidgets.QWidget):
         action_group = QtWidgets.QActionGroup(self.toolbar)
         # political view in the beginning
         a = qt.create_action(tools.load_ui_icon('icon.mini.political.png'), 'Show political view', action_group,
-            toggle_connection=self.switch_to_political_view, checkable=True)
+                             toggle_connection=self.switch_to_political_view, checkable=True)
         self.toolbar.addAction(a)
         # geographical view
         a = qt.create_action(tools.load_ui_icon('icon.mini.geographical.png'), 'Show geographical view', action_group,
-            toggle_connection=self.switch_to_geographical_view, checkable=True)
+                             toggle_connection=self.switch_to_geographical_view, checkable=True)
         self.toolbar.addAction(a)
         self.mode = constants.OverviewMapMode.POLITICAL
 
@@ -97,7 +100,6 @@ class MiniMap(QtWidgets.QWidget):
         # graphics items in scene (except the tracker)
         self.scene_items = []
 
-
     def switch_to_political_view(self, checked):
         """
             The toolbar button for the political view has been toggled.
@@ -105,8 +107,7 @@ class MiniMap(QtWidgets.QWidget):
         if checked:
             # mode should not be political
             self.mode = constants.OverviewMapMode.POLITICAL
-            #self.redraw()
-
+#           self.redraw()
 
     def switch_to_geographical_view(self, checked):
         """
@@ -115,10 +116,9 @@ class MiniMap(QtWidgets.QWidget):
         if checked:
             # mode should not be geographical
             self.mode = constants.OverviewMapMode.GEOGRAPHICAL
-            #self.redraw()
+#           self.redraw()
 
-
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event):  # noqa: N802
         """
         The mouse has been pressed inside the view. Center the tracker rectangle.
         """
