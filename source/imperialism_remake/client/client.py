@@ -21,6 +21,7 @@ Starts the client and delivers most of the code responsible for the main client 
 # TODO automatic placement of help dialog depending on if another dialog is open
 
 from functools import partial
+import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake.base import constants, tools
@@ -38,6 +39,9 @@ from imperialism_remake.client.lobby import GameLobbyWidget
 from imperialism_remake.client.game import GameMainScreen
 from imperialism_remake.client.preferences import PreferencesWidget
 from imperialism_remake.client.server_monitor import ServerMonitorWidget
+
+
+logger = logging.getLogger(__name__)
 
 
 class MapItem(QtCore.QObject):
@@ -395,7 +399,7 @@ def start_client():
     if tools.get_option(constants.Option.MAINWINDOW_BOUNDS) is None:
         tools.set_option(constants.Option.MAINWINDOW_BOUNDS, desktop.availableGeometry().adjusted(50, 50, -100, -100))
         tools.set_option(constants.Option.MAINWINDOW_MAXIMIZED, True)
-        tools.log_info('No previous bounds of the main window stored, start maximized')
+        logger.info('No previous bounds of the main window stored, start maximized')
 
     # load global stylesheet to app
     with open(constants.GLOBAL_STYLESHEET_FILE, encoding='utf-8') as file:  # open is 'r' by default
@@ -415,7 +419,7 @@ def start_client():
     client = Client()
     client.switch_to_start_screen()
 
-    tools.log_info('client initialized, start Qt app execution')
+    logger.info('client initialized, start Qt app execution')
     # TODO is this necessary to run as event?
     # noinspection PyCallByClass
     QtCore.QTimer.singleShot(0, local_network_connect)

@@ -140,7 +140,7 @@ def main():
 
     # create single options object, load options and send a log message
     tools.load_options(Options_File)
-    tools.log_info('options loaded from user folder ({})'.format(user_folder))
+    logger.info('options loaded from user folder (%s)', user_folder)
 
     # special case of some desktop environments under Linux where full screen mode does not work well
     from imperialism_remake.base import constants
@@ -150,7 +150,7 @@ def main():
         session = os.environ.get("DESKTOP_SESSION")
         if session and (session.startswith('ubuntu') or 'xfce' in session or session.startswith('xubuntu') or 'gnome' in session):
             tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED, False)
-            tools.log_warning('Desktop environment {} has problems with full screen mode. Will turn if off.'.format(session))
+            logger.warning('Desktop environment %s has problems with full screen mode. Will turn if off.', session)
     # we cannot have full screen without support
     if not tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN, False)
@@ -177,14 +177,14 @@ def main():
 
     # save options
     tools.save_options(Options_File)
-    tools.log_info('options saved')
+    logger.info('options saved to file %s', Options_File)
 
     # report on unused resources
     if switches.DEBUG_MODE:
         tools.find_unused_resources()
 
     # good bye message
-    tools.log_info('will exit soon - good bye')
+    logger.info('will exit soon - good bye')
 
 if __name__ == '__main__':
     main()

@@ -37,15 +37,6 @@ def load_ui_icon(name):
     return QtGui.QIcon(file_name)
 
 
-def log_info(text):
-    """
-    Prints a INFO message to stdout.
-
-    :param text:
-    """
-    utils.log_write_entry(sys.stdout, "INFO", text)
-
-
 def log_warning(text):
     """
     Prints a WARNING message to stdout.
