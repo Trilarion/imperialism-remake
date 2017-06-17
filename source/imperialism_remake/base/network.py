@@ -19,11 +19,16 @@
     names and a signal to connect/disconnect to.
 """
 
+import logging
+
 import PyQt5.QtCore as QtCore
 import PyQt5.QtNetwork as QtNetwork
 
 from imperialism_remake.base import constants
 import imperialism_remake.lib.network as lib_network
+
+
+logger = logging.getLogger(__name__)
 
 
 class NetworkClient(lib_network.ExtendedTcpSocket):
@@ -106,7 +111,7 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
 
         :param letter: The letter that was received
         """
-        print('network client received letter: {}'.format(letter))
+        logger.info('network client received letter: {}'.format(letter))
         channel = letter['channel']
 
         # do we have receivers in this category

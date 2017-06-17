@@ -18,6 +18,7 @@
     Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
+import logging
 import multiprocessing
 import os
 import random
@@ -33,6 +34,10 @@ import imperialism_remake.base.network as base_network
 from imperialism_remake.lib import utils
 import imperialism_remake.lib.network as lib_network
 from imperialism_remake.server.scenario import Scenario
+
+
+logger = logging.getLogger(__name__)
+
 
 # TODO start this in its own process
 # TODO ping server clients regularly and throw them out if not reacting
@@ -100,7 +105,7 @@ class ServerManager(QtCore.QObject):
         """
         Start the extended TCP server with a local scope.
         """
-        print('server starts')
+        logger.info('server starts')
         self.server.start(constants.NETWORK_PORT)
 
     def _new_client(self, socket: QtNetwork.QTcpSocket):
@@ -123,7 +128,7 @@ class ServerManager(QtCore.QObject):
                 break
         # noinspection PyUnboundLocalVariable
         client.client_id = new_id
-        print('new client with id {}'.format(new_id))
+        logger.info('new client with id {}'.format(new_id))
 
         # add some general channels and receivers
         # TODO the receivers should be in another module eventually
@@ -187,7 +192,7 @@ class ServerManager(QtCore.QObject):
         if action == constants.M.SYSTEM_SHUTDOWN:
             # shuts down
 
-            print('server manager shuts down')
+            logger.info('server manager shuts down')
             # TODO disconnect all server clients, clean up, ...
             self.server.stop()
             self.shutdown.emit()
@@ -271,7 +276,7 @@ def scenario_preview(scenario_file_name):
 
     # TODO existing? can be loaded?
     scenario = Scenario.from_file(scenario_file_name)
-    print('reading the file took {}s'.format(time.clock() - t0))
+    logger.info('reading of the file took {}s'.format(time.clock() - t0))
 
     preview = {'scenario': scenario_file_name}
 
@@ -301,6 +306,6 @@ def scenario_preview(scenario_file_name):
                 nations_map[row * columns + column] = nation_id
     preview['map'] = nations_map
 
-    print('generating preview took {}s'.format(time.clock() - t0))
+    logger.info('generating preview took {}s'.format(time.clock() - t0))
 
     return preview

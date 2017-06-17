@@ -368,7 +368,7 @@ def local_network_connect():
     """
 
     # connect network client of client
-    print('client tries to connect to server')
+    logger.info('client tries to connect to server')
     local_network_client.connect_to_host(constants.NETWORK_PORT)
     # TODO what if this is not possible
 

@@ -20,6 +20,7 @@ Basic general network functionality (client and server) wrapping around QtNetwor
 Messages are sent using yaml (for serialization) and zlib (for compression).
 """
 
+import logging
 import zlib
 
 import PyQt5.QtCore as QtCore
@@ -28,6 +29,8 @@ import yaml
 
 #: shortcut for QtNetwork.QHostAddress.LocalHost/Any
 SCOPE = {'local': QtNetwork.QHostAddress.LocalHost, 'any': QtNetwork.QHostAddress.Any}
+
+logger = logging.getLogger(__name__)
 
 
 class ExtendedTcpSocket(QtCore.QObject):
@@ -94,7 +97,7 @@ class ExtendedTcpSocket(QtCore.QObject):
         # TODO only if not yet connected
         if host == 'local':
             host = SCOPE['local']
-        print('client connects to host={} port={}'.format(host, port))
+        logger.info('client connects to host=%s port=%d', host, port)
         self.socket.connectToHost(host, port)
         self.socket.waitForConnected(2000)
 
@@ -112,7 +115,7 @@ class ExtendedTcpSocket(QtCore.QObject):
         Reading is reading of a QByteArray from the TCPSocket, un-compressing and de-serializing.
         """
         while self.socket.bytesAvailable() > 0:
-            print('socket will receive')
+            logger.info('socket will receive')
             # read a QByteArray using a data stream
             reader = QtCore.QDataStream(self.socket)
             bytearray = QtCore.QByteArray()
@@ -127,9 +130,8 @@ class ExtendedTcpSocket(QtCore.QObject):
             # decode from utf-8 bytes to unicode and deserialize from yaml
             value = yaml.load(uncompressed.decode())
 
-            print('socket received {}'.format(value))
+            logger.info('socket received {}'.format(value))
 
-            # print('connection id {} received {}'.format(self.id, value))
             self.received.emit(value)
 
     def send(self, value):
@@ -141,7 +143,7 @@ class ExtendedTcpSocket(QtCore.QObject):
         if not self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
             raise RuntimeError('Try to send on unconnected socket.')
 
-        print('socket send {}'.format(value))
+        logger.info('socket send %s', value)
         # serialize value to yaml
         serialized = yaml.dump(value, allow_unicode=True)
 
@@ -186,7 +188,7 @@ class ExtendedTcpServer(QtCore.QObject):
 
         :param socket_error: QAbstractSocket::SocketError
         """
-        print('accept error {}'.format(socket_error))
+        logger.info('accept error %s', socket_error)
 
     def start(self, port, scope: SCOPE = 'local'):
         """
@@ -196,10 +198,10 @@ class ExtendedTcpServer(QtCore.QObject):
         :param scope: The scope (local/any).
         """
         host = SCOPE[scope]
-        print('server listens on host={} port={}'.format(host, port))
+        logger.info('server listens on host=%s port=%d', host, port)
         if not self.tcp_server.listen(host, port):
             raise RuntimeError('Network error: cannot listen')
-        print('is listening {}'.format(self.tcp_server.isListening()))
+        logger.info('is listening %s', self.tcp_server.isListening())
 
     def is_listening(self):
         """
@@ -219,7 +221,7 @@ class ExtendedTcpServer(QtCore.QObject):
         Called by the newConnection signal of the QTCPServer. Not intended for outside use.
         Zero or more new clients might be available, emit new_client signal for each of them.
         """
-        print('new connection on server')
+        logger.info('new connection on server')
         while self.tcp_server.hasPendingConnections():
             # returns a new QTcpSocket
             socket = self.tcp_server.nextPendingConnection()

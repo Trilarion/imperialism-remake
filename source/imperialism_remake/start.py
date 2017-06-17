@@ -45,7 +45,7 @@ def set_start_directory(logger):
     Just take current package.
     """
     package_path = os.path.dirname(__file__)
-    print(package_path)
+    logger.debug("package path: %s", package_path)
     os.chdir(package_path)
 
 
