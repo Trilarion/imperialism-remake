@@ -36,7 +36,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
     Content widget for the game lobby.
     """
 
-    single_player_start = QtCore.pyqtSignal(str, str)
+    single_player_start = QtCore.pyqtSignal(str, int)
 
     def __init__(self, *args, **kwargs):
         """
