@@ -162,11 +162,6 @@ def main():
     # This is required at least for Linux distributions of Python3, since the current working
     # directory is not part of Python's search path by default.
     sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
-    # TODO: the module names embedded in the yaml description of scenarios do not start with "imperialism_remake."
-    #       (e.g. "base.constants.ScenarioProperty" instead of "imperialism_remake.base.constants.ScenarioProperty".
-    #       Thus loading a scenario fails without the additional search path below. This is not a good approach.
-    #       In general this kind of scenario loading allows arbitrary code to be executed by malicious scenarios.
-    sys.path.insert(1, os.path.realpath(os.path.dirname(__file__)))
 
     user_folder = get_user_directory()
 
