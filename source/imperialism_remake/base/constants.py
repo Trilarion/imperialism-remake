@@ -34,13 +34,13 @@ def extend(path, *parts):
     extended = os.path.join(path, *parts)
     if switches.FILE_EXISTENCE_CHECK and not os.path.exists(extended):
         raise RuntimeError('constructed path {} does not exist'.format(extended))
-    return extended
+    return os.path.abspath(os.path.realpath(extended))
 
 
 # TODO track used resources by the program
 
 #: base folders (do not directly contain data)
-DATA_FOLDER = extend('.', 'data')
+DATA_FOLDER = extend(os.path.dirname(__file__), os.path.pardir, 'data')
 ARTWORK_FOLDER = extend(DATA_FOLDER, 'artwork')
 
 #: scenarios (save games)
