@@ -432,15 +432,21 @@ class Scenario(QtCore.QObject):
 
         self._nations[nation][key] = value
 
-    def nation_property(self, nation, key):
+    def nation_property(self, nation_key, property_key):
         """
         Gets a nation property. One can only obtain properties that have been set before and only for nations
         that exist.
         """
-        if nation in self._nations and key in self._nations[nation]:
-            return self._nations[nation][key]
-        else:
-            raise RuntimeError('Unknown nation {} or property {}.'.format(nation, key))
+        try:
+            nation = self._nations[nation_key]
+        except KeyError:
+            raise RuntimeError('Unknown nation "{}" (known nations: {}).'
+                               .format(nation_key, ", ".join([str(key) for key in self._nations])))
+        try:
+            return nation[property_key]
+        except KeyError:
+            raise RuntimeError('Unknown nation property "{}" (known properties: {}).'
+                               .format(property_key, ", ".join([str(key) for key in nation])))
 
     def save(self, file_name):
         """
