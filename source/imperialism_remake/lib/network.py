@@ -142,7 +142,7 @@ class ExtendedTcpSocket(QtCore.QObject):
             # decode from utf-8 bytes to unicode and deserialize from yaml
             value = yaml.load(uncompressed.decode())
 
-            logger.info('socket received {}'.format(value))
+            logger.debug('socket received: %s', value)
 
             self.received.emit(value)
 
@@ -155,7 +155,7 @@ class ExtendedTcpSocket(QtCore.QObject):
         if not self.is_connected():
             raise RuntimeError('Try to send on unconnected socket.')
 
-        logger.info('socket send %s', value)
+        logger.debug('socket send: %s', value)
         # serialize value to yaml
         serialized = yaml.dump(value, allow_unicode=True)
 
