@@ -21,6 +21,7 @@ Messages are sent using yaml (for serialization) and zlib (for compression).
 """
 
 import logging
+import time
 import zlib
 
 import PyQt5.QtCore as QtCore
@@ -97,9 +98,20 @@ class ExtendedTcpSocket(QtCore.QObject):
         # TODO only if not yet connected
         if host == 'local':
             host = SCOPE['local']
-        logger.info('client connects to host=%s port=%d', host, port)
-        self.socket.connectToHost(host, port)
-        self.socket.waitForConnected(2000)
+        logger.info('client connecting to host=%s port=%d', host, port)
+        # try to connect multiple times - maybe the server did not manage to start, yet
+        failure_count = 0
+        while True:
+            self.socket.connectToHost(host, port)
+            if self.socket.waitForConnected(2000):
+                break
+            else:
+                time.sleep(0.2)
+                logger.warning("connection delayed - will try again")
+                failure_count += 1
+                if failure_count == 10:
+                    raise RuntimeError('Failed to connect to server: host=%s port=%d', host, port)
+        logger.info('client successfully connected to host=%s port=%d', host, port)
 
     def is_connected(self):
         """
@@ -140,7 +152,7 @@ class ExtendedTcpSocket(QtCore.QObject):
 
         :param value: The message to send.
         """
-        if not self.socket.state() == QtNetwork.QAbstractSocket.ConnectedState:
+        if not self.is_connected():
             raise RuntimeError('Try to send on unconnected socket.')
 
         logger.info('socket send %s', value)
