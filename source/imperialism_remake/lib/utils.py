@@ -18,7 +18,6 @@
     General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
     to the project.
 """
-from datetime import datetime
 import zipfile
 from enum import Enum
 
@@ -209,21 +208,3 @@ def index_of_element(sequence, element):
         if e == element:
             return index
     raise ValueError('element not contained in sequence')
-
-
-def log_write_entry(writer, prefix, text, exception=None):
-    """
-    Prints a message of format: date, time, prefix, text, exception to a writer.
-
-    :param writer:
-    :param prefix:
-    :param text:
-    :param exception:
-    """
-    now = datetime.now().isoformat(' ')
-    header = now + '\t' + prefix + '\t'
-
-    print(header + text, end='\r\n', file=writer)
-
-    if exception is not None:
-        print(header + exception, end='\r\n', file=writer)

@@ -36,7 +36,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
     Content widget for the game lobby.
     """
 
-    single_player_start = QtCore.pyqtSignal(str, str)
+    single_player_start = QtCore.pyqtSignal(str, int)
 
     def __init__(self, *args, **kwargs):
         """
@@ -52,23 +52,30 @@ class GameLobbyWidget(QtWidgets.QWidget):
         action_group = QtWidgets.QActionGroup(toolbar)
 
         # actions single player new/load
-        a = qt.create_action(tools.load_ui_icon('icon.lobby.single.new.png'), 'Start new single player scenario', action_group, toggle_connection=self.toggled_single_player_scenario_selection, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.lobby.single.new.png'),
+                             'Start new single player scenario', action_group,
+                             toggle_connection=self.toggled_single_player_scenario_selection, checkable=True)
         toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.lobby.single.load.png'), 'Continue saved single player scenario', action_group, toggle_connection=self.toggled_single_player_load_scenario, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.lobby.single.load.png'),
+                             'Continue saved single player scenario', action_group,
+                             toggle_connection=self.toggled_single_player_load_scenario, checkable=True)
         toolbar.addAction(a)
 
         toolbar.addSeparator()
 
         # actions multi player
-        a = qt.create_action(tools.load_ui_icon('icon.lobby.network.png'), 'Show server lobby', action_group, toggle_connection=self.toggled_server_lobby, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.lobby.network.png'),
+                             'Show server lobby', action_group,
+                             toggle_connection=self.toggled_server_lobby, checkable=True)
         toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.lobby.multiplayer-game.png'), 'Start or continue multiplayer scenario', action_group, toggle_connection=self.toggled_multiplayer_scenario_selection, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.lobby.multiplayer-game.png'),
+                             'Start or continue multiplayer scenario', action_group,
+                             toggle_connection=self.toggled_multiplayer_scenario_selection, checkable=True)
         toolbar.addAction(a)
 
         self.layout.addWidget(toolbar, alignment=QtCore.Qt.AlignTop)
 
         self.content = None
-
 
     def change_content_widget(self, widget, alignment=None):
         """
@@ -81,6 +88,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
         self.content = widget
 
         if self.content:
+            # TODO: remove line below?
             # self.layout.addWidget(widget, stretch=1, alignment=QtCore.Qt.AlignCenter)
             if alignment:
                 self.layout.addWidget(widget, stretch=1, alignment=alignment)
@@ -95,7 +103,8 @@ class GameLobbyWidget(QtWidgets.QWidget):
         if checked:
             # create single player scenario title selection widget
             widget = SinglePlayerScenarioTitleSelection()
-            # widget.title_selected.connect(self.single_player_scenario_selection_preview, QtCore.Qt.QueuedConnection)
+            # TODO: remove line below?
+#           widget.title_selected.connect(self.single_player_scenario_selection_preview, QtCore.Qt.QueuedConnection)
             widget.title_selected.connect(self.single_player_scenario_selection_preview)
 
             # change content widget
@@ -108,7 +117,8 @@ class GameLobbyWidget(QtWidgets.QWidget):
 
         if checked:
             # noinspection PyCallByClass
-            file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Continue Single Player Scenario', constants.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[0]
+            file_name = QtWidgets.QFileDialog.getOpenFileName(
+                self, 'Continue Single Player Scenario', constants.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[0]
             if file_name:
                 # TODO check that it is a valid single player scenario in play
                 pass
@@ -139,7 +149,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
         # create single player scenario preview widget
         widget = SinglePlayerScenarioPreview(scenario_file)
         widget.nation_selected.connect(partial(self.single_player_start.emit, scenario_file))
-        #widget.nation_selected.connect(
+#       widget.nation_selected.connect(
 
         # change content widget
         self.change_content_widget(widget)
@@ -156,8 +166,8 @@ class ServerLobby(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout(self)
 
         self.client_list_widget = QtWidgets.QListWidget()
-        # list.itemSelectionChanged.connect(self.selection_changed)
-        # list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+#       list.itemSelectionChanged.connect(self.selection_changed)
+#       list.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.client_list_widget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.client_list_widget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.client_list_widget.setFixedWidth(200)
@@ -170,7 +180,8 @@ class ServerLobby(QtWidgets.QWidget):
         self.chat_input_edit = QtWidgets.QLineEdit()
         self.chat_input_edit.returnPressed.connect(self.send_chat_message)
         chat_input_group = qt.wrap_in_groupbox(self.chat_input_edit, 'Chat input')
-        layout.addLayout(qt.wrap_in_boxlayout((chat_log_group, chat_input_group), horizontal=False, add_stretch=False), stretch=1)
+        layout.addLayout(qt.wrap_in_boxlayout((chat_log_group, chat_input_group), horizontal=False, add_stretch=False),
+                         stretch=1)
 
         # connection to server
 
@@ -196,7 +207,8 @@ class ServerLobby(QtWidgets.QWidget):
         local_network_client.send(constants.C.CHAT, constants.M.CHAT_MESSAGE, chat_message)
         self.chat_input_edit.setText('')
 
-    def receive_chat_messages(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M, content):
+    def receive_chat_messages(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M,
+                              content):
         """
         Receives a chat message. Adds it to the chat log.
 
@@ -214,7 +226,8 @@ class ServerLobby(QtWidgets.QWidget):
         """
         local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_CONNECTED_CLIENTS)
 
-    def receive_lobby_messages(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M, content):
+    def receive_lobby_messages(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M,
+                               content):
         """
         Handles all received lobby messages.
 
@@ -239,6 +252,7 @@ class ServerLobby(QtWidgets.QWidget):
         local_network_client.disconnect_from_channel(constants.C.LOBBY, self.receive_lobby_messages)
 
         return True
+
 
 class SinglePlayerScenarioPreview(QtWidgets.QWidget):
     """
@@ -288,7 +302,9 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.nations_list.itemSelectionChanged.connect(self.nations_list_selection_changed)
         self.nations_list.addItems(nation_names)
         self.nations_list.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.nations_list.setFixedWidth(self.nations_list.sizeHintForColumn(0) + 2 * self.nations_list.frameWidth() + 17 + 10) # 10px extra
+        # 10px extra
+        self.nations_list.setFixedWidth(self.nations_list.sizeHintForColumn(0) +
+                                        2 * self.nations_list.frameWidth() + 17 + 10)
         # TODO use app.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
         layout.addWidget(qt.wrap_in_groupbox(self.nations_list, 'Nations'), 0, 0)
 
@@ -297,8 +313,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.map_view = qt.FitSceneInViewGraphicsView(self.map_scene)
         self.map_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.map_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        #self.map_view.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
-        # self.map_view.setFixedSize(100, 100)
+#       self.map_view.setSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+#       self.map_view.setFixedSize(100, 100)
         layout.addWidget(qt.wrap_in_groupbox(self.map_view, 'Map'), 0, 1)
 
         # scenario description
@@ -307,7 +323,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.description.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.description.setReadOnly(True)
         self.description.setPlainText(message[constants.ScenarioProperty.DESCRIPTION])
-        height = self.description.fontMetrics().lineSpacing() * 4 # 4 lines high
+        height = self.description.fontMetrics().lineSpacing() * 4  # 4 lines high
         self.description.setFixedHeight(height)
         layout.addWidget(qt.wrap_in_groupbox(self.description, 'Description'), 1, 0, 1, 2)  # goes over two columns
 
@@ -316,7 +332,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         self.nation_info.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.nation_info.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.nation_info.setReadOnly(True)
-        height = self.nation_info.fontMetrics().lineSpacing() * 6 # 6 lines high
+        height = self.nation_info.fontMetrics().lineSpacing() * 6  # 6 lines high
         self.nation_info.setFixedHeight(height)
         layout.addWidget(qt.wrap_in_groupbox(self.nation_info, 'Nation Info'), 2, 0, 1, 2)
 
@@ -326,7 +342,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
 
         # add the start button
         toolbar = QtWidgets.QToolBar()
-        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar, trigger_connection=self.start_scenario_clicked))
+        toolbar.addAction(qt.create_action(tools.load_ui_icon('icon.confirm.png'), 'Start selected scenario', toolbar,
+                                           trigger_connection=self.start_scenario_clicked))
         layout.addWidget(toolbar, 3, 0, 1, 2, alignment=QtCore.Qt.AlignRight)
 
         # draw the map
@@ -363,8 +380,8 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             item = graphics.MiniMapNationItem(path)
             item.signaller.clicked.connect(
                 partial(self.map_selected_nation, utils.index_of_element(nation_names, nation_name)))
-            #item.signaller.entered.connect(partial(self.change_map_name, nation_name))
-            #item.signaller.left.connect(partial(self.change_map_name, ''))
+#           item.signaller.entered.connect(partial(self.change_map_name, nation_name))
+#           item.signaller.left.connect(partial(self.change_map_name, ''))
             brush = QtGui.QBrush(color)
             item.setBrush(brush)
 
@@ -376,7 +393,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             item.setPen(pen)
 
             self.map_scene.addItem(item)
-            # item = self.map_scene.addPath(path, brush=brush) # will use the default pen for outline
+#           item = self.map_scene.addPath(path, brush=brush) # will use the default pen for outline
 
         self.preview = message
 
@@ -399,7 +416,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         """
         row = self.nations_list.currentRow()
         nation_id = self.nation_ids[row]
-        # self.selected_nation = self.preview['nations'][nation_id][constants.NationProperty.NAME]
+#       self.selected_nation = self.preview['nations'][nation_id][constants.NationProperty.NAME]
         self.selected_nation = nation_id
         nation_description = self.preview['nations'][nation_id][constants.NationProperty.DESCRIPTION]
         self.nation_info.setPlainText(nation_description)
@@ -416,7 +433,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             Interruption. Clean up network channels and the like.
         """
         # TODO is this right? network channel might still be open
-        # local_network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
+#       local_network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
 
 
 class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):

@@ -26,6 +26,7 @@ from imperialism_remake.base import constants
 import imperialism_remake.base.network as base_network
 from imperialism_remake.client.client import local_network_client
 
+
 class ServerMonitorWidget(QtWidgets.QWidget):
     """
     Displays server stats
@@ -57,14 +58,16 @@ class ServerMonitorWidget(QtWidgets.QWidget):
         """
         local_network_client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE)
 
-    def update_monitor(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M, content):
+    def update_monitor(self, client: base_network.NetworkClient, channel: constants.C,
+                       action: constants.M, content):
         """
         Regular updates of the server stats
         """
         # get time and format it
         now = datetime.now().strftime('%H:%M:%S')
 
-        text = 'Last update: {} - {} connected clients'.format(now, content['number_connected_clients'])
+        text = 'Last update: {} - {} connected clients'.format(now,
+                                                               content['number_connected_clients'])
         self.status.setText(text)
 
     def cleanup(self, parent_widget):
@@ -73,5 +76,6 @@ class ServerMonitorWidget(QtWidgets.QWidget):
 
         :param parent_widget:
         """
-        local_network_client.disconnect_from_channel(constants.C.SYSTEM, self.request_monitor_update)
+        local_network_client.disconnect_from_channel(constants.C.SYSTEM,
+                                                     self.request_monitor_update)
         return True

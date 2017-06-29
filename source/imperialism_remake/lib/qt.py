@@ -20,8 +20,8 @@
     Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
 """
 
-import os
 from datetime import datetime
+import os
 
 import PyQt5.QtGui as QtGui
 import PyQt5.QtWidgets as QtWidgets
@@ -116,7 +116,7 @@ class RelativeLayoutConstraint:
 
 
 def calculate_relative_position(parent_rect: QtCore.QRect, own_size: QtCore.QSize,
-        constraint: RelativeLayoutConstraint):
+                                constraint: RelativeLayoutConstraint):
     """
     Calculates the position of the element, given its size, the position and size of the parent and a relative layout
     constraint. The position is the position of the parent plus the weighted size of the parent, the weighted size of
@@ -131,8 +131,14 @@ def calculate_relative_position(parent_rect: QtCore.QRect, own_size: QtCore.QSiz
         Returns the left, upper corner of an object if the parent rectangle (QRect) is given and our own size (QSize)
         and a relative layout constraint (see RelativeLayoutConstraint).
     """
-    x = parent_rect.x() + constraint.x[0] * parent_rect.width() + constraint.x[1] * own_size.width() + constraint.x[2]
-    y = parent_rect.y() + constraint.y[0] * parent_rect.height() + constraint.y[1] * own_size.height() + constraint.y[2]
+    x = (parent_rect.x()
+         + constraint.x[0] * parent_rect.width()
+         + constraint.x[1] * own_size.width()
+         + constraint.x[2])
+    y = (parent_rect.y()
+         + constraint.y[0] * parent_rect.height()
+         + constraint.y[1] * own_size.height()
+         + constraint.y[2])
     return x, y
 
 
@@ -149,7 +155,7 @@ class RelativeLayout(QtWidgets.QLayout):
         self.setContentsMargins(0, 0, 0, 0)
         self.items = []
 
-    def addItem(self, item: QtWidgets.QLayoutItem):
+    def addItem(self, item: QtWidgets.QLayoutItem):  # noqa: N802
         """
         Only add items that have a layout_constraint attribute.
 
@@ -160,13 +166,13 @@ class RelativeLayout(QtWidgets.QLayout):
             raise RuntimeError('Only add widgets (with attribute position_constraint).')
         self.items.append(item)
 
-    def sizeHint(self):
+    def sizeHint(self):  # noqa: N802
         """
         In most cases the size is set externally, but we prefer at least the minimum size.
         """
         return self.minimumSize()
 
-    def setGeometry(self, rect: QtCore.QRect):
+    def setGeometry(self, rect: QtCore.QRect):  # noqa: N802
         """
         Layout the elements by calculating their relative position inside the parent, given the parents coordinates.
 
@@ -181,7 +187,7 @@ class RelativeLayout(QtWidgets.QLayout):
 
             item.setGeometry(QtCore.QRect(x, y, o_size.width(), o_size.height()))
 
-    def itemAt(self, index):
+    def itemAt(self, index):  # noqa: N802
         """
         Returns an item (must be implemented).
 
@@ -193,7 +199,7 @@ class RelativeLayout(QtWidgets.QLayout):
         else:
             return None
 
-    def takeAt(self, index):
+    def takeAt(self, index):  # noqa: N802
         """
         Pops an item (must be implemented).
 
@@ -202,10 +208,10 @@ class RelativeLayout(QtWidgets.QLayout):
         """
         return self.items.pop(index)
 
-    def minimumSize(self):
+    def minimumSize(self):  # noqa: N802
         """
-        Minimum size is the size so that every child is displayed in full with the offsets (see RelativeLayoutConstraint)
-        however they could overlap.
+        Minimum size is the size so that every child is displayed in full with the offsets
+        (see RelativeLayoutConstraint) however they could overlap.
         """
         min_width = 0
         min_height = 0
@@ -236,7 +242,7 @@ class Notification(QtCore.QObject):
     clicked = QtCore.pyqtSignal(QtGui.QMouseEvent)
 
     def __init__(self, parent: QtWidgets.QWidget, content, fade_duration=2000, stay_duration=2000,
-            position_constraint: RelativeLayoutConstraint = None):
+                 position_constraint: RelativeLayoutConstraint = None):
         """
 
         :param parent: parent widget (QWidget)
@@ -462,7 +468,7 @@ class ZoomableGraphicsView(QtWidgets.QGraphicsView):
         super().__init__(*args, **kwargs)
         self.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
 
-    def wheelEvent(self, event):
+    def wheelEvent(self, event):  # noqa: N802
         """
         Upon a wheel event, change the zoom.
 
@@ -502,7 +508,7 @@ def make_widget_clickable(parent):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
-        def mousePressEvent(self, event):
+        def mousePressEvent(self, event):  # noqa: N802
             """
             Mouse has been pressed, process the event, then emit the signal.
 
@@ -534,7 +540,7 @@ def make_widget_draggable(parent):
             super().__init__(*args, **kwargs)
             self.position_on_click = None
 
-        def mousePressEvent(self, event):
+        def mousePressEvent(self, event):  # noqa: N802
             """
             The mouse is now pressed. Store initial position on screen.
 
@@ -543,7 +549,7 @@ def make_widget_draggable(parent):
             self.position_on_click = event.globalPos()
             super().mousePressEvent(event)
 
-        def mouseMoveEvent(self, event):
+        def mouseMoveEvent(self, event):  # noqa: N802
             """
             The mouse has moved. Calculate difference to previous position and emit signal dragged. Update position.
 
@@ -596,13 +602,13 @@ def make_GraphicsItem_clickable(parent):
                 So we need to turn both on.
             """
             parent.__init__(self, *args, **kwargs)
-            # QtCore.QObject.__init__(self)
+#           QtCore.QObject.__init__(self)
             self.parent = parent
             self.setAcceptHoverEvents(True)
             self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
             self.signaller = ClickableGraphicsItemSignaller()
 
-        def hoverEnterEvent(self, event):
+        def hoverEnterEvent(self, event):  # noqa: N802
             """
             Emit the entered signal after default handling.
 
@@ -611,7 +617,7 @@ def make_GraphicsItem_clickable(parent):
             self.parent.hoverEnterEvent(self, event)
             self.signaller.entered.emit(event)
 
-        def hoverLeaveEvent(self, event):
+        def hoverLeaveEvent(self, event):  # noqa: N802
             """
             Emit the left signal after default handling.
 
@@ -620,7 +626,7 @@ def make_GraphicsItem_clickable(parent):
             self.parent.hoverLeaveEvent(self, event)
             self.signaller.left.emit(event)
 
-        def mousePressEvent(self, event):
+        def mousePressEvent(self, event):  # noqa: N802
             """
             Emit the clicked signal after default handling.
 
@@ -656,9 +662,10 @@ def make_GraphicsItem_draggable(parent):
             self.parent = parent
             QtCore.QObject.__init__(self)
 
-            self.setFlags(QtWidgets.QGraphicsItem.ItemIsMovable | QtWidgets.QGraphicsItem.ItemSendsScenePositionChanges)
+            self.setFlags(QtWidgets.QGraphicsItem.ItemIsMovable
+                          | QtWidgets.QGraphicsItem.ItemSendsScenePositionChanges)
 
-        def itemChange(self, change, value):
+        def itemChange(self, change, value):  # noqa: N802
             """
             Catch all item position changes and emit the changed signal with the value (which will be the position).
 
@@ -715,7 +722,8 @@ class ClockLabel(QtWidgets.QLabel):
         self.setText(text)
 
 
-def create_action(icon: QtGui.QIcon, text, parent: QtWidgets.QWidget, trigger_connection=None, toggle_connection=None, checkable=False) -> QtWidgets.QAction:
+def create_action(icon: QtGui.QIcon, text, parent: QtWidgets.QWidget, trigger_connection=None, toggle_connection=None,
+                  checkable=False) -> QtWidgets.QAction:
     """
     Shortcut for creation of an action and wiring.
 
@@ -790,7 +798,7 @@ class FitSceneInViewGraphicsView(QtWidgets.QGraphicsView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def resizeEvent(self, event: QtGui.QResizeEvent):
+    def resizeEvent(self, event: QtGui.QResizeEvent):  # noqa: N802
         """
         The view is resized. We need to fit the scene rectangle into the view without distorting the scene proportions.
         We also need to center on the center in order to keep the scene centered.

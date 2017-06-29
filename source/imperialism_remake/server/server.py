@@ -18,38 +18,49 @@
     Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
+from datetime import datetime
+import logging
+import logging.handlers
 import multiprocessing
 import os
 import random
 import sys
 import time
-from datetime import datetime
 
 from PyQt5 import QtCore, QtNetwork
 
-import imperialism_remake.start as start
 from imperialism_remake.base import constants
 import imperialism_remake.base.network as base_network
 from imperialism_remake.lib import utils
 import imperialism_remake.lib.network as lib_network
 from imperialism_remake.server.scenario import Scenario
+import imperialism_remake.start as start
+
+
+logger = logging.getLogger(__name__)
+
 
 # TODO start this in its own process
 # TODO ping server clients regularly and throw them out if not reacting
 # TODO wait for a name but only change it once during a session
+
 
 class ServerProcess(multiprocessing.Process):
     """
     A Process that inside its run method executes a QCoreApplication which runs the server.
     """
 
-    def __init__(self):
+    def __init__(self, log_queue, log_formatter, log_level):
         super().__init__()
+        self._log_queue = log_queue
+        self._log_formatter = log_formatter
+        self._log_level = log_level
 
     def run(self):
         """
         Runs the server process by starting its own QCoreApplication.
         """
+        self._configure_forked_logger()
         # because PyQt5 eats exceptions in the event thread this workaround
         sys.excepthook = start.exception_hook
 
@@ -63,6 +74,24 @@ class ServerProcess(multiprocessing.Process):
 
         # run event loop of app
         app.exec_()
+
+    def _configure_forked_logger(self):
+        """ create a new logging handler that will inject its records into a queue
+
+        The listener of this queue runs in the main process (that opened the log files and stdout)
+        as a thread and will output all incoming log records via its configured handlers.
+        """
+        log_queue_handler = logging.handlers.QueueHandler(self._log_queue)
+        log_queue_handler.setFormatter(self._log_formatter)
+        root = logging.getLogger()
+        root.setLevel(self._log_level)
+        # remove all possibly inherited handlers - we only need our new queue logger
+        for handler in root.handlers:
+            root.removeHandler(handler)
+        root.addHandler(log_queue_handler)
+        logger = logging.getLogger(__name__)
+        logger.info("created a multiprocess logger (pid=%d)", os.getpid())
+
 
 class ServerNetworkClient(base_network.NetworkClient):
     """
@@ -91,6 +120,7 @@ class ServerManager(QtCore.QObject):
         We start with a server (ExtendedTcpServer) and an empty list of server clients (NetworkClient).
         """
         super().__init__()
+        logger.info("ServerManager started")
         self.server = lib_network.ExtendedTcpServer()
         self.server.new_client.connect(self._new_client)
         self.server_clients = []
@@ -100,7 +130,7 @@ class ServerManager(QtCore.QObject):
         """
         Start the extended TCP server with a local scope.
         """
-        print('server starts')
+        logger.info('server starts (pid=%d)', os.getpid())
         self.server.start(constants.NETWORK_PORT)
 
     def _new_client(self, socket: QtNetwork.QTcpSocket):
@@ -123,7 +153,7 @@ class ServerManager(QtCore.QObject):
                 break
         # noinspection PyUnboundLocalVariable
         client.client_id = new_id
-        print('new client with id {}'.format(new_id))
+        logger.info('new client with id {}'.format(new_id))
 
         # add some general channels and receivers
         # TODO the receivers should be in another module eventually
@@ -187,7 +217,7 @@ class ServerManager(QtCore.QObject):
         if action == constants.M.SYSTEM_SHUTDOWN:
             # shuts down
 
-            print('server manager shuts down')
+            logger.info('server manager shuts down')
             # TODO disconnect all server clients, clean up, ...
             self.server.stop()
             self.shutdown.emit()
@@ -223,6 +253,7 @@ class ServerManager(QtCore.QObject):
             connected_clients = [c.name for c in self.server_clients]
             client.send(channel, action, connected_clients)
 
+
 def general_messages(client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
     """
 
@@ -234,6 +265,7 @@ def general_messages(client: ServerNetworkClient, channel: constants.C, action: 
 
     if action == constants.M.GENERAL_NAME:
         client.name = content
+
 
 def scenario_core_titles():
     """
@@ -271,18 +303,23 @@ def scenario_preview(scenario_file_name):
 
     # TODO existing? can be loaded?
     scenario = Scenario.from_file(scenario_file_name)
-    print('reading the file took {}s'.format(time.clock() - t0))
+    logger.info('reading of the file took {}s'.format(time.clock() - t0))
 
     preview = {'scenario': scenario_file_name}
 
     # some scenario properties should be copied
-    scenario_copy_keys = [constants.ScenarioProperty.MAP_COLUMNS, constants.ScenarioProperty.MAP_ROWS, constants.ScenarioProperty.TITLE, constants.ScenarioProperty.DESCRIPTION]
+    scenario_copy_keys = [constants.ScenarioProperty.MAP_COLUMNS,
+                          constants.ScenarioProperty.MAP_ROWS,
+                          constants.ScenarioProperty.TITLE,
+                          constants.ScenarioProperty.DESCRIPTION]
     for key in scenario_copy_keys:
         preview[key] = scenario[key]
 
     # some nations properties should be copied
     nations = {}
-    nation_copy_keys = [constants.NationProperty.COLOR, constants.NationProperty.NAME, constants.NationProperty.DESCRIPTION]
+    nation_copy_keys = [constants.NationProperty.COLOR,
+                        constants.NationProperty.NAME,
+                        constants.NationProperty.DESCRIPTION]
     for nation in scenario.nations():
         nations[nation] = {}
         for key in nation_copy_keys:
@@ -301,6 +338,6 @@ def scenario_preview(scenario_file_name):
                 nations_map[row * columns + column] = nation_id
     preview['map'] = nations_map
 
-    print('generating preview took {}s'.format(time.clock() - t0))
+    logger.info('generating preview took {}s'.format(time.clock() - t0))
 
     return preview

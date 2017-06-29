@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+#
 # Imperialism remake
 # Copyright (C) 2014-16 Trilarion
 #
@@ -16,11 +18,19 @@
 
 """
 Starts the application (a client and a server).
-Start in project root folder and with 'debug' as parameter if wished.
+Start in project root folder and with '--debug' as parameter if wished.
 """
 
+import argparse
+import logging
+import multiprocessing
 import os
 import sys
+import threading
+
+
+APPLICATION_NAME = 'imperialism_remake'
+
 
 def exception_hook(type, value, traceback):
     """
@@ -28,24 +38,113 @@ def exception_hook(type, value, traceback):
     """
     sys.__excepthook__(type, value, traceback)
 
+
 def fix_pyqt5_exception_eating():
     """
     PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
     """
     sys.excepthook = exception_hook
 
-def set_start_directory():
+
+def set_start_directory(logger):
     """
     Just take current package.
+
+    TODO: probably this chdir was only required for the yaml Loader package loading. But this does not work in Linux,
+          since the current working directory is never part of Python's search path. Thus: just remove this?
     """
     package_path = os.path.dirname(__file__)
-    print(package_path)
+    logger.debug("package path: %s", package_path)
     os.chdir(package_path)
+
+
+def get_user_directory():
+    # determine user folder
+    if os.name == 'posix':
+        # Linux / Unix
+        # see 'XDG_CONFIG_HOME' in https://specifications.freedesktop.org/basedir-spec/
+        config_basedir = os.getenv('XDG_CONFIG_HOME',
+                                   os.path.join(os.path.expanduser('~'), '.config'))
+        user_folder = os.path.join(config_basedir, APPLICATION_NAME)
+    elif (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
+        # MS Windows
+        user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
+    else:
+        user_folder = os.path.join(os.path.expanduser('~'), 'Imperialism Remake User Data')
+    return os.path.abspath(user_folder)
+
+
+def get_arguments():
+    parser = argparse.ArgumentParser(prog=APPLICATION_NAME)
+    parser.add_argument('--debug', dest='debug', action='store_true',
+                        help='enable detailed debug logging')
+    return parser.parse_args()
+
+
+def get_configured_logger(user_folder, is_debug):
+    log_level = logging.DEBUG if is_debug else logging.INFO
+    logger = logging.getLogger()
+    logger.setLevel(log_level)
+    log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    log_console_handler = logging.StreamHandler()
+    log_console_handler.setFormatter(log_formatter)
+    logger.addHandler(log_console_handler)
+    if is_debug:
+        logger.info('debug mode is on')
+
+    # redirect output to log files (will be overwritten at each start)
+    log_filename = os.path.join(user_folder, 'remake.log')
+    log_details_handler = logging.FileHandler(log_filename, mode='w', encoding='utf-8')
+    log_details_handler.setFormatter(log_formatter)
+    logger.addHandler(log_details_handler)
+    logger.info('writing detailed log messages to %s', log_filename)
+
+    error_filename = os.path.join(user_folder, 'remake.error.log')
+    log_error_handler = logging.FileHandler(error_filename, mode='w', encoding='utf-8')
+    log_error_handler.setFormatter(log_formatter)
+    log_error_handler.setLevel(logging.ERROR)
+    logger.addHandler(log_error_handler)
+    logger.info('writing error log messages to %s', error_filename)
+
+    # the "log_queue" can be used by forked processes (e.g. ServerProcess) for log delivery
+    log_queue = multiprocessing.Queue()
+
+    def run_logger_thread(log_queue, logging=logging):
+        """ listen to a queue waiting for new log records
+
+        This queue can be filled by other processes (e.g. ServerProcess). Each sending process should configure its
+        own log handler (logging.handlers.QueueHandler) connected to this queue.
+        """
+        logger = logging.getLogger(__name__)
+        logger.info("created log receiver thread (pid=%d)", os.getpid())
+        while True:
+            record = log_queue.get()
+            if record is None:
+                break
+            logger = logging.getLogger(record.name)
+            logger.handle(record)
+
+    logger_thread = threading.Thread(target=run_logger_thread, args=(log_queue,))
+    logger_thread.start()
+
+    def logger_thread_cleanup(log_queue=log_queue, logger_thread=logger_thread):
+        """ the logger thread will exit as soon as he receives None in the log_queue
+
+        This function should be called immediately before exiting.
+        """
+        log_queue.put(None)
+        logger_thread.join()
+
+    return logger, log_queue, log_formatter, log_level, logger_thread_cleanup
+
 
 def main():
     """
     Main entry point. Called from the script generated in setup.py and called when running this module with python.
     """
+#   multiprocessing.freeze_support()
+    multiprocessing.set_start_method('spawn')
+
     # test for python version
     required_version = (3, 5)
     if sys.version_info < required_version:
@@ -53,60 +152,47 @@ def main():
 
     # test for existence of PyQt5
     try:
-        from PyQt5 import QtCore
+        from PyQt5 import QtCore  # noqa: F401
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
 
     # fix PyQt5 exception eating
     fix_pyqt5_exception_eating()
 
-    # set start directory
-    set_start_directory()
+    # Add the parent directory of the package directory to Python's search path.
+    # This allows the import of the 'imperialism_remake' modules.
+    # This is required at least for Linux distributions of Python3, since the current working
+    # directory is not part of Python's search path by default.
+    sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-    # determine user folder
-    if os.name == 'posix':
-        # Linux / Unix
-        user_folder = os.path.join(os.getenv('HOME'), 'Imperialism Remake User Data')
-    if (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
-        # MS Windows
-        user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
-    else:
-        user_folder = 'User Data'
-    print('user data stored in: {}'.format(user_folder))
+    user_folder = get_user_directory()
+
+    # determine DEBUG_MODE from runtime arguments
+    from imperialism_remake.base import switches
+    args = get_arguments()
+    switches.DEBUG_MODE = args.debug
+    logger, log_queue, log_formatter, log_level, logger_cleanup = get_configured_logger(user_folder,
+                                                                                        switches.DEBUG_MODE)
+    logger.info('user data stored in: {}'.format(user_folder))
+
+    # set start directory
+    set_start_directory(logger)
 
     # if not exist, create user folder
     if not os.path.isdir(user_folder):
         os.mkdir(user_folder)
 
-    # determine DEBUG_MODE from runtime arguments
-    from imperialism_remake.base import switches
-
-    if len(sys.argv) > 1 and sys.argv[1] == 'debug':
-        switches.DEBUG_MODE = True
-    if switches.DEBUG_MODE:
-        print('debug mode is on')
-
-    # redirect output to log files (will be overwritten at each start)
-    Log_File = os.path.join(user_folder, 'remake.log')
-    Error_File = os.path.join(user_folder, 'remake.error.log')
-    # in debug mode print to the console instead
-    if not switches.DEBUG_MODE:
-        import codecs
-
-        sys.stdout = codecs.open(Log_File, encoding='utf-8', mode='w')
-        sys.stderr = codecs.open(Error_File, encoding='utf-8', mode='w')
-
     # import some base libraries
     import imperialism_remake.base.tools as tools
 
     # search for existing options file, if not existing, save it once (should just save an empty dictionary)
-    Options_File = os.path.join(user_folder, 'options.info')
-    if not os.path.exists(Options_File):
-        tools.save_options(Options_File)
+    options_file = os.path.join(user_folder, 'options.info')
+    if not os.path.exists(options_file):
+        tools.save_options(options_file)
 
     # create single options object, load options and send a log message
-    tools.load_options(Options_File)
-    tools.log_info('options loaded from user folder ({})'.format(user_folder))
+    tools.load_options(options_file)
+    logger.info('options loaded from user folder (%s)', user_folder)
 
     # special case of some desktop environments under Linux where full screen mode does not work well
     from imperialism_remake.base import constants
@@ -114,23 +200,22 @@ def main():
     # full screen support
     if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         session = os.environ.get("DESKTOP_SESSION")
-        if session and (session.startswith('ubuntu') or 'xfce' in session or session.startswith('xubuntu') or 'gnome' in session):
+        # TODO: what exactly is the problem and how can we detect it (without guessing)?
+        if (session and (session.startswith('ubuntu')
+                         or ('xfce' in session)
+                         or session.startswith('xubuntu')
+                         or ('gnome' in session))):
             tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED, False)
-            tools.log_warning('Desktop environment {} has problems with full screen mode. Will turn if off.'.format(session))
+            logger.warning('Desktop environment %s has problems with full screen mode. Will turn if off.', session)
     # we cannot have full screen without support
     if not tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN, False)
 
     # now we can safely assume that the environment is good to us
 
-    # start server
-    import multiprocessing
-
-    # multiprocessing.freeze_support()
-    multiprocessing.set_start_method('spawn')
     from imperialism_remake.server.server import ServerProcess
 
-    server_process = ServerProcess()
+    server_process = ServerProcess(log_queue, log_formatter, log_level)
     server_process.start()
 
     # start client, we will return when the program finishes
@@ -142,15 +227,18 @@ def main():
     server_process.join()
 
     # save options
-    tools.save_options(Options_File)
-    tools.log_info('options saved')
+    tools.save_options(options_file)
+    logger.info('options saved to file %s', options_file)
 
     # report on unused resources
     if switches.DEBUG_MODE:
         tools.find_unused_resources()
 
     # good bye message
-    tools.log_info('will exit soon - good bye')
+    logger.info('will exit soon - good bye')
+
+    logger_cleanup()
+
 
 if __name__ == '__main__':
     main()

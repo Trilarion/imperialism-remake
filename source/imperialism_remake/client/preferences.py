@@ -44,19 +44,27 @@ class PreferencesWidget(QtWidgets.QWidget):
         action_group = QtWidgets.QActionGroup(toolbar)
 
         # general preferences
-        action_general = qt.create_action(tools.load_ui_icon('icon.preferences.general.png'), 'Show general preferences', action_group, toggle_connection=self._toggled_action_preferences_general, checkable=True)
+        action_general = qt.create_action(tools.load_ui_icon('icon.preferences.general.png'),
+                                          'Show general preferences', action_group,
+                                          toggle_connection=self._toggled_action_preferences_general, checkable=True)
         toolbar.addAction(action_general)
 
         # network preferences
-        a = qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Show network preferences', action_group, toggle_connection=self._toggled_action_preferences_network, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.network.png'),
+                             'Show network preferences', action_group,
+                             toggle_connection=self._toggled_action_preferences_network, checkable=True)
         toolbar.addAction(a)
 
         # graphics preferences
-        a = qt.create_action(tools.load_ui_icon('icon.preferences.graphics.png'), 'Show graphics preferences', action_group, toggle_connection=self._toggled_action_preferences_graphics, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.graphics.png'),
+                             'Show graphics preferences', action_group,
+                             toggle_connection=self._toggled_action_preferences_graphics, checkable=True)
         toolbar.addAction(a)
 
         # music preferences
-        a = qt.create_action(tools.load_ui_icon('icon.preferences.music.png'), 'Show music preferences', action_group, toggle_connection=self._toggled_action_preferences_music, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.music.png'),
+                             'Show music preferences', action_group,
+                             toggle_connection=self._toggled_action_preferences_music, checkable=True)
         toolbar.addAction(a)
 
         # spacer
@@ -95,7 +103,8 @@ class PreferencesWidget(QtWidgets.QWidget):
         Shows small confirmation dialog, then resets preferences to factory standard.
         """
         answer = QtWidgets.QMessageBox.question(self, 'Preferences', 'Restore standard preferences?',
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                QtWidgets.QMessageBox.No)
         if answer == QtWidgets.QMessageBox.Yes:
             pass
 
@@ -188,7 +197,8 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # local server group box
         layout = QtWidgets.QVBoxLayout()
-        local_ip = [x.toString() for x in QtNetwork.QNetworkInterface.allAddresses() if not x.isLoopback() and x.protocol() == QtNetwork.QAbstractSocket.IPv4Protocol][0]
+        local_ip = [x.toString() for x in QtNetwork.QNetworkInterface.allAddresses()
+                    if not x.isLoopback() and x.protocol() == QtNetwork.QAbstractSocket.IPv4Protocol][0]
         layout.addWidget(QtWidgets.QLabel('Local IP address: {}'.format(local_ip)))
         # accepts incoming connections checkbox
         checkbox = QtWidgets.QCheckBox('Accepts incoming connections')
@@ -220,7 +230,8 @@ class PreferencesWidget(QtWidgets.QWidget):
         toolbar = QtWidgets.QToolBar()
         toolbar.setIconSize(QtCore.QSize(24, 24))
         # connect to remote server
-        a = qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server', toolbar, checkable=True)
+        a = qt.create_action(tools.load_ui_icon('icon.preferences.network.png'), 'Connect/Disconnect to remote server',
+                             toolbar, checkable=True)
         toolbar.addAction(a)
         layout.addLayout(qt.wrap_in_boxlayout(toolbar))
         tab_layout.addWidget(qt.wrap_in_groupbox(layout, 'Remote Server'))
@@ -316,11 +327,14 @@ class PreferencesWidget(QtWidgets.QWidget):
         :return:
         """
         # check if something was changed
-        options_modified = any([box.isChecked() is not tools.get_option(option) for (box, option) in self._check_boxes])
+        options_modified = any([box.isChecked() is not tools.get_option(option)
+                                for (box, option) in self._check_boxes])
         # TODO line edits and sliders
 
         if options_modified:
-            answer = QtWidgets.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences', QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.Yes)
+            answer = QtWidgets.QMessageBox.question(parent_widget, 'Preferences', 'Save modified preferences',
+                                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                    QtWidgets.QMessageBox.Yes)
             if answer == QtWidgets.QMessageBox.Yes:
                 # all _check_boxes
                 for (box, option) in self._check_boxes:

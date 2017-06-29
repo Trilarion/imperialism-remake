@@ -19,20 +19,21 @@ Discovers all tests and runs them. Assumes that initially the working directory 
 in the sys path.
 """
 
-import sys
 import os
+import sys
 import unittest
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
+    tests_dir = os.path.abspath(os.path.dirname(__file__))
     # add source directory to path if needed
-    source_directory = os.path.abspath(os.path.join('..', 'source'))
+    source_directory = os.path.join(tests_dir, os.path.pardir, 'source')
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
 
     loader = unittest.defaultTestLoader
 
-    tests = loader.discover('.')
+    tests = loader.discover(tests_dir)
 
     runner = unittest.TextTestRunner()
 
