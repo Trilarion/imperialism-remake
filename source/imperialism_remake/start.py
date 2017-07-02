@@ -167,6 +167,10 @@ def main():
 
     user_folder = get_user_directory()
 
+    # if not exist, create user folder
+    if not os.path.isdir(user_folder):
+        os.mkdir(user_folder)
+
     # determine DEBUG_MODE from runtime arguments
     from imperialism_remake.base import switches
     args = get_arguments()
@@ -177,10 +181,6 @@ def main():
 
     # set start directory
     set_start_directory(logger)
-
-    # if not exist, create user folder
-    if not os.path.isdir(user_folder):
-        os.mkdir(user_folder)
 
     # import some base libraries
     import imperialism_remake.base.tools as tools
