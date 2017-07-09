@@ -46,20 +46,11 @@ def fix_pyqt5_exception_eating():
     sys.excepthook = exception_hook
 
 
-def set_start_directory(logger):
-    """
-    Just take current package.
-
-    TODO: probably this chdir was only required for the yaml Loader package loading. But this does not work in Linux,
-          since the current working directory is never part of Python's search path. Thus: just remove this?
-    """
-    package_path = os.path.dirname(__file__)
-    logger.debug("package path: %s", package_path)
-    os.chdir(package_path)
-
-
 def get_user_directory():
-    # determine user folder
+    """
+    Determines the location of the user folder.
+    """
+
     if os.name == 'posix':
         # Linux / Unix
         # see 'XDG_CONFIG_HOME' in https://specifications.freedesktop.org/basedir-spec/
@@ -75,6 +66,9 @@ def get_user_directory():
 
 
 def get_arguments():
+    """
+    Parses command line arguments.
+    """
     parser = argparse.ArgumentParser(prog=APPLICATION_NAME)
     parser.add_argument('--debug', dest='debug', action='store_true',
                         help='enable detailed debug logging')
@@ -82,6 +76,9 @@ def get_arguments():
 
 
 def get_configured_logger(user_folder, is_debug):
+    """
+    Obtain configured logger, depending on location of user folder and debug mode (set by command line).
+    """
     log_level = logging.DEBUG if is_debug else logging.INFO
     logger = logging.getLogger()
     logger.setLevel(log_level)
@@ -110,7 +107,7 @@ def get_configured_logger(user_folder, is_debug):
     log_queue = multiprocessing.Queue()
 
     def run_logger_thread(log_queue, logging=logging):
-        """ listen to a queue waiting for new log records
+        """ Listen to a queue waiting for new log records
 
         This queue can be filled by other processes (e.g. ServerProcess). Each sending process should configure its
         own log handler (logging.handlers.QueueHandler) connected to this queue.
@@ -128,7 +125,7 @@ def get_configured_logger(user_folder, is_debug):
     logger_thread.start()
 
     def logger_thread_cleanup(log_queue=log_queue, logger_thread=logger_thread):
-        """ the logger thread will exit as soon as he receives None in the log_queue
+        """ The logger thread will exit as soon as he receives None in the log_queue
 
         This function should be called immediately before exiting.
         """
@@ -142,10 +139,15 @@ def main():
     """
     Main entry point. Called from the script generated in setup.py and called when running this module with python.
     """
-#   multiprocessing.freeze_support()
+
+    # TODO freeze_support might be needed for windows (https://docs.python.org/3.6/library/multiprocessing.html#multiprocessing.freeze_support)
+    # check if this is still the case, we are using pynsist (https://github.com/takluyver/pynsist) for packaging on Windows
+    # multiprocessing.freeze_support()
+
+    # guidelines at https://docs.python.org/3.6/library/multiprocessing.html#programming-guidelines
     multiprocessing.set_start_method('spawn')
 
-    # test for python version
+    # test for minimal supported python version
     required_version = (3, 5)
     if sys.version_info < required_version:
         raise RuntimeError('Python version must be {}.{} at least.'.format(*required_version))
@@ -167,7 +169,7 @@ def main():
 
     user_folder = get_user_directory()
 
-    # if not exist, create user folder
+    # if not existing, create user folder
     if not os.path.isdir(user_folder):
         os.mkdir(user_folder)
 
@@ -178,9 +180,6 @@ def main():
     logger, log_queue, log_formatter, log_level, logger_cleanup = get_configured_logger(user_folder,
                                                                                         switches.DEBUG_MODE)
     logger.info('user data stored in: {}'.format(user_folder))
-
-    # set start directory
-    set_start_directory(logger)
 
     # import some base libraries
     import imperialism_remake.base.tools as tools
@@ -194,7 +193,7 @@ def main():
     tools.load_options(options_file)
     logger.info('options loaded from user folder (%s)', user_folder)
 
-    # special case of some desktop environments under Linux where full screen mode does not work well
+    # fix options: special case of some desktop environments under Linux where full screen mode does not work well
     from imperialism_remake.base import constants
 
     # full screen support
@@ -207,18 +206,18 @@ def main():
                          or ('gnome' in session))):
             tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED, False)
             logger.warning('Desktop environment %s has problems with full screen mode. Will turn if off.', session)
-    # we cannot have full screen without support
+
+    # options constraint: we cannot have full screen without support
     if not tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):
         tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN, False)
 
-    # now we can safely assume that the environment is good to us
-
+    # start server
     from imperialism_remake.server.server import ServerProcess
 
     server_process = ServerProcess(log_queue, log_formatter, log_level)
     server_process.start()
 
-    # start client, we will return when the program finishes
+    # start client, we will return when the client finishes
     from imperialism_remake.client.client import start_client
 
     start_client()
@@ -234,9 +233,8 @@ def main():
     if switches.DEBUG_MODE:
         tools.find_unused_resources()
 
-    # good bye message
+    # good bye message and shutdown logger
     logger.info('will exit soon - good bye')
-
     logger_cleanup()
 
 

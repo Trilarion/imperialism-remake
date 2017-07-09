@@ -18,8 +18,10 @@
 Global switches.
 """
 
-#: global switch for DEBUG MODE on (displays errors and info messages on console) and DEBUG MODE off (stores errors
-# in the error log file)
+#: global switch for DEBUG MODE
+# DEBUG ON (True): Logs also debug messages, prints log messages also on the console
+# DEBUG OFF (False): Does not log debug messages, does not print log messages on the console
+# TODO check if this holds
 DEBUG_MODE = True
 
 #: global switch for checking existence if files in constants (not needed if we are creating these files)
