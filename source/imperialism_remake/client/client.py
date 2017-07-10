@@ -47,10 +47,10 @@ logger = logging.getLogger(__name__)
 
 class MapItem(QtCore.QObject):
     """
-        Holds together a clickable QPixmapItem, a description text and a reference to a label that
-        shows the text
+    Holds together a clickable QPixmapItem, a description text and a reference to a label that
+    shows the text
 
-        TODO use signals to show the text instead
+    TODO use signals to show the text instead
     """
     description_change = QtCore.pyqtSignal(str)
 
@@ -75,22 +75,21 @@ class MapItem(QtCore.QObject):
 
     def show_description(self):
         """
-            Shows the description in the label.
+        Shows the description in the label.
         """
         self.label.setText('<font color=#ffffff size=6>{}</font>'.format(self.description))
 
     def hide_description(self):
         """
-            Hides the description from the label.
+        Hides the description from the label.
         """
         self.label.setText('')
 
 
+# TODO convert to simple method which does it, no need to be a class
 class StartScreen(QtWidgets.QWidget):
     """
-        Creates the start screen
-
-        TODO convert to simple method which does it, no need to be a class
+    Creates the start screen
     """
 
     frame_pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 255, 255, 64)), 6)
@@ -103,8 +102,8 @@ class StartScreen(QtWidgets.QWidget):
 
         layout = qt.RelativeLayout(self)
 
-        start_image = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER,
-                                                     'start.background.jpg'))
+        path = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.background.jpg')
+        start_image = QtGui.QPixmap(path)
         start_image_item = QtWidgets.QGraphicsPixmapItem(start_image)
         start_image_item.setZValue(1)
 
@@ -121,6 +120,8 @@ class StartScreen(QtWidgets.QWidget):
         layout.addWidget(view)
 
         subtitle = QtWidgets.QLabel('')
+        subtitle.resize(0,0)
+        # TODO this is below the main image but collides with screens only 768 px high
         subtitle.layout_constraint = qt.RelativeLayoutConstraint(
             (0.5, -0.5, 0), (0.5, -0.5, start_image.height() / 2 + 20))
         layout.addWidget(subtitle)
@@ -142,7 +143,7 @@ class StartScreen(QtWidgets.QWidget):
         for k, v in image_map.items():
             # add action from our predefined action dictionary
             pixmap = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER, v['overlay']))
-            map_item = MapItem(view, pixmap, label=subtitle, description=v['label'])
+            map_item = MapItem(scene, pixmap, label=subtitle, description=v['label'])
             map_item.item.setZValue(3)
             offset = v['offset']
             map_item.item.setOffset(QtCore.QPointF(offset[0], offset[1]))
@@ -156,6 +157,7 @@ class StartScreen(QtWidgets.QWidget):
 
         version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'
                                          .format(version.__version_full__))
+        version_label.resize(version_label.sizeHint())
         version_label.layout_constraint = qt.RelativeLayoutConstraint().east(20).south(20)
         layout.addWidget(version_label)
 
@@ -400,7 +402,7 @@ def local_network_connect():
 
 def start_client():
     """
-        Creates the Qt application and shows the main window.
+    Creates the Qt application and shows the main window.
     """
 
     # create app
@@ -445,8 +447,8 @@ def start_client():
     client = Client()
     client.switch_to_start_screen()
 
+    # start Qt app execution and immediately try to connect to local server
     logger.info('client initialized, start Qt app execution')
-    # TODO is this necessary to run as event?
     # noinspection PyCallByClass
     QtCore.QTimer.singleShot(0, local_network_connect)
     app.exec_()

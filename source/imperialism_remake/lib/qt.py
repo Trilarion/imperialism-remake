@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Graphics (PyQt5) based objects and algorithms that do not depend specifically on the project but only on PyQt5.
+Graphics (PyQt5) based objects and algorithms that do not depend specifically on the project but only on PyQt5.
 
-    Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
+Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
 """
 
 from datetime import datetime
@@ -147,7 +147,7 @@ class RelativeLayout(QtWidgets.QLayout):
         An implementation of QLayout working with RelativeLayoutConstraints so the position can be estimated by
         method calculate_relative_position()
 
-        Note: No margins in this layout.
+        Note: No margins in this layout. The elements must have been set to their target size.
     """
 
     def __init__(self, *args):
@@ -174,12 +174,14 @@ class RelativeLayout(QtWidgets.QLayout):
 
     def setGeometry(self, rect: QtCore.QRect):  # noqa: N802
         """
-        Layout the elements by calculating their relative position inside the parent, given the parents coordinates.
+        Layout the elements by calculating their relative position inside the parent, given the parents coordinates
+        and the sizes of the elements. The width and height are not changed but the offset is computed according to
+        the layout constraint and the parent size.
 
         :param rect: Position and size of the parent.
         """
         for item in self.items:
-            o_size = item.sizeHint()
+            o_size = item.widget().size()
 
             c = item.widget().layout_constraint
 
@@ -217,7 +219,7 @@ class RelativeLayout(QtWidgets.QLayout):
         min_height = 0
 
         for item in self.items:
-            o_size = item.sizeHint()
+            o_size = item.widget().size()
 
             c = item.widget().layout_constraint
             gap_x = abs(c.x[2])

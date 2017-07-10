@@ -82,7 +82,7 @@ MINIMAL_SCREEN_SIZE = (1024, 768)
 @unique
 class Option(utils.AutoNumberedEnum):
     """
-        Options as automatically numbered enum. The members of it are then the Options.
+    Options as automatically numbered enum. The members of it are then the Options.
     """
     LOCALSERVER_OPEN = ()
     # local server accepts outside connections

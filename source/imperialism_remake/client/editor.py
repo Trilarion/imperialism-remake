@@ -612,7 +612,10 @@ class NewScenarioWidget(QtWidgets.QWidget):
     """
 
     #: signal, emitted if this dialog finishes successfully and transmits parameters in the dictionary
-    finished = QtCore.pyqtSignal(dict)
+    finished = QtCore.pyqtSignal(object)
+    # see also: https://stackoverflow.com/questions/43964766/pyqt-emit-signal-with-dict
+    # and https://www.riverbankcomputing.com/pipermail/pyqt/2017-May/039175.html
+    # may be changed back to dict with a later PyQt5 version
 
     def __init__(self, *args, **kwargs):
         """

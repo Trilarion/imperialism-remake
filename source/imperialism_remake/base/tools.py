@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Non-specific independent helper functions. Do not depend on any other part of the project except on package lib
-    and base.constants and is specifically used by the project.
+Non-specific independent helper functions. Do not depend on any other part of the project except on package lib
+and base.constants and is specifically used by the project.
 """
 
 import PyQt5.QtGui as QtGui

@@ -12,6 +12,11 @@
 
 [![Build Status](https://travis-ci.org/Trilarion/imperialism-remake.svg?branch=master)](https://travis-ci.org/Trilarion/imperialism-remake)
 
+## Requirements
+
+- Minimal screen size: 1024 x 768
+- Python (with some modules (see below) or included in a package)
+
 ## Getting Started
 
 ### Access the source code
