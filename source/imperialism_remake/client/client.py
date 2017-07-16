@@ -176,8 +176,6 @@ class ClientMainWindowWidget(QtWidgets.QWidget):
         super().__init__(*args, **kwargs)
         # set geometry
         self.setGeometry(tools.get_option(constants.Option.MAINWINDOW_BOUNDS))
-        # set icon
-        self.setWindowIcon(tools.load_ui_icon('window.icon.ico'))
         # set title
         self.setWindowTitle('Imperialism Remake')
 
@@ -433,6 +431,9 @@ def start_client():
     with open(constants.GLOBAL_STYLESHEET_FILE, encoding='utf-8') as file:
         style_sheet = file.read()
     app.setStyleSheet(style_sheet)
+
+    # set icon
+    app.setWindowIcon(tools.load_ui_icon('window.icon.ico'))
 
     # setup sound system
     audio.load_soundtrack_playlist()
