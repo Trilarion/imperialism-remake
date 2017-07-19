@@ -167,7 +167,7 @@ class ExtendedTcpSocket(QtCore.QObject):
 
         # write using a data stream
         writer = QtCore.QDataStream(self.socket)
-        writer.setVersion(QtCore.QDataStream.Qt_5_6)
+        writer.setVersion(QtCore.QDataStream.Qt_5_5)
         writer << bytearray
 
     def count_bytes_written(self, bytes):

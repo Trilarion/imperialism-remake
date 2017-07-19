@@ -147,7 +147,7 @@ def main():
     # guidelines at https://docs.python.org/3.6/library/multiprocessing.html#programming-guidelines
     multiprocessing.set_start_method('spawn')
 
-    # test for minimal supported python version
+    # test for minimal supported python version (3.5)
     required_version = (3, 5)
     if sys.version_info < required_version:
         raise RuntimeError('Python version must be {}.{} at least.'.format(*required_version))
@@ -157,6 +157,10 @@ def main():
         from PyQt5 import QtCore  # noqa: F401
     except ImportError:
         raise RuntimeError('PyQt5 must be installed.')
+
+    # test for minimal supported Qt version (5.5)
+    if QtCore.QT_VERSION < 0x50500:
+        raise RuntimeError('Qt version of PyQt5 must be 5.5 at least.')
 
     # fix PyQt5 exception eating
     fix_pyqt5_exception_eating()
