@@ -20,5 +20,5 @@ _build
 environment.pickle
 
 # ours
-/data/manual
+source/imperialism_remake/data/manual
 /build
