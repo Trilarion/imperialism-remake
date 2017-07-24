@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+#
 # Imperialism remake
 # Copyright (C) 2016 Trilarion
 #
