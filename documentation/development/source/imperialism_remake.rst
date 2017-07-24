@@ -1,5 +1,5 @@
-imperialism_remake package
-==========================
+imperialism\_remake package
+===========================
 
 Subpackages
 -----------
@@ -14,16 +14,16 @@ Subpackages
 Submodules
 ----------
 
-imperialism_remake.start module
--------------------------------
+imperialism\_remake\.start module
+---------------------------------
 
 .. automodule:: imperialism_remake.start
     :members:
     :undoc-members:
     :show-inheritance:
 
-imperialism_remake.version module
----------------------------------
+imperialism\_remake\.version module
+-----------------------------------
 
 .. automodule:: imperialism_remake.version
     :members:

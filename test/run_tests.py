@@ -28,6 +28,7 @@ import unittest
 
 if __name__ == '__main__':
     tests_dir = os.path.abspath(os.path.dirname(__file__))
+
     # add source directory to path if needed
     source_directory = os.path.join(tests_dir, os.path.pardir, 'source')
     if source_directory not in sys.path:

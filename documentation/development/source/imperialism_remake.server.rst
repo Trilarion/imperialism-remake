@@ -1,19 +1,19 @@
-imperialism_remake.server package
-=================================
+imperialism\_remake\.server package
+===================================
 
 Submodules
 ----------
 
-imperialism_remake.server.scenario module
------------------------------------------
+imperialism\_remake\.server\.scenario module
+--------------------------------------------
 
 .. automodule:: imperialism_remake.server.scenario
     :members:
     :undoc-members:
     :show-inheritance:
 
-imperialism_remake.server.server module
----------------------------------------
+imperialism\_remake\.server\.server module
+------------------------------------------
 
 .. automodule:: imperialism_remake.server.server
     :members:

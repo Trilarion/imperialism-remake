@@ -70,27 +70,28 @@ def copy_manual(source, target):
 
 if __name__ == '__main__':
 
-    # start with directory one down
-    os.chdir('..')
+    # get start directories
+    tools_directory = os.path.abspath(os.path.dirname(__file__))
+    source_directory = os.path.join(tools_directory, os.path.pardir, 'source')
+    documentation_directory = os.path.join(tools_directory, os.path.pardir, 'documentation')
 
     # sphinx api build
-    source_directory = 'source'
-    api_build_out_directory = os.path.join('documentation', 'development', 'source')
+    api_build_out_directory = os.path.join(documentation_directory, 'development', 'source')
     sphinx_api_build(source_directory, api_build_out_directory)
     
     # build manual
-    manual_rst_directory = os.path.join('documentation', 'manual')
+    manual_rst_directory = os.path.join(documentation_directory, 'manual')
     sphinx_build(manual_rst_directory)
 
     # copy manual to ./data
-    manual_data_directory = os.path.join('source', 'imperialism_remake', 'data', 'manual')
+    manual_data_directory = os.path.join(source_directory, 'imperialism_remake', 'data', 'manual')
     manual_build_directory = os.path.join(manual_rst_directory, '_build')
     copy_manual(manual_build_directory, manual_data_directory)
     
     # build definition
-    definition_rst_directory = os.path.join('documentation', 'definition')
+    definition_rst_directory = os.path.join(documentation_directory, 'definition')
     sphinx_build(definition_rst_directory)
     
     # build developer manual
-    developer_rst_directory = os.path.join('documentation', 'development')
+    developer_rst_directory = os.path.join(documentation_directory, 'development')
     sphinx_build(developer_rst_directory)
