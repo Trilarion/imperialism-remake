@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
-    to the project.
+General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
+to the project.
 """
 import zipfile
 from enum import Enum

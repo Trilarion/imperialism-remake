@@ -15,18 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Wraps around QtWebEngineWidgets.QWebEngineView to provide a simple browser with home, forward and
-    backward functionality.
+Wraps around QtWebEngineWidgets.QWebEngineView to provide a simple browser with home, forward and
+backward functionality.
 """
 
-import PyQt5.QtWidgets as QtWidgets
-
-
+from PyQt5 import QtWidgets
 # TODO export new document title when load finished
+
 
 class BrowserWidget(QtWidgets.QWidget):
     """
-        Browser based on QtWebEngineWidgets.QWebEngineView. Provides Home, Forward, Backward (history) functionality.
+    Browser based on QtWebEngineWidgets.QWebEngineView. Provides Home, Forward, Backward (history) functionality.
     """
 
     def __init__(self, icon_provider):
@@ -62,7 +61,7 @@ class BrowserWidget(QtWidgets.QWidget):
         self.action_forward = action_forward
 
         # create and add web view, also store history
-        import PyQt5.QtWebEngineWidgets as QtWebEngineWidgets
+        from PyQt5 import QtWebEngineWidgets
         web_view = QtWebEngineWidgets.QWebEngineView()
         self.web_view = web_view
         self.web_view.loadFinished.connect(self.load_finished)

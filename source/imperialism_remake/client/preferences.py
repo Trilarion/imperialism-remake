@@ -18,9 +18,7 @@
 Preferences Widget
 """
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtWidgets as QtWidgets
-import PyQt5.QtNetwork as QtNetwork
+from PyQt5 import QtCore, QtWidgets, QtNetwork
 
 from imperialism_remake.base import constants, tools
 from imperialism_remake.client import audio

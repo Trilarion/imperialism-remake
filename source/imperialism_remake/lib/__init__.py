@@ -1,5 +1,5 @@
 """
-    Package lib
+Package lib
 
-    Non game specific code.
+Non game specific code.
 """

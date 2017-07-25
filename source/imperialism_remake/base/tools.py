@@ -19,10 +19,10 @@ Non-specific independent helper functions. Do not depend on any other part of th
 and base.constants and is specifically used by the project.
 """
 
-import PyQt5.QtGui as QtGui
+from PyQt5 import QtGui
 
-import imperialism_remake.base.constants as constants
-import imperialism_remake.lib.utils as utils
+from imperialism_remake.base import constants
+from imperialism_remake.lib import utils
 
 
 def load_ui_icon(name):

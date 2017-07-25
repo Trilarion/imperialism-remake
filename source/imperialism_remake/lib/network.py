@@ -24,8 +24,7 @@ import logging
 import time
 import zlib
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtNetwork as QtNetwork
+from PyQt5 import QtCore, QtNetwork
 import yaml
 
 #: shortcut for QtNetwork.QHostAddress.LocalHost/Any

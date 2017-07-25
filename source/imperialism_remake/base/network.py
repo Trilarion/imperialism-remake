@@ -15,17 +15,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Using Signals of Qt, we refine on the network Client class in lib/network.py. Channels are
-    introduced which have names and a signal to connect/disconnect to.
+Using Signals of Qt, we refine on the network Client class in lib/network.py. Channels are
+introduced which have names and a signal to connect/disconnect to.
 """
 
 import logging
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtNetwork as QtNetwork
+from PyQt5 import QtCore, QtNetwork
 
 from imperialism_remake.base import constants
-import imperialism_remake.lib.network as lib_network
+from imperialism_remake.lib import network as lib_network
 
 
 logger = logging.getLogger(__name__)

@@ -23,11 +23,9 @@ import math
 import os
 from functools import partial
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtGui as QtGui
-import PyQt5.QtWidgets as QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-import imperialism_remake.client.graphics as graphics
+from imperialism_remake.client import graphics
 from imperialism_remake.base import constants, tools
 from imperialism_remake.lib import qt, utils
 from imperialism_remake.server.scenario import Scenario

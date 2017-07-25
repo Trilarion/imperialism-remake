@@ -23,8 +23,8 @@ import math
 
 from PyQt5 import QtCore
 
-import imperialism_remake.base.constants as constants
-import imperialism_remake.lib.utils as utils
+from imperialism_remake.base import constants
+from imperialism_remake.lib import utils
 
 
 # TODO rivers are implemented inefficiently

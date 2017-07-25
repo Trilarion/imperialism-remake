@@ -27,16 +27,15 @@ import unittest
 
 
 if __name__ == '__main__':
-    tests_dir = os.path.abspath(os.path.dirname(__file__))
-
     # add source directory to path if needed
-    source_directory = os.path.join(tests_dir, os.path.pardir, 'source')
+    tests_directory = os.path.abspath(os.path.dirname(__file__))
+    source_directory = os.path.realpath(os.path.join(tests_directory, os.path.pardir, 'source'))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
 
     loader = unittest.defaultTestLoader
 
-    tests = loader.discover(tests_dir)
+    tests = loader.discover(tests_directory)
 
     runner = unittest.TextTestRunner()
 

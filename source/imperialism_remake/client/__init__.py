@@ -1,3 +1,5 @@
 """
-    Client user interface, editor and network connection.
+Client package.
+
+User interface, editor and network connection.
 """

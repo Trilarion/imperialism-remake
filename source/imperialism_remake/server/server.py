@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Server network code. Only deals with the network connection, client connection management and message distribution.
+Server network code. Only deals with the network connection, client connection management and message distribution.
 """
 
 from datetime import datetime
@@ -29,12 +29,10 @@ import time
 
 from PyQt5 import QtCore, QtNetwork
 
-from imperialism_remake.base import constants
-import imperialism_remake.base.network as base_network
-from imperialism_remake.lib import utils
-import imperialism_remake.lib.network as lib_network
+from imperialism_remake.base import constants, network as base_network
+from imperialism_remake.lib import utils, network as lib_network
 from imperialism_remake.server.scenario import Scenario
-import imperialism_remake.start as start
+from imperialism_remake import start
 
 
 logger = logging.getLogger(__name__)

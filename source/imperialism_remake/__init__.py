@@ -1,3 +1,3 @@
 """
-    Package imperialism_remake
+Package imperialism_remake
 """

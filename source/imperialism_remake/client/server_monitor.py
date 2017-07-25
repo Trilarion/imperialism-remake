@@ -22,8 +22,7 @@ from datetime import datetime
 
 from PyQt5 import QtCore, QtWidgets
 
-from imperialism_remake.base import constants
-import imperialism_remake.base.network as base_network
+from imperialism_remake.base import constants, network as base_network
 from imperialism_remake.client.client import local_network_client
 
 

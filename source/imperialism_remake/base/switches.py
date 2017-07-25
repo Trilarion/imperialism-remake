@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-Global switches.
+Global switches (and default values).
 """
 
 #: global switch for DEBUG MODE

@@ -23,14 +23,11 @@ Abstraction of the used elements in the project to achieve an intermediate layer
 from datetime import datetime
 import os
 
-import PyQt5.QtGui as QtGui
-import PyQt5.QtWidgets as QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 # some constant expressions
 
 #: transparent pen
-from PyQt5 import QtCore as QtCore
-
 TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
 
 
@@ -600,8 +597,8 @@ def make_GraphicsItem_clickable(parent):
 
         def __init__(self, *args, **kwargs):
             """
-                QGraphicsItems by default do not accept hover events or accept mouse buttons (for performance reasons).
-                So we need to turn both on.
+            QGraphicsItems by default do not accept hover events or accept mouse buttons (for performance reasons).
+            So we need to turn both on.
             """
             parent.__init__(self, *args, **kwargs)
 #           QtCore.QObject.__init__(self)

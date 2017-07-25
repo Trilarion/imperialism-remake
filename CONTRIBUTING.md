@@ -1,6 +1,6 @@
 ## Introduction
 
-Thank you for considering contributing to the [Imperialism Remake](http://remake.twelvepm.de/)vproject!
+Thank you for considering contributing to the [Imperialism Remake](http://remake.twelvepm.de/) project!
 
 Volunteers are always welcome. There are plenty of chances to take part in coding,
 graphics design, discussing the game rules or just giving feedback.
@@ -10,10 +10,9 @@ please consider registering there.
 
 For programmers direct interaction with the [github repository](https://github.com/Trilarion/imperialism-remake)
 by forking and pushing merge requests are preferred. Please use the
-[issues tracker](https://github.com/Trilarion/imperialism-remake/issues) to report problems with
-the game. Requests for enhancement should be posted in the community forum or if they more technical
+[issues tracker](https://github.com/Trilarion/imperialism-remake/issues) to report problems.
+Requests for enhancement should be posted in the community forum or if they are more technical
 (coding related) also at the issues tracker.
-
 
 ## Getting started
 
@@ -21,14 +20,22 @@ the game. Requests for enhancement should be posted in the community forum or if
 
 The [source code](https://github.com/Trilarion/Imperialism-Remake) is on GitHub.
 
+The folder structure is as follow:
+
+- `.idea` Workspace for Pycharm IDE
+- `documentation` Game manuals as sphinx projects
+- `examples` Code snippets demonstrating certain aspects of the code base. No tests
+- `prototypes` Showcase implementation of larger parts of the game before they are integrated in the code base.
+- `source` The code base of the game with game assets (artwork, sound, ..) located at `source/imperialism_remake/data`
+- `test` Collection of tests.
+- `tools` Helper scripts for creating content files, building the documentation, ..
+
+
 #### Using Git
 
-[Download Git](http://git-scm.com/downloads) or on Windows install [TortoiseGit](https://code.google.com/p/tortoisegit/)
-which conveniently integrates git with the explorer.
-
-Git is not easy. Be careful. Here is a [tutorial](https://www.atlassian.com/git/tutorials/syncing).
-
-Please use the usual fork and create pull request scheme for suggesting changes to the code.
+Please use the usual fork and create pull request scheme for suggesting changes to the code. Also see this tutorial
+[learngitbranching](http://learngitbranching.js.org/). On Windows, [TortoiseGit](https://code.google.com/p/tortoisegit/)
+conveniently integrates git with the explorer.
 
 ### Developer documentation
 

@@ -25,12 +25,10 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from imperialism_remake.base import constants, tools
-import imperialism_remake.base.network as base_network
-from imperialism_remake.client import audio
-import imperialism_remake.client.graphics as graphics
+from imperialism_remake.base import constants, tools, network as base_network
+from imperialism_remake.client import audio, graphics
 from imperialism_remake.lib import qt, utils
-import imperialism_remake.version as version
+from imperialism_remake import version
 
 # TODO like in audio, set the network client singleton somewhere else
 local_network_client = base_network.NetworkClient()

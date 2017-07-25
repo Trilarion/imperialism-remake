@@ -18,8 +18,7 @@ import sys
 
 import PyQt5.QtWidgets as QtWidgets
 
-import imperialism_remake
-import client.audio as audio
+import imperialism_remake.client.audio as audio
 import lib.qt as qt
 
 def playlist_index_changed(position):

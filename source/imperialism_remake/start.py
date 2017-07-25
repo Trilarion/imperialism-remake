@@ -125,8 +125,8 @@ def get_configured_logger(user_folder, is_debug):
     logger_thread.start()
 
     def logger_thread_cleanup(log_queue=log_queue, logger_thread=logger_thread):
-        """ The logger thread will exit as soon as he receives None in the log_queue
-
+        """
+        The logger thread will exit as soon as he receives None in the log_queue
         This function should be called immediately before exiting.
         """
         log_queue.put(None)
@@ -169,7 +169,9 @@ def main():
     # This allows the import of the 'imperialism_remake' modules.
     # This is required at least for Linux distributions of Python3, since the current working
     # directory is not part of Python's search path by default.
-    sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
 
     user_folder = get_user_directory()
 
@@ -186,7 +188,7 @@ def main():
     logger.info('user data stored in: {}'.format(user_folder))
 
     # import some base libraries
-    import imperialism_remake.base.tools as tools
+    from imperialism_remake.base import tools
 
     # search for existing options file, if not existing, save it once (should just save an empty dictionary)
     options_file = os.path.join(user_folder, 'options.info')

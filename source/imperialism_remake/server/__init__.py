@@ -1,3 +1,5 @@
 """
-    Server part: Network organization, Client organization, AI.
+Server package.
+
+Network organization, Client organization, AI.
 """

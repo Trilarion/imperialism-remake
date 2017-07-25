@@ -20,14 +20,11 @@ Game lobby. Place for starting/loading games.
 
 from functools import partial
 
-import PyQt5.QtCore as QtCore
-import PyQt5.QtGui as QtGui
-import PyQt5.QtWidgets as QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-from imperialism_remake.base import constants, tools
-import imperialism_remake.base.network as base_network
-import imperialism_remake.client.graphics as graphics
+from imperialism_remake.base import constants, tools, network as base_network
 from imperialism_remake.lib import qt, utils
+from imperialism_remake.client import graphics
 from imperialism_remake.client.client import local_network_client
 
 
