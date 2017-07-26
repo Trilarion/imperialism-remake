@@ -14,9 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-'''
-    Infos about PyQt
-'''
+"""
+Infos about PyQt
+"""
 
 from PyQt5.QtCore import QT_VERSION_STR, PYQT_VERSION_STR
 from sip import SIP_VERSION_STR

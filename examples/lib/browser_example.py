@@ -15,17 +15,22 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Starts the browser. Start with project root as working directory.
+Starts the browser. Start with project root as working directory.
 """
 
-import PyQt5.QtWidgets as QtWidgets
-import PyQt5.QtCore as QtCore
+import os, sys
 
-import imperialism_remake
-from base import tools
-from lib import qt_webengine
+from PyQt5 import QtCore, QtWidgets
+
+from imperialism_remake.base import tools
+from imperialism_remake.lib import qt_webengine
 
 if __name__ == '__main__':
+
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
 
     app = QtWidgets.QApplication([])
 

@@ -15,16 +15,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Examples for usages of ExtendedTcpSocket and ExtendedTcpServer from lib.network
+Examples for usages of ExtendedTcpSocket and ExtendedTcpServer from lib.network
 """
 
-import sys
+import sys, os
 import datetime
 
-import PyQt5.QtCore as QtCore
+from PyQt5 import QtCore
 
-import imperialism_remake
-import lib.network as network
+from imperialism_remake.lib import network
 
 PORT = 37846
 
@@ -112,6 +111,11 @@ def server_client_sends_something():
     sclient.send([1, 2, 'Three'])
 
 if __name__ == '__main__':
+
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
 
     app = QtCore.QCoreApplication([])
 

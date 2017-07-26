@@ -18,11 +18,12 @@
 Examples for base.network and server.network using ServerProcess
 """
 
-import PyQt5.QtCore as QtCore
+import os, sys
 
-import imperialism_remake
-from base import constants, network
-from server import server
+from PyQt5 import QtCore
+
+from imperialism_remake.base import constants, network as base_network
+from imperialism_remake.server import server
 
 def client_connect():
     """
@@ -51,8 +52,11 @@ def send_shutdown():
     client.send(constants.C.SYSTEM, constants.M.SYSTEM_SHUTDOWN)
 
 if __name__ == '__main__':
-    imperialism_remake.fix_pyqt5_exception_eating()
-    imperialism_remake.set_start_directory()
+
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
 
     # create server process and start it
     server_process = server.ServerProcess()
@@ -61,7 +65,7 @@ if __name__ == '__main__':
     # create app in this process
     app = QtCore.QCoreApplication([])
 
-    client = network.NetworkClient()
+    client = base_network.NetworkClient()
 
     # actions
     QtCore.QTimer.singleShot(100, client_connect)

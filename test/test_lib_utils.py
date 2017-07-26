@@ -20,7 +20,7 @@ Tests lib/utils
 
 import os
 import unittest
-import imperialism_remake.lib.utils as utils
+from imperialism_remake.lib import utils
 
 class TestYAML(unittest.TestCase):
 

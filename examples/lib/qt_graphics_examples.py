@@ -14,14 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-'''
-    Tests some of the generic graphics elements in lib/qt
-'''
+"""
+Tests some of the generic graphics elements in lib/qt
+"""
+
+import os, sys
 
 from PyQt5 import QtWidgets
 
-import imperialism_remake
-import lib.qt as qt
+from imperialism_remake.lib import qt
+
 
 class Window(QtWidgets.QWidget):
     def __init__(self):
@@ -56,6 +58,12 @@ class Window(QtWidgets.QWidget):
         self.notification.show()
 
 if __name__ == '__main__':
+
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
+
     app = QtWidgets.QApplication([])
 
     window = Window()

@@ -14,9 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-'''
-    Basic actions of QTcpServer, QTcpSocket communication.
-'''
+"""
+Basic actions of QTcpServer, QTcpSocket communication.
+"""
 
 from PyQt5 import QtCore, QtNetwork
 
@@ -30,14 +30,15 @@ def setup():
     server.listen(QtNetwork.QHostAddress.LocalHost, 34543)
     client_socket.connectToHost(QtNetwork.QHostAddress.LocalHost, 34543)
 
+if __name__ == '__main__':
 
-app = QtCore.QCoreApplication([])
+    app = QtCore.QCoreApplication([])
 
-server = QtNetwork.QTcpServer()
-server.newConnection.connect(new_server_connection)
-client_socket = QtNetwork.QTcpSocket()
-client_socket.connected.connect(new_client_connection)
+    server = QtNetwork.QTcpServer()
+    server.newConnection.connect(new_server_connection)
+    client_socket = QtNetwork.QTcpSocket()
+    client_socket.connected.connect(new_client_connection)
 
-QtCore.QTimer.singleShot(0, setup)
-QtCore.QTimer.singleShot(3000, app.quit)
-app.exec_()
+    QtCore.QTimer.singleShot(0, setup)
+    QtCore.QTimer.singleShot(3000, app.quit)
+    app.exec_()

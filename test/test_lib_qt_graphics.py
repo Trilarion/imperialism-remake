@@ -19,8 +19,8 @@ Tests lib/qt
 """
 
 import unittest
-import PyQt5.QtCore as QtCore
-import imperialism_remake.lib.qt as qt
+from PyQt5 import QtCore
+from imperialism_remake.lib import qt
 
 class TestRelativeLayout(unittest.TestCase):
 

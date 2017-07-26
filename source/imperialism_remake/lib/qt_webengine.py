@@ -22,6 +22,11 @@ backward functionality.
 from PyQt5 import QtWidgets
 # TODO export new document title when load finished
 
+try:
+    from PyQt5 import QtWebEngineWidgets
+except:
+    pass # TODO use this as switch
+
 
 class BrowserWidget(QtWidgets.QWidget):
     """
@@ -61,7 +66,6 @@ class BrowserWidget(QtWidgets.QWidget):
         self.action_forward = action_forward
 
         # create and add web view, also store history
-        from PyQt5 import QtWebEngineWidgets
         web_view = QtWebEngineWidgets.QWebEngineView()
         self.web_view = web_view
         self.web_view.loadFinished.connect(self.load_finished)

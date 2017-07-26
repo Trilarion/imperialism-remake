@@ -18,11 +18,12 @@
 Examples for base.network and server.network
 """
 
+import os, sys
+
 from PyQt5 import QtCore
 
-import imperialism_remake
-from base import constants, network
-from server.server import ServerManager
+from imperialism_remake.base import constants, network as base_network
+from imperialism_remake.server import server
 
 def client_connect():
     """
@@ -46,13 +47,16 @@ def receive(client, channel, action, content):
 
 
 if __name__ == '__main__':
-    imperialism_remake.fix_pyqt5_exception_eating()
-    imperialism_remake.set_start_directory()
+
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
 
     app = QtCore.QCoreApplication([])
 
-    server_manager = ServerManager()
-    client = network.NetworkClient()
+    server_manager = server.ServerManager()
+    client = base_network.NetworkClient()
 
     # actions
     QtCore.QTimer.singleShot(0, server_manager.start)

@@ -14,18 +14,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import sys
+"""
+Starts an audio player.
+"""
 
-import PyQt5.QtWidgets as QtWidgets
+import os, sys
 
-import imperialism_remake.client.audio as audio
-import lib.qt as qt
+from PyQt5 import QtWidgets
+
+from imperialism_remake.client import audio
+from imperialism_remake.lib import qt
 
 def playlist_index_changed(position):
     print('Next song')
     qt.Notification(window, 'Next song', positioner=qt.Relative_Positioner().center_horizontal().south(20))
 
 if __name__ == '__main__':
+
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
 
     app = QtWidgets.QApplication([])
 
@@ -34,7 +43,6 @@ if __name__ == '__main__':
 
     # setup sound system and start playing
     audio.load_soundtrack_playlist()
-    audio.setup_soundtrack_player()
     audio.setup_soundtrack_player()
     audio.soundtrack_playlist.currentIndexChanged.connect(playlist_index_changed)
     audio.soundtrack_player.play()

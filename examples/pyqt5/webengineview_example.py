@@ -15,21 +15,22 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Simple example of how to show a web view with PyQt5. Uses QtWebEngineWidgets.QtWebEngineView
+Simple example of how to show a web view with PyQt5. Uses QtWebEngineWidgets.QtWebEngineView
 """
 
-import PyQt5.QtWidgets as QtWidgets
-import PyQt5.QtCore as QtCore
-import PyQt5.QtWebEngineWidgets as QtWebEngineWidgets
+from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
 
-# create app
-app = QtWidgets.QApplication([])
+if __name__ == '__main__':
 
-# QWebEngineView
-web_view_widget = QtWebEngineWidgets.QWebEngineView()
-web_view_widget.titleChanged.connect(web_view_widget.setWindowTitle) # displays the actual page title as windows title
-web_view_widget.load(QtCore.QUrl("http://qt-project.org/"))
-web_view_widget.show()
+    # create app
+    app = QtWidgets.QApplication([])
 
-# run
-app.exec_()
+    # QWebEngineView
+    web_view_widget = QtWebEngineWidgets.QWebEngineView()
+    # displays the actual page title as windows title
+    web_view_widget.titleChanged.connect(web_view_widget.setWindowTitle)
+    web_view_widget.load(QtCore.QUrl("http://qt-project.org/"))
+    web_view_widget.show()
+
+    # run
+    app.exec_()

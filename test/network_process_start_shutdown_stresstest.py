@@ -18,9 +18,9 @@
 Examples for base.network and server.network using ServerProcess
 """
 
-import PyQt5.QtCore as QtCore
+from PyQt5 import QtCore
 from imperialism_remake import start
-from imperialism_remake.base import constants, network
+from imperialism_remake.base import constants, network as base_network
 from imperialism_remake.server import server
 
 def client_connect():
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # create app in this process
     app = QtCore.QCoreApplication([])
 
-    client = network.NetworkClient()
+    client = base_network.NetworkClient()
 
     # actions
     QtCore.QTimer.singleShot(100, client_connect)
