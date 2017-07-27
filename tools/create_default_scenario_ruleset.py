@@ -18,27 +18,33 @@
 Generate the default rules.
 """
 
-import os
-os.chdir('..')
+import os, sys
 
-from lib import utils
-from base import constants
+from imperialism_remake.lib import utils
+from imperialism_remake.base import constants
 
-rules = {}
+if __name__ == '__main__':
 
-# terrain names
-terrain_names = {
-    0: 'Sea',
-    1: 'Plain',
-    2: 'Hills',
-    3: 'Mountains',
-    4: 'Tundra',
-    5: 'Swamp',
-    6: 'Desert'
-}
-rules['terrain.names'] = terrain_names
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
 
-# save
-file = constants.SCENARIO_RULESET_STANDARD_FILE
-print('write to {}'.format(file))
-utils.write_as_yaml(file, rules)
+    rules = {}
+
+    # terrain names
+    terrain_names = {
+        0: 'Sea',
+        1: 'Plain',
+        2: 'Hills',
+        3: 'Mountains',
+        4: 'Tundra',
+        5: 'Swamp',
+        6: 'Desert'
+    }
+    rules['terrain.names'] = terrain_names
+
+    # save
+    file = constants.SCENARIO_RULESET_STANDARD_FILE
+    print('write to {}'.format(file))
+    utils.write_as_yaml(file, rules)

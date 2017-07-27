@@ -13,30 +13,33 @@ import glob
 import sphinx
 from sphinx import apidoc
 
-def sphinx_build(directory):
+def sphinx_build(rst_directory):
     """
+    Builds a sphinx project as html and latex.
 
-    :param directory:
+    :param rst_directory:
     :return:
     """
 
-    print('build directory {}'.format(directory))
+    print('project directory {}'.format(rst_directory))
 
     # output directory and builder name
-    out_directory = os.path.join(directory, '_build')
-    builder_name = 'html'
+    build_directory = os.path.join(rst_directory, '_build')
 
     # delete files of old build
-    if os.path.exists(out_directory):
-        shutil.rmtree(out_directory)
-    environment_file = os.path.join(directory, 'environment.pickle')
+    if os.path.exists(build_directory):
+        shutil.rmtree(build_directory)
+
+    environment_file = os.path.join(rst_directory, 'environment.pickle')
     if os.path.exists(environment_file):
         os.remove(environment_file)
-    for file_name in glob.glob(os.path.join(directory, '*.doctree')):
+
+    for file_name in glob.glob(os.path.join(rst_directory, '*.doctree')):
         os.remove(file_name)
 
     # call to sphinx
-    sphinx.build_main(argv=['', '-b', builder_name, directory, out_directory])
+    for builder_name in ('html', 'latex'):
+        sphinx.build_main(argv=['', '-b', builder_name, rst_directory, os.path.join(build_directory, builder_name)])
 
 def sphinx_api_build(source_directory, out_directory):
     """
@@ -75,17 +78,17 @@ if __name__ == '__main__':
     source_directory = os.path.join(tools_directory, os.path.pardir, 'source')
     documentation_directory = os.path.join(tools_directory, os.path.pardir, 'documentation')
 
-    # sphinx api build
-    api_build_out_directory = os.path.join(documentation_directory, 'development', 'source')
-    sphinx_api_build(source_directory, api_build_out_directory)
+    # sphinx api build (python to rst)
+    api_build_directory = os.path.join(documentation_directory, 'development', 'source')
+    sphinx_api_build(source_directory, api_build_directory)
     
-    # build manual
+    # build manual (rst to html, latex)
     manual_rst_directory = os.path.join(documentation_directory, 'manual')
     sphinx_build(manual_rst_directory)
 
-    # copy manual to ./data
+    # copy html manual to source/imperialism_remake/data/manual
     manual_data_directory = os.path.join(source_directory, 'imperialism_remake', 'data', 'manual')
-    manual_build_directory = os.path.join(manual_rst_directory, '_build')
+    manual_build_directory = os.path.join(manual_rst_directory, '_build', 'html')
     copy_manual(manual_build_directory, manual_data_directory)
     
     # build definition

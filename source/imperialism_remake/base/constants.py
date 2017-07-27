@@ -40,7 +40,8 @@ def extend(path, *parts):
 # TODO track used resources by the program
 
 #: base folders (do not directly contain data)
-DATA_FOLDER = extend(os.path.dirname(__file__), os.path.pardir, 'data')
+SOURCE_FOLDER = os.path.join(os.path.dirname(__file__), os.path.pardir)
+DATA_FOLDER = extend(SOURCE_FOLDER, 'data')
 ARTWORK_FOLDER = extend(DATA_FOLDER, 'artwork')
 
 #: scenarios (save games)

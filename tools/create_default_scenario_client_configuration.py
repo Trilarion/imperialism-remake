@@ -18,17 +18,23 @@
 Generate the default scenario client configuration file.
 """
 
-import os
-os.chdir('..')
+import os, sys
 
-from lib import utils
-from base import constants
+from imperialism_remake.lib import utils
+from imperialism_remake.base import constants
 
-config = {
-    constants.ClientConfiguration.OVERVIEW_WIDTH: 300
-}
+if __name__ == '__main__':
 
-# save
-file = constants.SCENARIO_CLIENT_STANDARD_FILE
-print('write to {}'.format(file))
-utils.write_as_yaml(file, config)
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
+
+    config = {
+        constants.ClientConfiguration.OVERVIEW_WIDTH: 300
+    }
+
+    # save
+    file = constants.SCENARIO_CLIENT_STANDARD_FILE
+    print('write to {}'.format(file))
+    utils.write_as_yaml(file, config)

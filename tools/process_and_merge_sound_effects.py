@@ -14,6 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+"""
+Processes sound effects. (Not yet implemented.)
+
+wavfile (taken from scipy) requires numpy
+"""
+
 import wavfile
 
 # read sound effects configuration

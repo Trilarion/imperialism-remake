@@ -14,22 +14,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import os
-os.chdir('..')
-
-from lib import utils as u
-from base import constants as c
-
 """
-    Generates the playlist of the soundtrack (file names and titles displayed
-    in the game). Phonon cannot read metadata under Windows sometimes, see:
-    http://stackoverflow.com/questions/23288557/phonon-cant-get-meta-data-of-audio-files-in-python
+Generates the playlist of the soundtrack (file names and titles displayed
+in the game).
+
+Phonon cannot read metadata under Windows sometimes, see:
+http://stackoverflow.com/questions/23288557/phonon-cant-get-meta-data-of-audio-files-in-python
 """
 
-# create the playlist, a list of (filename, title)
-playlist = [['01 Imperialism Theme.ogg', 'Imperialism Theme']]
-playlist.append(['02 Silent Ashes.ogg', 'Silent Ashes'])
+import os, sys
 
-# write
-print('write to {}'.format(c.SOUNDTRACK_INFO_FILE))
-u.write_as_yaml(c.SOUNDTRACK_INFO_FILE, playlist)
+from imperialism_remake.lib import utils
+from imperialism_remake.base import constants
+
+if __name__ == '__main__':
+
+    # add source directory to path if needed
+    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, 'source'))
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
+
+    # create the playlist, a list of (filename, title)
+    playlist = [['01 Imperialism Theme.ogg', 'Imperialism Theme']]
+    playlist.append(['02 Silent Ashes.ogg', 'Silent Ashes'])
+
+    # write
+    print('write to {}'.format(constants.SOUNDTRACK_INFO_FILE))
+    utils.write_as_yaml(constants.SOUNDTRACK_INFO_FILE, playlist)
