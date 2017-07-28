@@ -27,7 +27,7 @@ from imperialism_remake.lib import qt
 
 def playlist_index_changed(position):
     print('Next song')
-    qt.Notification(window, 'Next song', positioner=qt.Relative_Positioner().center_horizontal().south(20))
+    qt.Notification(window, 'Next song', position_constraint=qt.RelativeLayoutConstraint().center_horizontal().south(20))
 
 if __name__ == '__main__':
 
@@ -36,6 +36,8 @@ if __name__ == '__main__':
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
 
+    qt.fix_pyqt5_exception_eating()
+
     app = QtWidgets.QApplication([])
 
     window = QtWidgets.QWidget()
@@ -43,6 +45,7 @@ if __name__ == '__main__':
 
     # setup sound system and start playing
     audio.load_soundtrack_playlist()
+    print(audio.soundtrack_playlist.mediaCount())
     audio.setup_soundtrack_player()
     audio.soundtrack_playlist.currentIndexChanged.connect(playlist_index_changed)
     audio.soundtrack_player.play()

@@ -31,21 +31,6 @@ import threading
 
 APPLICATION_NAME = 'imperialism_remake'
 
-
-def exception_hook(type, value, traceback):
-    """
-    Use sys.__excepthook__, the standard hook.
-    """
-    sys.__excepthook__(type, value, traceback)
-
-
-def fix_pyqt5_exception_eating():
-    """
-    PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
-    """
-    sys.excepthook = exception_hook
-
-
 def get_user_directory():
     """
     Determines the location of the user folder.
@@ -163,7 +148,8 @@ def main():
         raise RuntimeError('Qt version of PyQt5 must be 5.5 at least.')
 
     # fix PyQt5 exception eating
-    fix_pyqt5_exception_eating()
+    from imperialism_remake.lib import qt
+    qt.fix_pyqt5_exception_eating()
 
     # Add the parent directory of the package directory to Python's search path.
     # This allows the import of the 'imperialism_remake' modules.

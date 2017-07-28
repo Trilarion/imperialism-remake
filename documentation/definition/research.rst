@@ -22,51 +22,51 @@ General aspects
 Techs
 ===========================
 
-* (MN) Light warship II
-* (MN) Light warship III requires Light warship II
-* (MN) Heavy warship II
-* (MN) Heavy warship III requires Heavy warship III
-* (ML) Militia II
-* (ML) Infantry II ("Breech loading rifle", IY 1848) [image of a  Dreyse needle gun as background]
-* (ML) Infantry III ("Machine gun", IY 1880) requires Infantry II
-* (ML) Artillery II
-* (ML) Artillery III requires Artillery II
-* (ML) Cavallery II
-* (ML) Cavallery III ("Tanks", IY 1900) requires Cavallery II
-* (ML) +1 Militia per province
-* (ML) +2 Units per battle
-* (ME) -10% Upkeep ("Nationalism")
-* (ME )-10% Training costs
-* (M) 5% trickleback of casualties
-* (M) +5% experience of trained soldiers ("Military school")
+* M+N Light warship II
+* M+N Light warship III requires Light warship II
+* M+N Heavy warship II
+* M+N Heavy warship III requires Heavy warship III
+* M+L Militia II
+* M+L Infantry II ("Breech loading rifle", IY 1848) [image of a  Dreyse needle gun as background]
+* M+L Infantry III ("Machine gun", IY 1880) requires Infantry II
+* M+L Artillery II
+* M+L Artillery III requires Artillery II
+* M+L Cavallery II
+* M+L Cavallery III ("Tanks", IY 1900) requires Cavallery II
+* M+L +1 Militia per province
+* M+L +2 Units per battle
+* M+E -10% Upkeep ("Nationalism")
+* M+E-10% Training costs
+* M 5% trickleback of casualties
+* M +5% experience of trained soldiers ("Military school")
 
 Possible names: Streamlined Hulls, Bessemer Converter, Rifled Artillery, Steel armor plate,  Gunpowder, Canon,
 Artillery, Geography and map making, Construction of turbine propeller, Colt gun, Morse code, Rifles invented,
 Internal combustion machine, Diesel machine, Telephone (better communication, efficiency)
 
-* (EN) Light merchant ship II
-* (EN) Light merchant ship III requires Light merchant ship II
-* (EN) Heavy merchant ship II ("Paddlewheel")
-* (EN) Heavy merchant ship III requires Heavy merchant ship II
-* (EF) Apple resources II
-* (EF) Apple resources III requires Apple resources II
-* (EF) Wheat resources II ("Windmill")
-* (EF) Wheat resources III requires Wheat resources II
-* (EF) Meat resources II
-* (EF) Meat resources III requires Meat resources II
-* (ER) Wood from forest II
-* (ER) Wood from forest III requires Wood from Forest II
-* (ER) Oil well II
-* (ER) Oil well III requires Oil well II
-* (ER) Ore mine II ("Square set timbering")
-* (ER) Ore mine III requires Ore mine II
-* (ER) Coal mine II ("Coal extraction")
-* (ER) Coal mine III requires Coal mine II
-* (E) Silver mine II
-* (ER) Wool&Cotton resource II
-* (ER) Wool&Cotton resource III requires Wool&Cotton resource II
-* (E) Railroad possible on swamps and hills ("Iron railroad bridge")
-* (E) Railroad possible into mountains ("Dynamite") requires Railroad possible on swamps and hills
+* E+N Light merchant ship II
+* E+N Light merchant ship III requires Light merchant ship II
+* E+N Heavy merchant ship II ("Paddlewheel")
+* E+N Heavy merchant ship III requires Heavy merchant ship II
+* E+F Apple resources II
+* E+F Apple resources III requires Apple resources II
+* E+F Wheat resources II ("Windmill")
+* E+F Wheat resources III requires Wheat resources II
+* E+F Meat resources II
+* E+F Meat resources III requires Meat resources II
+* E+R Wood from forest II
+* E+R Wood from forest III requires Wood from Forest II
+* E+R Oil well II
+* E+R Oil well III requires Oil well II
+* E+R Ore mine II ("Square set timbering")
+* E+R Ore mine III requires Ore mine II
+* E+R Coal mine II ("Coal extraction")
+* E+R Coal mine III requires Coal mine II
+* E Silver mine II
+* E+R Wool&Cotton resource II
+* E+R Wool&Cotton resource III requires Wool&Cotton resource II
+* E Railroad possible on swamps and hills ("Iron railroad bridge")
+* E Railroad possible into mountains ("Dynamite") requires Railroad possible on swamps and hills
 
 Names: Jenny Speed invented: Wool from sheep, Better transport wagons: More efficient wagons, Better pump for mines:
 More efficient mines, Steam engine, high pressure: Enables railroad building, Seed Drill: Improve grain farms and
@@ -77,9 +77,9 @@ efficiently , Cement improved, Electric generator: town upgrade?, Chemicals for 
 mines to level 3, Oil drill, Dynamite: Improved railroad, Electric light: Mines and city upgrade, Car with
 combustion machine.
 
-* (D) +5% influence creation with minor nations
-* (D) +5% efficiency of propaganda ("Radio")
-* (E) +5% efficiency of research ("National elite university")
+* D +5% influence creation with minor nations
+* D +5% efficiency of propaganda ("Radio")
+* E +5% efficiency of research ("National elite university")
 
 Higher tech efficiency, higher cultural ranking, more diplomatic influence
 

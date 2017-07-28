@@ -32,9 +32,9 @@ soundtrack_playlist = None
 
 def load_soundtrack_playlist():
     """
-        Loads the play list of the soundtracks and replaces the file name with the full path.
+    Loads the play list of the soundtracks and replaces the file name with the full path.
 
-        A playlist is a list where each entry is a list of two strings: file path, title
+    A playlist is a list where each entry is a list of two strings: file path, title
     """
     global soundtrack_playlist
 
@@ -55,10 +55,15 @@ def load_soundtrack_playlist():
 
 def setup_soundtrack_player():
     """
-        Initializes the singleton soundtrack player.
+    Initializes the singleton soundtrack player.
     """
     global soundtrack_player
     global soundtrack_playlist
+
+    if soundtrack_player:
+        raise RuntimeError('Should setup the player only once')
+    if not soundtrack_playlist:
+        raise RuntimeError('Need to load the playlist before')
 
     soundtrack_player = QtMultimedia.QMediaPlayer()
     soundtrack_player.setPlaylist(soundtrack_playlist)

@@ -21,7 +21,7 @@ Abstraction of the used elements in the project to achieve an intermediate layer
 """
 
 from datetime import datetime
-import os
+import os, sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -29,6 +29,19 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 #: transparent pen
 TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
+
+def exception_hook(type, value, traceback):
+    """
+    Use sys.__excepthook__, the standard hook.
+    """
+    sys.__excepthook__(type, value, traceback)
+
+
+def fix_pyqt5_exception_eating():
+    """
+    PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
+    """
+    sys.excepthook = exception_hook
 
 
 class RelativeLayoutConstraint:

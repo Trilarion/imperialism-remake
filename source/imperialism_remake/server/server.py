@@ -24,15 +24,13 @@ import logging.handlers
 import multiprocessing
 import os
 import random
-import sys
 import time
 
 from PyQt5 import QtCore, QtNetwork
 
 from imperialism_remake.base import constants, network as base_network
-from imperialism_remake.lib import utils, network as lib_network
+from imperialism_remake.lib import utils, qt, network as lib_network
 from imperialism_remake.server.scenario import Scenario
-from imperialism_remake import start
 
 
 logger = logging.getLogger(__name__)
@@ -59,8 +57,8 @@ class ServerProcess(multiprocessing.Process):
         Runs the server process by starting its own QCoreApplication.
         """
         self._configure_forked_logger()
-        # because PyQt5 eats exceptions in the event thread this workaround
-        sys.excepthook = start.exception_hook
+
+        qt.fix_pyqt5_exception_eating()
 
         app = QtCore.QCoreApplication([])
 
