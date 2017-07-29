@@ -28,8 +28,8 @@ import os
 import sys
 import threading
 
-
 APPLICATION_NAME = 'imperialism_remake'
+
 
 def get_user_directory():
     """
@@ -125,8 +125,10 @@ def main():
     Main entry point. Called from the script generated in setup.py and called when running this module with python.
     """
 
-    # TODO freeze_support might be needed for windows (https://docs.python.org/3.6/library/multiprocessing.html#multiprocessing.freeze_support)
-    # check if this is still the case, we are using pynsist (https://github.com/takluyver/pynsist) for packaging on Windows
+    # TODO freeze_support might be needed for windows
+    # (https://docs.python.org/3.6/library/multiprocessing.html#multiprocessing.freeze_support)
+    # check if this is still the case, we are using pynsist (https://github.com/takluyver/pynsist)
+    # for packaging on Windows
     # multiprocessing.freeze_support()
 
     # guidelines at https://docs.python.org/3.6/library/multiprocessing.html#programming-guidelines

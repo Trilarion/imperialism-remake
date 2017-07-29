@@ -25,7 +25,7 @@ from PyQt5 import QtWidgets
 try:
     from PyQt5 import QtWebEngineWidgets
 except:
-    pass # TODO use this as switch
+    pass  # TODO use this as switch
 
 
 class BrowserWidget(QtWidgets.QWidget):

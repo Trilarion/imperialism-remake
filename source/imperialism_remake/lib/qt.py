@@ -21,7 +21,8 @@ Abstraction of the used elements in the project to achieve an intermediate layer
 """
 
 from datetime import datetime
-import os, sys
+import os
+import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -29,6 +30,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 #: transparent pen
 TRANSPARENT_PEN = QtGui.QPen(QtCore.Qt.transparent)
+
 
 def exception_hook(type, value, traceback):
     """

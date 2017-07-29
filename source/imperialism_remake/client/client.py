@@ -118,7 +118,7 @@ class StartScreen(QtWidgets.QWidget):
         layout.addWidget(view)
 
         subtitle = QtWidgets.QLabel('')
-        subtitle.resize(0,0)
+        subtitle.resize(0, 0)
         # TODO this is below the main image but collides with screens only 768 px high
         subtitle.layout_constraint = qt.RelativeLayoutConstraint(
             (0.5, -0.5, 0), (0.5, -0.5, start_image.height() / 2 + 20))

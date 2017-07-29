@@ -499,6 +499,10 @@ class MainMap(QtWidgets.QGraphicsView):
         Right click (context click) on a tile. Shows the context menu, depending on the tile position
         """
 
+        # if there is no scenario existing, don't process the context click
+        if not editor_scenario.scenario:
+            return
+
         # get mouse position in scene coordinates
         scene_position = self.mapToScene(event.pos()) / self.TILE_SIZE
         column, row = editor_scenario.scenario.map_position(scene_position.x(), scene_position.y())
@@ -1165,7 +1169,7 @@ class EditorScreen(QtWidgets.QWidget):
         content_widget = ChangeTerrainWidget(column, row)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Change terrain',
                                      delete_on_close=True, help_callback=self.client.show_help_browser)
-        dialog.setFixedSize(QtCore.QSize(900, 700))
+        #dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
     def scenario_changed(self):
