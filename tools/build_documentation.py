@@ -1,4 +1,20 @@
 #!/usr/bin/env python3
+#
+# Imperialism remake
+# Copyright (C) 2014-16 Trilarion
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
 Builds the documentation.
@@ -70,8 +86,10 @@ def copy_manual(source, target):
     # copy manual
     shutil.copytree(source, target, ignore=shutil.ignore_patterns('.*'))
 
-
-if __name__ == '__main__':
+def build_documentation():
+    """
+    Builds all three documentation projects and copies the player manual to the sources/../data folder.
+    """
 
     # get start directories
     tools_directory = os.path.abspath(os.path.dirname(__file__))
@@ -81,7 +99,7 @@ if __name__ == '__main__':
     # sphinx api build (python to rst)
     api_build_directory = os.path.join(documentation_directory, 'development', 'source')
     sphinx_api_build(source_directory, api_build_directory)
-    
+
     # build manual (rst to html, latex)
     manual_rst_directory = os.path.join(documentation_directory, 'manual')
     sphinx_build(manual_rst_directory)
@@ -90,11 +108,16 @@ if __name__ == '__main__':
     manual_data_directory = os.path.join(source_directory, 'imperialism_remake', 'data', 'manual')
     manual_build_directory = os.path.join(manual_rst_directory, '_build', 'html')
     copy_manual(manual_build_directory, manual_data_directory)
-    
+
     # build definition
     definition_rst_directory = os.path.join(documentation_directory, 'definition')
     sphinx_build(definition_rst_directory)
-    
+
     # build developer manual
     developer_rst_directory = os.path.join(documentation_directory, 'development')
     sphinx_build(developer_rst_directory)
+
+
+if __name__ == '__main__':
+
+    build_documentation()

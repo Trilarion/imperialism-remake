@@ -15,50 +15,55 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-    Creates an OS independent package (as zip file) that contains the sources and the
-    data but requires Python and PySide to be installed manually also saving space.
-    It serves as generic non Windows distribution for the moment.
+Creates an OS independent package (as zip file) that contains the sources and the
+data but requires Python and Python modules to be installed manually before.
+It serves as generic non Windows distribution for the moment.
 """
 
-import os, shutil, zipfile
+import os, sys, shutil, zipfile
 
-# version string for file name encoding
-version = '0.2.1'
+if __name__ == '__main__':
 
-# change to project root
-os.chdir('..')
+    # first build the documentation
+    from build_documentation import build_documentation
+    build_documentation()
 
-# run conversion of help files from markdown
-manual_markdown_converter.convert()
+    # add source directory to path if needed
+    root_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir))
+    source_directory = os.path.join(root_directory, 'source')
+    if source_directory not in sys.path:
+        sys.path.insert(0, source_directory)
 
-# change to build directory
-os.chdir('build')
+    # create build directory if not existing
+    build_directory = os.path.join(root_directory, 'build')
+    if not os.path.exists(build_directory):
+        os.mkdir(build_directory)
 
-# set names
-folder_name = 'ImperialismRemake-{}'.format(version)
-zip_name = 'ImperialismRemake-{}-allOS.zip'.format(version)
-source_path = os.path.join('..', 'source')
-data_path = os.path.join('..', 'data')
+    # get build folder name
+    from imperialism_remake import version
+    target_directory_name = 'ImperialismRemake-{}'.format(version.__version__)
+    target_zip_name = 'ImperialismRemake-{}-allOS.zip'.format(version.__version__)
+    target_directory = os.path.join(build_directory, target_directory_name)
+    target_zip = os.path.join(build_directory, target_zip_name)
 
-# delete directory and zip file if still existing
-shutil.rmtree(folder_name, ignore_errors=True)
-if os.path.isfile(zip_name):
-    os.remove(zip_name)
+    # delete target directory and zip file if still existing
+    shutil.rmtree(target_directory, ignore_errors=True)
+    if os.path.isfile(target_zip):
+        os.remove(target_zip)
 
-# copy, first source and then data (copytree can only copy if destination folder is not existing)
-shutil.copytree(source_path, folder_name, ignore=shutil.ignore_patterns('__pycache__'))
-shutil.copytree(data_path, os.path.join(folder_name, 'data'))
+    # copy source (copytree can only copy if destination folder is not existing!)
+    shutil.copytree(source_directory, target_directory, ignore=shutil.ignore_patterns('__pycache__'))
 
-# add some more files
-shutil.copyfile(os.path.join('..', 'LICENSE'), os.path.join(folder_name, 'LICENSE'))
-shutil.copyfile(os.path.join('..', 'resources', 'README-allOS'), os.path.join(folder_name, 'README'))
+    # add some more files
+    shutil.copyfile(os.path.join(root_directory, 'LICENSE'), os.path.join(target_directory, 'LICENSE'))
+    shutil.copyfile(os.path.join(root_directory, 'documentation', 'README-allOS.txt'), os.path.join(target_directory, 'README.txt'))
 
-# zip the directory
-def zipdir(path, zip):
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            zip.write(os.path.join(root, file))
+    # zip the directory
+    def zipdir(path, zip):
+        for root, dirs, files in os.walk(path):
+            for file in files:
+                zip.write(os.path.join(root, file))
 
-zip = zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED)
-zipdir(folder_name, zip)
-zip.close()
+    zip = zipfile.ZipFile(target_zip, 'w', zipfile.ZIP_DEFLATED)
+    zipdir(target_directory, zip)
+    zip.close()

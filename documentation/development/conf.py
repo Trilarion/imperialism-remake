@@ -19,8 +19,10 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath(os.path.join('..', '..', 'source')))
-import imperialism_remake.version as vs
+source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
+if source_directory not in sys.path:
+    sys.path.insert(0, source_directory)
+from imperialism_remake import version as vs
 
 # -- General configuration ------------------------------------------------
 
@@ -54,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Imperialism Remake'
-copyright = '2016, Imperialism Remake'
+copyright = 'Imperialism Remake community'
 author = 'Trilarion'
 
 # The version info for the project you're documenting, acts as replacement for

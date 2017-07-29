@@ -17,12 +17,14 @@ CLASSIFIERS = ['Development Status :: 2 - Pre-Alpha',
 
 KEYWORDS = 'imperialism remake turn based strategy game open source'
 
+
 def get_long_description():
     """
     Get the long description from the README file.
     """
     with open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
         return f.read()
+
 
 def get_package_data_files():
     """
@@ -36,7 +38,9 @@ def get_package_data_files():
         data_files.extend(names)
     return {'imperialism_remake': data_files}
 
+
 if __name__ == "__main__":
+
     setup(name='imperialism_remake',
         version=vs.__version__,
         description='Open source remake of Imperialism',
@@ -47,9 +51,9 @@ if __name__ == "__main__":
         license='GPL',
         classifiers=CLASSIFIERS,
         keywords=KEYWORDS,
-        package_dir={'':'source'},
+        package_dir={'': 'source'},
         packages=find_packages(where=os.path.join(HERE, 'source')),
-        install_requires=['PyYAML>=3.1', 'PyQt5>=5.6'],
+        install_requires=['PyYAML>=3.1', 'PyQt5>=5.5'],
         package_data=get_package_data_files(),
         entry_points={'console_scripts': ['imperialism_remake_start=imperialism_remake.start:main']},
         zip_safe=False)

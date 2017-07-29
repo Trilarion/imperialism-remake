@@ -14,54 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import os, shutil, sys
-
-from cx_Freeze import setup, Executable
-
-import  manual_markdown_converter
-
 """
-    Creates a Windows standalone package (including Python3 and PySide) via cx_Freeze.
-    Run with script parameter build
-    See also: http://cx-freeze.readthedocs.org/en/latest/index.html
+Creates a Windows standalone package.
 """
 
-# version string
-version = '0.2.1'
-
-# change to project root
-os.chdir('..')
-
-# run conversion of help files from markdown
-manual_markdown_converter.convert()
-
-print('start building')
-
-# set options
-options = {'build_exe': {
-    'optimize': 2,
-    'icon': os.path.join('data', 'artwork', 'graphics', 'ui', 'window.icon.ico'),
-    'compressed': True,
-    'include_in_shared_zip': True,
-    'include_msvcr': False,
-    'include_files': [('data', 'data')],
-    'excludes': ['Tkinter']
-}}
-
-base = None
-if sys.platform == 'win32':
-    base = 'Win32GUI'
-
-executables = [Executable(os.path.join('source', 'imperialism_remake.py'), targetName='ImperialismRemake.exe', base=base)]
-
-# delete previous build directory completely
-path = os.path.join('build', 'exe.win-amd64-3.5')
-if os.path.isdir(path):
-    shutil.rmtree(path)
-
-# freeze
-setup(name='Imperialism Remake', version=version, description='Open Source remake of the classic SSI strategy game: Imperialism',
-      options=options, executables=executables)
-
-# add some more files
-shutil.copyfile('LICENSE', os.path.join(path, 'LICENSE'))
