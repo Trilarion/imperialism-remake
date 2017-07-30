@@ -130,6 +130,7 @@ def main():
     # check if this is still the case, we are using pynsist (https://github.com/takluyver/pynsist)
     # for packaging on Windows
     # multiprocessing.freeze_support()
+    # probably not with pynsist because it ships a full featured Python
 
     # guidelines at https://docs.python.org/3.6/library/multiprocessing.html#programming-guidelines
     multiprocessing.set_start_method('spawn')

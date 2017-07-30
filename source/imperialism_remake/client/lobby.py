@@ -85,8 +85,6 @@ class GameLobbyWidget(QtWidgets.QWidget):
         self.content = widget
 
         if self.content:
-            # TODO: remove line below?
-            # self.layout.addWidget(widget, stretch=1, alignment=QtCore.Qt.AlignCenter)
             if alignment:
                 self.layout.addWidget(widget, stretch=1, alignment=alignment)
             else:

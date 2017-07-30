@@ -57,14 +57,15 @@ class Scenario(QtCore.QObject):
         self._rules = {}
 
     @staticmethod
-    def from_file(file_name):
+    def from_file(file_path):
         """
         Load/deserialize all internal variables from a zipped archive via YAML.
         """
+        # TODO what if not a valid scenario file, we should raise an error then
 
         scenario = Scenario()
 
-        reader = utils.ZipArchiveReader(file_name)
+        reader = utils.ZipArchiveReader(file_path)
 
         scenario._properties = reader.read_as_yaml(constants.SCENARIO_FILE_PROPERTIES)
         scenario._maps = reader.read_as_yaml(constants.SCENARIO_FILE_MAPS)
@@ -376,7 +377,7 @@ class Scenario(QtCore.QObject):
 
     def transfer_province_to_nation(self, province, nation):
         """
-            Moves a province to a nation.
+        Moves a province to a nation.
         """
         # TODO this is not right yet
         # wire it in both ways

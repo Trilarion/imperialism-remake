@@ -37,7 +37,6 @@ logger = logging.getLogger(__name__)
 
 
 # TODO start this in its own process
-# TODO ping server clients regularly and throw them out if not reacting
 # TODO wait for a name but only change it once during a session
 
 

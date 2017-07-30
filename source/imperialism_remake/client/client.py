@@ -162,10 +162,10 @@ class StartScreen(QtWidgets.QWidget):
 
 class ClientMainWindowWidget(QtWidgets.QWidget):
     """
-        The main window (widget) which is the top level window of the application. It can be full
-        screen or not and hold a single widget in a margin-less layout.
+    The main window (widget) which is the top level window of the application. It can be full
+    screen or not and hold a single widget in a margin-less layout.
     """
-    # TODO should we make this as small as possible, used only once put in Client
+    # TODO does this need to be a class, used only once put in Client
 
     def __init__(self, *args, **kwargs):
         """
@@ -227,7 +227,7 @@ class Client:
         self.main_window = ClientMainWindowWidget()
 
         # help browser
-        # TODO help browser only if
+        # TODO help browser only if QtWebEngineWidgets available (or preferences)
         # self.help_browser_widget = qt.BrowserWidget(tools.load_ui_icon)
         # self.help_browser_widget = qt.BrowserWidget(tools.load_ui_icon)
         # self.help_browser_widget.home_url = tools.local_url(constants.DOCUMENTATION_INDEX_FILE)
@@ -302,12 +302,11 @@ class Client:
 
     def show_server_monitor(self):
         """
-            Displays the server monitor as a modal window.
+        Displays the server monitor as a modal window.
 
-            TODO Do we want that non-modal?
-
-            Is invoked when pressing F2.
+        Is invoked when pressing F2.
         """
+        # TODO Do we want that non-modal?
         monitor_widget = ServerMonitorWidget()
         dialog = graphics.GameDialog(self.main_window, monitor_widget, modal=False,
                                      delete_on_close=True, title='Server Monitor',
@@ -317,14 +316,14 @@ class Client:
 
     def switch_to_start_screen(self):
         """
-            Switches the content of the main window to the start screen.
+        Switches the content of the main window to the start screen.
         """
         widget = StartScreen(self)
         self.main_window.change_content_widget(widget)
 
     def show_game_lobby_dialog(self):
         """
-            Shows the game lobby dialog.
+        Shows the game lobby dialog.
         """
         lobby_widget = GameLobbyWidget()
         dialog = graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True,
@@ -335,7 +334,7 @@ class Client:
 
     def single_player_start(self, scenario_file, selected_nation):
         """
-            Shows the main game screen which will start a scenario file and a selected nation.
+        Shows the main game screen which will start a scenario file and a selected nation.
         """
 #       lobby_dialog.close()
         widget = GameMainScreen(self)
@@ -343,14 +342,14 @@ class Client:
 
     def switch_to_editor_screen(self):
         """
-            Switches the content of the main window to the editor screen.
+        Switches the content of the main window to the editor screen.
         """
         widget = EditorScreen(self)
         self.main_window.change_content_widget(widget)
 
     def show_preferences_dialog(self):
         """
-            Shows the preferences dialog.
+        Shows the preferences dialog.
         """
         preferences_widget = PreferencesWidget()
         dialog = graphics.GameDialog(
@@ -363,7 +362,7 @@ class Client:
 
     def quit(self):
         """
-            Cleans up and closes the main window which causes app.exec_() to finish.
+        Cleans up and closes the main window which causes app.exec_() to finish.
         """
         # store state in options
         tools.set_option(constants.Option.MAINWINDOW_BOUNDS, self.main_window.normalGeometry())
@@ -383,13 +382,14 @@ class Client:
 
 def local_network_connect():
     """
-        Connect to a server running locally.
+    Connect to a server running locally.
     """
 
     # connect network client of client
     logger.info('client tries to connect to server')
     local_network_client.connect_to_host(constants.NETWORK_PORT)
     # TODO what if this is not possible
+    # that should always be possible, if not, we should try again, and then throw an error
 
     # tell name
     local_network_client.send(constants.C.GENERAL, constants.M.GENERAL_NAME,
@@ -403,8 +403,6 @@ def start_client():
 
     # create app
     app = QtWidgets.QApplication([])
-
-    # TODO multiple screen support?
 
     # test for desktop availability
     desktop = app.desktop()

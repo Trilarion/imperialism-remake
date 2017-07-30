@@ -1045,9 +1045,9 @@ class EditorScenario(QtCore.QObject):
 
         :param file_name:
         """
-        # TODO what if file name does not exist or is not a valid scenario file
-        self.scenario = Scenario.from_file(file_name)
-        self.changed.emit()
+        if os.path.isfile(file_name):
+            self.scenario = Scenario.from_file(file_name)
+            self.changed.emit()
 
     def create(self, properties):
         """
