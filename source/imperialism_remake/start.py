@@ -150,10 +150,6 @@ def main():
     if QtCore.QT_VERSION < 0x50500:
         raise RuntimeError('Qt version of PyQt5 must be 5.5 at least.')
 
-    # fix PyQt5 exception eating
-    from imperialism_remake.lib import qt
-    qt.fix_pyqt5_exception_eating()
-
     # Add the parent directory of the package directory to Python's search path.
     # This allows the import of the 'imperialism_remake' modules.
     # This is required at least for Linux distributions of Python3, since the current working
@@ -161,6 +157,10 @@ def main():
     source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
+
+    # fix PyQt5 exception eating
+    from imperialism_remake.lib import qt
+    qt.fix_pyqt5_exception_eating()
 
     user_folder = get_user_directory()
 

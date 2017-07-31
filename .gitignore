@@ -22,3 +22,10 @@ environment.pickle
 # ours
 source/imperialism_remake/data/manual
 /build
+
+# Mac
+.DS_Store
+
+# emacs
+*~
+\#*\#
