@@ -24,15 +24,15 @@ http://stackoverflow.com/questions/23288557/phonon-cant-get-meta-data-of-audio-f
 
 import os, sys
 
-from imperialism_remake.lib import utils
-from imperialism_remake.base import constants
-
 if __name__ == '__main__':
 
     # add source directory to path if needed
     source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, 'source'))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
+
+    from imperialism_remake.lib import utils
+    from imperialism_remake.base import constants
 
     # create the playlist, a list of (filename, title)
     playlist = [['01 Imperialism Theme.ogg', 'Imperialism Theme']]

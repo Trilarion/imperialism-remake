@@ -42,11 +42,5 @@ class TestRelativeLayout(unittest.TestCase):
         self.assertEqual((x1, y1), (410, 210))
 
 
-class TestZStacking(unittest.TestCase):
-
-    def test_z_stacking(self):
-
-        manager = qt.ZStackingManager()
-
 if __name__ == '__main__':
     unittest.main()

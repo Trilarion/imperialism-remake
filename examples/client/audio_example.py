@@ -22,9 +22,6 @@ import os, sys
 
 from PyQt5 import QtWidgets
 
-from imperialism_remake.client import audio
-from imperialism_remake.lib import qt
-
 def playlist_index_changed(position):
     print('Next song')
     qt.Notification(window, 'Next song', position_constraint=qt.RelativeLayoutConstraint().center_horizontal().south(20))
@@ -35,6 +32,9 @@ if __name__ == '__main__':
     source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
+
+    from imperialism_remake.client import audio
+    from imperialism_remake.lib import qt
 
     qt.fix_pyqt5_exception_eating()
 

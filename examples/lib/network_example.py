@@ -23,8 +23,6 @@ import datetime
 
 from PyQt5 import QtCore
 
-from imperialism_remake.lib import network
-
 PORT = 37846
 
 def now():
@@ -116,6 +114,8 @@ if __name__ == '__main__':
     source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
+
+    from imperialism_remake.lib import network
 
     app = QtCore.QCoreApplication([])
 

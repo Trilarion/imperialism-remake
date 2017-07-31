@@ -22,15 +22,15 @@ import os, sys
 
 from PyQt5 import QtCore, QtWidgets
 
-from imperialism_remake.base import tools
-from imperialism_remake.lib import qt_webengine
-
 if __name__ == '__main__':
 
     # add source directory to path if needed
     source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
+
+    from imperialism_remake.base import tools
+    from imperialism_remake.lib import qt_webengine
 
     app = QtWidgets.QApplication([])
 

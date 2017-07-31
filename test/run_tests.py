@@ -41,5 +41,5 @@ if __name__ == '__main__':
 
     results = runner.run(tests)
 
-    # return number of failures
-    sys.exit(len(results.failures))
+    # return sum of number of errors and number of failures
+    sys.exit(len(results.errors) + len(results.failures))

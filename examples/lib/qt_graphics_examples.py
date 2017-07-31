@@ -22,8 +22,6 @@ import os, sys
 
 from PyQt5 import QtWidgets
 
-from imperialism_remake.lib import qt
-
 
 class Window(QtWidgets.QWidget):
     def __init__(self):
@@ -63,6 +61,8 @@ if __name__ == '__main__':
     source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
+
+    from imperialism_remake.lib import qt
 
     app = QtWidgets.QApplication([])
 
