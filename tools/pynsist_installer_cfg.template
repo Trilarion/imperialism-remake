@@ -1,23 +1,22 @@
 [Application]
 name=Imperialism Remake
-version=0.2.2
-publisher=XX
+version=$version
+publisher=Imperialism Remake Community
 entry_point=imperialism_remake.start:main
 #icon=xxx.ico
 console=false
 
 [Python]
-version=3.5.2
+version=3.6.2
 bitness=64
 format=bundled
 include_msvcrt=false
 
 [Include]
-pypi_wheels=imperialism_remake==0.2.2
-PyQt5==5.7
-sip==4.18
+pypi_wheels=imperialism_remake==$version
+PyQt5==5.9
 PyYaml==3.12
 	
 [Build]
 #directory=../build/nsis
-installer_name=imperialism_remake-0.2.2-win.exe
+installer_name=imperialism_remake-$version-win.exe

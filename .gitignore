@@ -22,6 +22,7 @@ environment.pickle
 # ours
 source/imperialism_remake/data/manual
 /build
+/tools/pynsist_installer.cfg
 
 # Mac
 .DS_Store

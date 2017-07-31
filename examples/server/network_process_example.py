@@ -24,7 +24,7 @@ from PyQt5 import QtCore
 
 def client_connect():
     """
-        Client tries to connect.
+    Client tries to connect.
     """
     client.connect_to_host(constants.NETWORK_PORT)
 
