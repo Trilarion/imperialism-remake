@@ -22,7 +22,7 @@ def get_long_description():
     """
     Get the long description from the README file.
     """
-    with open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
+    with open(os.path.join(HERE, 'documentation', 'setup_py_long_description.txt'), encoding='utf-8') as f:
         return f.read()
 
 
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         keywords=KEYWORDS,
         package_dir={'': 'source'},
         packages=find_packages(where=os.path.join(HERE, 'source')),
-        install_requires=['PyYAML>=3.1', 'PyQt5>=5.5'],
+        install_requires=['PyYAML>=3.1', 'PyQt5>=5.5', 'ipgetter>=0.6'],
         package_data=get_package_data_files(),
         entry_points={'console_scripts': ['imperialism_remake_start=imperialism_remake.start:main']},
         zip_safe=False)

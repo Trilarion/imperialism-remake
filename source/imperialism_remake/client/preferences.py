@@ -195,9 +195,9 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # local server group box
         layout = QtWidgets.QVBoxLayout()
-        local_ip = [x.toString() for x in QtNetwork.QNetworkInterface.allAddresses()
-                    if not x.isLoopback() and x.protocol() == QtNetwork.QAbstractSocket.IPv4Protocol][0]
-        layout.addWidget(QtWidgets.QLabel('Local IP address: {}'.format(local_ip)))
+        import ipgetter
+        local_ip = ipgetter.myip()
+        layout.addWidget(QtWidgets.QLabel('Local public IP address: {}'.format(local_ip)))
         # accepts incoming connections checkbox
         checkbox = QtWidgets.QCheckBox('Accepts incoming connections')
         self._register_check_box(checkbox, constants.Option.LOCALSERVER_OPEN)

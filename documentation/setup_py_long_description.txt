@@ -1,0 +1,14 @@
+**Imperialism Remake** is an open source game project to create a game very similar to the original Imperialism.
+It is written in Python.
+
+- Homepage: http://remake.twelvepm.de/
+- Community: http://remake.twelvepm.de/forum/
+- Download: http://remake.twelvepm.de/home/download/
+- Sources: https://github.com/Trilarion/Imperialism-Remake
+- Contribute: https://github.com/Trilarion/imperialism-remake/blob/master/CONTRIBUTING.md
+- Documentation: http://imperialism-remake.readthedocs.io/en/latest/?badge=latest
+
+The community is centered around the forum (http://remake.twelvepm.de/forum/) and the
+Github project (https://github.com/Trilarion/imperialism-remake). Please post feedback
+on the forum and/or follow the contribution guidelines (https://github.com/Trilarion/imperialism-remake/blob/master/CONTRIBUTING.md).
+

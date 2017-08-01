@@ -34,9 +34,10 @@ class Scenario(QtCore.QObject):
     Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
 
     * _properties is a dictionary with keys from constants.ScenarioProperties
-    * _provinces is a
+    * _provinces is a dictionary with
     * _nations is a
     * _maps is a dictionary of different maps (terrain, resource)
+      each map is a linear list, the map size is a scenario property
     * _rules is a dictionary of rules properties
 
     Notes:
