@@ -24,6 +24,7 @@ import os
 
 from imperialism_remake.base import switches
 from imperialism_remake.lib import utils
+from imperialism_remake.start import APPLICATION_NAME
 
 
 def extend(path, *parts):
@@ -227,3 +228,22 @@ class OverviewMapMode(utils.AutoNumberedEnum):
     POLITICAL = ()
     # local server accepts outside connections
     GEOGRAPHICAL = ()
+
+
+def get_user_directory():
+    """
+    Determines the location of the user folder.
+    """
+
+    if os.name == 'posix':
+        # Linux / Unix
+        # see 'XDG_CONFIG_HOME' in https://specifications.freedesktop.org/basedir-spec/
+        config_basedir = os.getenv('XDG_CONFIG_HOME',
+                                   os.path.join(os.path.expanduser('~'), '.config'))
+        user_folder = os.path.join(config_basedir, APPLICATION_NAME)
+    elif (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
+        # MS Windows
+        user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
+    else:
+        user_folder = os.path.join(os.path.expanduser('~'), 'Imperialism Remake User Data')
+    return os.path.abspath(user_folder)

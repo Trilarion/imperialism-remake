@@ -160,59 +160,6 @@ class StartScreen(QtWidgets.QWidget):
         layout.addWidget(version_label)
 
 
-class ClientMainWindowWidget(QtWidgets.QWidget):
-    """
-    The main window (widget) which is the top level window of the application. It can be full
-    screen or not and hold a single widget in a margin-less layout.
-    """
-    # TODO does this need to be a class, used only once put in Client
-
-    def __init__(self, *args, **kwargs):
-        """
-        All the necessary initializations. Is shown at the end.
-        """
-        super().__init__(*args, **kwargs)
-        # set geometry
-        self.setGeometry(tools.get_option(constants.Option.MAINWINDOW_BOUNDS))
-        # set title
-        self.setWindowTitle('Imperialism Remake')
-
-        # just a layout but nothing else
-        self.layout = QtWidgets.QHBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.content = None
-
-        # show in full screen, maximized or normal
-        if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN):
-            self.setWindowFlags(self.windowFlags() | QtCore.Qt.FramelessWindowHint)
-            self.showFullScreen()
-        elif tools.get_option(constants.Option.MAINWINDOW_MAXIMIZED):
-            self.showMaximized()
-        else:
-            self.show()
-
-        # loading animation
-        # TODO animation right and start, stop in client
-        self.animation = QtGui.QMovie(constants.extend(constants.GRAPHICS_UI_FOLDER,
-                                                       'loading.gif'))
-#       self.animation.start()
-        self.loading_label = QtWidgets.QLabel(
-            self, flags=QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window)
-        self.loading_label.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.loading_label.setMovie(self.animation)
-        # self.loading_label.show()
-
-    def change_content_widget(self, widget):
-        """
-        Another screen shall be displayed. Exchange the content widget with a new one.
-        """
-        if self.content:
-            self.layout.removeWidget(self.content)
-            self.content.deleteLater()
-        self.content = widget
-        self.layout.addWidget(widget)
-
-
 class Client:
     """
         Main class of the client, holds the help browser, the main window (full screen or not), the
@@ -224,7 +171,23 @@ class Client:
             Create the main window, the help browser dialog, the audio player, ...
         """
         # main window
-        self.main_window = ClientMainWindowWidget()
+        self.main_window = QtWidgets.QWidget()
+        # set geometry
+        self.main_window.setGeometry(tools.get_option(constants.Option.MAINWINDOW_BOUNDS))
+        # set title
+        self.main_window.setWindowTitle('Imperialism Remake')
+        # show in full screen, maximized or normal
+        if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN):
+            self.main_window.setWindowFlags(self.main_window.windowFlags() | QtCore.Qt.FramelessWindowHint)
+            self.main_window.showFullScreen()
+        elif tools.get_option(constants.Option.MAINWINDOW_MAXIMIZED):
+            self.main_window.showMaximized()
+        else:
+            self.main_window.show()
+
+
+        # widget switcher
+        self.widget_switcher = qt.WidgetSwitcher(self.main_window)
 
         # help browser
         # TODO help browser only if QtWebEngineWidgets available (or preferences)
@@ -319,7 +282,7 @@ class Client:
         Switches the content of the main window to the start screen.
         """
         widget = StartScreen(self)
-        self.main_window.change_content_widget(widget)
+        self.widget_switcher.switch(widget)
 
     def show_game_lobby_dialog(self):
         """
@@ -345,7 +308,7 @@ class Client:
         Switches the content of the main window to the editor screen.
         """
         widget = EditorScreen(self)
-        self.main_window.change_content_widget(widget)
+        self.widget_switcher.switch(widget)
 
     def show_preferences_dialog(self):
         """

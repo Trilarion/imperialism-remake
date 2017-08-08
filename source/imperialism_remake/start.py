@@ -31,25 +31,6 @@ import threading
 APPLICATION_NAME = 'imperialism_remake'
 
 
-def get_user_directory():
-    """
-    Determines the location of the user folder.
-    """
-
-    if os.name == 'posix':
-        # Linux / Unix
-        # see 'XDG_CONFIG_HOME' in https://specifications.freedesktop.org/basedir-spec/
-        config_basedir = os.getenv('XDG_CONFIG_HOME',
-                                   os.path.join(os.path.expanduser('~'), '.config'))
-        user_folder = os.path.join(config_basedir, APPLICATION_NAME)
-    elif (os.name == 'nt') and (os.getenv('USERPROFILE') is not None):
-        # MS Windows
-        user_folder = os.path.join(os.getenv('USERPROFILE'), 'Imperialism Remake User Data')
-    else:
-        user_folder = os.path.join(os.path.expanduser('~'), 'Imperialism Remake User Data')
-    return os.path.abspath(user_folder)
-
-
 def get_arguments():
     """
     Parses command line arguments.
@@ -158,11 +139,15 @@ def main():
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
 
-    # fix PyQt5 exception eating
+    # import imperialism remake modules
     from imperialism_remake.lib import qt
+    from imperialism_remake.base import constants, tools
+
+    # fix PyQt5 exception eating
     qt.fix_pyqt5_exception_eating()
 
-    user_folder = get_user_directory()
+    # user folder
+    user_folder = constants.get_user_directory()
 
     # if not existing, create user folder
     if not os.path.isdir(user_folder):
@@ -176,9 +161,6 @@ def main():
                                                                                         switches.DEBUG_MODE)
     logger.info('user data stored in: {}'.format(user_folder))
 
-    # import some base libraries
-    from imperialism_remake.base import tools
-
     # search for existing options file, if not existing, save it once (should just save an empty dictionary)
     options_file = os.path.join(user_folder, 'options.info')
     if not os.path.exists(options_file):
@@ -189,7 +171,6 @@ def main():
     logger.info('options loaded from user folder (%s)', user_folder)
 
     # fix options: special case of some desktop environments under Linux where full screen mode does not work well
-    from imperialism_remake.base import constants
 
     # full screen support
     if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN_SUPPORTED):

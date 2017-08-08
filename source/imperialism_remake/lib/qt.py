@@ -830,3 +830,27 @@ def local_url(relative_path):
     absolute_path = os.path.abspath(relative_path)
     url = QtCore.QUrl.fromLocalFile(absolute_path)
     return url
+
+class WidgetSwitcher:
+    """
+    Holds a layout that can switch a widget. No margins.
+    """
+
+    def __init__(self, parent):
+        self._layout = QtWidgets.QHBoxLayout(parent)
+        self._layout.setContentsMargins(0, 0, 0, 0)
+
+    def switch(self, widget):
+        """
+        Exchange content with a new widget.
+
+        If there is a widget in the layout, remove it and delete it. Then add the new widget.
+        This ensures that there is at most only one widget in the layout.
+        """
+
+        if self._layout.count() > 0:
+            item = self._layout.itemAt(0)
+            self._layout.removeItem(item)
+            item.widget().deleteLater()
+
+        self._layout.addWidget(widget)
