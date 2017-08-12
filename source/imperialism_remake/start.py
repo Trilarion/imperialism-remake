@@ -195,10 +195,9 @@ def main():
 
     # start client, we will return when the client finishes
     from imperialism_remake.client.client import start_client
-
     start_client()
 
-    # wait for server
+    # wait for server process to stop
     server_process.join()
 
     # save options

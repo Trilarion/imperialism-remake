@@ -84,80 +84,81 @@ class MapItem(QtCore.QObject):
         self.label.setText('')
 
 
-# TODO convert to simple method which does it, no need to be a class
-class StartScreen(QtWidgets.QWidget):
+def create_start_screen_widget(client):
     """
-    Creates the start screen
+    Creates the start screen.
+
+    :param client:
+    :return:
     """
+
+    screen = QtWidgets.QWidget()
+    screen.setAttribute(QtCore.Qt.WA_StyledBackground, True)
+    screen.setProperty('background', 'black')
+
+    layout = qt.RelativeLayout(screen)
+
+    path = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.background.jpg')
+    start_image = QtGui.QPixmap(path)
+    start_image_item = QtWidgets.QGraphicsPixmapItem(start_image)
+    start_image_item.setZValue(1)
+
+    scene = QtWidgets.QGraphicsScene(screen)
+    scene.addItem(start_image_item)
+
+    view = QtWidgets.QGraphicsView(scene)
+    view.resize(start_image.size())
+    view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+    view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+    view.setSceneRect(0, 0, start_image.width(), start_image.height())
+    view.layout_constraint = qt.RelativeLayoutConstraint().center_horizontal()\
+        .center_vertical()
+    layout.addWidget(view)
+
+    subtitle = QtWidgets.QLabel('')
+    subtitle.resize(0, 0)
+    # TODO this is below the main image but collides with screens only 768 px high
+    subtitle.layout_constraint = qt.RelativeLayoutConstraint(
+        (0.5, -0.5, 0), (0.5, -0.5, start_image.height() / 2 + 20))
+    layout.addWidget(subtitle)
+
+    actions = {'exit': client.quit,
+               'help': client.show_help_browser,
+               'lobby': client.show_game_lobby_dialog,
+               'editor': client.switch_to_editor_screen,
+               'options': client.show_preferences_dialog}
+
+    image_map_file = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.overlay.info')
+    image_map = utils.read_as_yaml(image_map_file)
+
+    # security check, they have to be the same
+    if actions.keys() != image_map.keys():
+        raise RuntimeError('Start screen hot map info file ({}) corrupt.'
+                           .format(image_map_file))
 
     frame_pen = QtGui.QPen(QtGui.QBrush(QtGui.QColor(255, 255, 255, 64)), 6)
+    for k, v in image_map.items():
+        # add action from our predefined action dictionary
+        pixmap = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER, v['overlay']))
+        map_item = MapItem(scene, pixmap, label=subtitle, description=v['label'])
+        map_item.item.setZValue(3)
+        offset = v['offset']
+        map_item.item.setOffset(QtCore.QPointF(offset[0], offset[1]))
+        map_item.item.signaller.clicked.connect(actions[k])
 
-    def __init__(self, client):
-        super().__init__()
+        frame_path = QtGui.QPainterPath()
+        frame_path.addRect(map_item.item.boundingRect())
+        frame_item = scene.addPath(frame_path, frame_pen)
+        frame_item.setZValue(4)
+        scene.addItem(map_item.item)
 
-        self.setAttribute(QtCore.Qt.WA_StyledBackground)
-        self.setProperty('background', 'black')
+    version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'
+                                     .format(version.__version_full__))
+    version_label.resize(version_label.sizeHint())
+    version_label.layout_constraint = qt.RelativeLayoutConstraint().east(20).south(20)
+    layout.addWidget(version_label)
 
-        layout = qt.RelativeLayout(self)
-
-        path = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.background.jpg')
-        start_image = QtGui.QPixmap(path)
-        start_image_item = QtWidgets.QGraphicsPixmapItem(start_image)
-        start_image_item.setZValue(1)
-
-        scene = QtWidgets.QGraphicsScene(self)
-        scene.addItem(start_image_item)
-
-        view = QtWidgets.QGraphicsView(scene)
-        view.resize(start_image.size())
-        view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        view.setSceneRect(0, 0, start_image.width(), start_image.height())
-        view.layout_constraint = qt.RelativeLayoutConstraint().center_horizontal()\
-            .center_vertical()
-        layout.addWidget(view)
-
-        subtitle = QtWidgets.QLabel('')
-        subtitle.resize(0, 0)
-        # TODO this is below the main image but collides with screens only 768 px high
-        subtitle.layout_constraint = qt.RelativeLayoutConstraint(
-            (0.5, -0.5, 0), (0.5, -0.5, start_image.height() / 2 + 20))
-        layout.addWidget(subtitle)
-
-        actions = {'exit': client.quit,
-                   'help': client.show_help_browser,
-                   'lobby': client.show_game_lobby_dialog,
-                   'editor': client.switch_to_editor_screen,
-                   'options': client.show_preferences_dialog}
-
-        image_map_file = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.overlay.info')
-        image_map = utils.read_as_yaml(image_map_file)
-
-        # security check, they have to be the same
-        if actions.keys() != image_map.keys():
-            raise RuntimeError('Start screen hot map info file ({}) corrupt.'
-                               .format(image_map_file))
-
-        for k, v in image_map.items():
-            # add action from our predefined action dictionary
-            pixmap = QtGui.QPixmap(constants.extend(constants.GRAPHICS_UI_FOLDER, v['overlay']))
-            map_item = MapItem(scene, pixmap, label=subtitle, description=v['label'])
-            map_item.item.setZValue(3)
-            offset = v['offset']
-            map_item.item.setOffset(QtCore.QPointF(offset[0], offset[1]))
-            map_item.item.signaller.clicked.connect(actions[k])
-
-            frame_path = QtGui.QPainterPath()
-            frame_path.addRect(map_item.item.boundingRect())
-            frame_item = scene.addPath(frame_path, StartScreen.frame_pen)
-            frame_item.setZValue(4)
-            scene.addItem(map_item.item)
-
-        version_label = QtWidgets.QLabel('<font color=#ffffff>{}</font>'
-                                         .format(version.__version_full__))
-        version_label.resize(version_label.sizeHint())
-        version_label.layout_constraint = qt.RelativeLayoutConstraint().east(20).south(20)
-        layout.addWidget(version_label)
+    return screen
 
 
 class Client:
@@ -281,7 +282,7 @@ class Client:
         """
         Switches the content of the main window to the start screen.
         """
-        widget = StartScreen(self)
+        widget = create_start_screen_widget(self)
         self.widget_switcher.switch(widget)
 
     def show_game_lobby_dialog(self):

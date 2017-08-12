@@ -833,7 +833,7 @@ def local_url(relative_path):
 
 class WidgetSwitcher:
     """
-    Holds a layout that can switch a widget. No margins.
+    Holds a simple layout that can switch between widgets. No margins.
     """
 
     def __init__(self, parent):
