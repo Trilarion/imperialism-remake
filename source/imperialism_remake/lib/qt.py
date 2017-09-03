@@ -42,6 +42,8 @@ def exception_hook(type, value, traceback):
 def fix_pyqt5_exception_eating():
     """
     PyQt5 by default eats exceptions (see http://stackoverflow.com/q/14493081/1536976)
+
+    As of PyQt 5.9 still needed.
     """
     sys.excepthook = exception_hook
 

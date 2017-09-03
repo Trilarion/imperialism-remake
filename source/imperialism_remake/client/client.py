@@ -84,7 +84,7 @@ class MapItem(QtCore.QObject):
         self.label.setText('')
 
 
-def create_start_screen_widget(client):
+def create_start_screen_widget(actions):
     """
     Creates the start screen.
 
@@ -122,12 +122,6 @@ def create_start_screen_widget(client):
         (0.5, -0.5, 0), (0.5, -0.5, start_image.height() / 2 + 20))
     layout.addWidget(subtitle)
 
-    actions = {'exit': client.quit,
-               'help': client.show_help_browser,
-               'lobby': client.show_game_lobby_dialog,
-               'editor': client.switch_to_editor_screen,
-               'options': client.show_preferences_dialog}
-
     image_map_file = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.overlay.info')
     image_map = utils.read_as_yaml(image_map_file)
 
@@ -163,13 +157,13 @@ def create_start_screen_widget(client):
 
 class Client:
     """
-        Main class of the client, holds the help browser, the main window (full screen or not), the
-        content of the main window, the audio player
+    Main class of the client, holds the help browser, the main window (full screen or not), the
+    content of the main window, the audio player
     """
 
     def __init__(self):
         """
-            Create the main window, the help browser dialog, the audio player, ...
+        Create the main window, the help browser dialog, the audio player, ...
         """
         # main window
         self.main_window = QtWidgets.QWidget()
@@ -282,7 +276,12 @@ class Client:
         """
         Switches the content of the main window to the start screen.
         """
-        widget = create_start_screen_widget(self)
+        actions = {'exit': self.quit,
+                   'help': self.show_help_browser,
+                   'lobby': self.show_game_lobby_dialog,
+                   'editor': self.switch_to_editor_screen,
+                   'options': self.show_preferences_dialog}
+        widget = create_start_screen_widget(actions)
         self.widget_switcher.switch(widget)
 
     def show_game_lobby_dialog(self):

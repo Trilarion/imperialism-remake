@@ -21,9 +21,7 @@ Extraction of the start screen only from the client.
 import os
 import sys
 
-from PyQt5 import QtWidgets
-
-import imperialism_remake.base.constants
+from PyQt5 import QtWidgets, QtCore
 
 if __name__ == '__main__':
 
@@ -35,6 +33,7 @@ if __name__ == '__main__':
     # imperialism remake imports
     from imperialism_remake.lib import qt
     from imperialism_remake.base import tools, constants
+    from imperialism_remake.client import client
 
     qt.fix_pyqt5_exception_eating()
 
@@ -63,12 +62,30 @@ if __name__ == '__main__':
     app.setWindowIcon(tools.load_ui_icon('window.icon.ico'))
 
     # main window
-    from imperialism_remake.client.client import ClientMainWindowWidget, StartScreen
-    main_window = ClientMainWindowWidget()
-    main_window.activateWindow()
-    widget = StartScreen(main_window)
-    main_window.change_content_widget(widget)
+    main_window = QtWidgets.QWidget()
+    # set geometry
+    main_window.setGeometry(tools.get_option(constants.Option.MAINWINDOW_BOUNDS))
+    # set title
+    main_window.setWindowTitle('Imperialism Remake')
+    # show in full screen, maximized or normal
+    if tools.get_option(constants.Option.MAINWINDOW_FULLSCREEN):
+        main_window.setWindowFlags(main_window.windowFlags() | QtCore.Qt.FramelessWindowHint)
+        main_window.showFullScreen()
+    elif tools.get_option(constants.Option.MAINWINDOW_MAXIMIZED):
+        main_window.showMaximized()
+    else:
+        main_window.show()
 
-    # NOT FINISHED!
+    # widget switcher
+    widget_switcher = qt.WidgetSwitcher(main_window)
+
+    do_nothing = lambda *args: None
+    actions = {'exit': main_window.close,
+               'help': do_nothing,
+               'lobby': do_nothing,
+               'editor': do_nothing,
+               'options': do_nothing}
+    widget = client.create_start_screen_widget(actions)
+    widget_switcher.switch(widget)
 
     app.exec_()
