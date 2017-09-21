@@ -25,7 +25,8 @@ import time
 import zlib
 
 from PyQt5 import QtCore, QtNetwork
-import yaml
+from imperialism_remake.lib.utils import yaml
+from ruamel.yaml.compat import StringIO
 
 #: shortcut for QtNetwork.QHostAddress.LocalHost/Any
 SCOPE = {'local': QtNetwork.QHostAddress.LocalHost, 'any': QtNetwork.QHostAddress.Any}
@@ -156,7 +157,9 @@ class ExtendedTcpSocket(QtCore.QObject):
 
         logger.debug('socket send: %s', value)
         # serialize value to yaml
-        serialized = yaml.dump(value, allow_unicode=True)
+        stream = StringIO()
+        yaml.dump(value, stream)
+        serialized = stream.getvalue()
 
         # encode to utf-8 bytes and compress
         compressed = zlib.compress(serialized.encode())

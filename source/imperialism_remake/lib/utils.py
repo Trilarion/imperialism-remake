@@ -21,18 +21,8 @@ to the project.
 import zipfile
 from enum import Enum
 
-import yaml
-
-# use libyaml if available (see http://pyyaml.org/ticket/34)
-if hasattr(yaml, 'CLoader'):
-    Loader = yaml.CLoader
-else:
-    Loader = yaml.Loader
-if hasattr(yaml, 'CDumper'):
-    Dumper = yaml.CDumper
-else:
-    Dumper = yaml.Dumper
-
+from ruamel.yaml import YAML
+yaml = YAML(typ='unsafe')
 
 class AutoNumberedEnum(Enum):
     """
@@ -54,7 +44,7 @@ def read_as_yaml(file_name):
     :return: Python value
     """
     with open(file_name) as file:  # open is 'r' by default
-        return yaml.load(file, Loader=Loader)
+        return yaml.load(file)
 
 
 def write_as_yaml(file_name, value):
@@ -65,7 +55,7 @@ def write_as_yaml(file_name, value):
     :param value: Python value
     """
     with open(file_name, 'w') as file:
-        yaml.dump(value, file, allow_unicode=True, Dumper=Dumper)
+        yaml.dump(value, file)
         # TODO are keys of dictionaries in YAML sorted automatically? If not we might want to do that here.
 
 
@@ -101,7 +91,7 @@ class ZipArchiveReader:
         :return: De-serialized Python value.
         """
         data = self.read(name)
-        obj = yaml.load(data.decode(), Loader=Loader)
+        obj = yaml.load(data.decode())
         return obj
 
     def __del__(self):
@@ -142,7 +132,7 @@ class ZipArchiveWriter:
         :param name: File name
         :param obj: Python value
         """
-        data = yaml.dump(obj, allow_unicode=True, Dumper=Dumper).encode()
+        data = yaml.dump(obj).encode()
         self.write(name, data)
 
     def __del__(self):

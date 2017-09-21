@@ -53,7 +53,7 @@ if __name__ == "__main__":
         keywords=KEYWORDS,
         package_dir={'': 'source'},
         packages=find_packages(where=os.path.join(HERE, 'source')),
-        install_requires=['PyYAML>=3.1', 'PyQt5>=5.5', 'ipgetter>=0.6'],
+        install_requires=['ruamel.yaml>=0.15', 'PyQt5>=5.5', 'ipgetter>=0.6'],
         package_data=get_package_data_files(),
         entry_points={'console_scripts': ['imperialism_remake_start=imperialism_remake.start:main']},
         zip_safe=False)
