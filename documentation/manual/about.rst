@@ -69,7 +69,7 @@ Changes:
 - Continuous terrain (visual effect of connectedness for connected tiles of the same type) now implemented although tile graphics aren't yet optimized for it
 - Complete overhaul of server-client communication, possibility to start a local server, connect to it and to send/receive chat messages
 - Somewhat better buttons now showing their function in purely symbolic ways in wooden design
-- Crash fixed: when soundsystem would have a mixer available but could not obtain lines
+- Crash fixed: when sound system would have a mixer available but could not obtain lines
 
 Contribution:
 

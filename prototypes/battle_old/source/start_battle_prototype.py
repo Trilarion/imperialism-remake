@@ -37,13 +37,13 @@ nation_fr = window_config.get_nation("france")
 
 unit_militia_default = window_config.get_unit_type('Militia I')
 current_unit = LandUnitInBattle(False, 'Charge', False, 50, 25, 1, unit_militia_default, nation_fr)
-targetted_unit = LandUnitInBattle(False, 'Shoot', False, 75, 50, 1, unit_militia_default, nation_uk)
+targeted_unit = LandUnitInBattle(False, 'Shoot', False, 75, 50, 1, unit_militia_default, nation_uk)
 
 defender = LandArmy(False, None, nation_uk)
 attacker = LandArmy(False, None, nation_fr)
 
 initial_battle_state = dict(auto_combat=False, turn=0,
-                            current_unit=current_unit, targetted_unit=targetted_unit,
+                            current_unit=current_unit, targetted_unit=targeted_unit,
                             defender=defender, attacker=attacker)
 
 # start the battle view

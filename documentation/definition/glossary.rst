@@ -45,7 +45,7 @@ Glossary
         Military reserve
 
     NAP
-        Non-agression pact
+        Non-aggression pact
 
     WP
         Worker pool

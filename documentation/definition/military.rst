@@ -24,7 +24,7 @@ points here:
 * Light and heavy cavalry (move and attack or heavy artillery attack only, or move attack and move on, light cavalry)
 * Health status is displayed as a bar with green yellow and red (red is casualties, green is full morale) or so
 * Movement capacity and speed depends on development of railroad system.
-* Military garnisons can only be seen by neighbored provinces with some degree of uncertainty depending on how many
+* Military garrisons can only be seen by neighbored provinces with some degree of uncertainty depending on how many
   units (especially officers) you have for yourself.
 
 .. todo:: Provide details of how capacity and speed depend on development of railroad system and make this
@@ -42,7 +42,7 @@ Land Units
 
 * militia (stationed in provinces, number is limited per province, only good in defense)
 * infantry (cheap, slow, short distance, good in defense and city attack)
-* cavallery (expensive, fast, short distance, weak against cities)
+* cavalry (expensive, fast, short distance, weak against cities)
 * artillery (expensive, slow, large distance)
 * officers (at most one per army, increases moral and attack of surrounding units)
 
@@ -53,7 +53,7 @@ Land Units
 * range (IN 2 – 8): firing distance to target in tiles of the battlefield
 * speed (IN 2 – 10): movement speed in tiles of the battlefield
 * creation cost ($): amount of money to create from the soldier pool
-* upkeep ($ and FN units of fuel): payment per turn for upkeeping this unit, also including fuel costs
+* upkeep ($ and FN units of fuel): payment per turn for upkeep of this unit, also including fuel costs
 * experience level (IN 1-5): experience increase efficiency and is gained by taking part in combats, is lowered when the
   unit is refilled
 
@@ -86,7 +86,7 @@ Officers       8      0     4     1.0            1.0
 
 Additionally:
 
-* Artillery -50% when defening
+* Artillery -50% when defending
 * Cavalry -50% when attacking a city area
 * Officers only defending
 
@@ -111,7 +111,7 @@ Navy
 
 * Upgrade means we basically buy a new ship but get some discount on raw material from scrapping the old vessel.
 * Land invasion from sea with a large number of provinces in between delays the action, strong naval defense delays
-  it even further or blocks it alltogether.
+  it even further or blocks it altogether.
 * Merchant marine does not appear on the map, only somewhere within the trade screens.
 * Movement of war ships takes one turn per one sea zone always.
 
@@ -143,7 +143,7 @@ Navy
 * 3 (merchants) or 3 (war ships) levels of improvement for each type where cargo and speed improves while upkeep stays
   constant. All higher levels must be researched first.
 * small merchants: carrack, trader, clipper
-* large merchants: fluyte, indiamen, freighter
+* large merchants: fluyt, indiamen, freighter
 * light war ships: frigate, raider, battle cruiser
 * heavy war ships: ship-of-the-line, ironclad, dreadnought
 
@@ -155,7 +155,7 @@ Name         Speed         Cargo [units] Building costs
 Carrack      3             3
 Trader       4             3
 Clipper      5             4
-Fluyte       1             8
+Fluyt        1             8
 Indiamen     2             10
 Freighter    4             12
 ============ ============= ============= ==============
@@ -175,7 +175,7 @@ Ironclad         2             20
 Dreadnought      3             26
 ================ ============= ============= ==============
 
-.. todo:: Provide costs and rebalance
+.. todo:: Provide costs and re-balance
 
 Ideas behind:
 

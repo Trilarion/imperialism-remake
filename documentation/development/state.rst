@@ -12,7 +12,7 @@ Short overview of the functionality of the game at current version 0.2.2.
 
     + The manual has to be built with tools/build_documentation.py before
 
-    + The help is displayed in a browser on the running system, a qtwebengine implementation is available but not switched on
+    + The help is displayed in a browser on the running system, an implementation using QtWebEngine is available but not switched on
 
 - The preferences dialog has a toolbar with placeholder icons (not made yet, see the tooltips for meaning) switching the
   widget below and some basic stuff to configure

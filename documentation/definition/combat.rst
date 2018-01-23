@@ -36,7 +36,7 @@ Special bonuses
 * Encirclement factor of provinces = Number of own surrounding provinces minus Number of provinces of the enemy
   divided by the sum of both gives up to 50% bonus for attacker or defender. Reason: avoid isolated provinces in
   foreign territory, favor straight front lines
-* Sea invasion ignores Encirclement factor but gives fixed 20% malus to invader because it is more difficult.
+* Sea invasion ignores Encirclement factor but gives fixed 20% penalty to invader because it is more difficult.
 * How to add all bonuses? Additive? Multiplicative? Limit?
 
 Strategic Combat

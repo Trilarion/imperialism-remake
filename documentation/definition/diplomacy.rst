@@ -33,7 +33,7 @@ Allows to trade and to seek other treaties
 * Makes the diplomatic states of this nation visible
 * After prolonged war (8 turns of non-interrupted war) it will be destroyed
 
-**Non-Agression Pact**
+**Non-Aggression Pact**
 
 * Requires DR ≥ 40 and an established embassy
 * Allows an assured time of peace (at least 4 turns) and a compensation payment for immediate breaking later on.
@@ -45,7 +45,7 @@ Allows to trade and to seek other treaties
 **Alliance**
 
 * DR ≥ 60
-* Includes a Non-Agression Pact
+* Includes a Non-Aggression Pact
 * Each nation can only be in one alliance at most
 * Gives bonus in trade (+15% revenue) and in technology (-5% costs)
 * Effects are taking place as long as the NAP holds; the alliance is automatically canceled if the NAP is canceled or broken;
@@ -110,7 +110,7 @@ Relations can be improved by:
 * Subventions for developing their infrastructure (only towards minor nations)
 * Existing peace and alliance treaties
 * Propaganda (by secret organizations or by influencing the press)
-* Fullfilling wishes of minor nations
+* Fulfilling wishes of minor nations
 
 Diplomatic Influence
 =====================================

@@ -42,7 +42,7 @@ relations and a strong army, you'll have the best chances to build a lasting emp
 
 **Strategizing**
 
-Typical for strategy games is balancing of different goals, making sacrifizes and balancing risks and rewards. Even more,
+Typical for strategy games is balancing of different goals, making sacrifices and balancing risks and rewards. Even more,
 the optimal strategy dynamically depends on the behavior of the competitors thus creating a fascinating circle of
 strategies and counter-strategies. We therefore want to present to the player decisions that matter:
 

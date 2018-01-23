@@ -1,32 +1,26 @@
-# PyCharm (see https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore)
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/dictionaries
-.idea/vcs.xml
-.idea/jsLibraryMappings.xml
-.idea/misc.xml
-.idea/Imperialism Remake.iml
+# PyCharm
+.idea
 
 # Python
 __pycache__
 *.egg-info
 
-# vim
-.*.swp
-
 # Sphinx Doc
-*.doctree
 _build
-environment.pickle
 
-# ours
+# own
 source/imperialism_remake/data/manual
 /build
 /dist
+
+# pynsist
 /tools/pynsist_installer.cfg
 
 # Mac
 .DS_Store
+
+# vim
+.*.swp
 
 # emacs
 *~

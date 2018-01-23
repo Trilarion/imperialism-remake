@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-Infos about PyQt
+PyQt/Qt versions
 """
 
 from PyQt5.QtCore import QT_VERSION_STR, PYQT_VERSION_STR

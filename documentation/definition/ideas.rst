@@ -71,8 +71,8 @@ Unincorporated ideas
 * Minor powers cannot negotiate alliances or other important treaties or at least not as leading power?
 * Diplomacy: Treaties secret or open to everybody or what should be secret? Or secret for some period?
 * Diplomacy: Treaties only between two power, however include third power like being neutral to this power. Similar to Crown of Glory.
-* Traveling with soldiers through friendly territory? Teleporting back in case of sudden war?
-* Technology: Tech tree means that some will just look for the shortest route to some military techs. So not too many prequisites.
+* Traveling with soldiers through friendly territory? Teleportate back in case of sudden war?
+* Technology: Tech tree means that some will just look for the shortest route to some military techs. So not too many prerequisites.
 * Number of Techs somewhere between 35 techs (Imp1) and 108 (Imp2).
 * Diplomacy: Spies could have a great potential. For trading relations but also for spying on military. To not abuse load/reload, a mission should always take several turns before a result is shown.
 * All units: specialists/civilian, workers, military should use food.
@@ -105,9 +105,9 @@ Specialization
 * Each unit can have one special trait, cannot be undone
 * Unit must have at least a certain level of experience or there is a certain fixed chance after each kill/battle
   action to develop a special trait
-* Upgrade anytime (not during combat) after the conditions are fullfilled
+* Upgrade anytime (not during combat) after the conditions are fulfilled
 * Infantry: City attack (bonus on attacking in cities), Tough (bonus on defense)
 * Artillery: Slow down (every attack slows a unit down one movement (not cumulative)), Defender (bonus on attack,
-  malus on movement)
-* Cavallery: Blitz (bonus on first attack), Fallback (certain chance of withdrawal instead of attack), Scout (can
+  penalty on movement)
+* Cavalry: Blitz (bonus on first attack), Fallback (certain chance of withdrawal instead of attack), Scout (can
   sneak through enemy lines)

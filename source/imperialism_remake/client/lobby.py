@@ -256,7 +256,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
     If a nation is selected the nation_selected signal is emitted with the nation name.
     """
 
-    #: signal, emitted if a nation is selected and the start button is presed
+    #: signal, emitted if a nation is selected and the start button is pressed
     nation_selected = QtCore.pyqtSignal(int)
 
     def __init__(self, scenario_file):

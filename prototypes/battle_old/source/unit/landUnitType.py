@@ -19,7 +19,7 @@
 from PyQt5.QtGui import QTransform, QPixmap
 
 
-def miror_pixmap(pixmap):
+def mirror_pixmap(pixmap):
     transform = QTransform()
     transform.scale(-1, 1)
     return QPixmap(pixmap.transformed(transform))
@@ -30,14 +30,14 @@ UNIT_HEIGHT = 400
 
 
 class LandUnitType:
-    def __init__(self, name, evolution_level, description, officier, attack_strength, fire_range, speed, creation_cost,
+    def __init__(self, name, evolution_level, description, officer, attack_strength, fire_range, speed, creation_cost,
                  upkeep, graphic_charge, graphic_shoot, graphic_stand):
         """function __init__
 
         :param name: str (not empty)
         :param evolution_level: int range(0,3)
         :param description; str (not empty)
-        :param officier: bool
+        :param officer: bool
         :param attack_strength: int range(0,20)
         :param fire_range: int range(2,8)
         :param speed: int range(2,10)
@@ -59,11 +59,11 @@ class LandUnitType:
             raise ValueError('evolution_level must be an int in  {1,2,3}')
         if not isinstance(description, str) or description == '':
             raise ValueError('description must be a non empty string')
-        if not isinstance(officier, bool):
-            raise ValueError('officier must be a boolean')
+        if not isinstance(officer, bool):
+            raise ValueError('officer must be a boolean')
         if not isinstance(attack_strength, int) or attack_strength not in range(0, 21):
             raise ValueError('attack_strength must be an int in range(0,20)')
-        if (not isinstance(fire_range, int) or fire_range not in range(2, 9)) and not officier:
+        if (not isinstance(fire_range, int) or fire_range not in range(2, 9)) and not officer:
             raise ValueError('fire_range must be an int in range(2,8)')
         if not isinstance(speed, int) or speed not in range(2, 11):
             raise ValueError('speed must be an int in range(2,10)')
@@ -80,7 +80,7 @@ class LandUnitType:
         self.name = name
         self.evolutionLevel = evolution_level
         self.description = description
-        self.officier = officier
+        self.officer = officer
         self.attackStrength = attack_strength
         self.fireRange = fire_range
         self.speed = speed
@@ -98,7 +98,7 @@ class LandUnitType:
         # TODO - blurgh!
         return 'Name: %s\n\tEvolution level: %d\n\tDescription: %s\n\tOfficer: %r\n\t' \
                'Attacks: %d\n\tSpeed: %d\n\tRange: %d\n\tCreation Cost: %f\n\tUpkeep: %d\n' \
-               % (self.name, self.evolutionLevel, self.description, self.officier, self.attackStrength,
+               % (self.name, self.evolutionLevel, self.description, self.officer, self.attackStrength,
                   self.speed, self.fireRange, self.creationCost, self.upkeep)
 
     def to_html_table_row(self):
@@ -131,5 +131,5 @@ class LandUnitType:
 
         unit_pixmap = self.get_pixmap(status).scaled(size.width() * 80 / 100, size.height() * 80 / 100)
         if defending:
-            unit_pixmap = miror_pixmap(unit_pixmap)
+            unit_pixmap = mirror_pixmap(unit_pixmap)
         scene.addPixmap(unit_pixmap)

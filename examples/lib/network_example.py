@@ -83,19 +83,19 @@ def server_stop():
     log('server tries to stop')
     server.stop()
 
-sclient = None # server client
+server_client = None # server client
 
 def server_new_client(client):
     """
         New client connected to server.
     """
-    global sclient
-    sclient = network.ExtendedTcpSocket(client)
-    sclient.received.connect(sclient_received)
-    sclient.error.connect(print)
+    global server_client
+    server_client = network.ExtendedTcpSocket(client)
+    server_client.received.connect(server_client_received)
+    server_client.error.connect(print)
     log('server has new connection')
 
-def sclient_received(message):
+def server_client_received(message):
     """
         Connected server client received something.
     """
@@ -106,7 +106,7 @@ def server_client_sends_something():
         Action, server client tries to send something
     """
     log('server-client tries to send something')
-    sclient.send([1, 2, 'Three'])
+    server_client.send([1, 2, 'Three'])
 
 if __name__ == '__main__':
 

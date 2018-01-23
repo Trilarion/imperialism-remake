@@ -11,7 +11,7 @@ General aspects
 * After the starting year of the tech, the cost get exponentially cheaper with a half time of 20 years
 * At most 2 tech projects at the same time, unless the College is upgraded to a University (then 4 tech projects at
   the same time).
-* Techs are not tradable, there are additional discounts (~20% if all players have the Tech already)
+* Techs are not tradeable, there are additional discounts (~20% if all players have the Tech already)
 * Exploring the country for minerals is also a research project – it will reveal some random resources. Can only be
   researched if there are resources to be discovered left. The resource to be discovered will not change upon reload.
 * Different categories: Military (M), Economical (E), Diplomatic (D), Naval (N), Land units (L), Resources non-food
@@ -31,13 +31,13 @@ Techs
 * M+L Infantry III ("Machine gun", IY 1880) requires Infantry II
 * M+L Artillery II
 * M+L Artillery III requires Artillery II
-* M+L Cavallery II
-* M+L Cavallery III ("Tanks", IY 1900) requires Cavallery II
+* M+L Cavalry II
+* M+L Cavalry III ("Tanks", IY 1900) requires Cavalry II
 * M+L +1 Militia per province
 * M+L +2 Units per battle
 * M+E -10% Upkeep ("Nationalism")
 * M+E-10% Training costs
-* M 5% trickleback of casualties
+* M 5% trickle back of casualties
 * M +5% experience of trained soldiers ("Military school")
 
 Possible names: Streamlined Hulls, Bessemer Converter, Rifled Artillery, Steel armor plate,  Gunpowder, Canon,
@@ -46,7 +46,7 @@ Internal combustion machine, Diesel machine, Telephone (better communication, ef
 
 * E+N Light merchant ship II
 * E+N Light merchant ship III requires Light merchant ship II
-* E+N Heavy merchant ship II ("Paddlewheel")
+* E+N Heavy merchant ship II (paddle-wheel)
 * E+N Heavy merchant ship III requires Heavy merchant ship II
 * E+F Apple resources II
 * E+F Apple resources III requires Apple resources II

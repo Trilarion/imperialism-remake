@@ -94,7 +94,7 @@ class BattleView(QObject):
 
         # info containers
         self.dateLabel = QLabel(self.centralWidget)  # display current turn in battle
-        self.hintLabel = QLabel(self.centralWidget)  # display hint when hovering over an elemend
+        self.hintLabel = QLabel(self.centralWidget)  # display hint when hovering over an element
 
         # the actual battle scene
         self.mainScene = MainQGraphicsScene()
@@ -170,7 +170,7 @@ class BattleView(QObject):
         # Space between flag view and next target Button
         spacer_item1 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.MinimumExpanding)
         self.gridLayout.addItem(spacer_item1, 4, 1, 1, 1)
-        # Space between retreat Button and targetted unit view
+        # Space between retreat Button and targeted unit view
         spacer_item2 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.gridLayout.addItem(spacer_item2, 8, 1, 1, 1)
         # Space between current unit view and auto Button
