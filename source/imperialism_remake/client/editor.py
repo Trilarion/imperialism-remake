@@ -1169,7 +1169,7 @@ class EditorScreen(QtWidgets.QWidget):
         content_widget = ChangeTerrainWidget(column, row)
         dialog = graphics.GameDialog(self.client.main_window, content_widget, title='Change terrain',
                                      delete_on_close=True, help_callback=self.client.show_help_browser)
-        #dialog.setFixedSize(QtCore.QSize(900, 700))
+        # dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
     def scenario_changed(self):

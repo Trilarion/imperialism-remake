@@ -88,7 +88,6 @@ def create_start_screen_widget(actions):
     """
     Creates the start screen.
 
-    :param client:
     :return:
     """
 
@@ -179,7 +178,6 @@ class Client:
             self.main_window.showMaximized()
         else:
             self.main_window.show()
-
 
         # widget switcher
         self.widget_switcher = qt.WidgetSwitcher(self.main_window)

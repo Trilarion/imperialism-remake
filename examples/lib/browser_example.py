@@ -35,7 +35,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication([])
 
     widget = qt_webengine.BrowserWidget(tools.load_ui_icon)
-    widget.home_url = QtCore.QUrl(("http://qt-project.org/"))
+    widget.home_url = QtCore.QUrl("http://qt-project.org/")
     widget.show()
 
     app.exec_()
