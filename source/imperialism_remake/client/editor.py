@@ -1206,8 +1206,9 @@ class EditorScreen(QtWidgets.QWidget):
                                                           'Scenario Files (*.scenario)')[0]
         if file_name:
             editor_scenario.load(file_name)
-            self.client.schedule_notification('Loaded scenario {}'
-                                              .format(editor_scenario.scenario[constants.ScenarioProperty.TITLE]))
+            # TODO: on fast PC notification is shown after loading and leads to black screen
+            # self.client.schedule_notification('Loaded scenario {}'
+            #                                  .format(editor_scenario.scenario[constants.ScenarioProperty.TITLE]))
 
     def save_scenario_dialog(self):
         """

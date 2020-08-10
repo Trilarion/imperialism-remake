@@ -301,7 +301,7 @@ class Client:
         """
 #       lobby_dialog.close()
         widget = GameMainScreen(self)
-        self.main_window.change_content_widget(widget)
+        self.widget_switcher.switch(widget)
 
     def switch_to_editor_screen(self):
         """
