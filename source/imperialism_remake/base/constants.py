@@ -19,8 +19,8 @@ Game specific path locations for artwork, music, ...
 Only static values here.
 """
 
-from enum import unique
 import os
+from enum import unique
 
 from imperialism_remake.base import switches
 from imperialism_remake.lib import utils
@@ -63,6 +63,7 @@ SOUNDTRACK_INFO_FILE = extend(SOUNDTRACK_FOLDER, 'soundtrack.info')
 GRAPHICS_FOLDER = extend(ARTWORK_FOLDER, 'graphics')
 GRAPHICS_UI_FOLDER = extend(GRAPHICS_FOLDER, 'ui')
 GRAPHICS_MAP_FOLDER = extend(GRAPHICS_FOLDER, 'map')
+GRAPHICS_TEXTURES_FOLDER = extend(GRAPHICS_MAP_FOLDER, 'terrains')
 
 #: special locations
 DOCUMENTATION_BASE_FOLDER = extend(DATA_FOLDER, 'manual')
@@ -77,6 +78,8 @@ NETWORK_PORT = 42932
 
 #: minimal screen resolution
 MINIMAL_SCREEN_SIZE = (1024, 768)
+
+TILE_SIZE = 80
 
 
 # options

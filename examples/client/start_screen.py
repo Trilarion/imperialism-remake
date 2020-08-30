@@ -26,7 +26,8 @@ from PyQt5 import QtWidgets, QtCore
 if __name__ == '__main__':
 
     # add source directory to path if needed
-    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
+    source_directory = os.path.realpath(
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, os.path.pardir, 'source'))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
 
@@ -64,7 +65,8 @@ if __name__ == '__main__':
     # main window
     main_window = QtWidgets.QWidget()
     # set geometry
-    main_window.setGeometry(tools.get_option(constants.Option.MAINWINDOW_BOUNDS))
+    ax, ay, aw, ah = tools.get_option(constants.Option.MAINWINDOW_BOUNDS)
+    main_window.setGeometry(ax, ay, aw, ah)
     # set title
     main_window.setWindowTitle('Imperialism Remake')
     # show in full screen, maximized or normal

@@ -48,7 +48,7 @@ conveniently integrates git with the explorer.
 
 Install [Python 3.X](https://www.python.org/downloads/). See also the [Python documentation](https://docs.python.org/3/).
 
-Only PyQt5 and [PyYAML](http://pyyaml.org/wiki/PyYAML) are required for running. Sphinx and sphinx_rtd_theme for creating the documentation.
+Only PyQt5 is required for running. Sphinx and ushahidi_sphinx_rtd_theme for creating the documentation.
 
 #### PyQt5
 

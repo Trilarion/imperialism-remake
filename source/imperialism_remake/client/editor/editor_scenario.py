@@ -1,5 +1,5 @@
 # Imperialism remake
-# Copyright (C) 2016 Trilarion
+# Copyright (C) 2014-16 Trilarion
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,27 +15,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 """
-Tests lib/utils
+GUI and internal working of the scenario editor. This is also partly of the client but since the client should not
+know anything about the scenario, we put it in the server module.
 """
+import logging
 
-import os
-import unittest
-from imperialism_remake.lib import utils
+from imperialism_remake.client.common.generic_scenario import GenericScenario
 
-class TestYAML(unittest.TestCase):
+logger = logging.getLogger(__name__)
 
-    def test_write_read(self):
-        value = {
-            "One": [2, 3, 'Four', None],
-            2: ("Cat", "Dog")
-        }
-        temp_file = 'temporary_file'
-        if os.path.exists(temp_file):
-            raise RuntimeError('temporary file already existing')
-        utils.write_as_yaml(temp_file, value)
-        copy = utils.read_as_yaml(temp_file)
-        os.remove(temp_file)
-        self.assertEqual(value, copy)
 
-if __name__ == '__main__':
-    unittest.main()
+class EditorScenario(GenericScenario):
+    """
+    Wrap around the Scenario file to get notified of recreations
+    """
+
+    def __init__(self):
+        super().__init__()

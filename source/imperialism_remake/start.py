@@ -188,14 +188,18 @@ def main():
         tools.set_option(constants.Option.MAINWINDOW_FULLSCREEN, False)
 
     # start server
-    from imperialism_remake.server.server import ServerProcess
+    from imperialism_remake.server.server_process import ServerProcess
 
     server_process = ServerProcess(log_queue, log_formatter, log_level)
     server_process.start()
 
+    logger.info('server process started (%s)', server_process.pid)
+
     # start client, we will return when the client finishes
-    from imperialism_remake.client.client import start_client
+    from imperialism_remake.client.client.client import start_client
     start_client()
+
+    logger.info('client started')
 
     # wait for server process to stop
     server_process.join()

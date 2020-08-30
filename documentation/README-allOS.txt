@@ -3,10 +3,6 @@
 
 2. Install PyQt5
    http://???
-   
-3. Install PyYaml
-   http://pyyaml.org/wiki/PyYAMLDocumentation
-   http://stackoverflow.com/questions/14261614/how-do-i-install-the-yaml-package-for-python
 
 3. Execute "imperialism_remake/start.py" in this folder with Python 3.
    e.g. python3 start.py

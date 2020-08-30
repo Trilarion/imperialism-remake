@@ -20,68 +20,29 @@ Starts the client and delivers most of the code responsible for the main client 
 
 # TODO automatic placement of help dialog depending on if another dialog is open
 
-from functools import partial
 import logging
+import logging.config
+from functools import partial
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from imperialism_remake.base import constants, tools, network as base_network
-from imperialism_remake.client import audio, graphics
-from imperialism_remake.lib import qt, utils
 from imperialism_remake import version
+from imperialism_remake.base import constants, tools, network as base_network
+from imperialism_remake.client import audio
+from imperialism_remake.client.client.map_item import MapItem
+from imperialism_remake.client.config import config_log
+from imperialism_remake.client.editor.editor_screen import EditorScreen
+from imperialism_remake.client.game.game_main_screen import GameMainScreen
+from imperialism_remake.client.graphics.game_dialog import GameDialog
+from imperialism_remake.client.lobby.game_lobby_widget import GameLobbyWidget
+from imperialism_remake.client.preferences import PreferencesWidget
+from imperialism_remake.client.server_monitor import ServerMonitorWidget
+from imperialism_remake.lib import qt, utils
 
 # TODO like in audio, set the network client singleton somewhere else
 local_network_client = base_network.NetworkClient()
 
-from imperialism_remake.client.editor import EditorScreen
-from imperialism_remake.client.lobby import GameLobbyWidget
-from imperialism_remake.client.game import GameMainScreen
-from imperialism_remake.client.preferences import PreferencesWidget
-from imperialism_remake.client.server_monitor import ServerMonitorWidget
-
-
 logger = logging.getLogger(__name__)
-
-
-class MapItem(QtCore.QObject):
-    """
-    Holds together a clickable QPixmapItem, a description text and a reference to a label that
-    shows the text
-
-    TODO use signals to show the text instead
-    """
-    description_change = QtCore.pyqtSignal(str)
-
-    def __init__(self, parent, pixmap, label, description):
-        super().__init__(parent)
-        # store label and description
-        self.label = label
-        self.description = description
-
-        # create clickable pixmap item and create fade animation
-        self.item = qt.ClickablePixmapItem(pixmap)
-        self.fade = qt.FadeAnimation(self.item)
-        self.fade.set_duration(300)
-
-        # wire to fade in/out
-        self.item.signaller.entered.connect(self.fade.fadein)
-        self.item.signaller.left.connect(self.fade.fadeout)
-
-        # wire to show/hide description
-        self.item.signaller.entered.connect(self.show_description)
-        self.item.signaller.left.connect(self.hide_description)
-
-    def show_description(self):
-        """
-        Shows the description in the label.
-        """
-        self.label.setText('<font color=#ffffff size=6>{}</font>'.format(self.description))
-
-    def hide_description(self):
-        """
-        Hides the description from the label.
-        """
-        self.label.setText('')
 
 
 def create_start_screen_widget(actions):
@@ -91,6 +52,7 @@ def create_start_screen_widget(actions):
     :param client:
     :return:
     """
+    logger.debug('create_start_screen_widget actions:%s', actions)
 
     screen = QtWidgets.QWidget()
     screen.setAttribute(QtCore.Qt.WA_StyledBackground, True)
@@ -111,7 +73,7 @@ def create_start_screen_widget(actions):
     view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
     view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
     view.setSceneRect(0, 0, start_image.width(), start_image.height())
-    view.layout_constraint = qt.RelativeLayoutConstraint().center_horizontal()\
+    view.layout_constraint = qt.RelativeLayoutConstraint().center_horizontal() \
         .center_vertical()
     layout.addWidget(view)
 
@@ -123,7 +85,7 @@ def create_start_screen_widget(actions):
     layout.addWidget(subtitle)
 
     image_map_file = constants.extend(constants.GRAPHICS_UI_FOLDER, 'start.overlay.info')
-    image_map = utils.read_as_yaml(image_map_file)
+    image_map = utils.read_from_file(image_map_file)
 
     # security check, they have to be the same
     if actions.keys() != image_map.keys():
@@ -165,6 +127,8 @@ class Client:
         """
         Create the main window, the help browser dialog, the audio player, ...
         """
+        logging.config.dictConfig(config_log.LOG_CONFIG)
+
         # main window
         self.main_window = QtWidgets.QWidget()
         # set geometry
@@ -210,7 +174,7 @@ class Client:
 
         # for the notifications
         self.pending_notifications = []
-        self.notification_position_constraint = qt.RelativeLayoutConstraint().center_horizontal()\
+        self.notification_position_constraint = qt.RelativeLayoutConstraint().center_horizontal() \
             .south(20)
         self.notification = None
 
@@ -218,12 +182,16 @@ class Client:
         # set it active again or it doesn't get keyboard focus
         self.main_window.activateWindow()
 
+        logger.debug('Client initialized')
+
     def schedule_notification(self, text):
         """
             Generic scheduling of a notification. Will be shown immediately if no other
             notification is shown, otherwise it will be shown as soon at the of the current list of
             notifications to be shown.
         """
+        logger.debug('schedule_notification text:%s', text)
+
         self.pending_notifications.append(text)
         if self.notification is None:
             self.show_next_notification()
@@ -233,6 +201,8 @@ class Client:
             Will be called whenever a notification is shown and was cleared. Tries to show the next
             one if there is one.
         """
+        logger.debug('show_next_notification')
+
         if len(self.pending_notifications) > 0:
             message = self.pending_notifications.pop(0)
             self.notification = qt.Notification(
@@ -247,6 +217,8 @@ class Client:
         """
             Displays the help browser somewhere on screen. Can set a special page if needed.
         """
+        logger.debug('show_help_browser path:%s', path)
+
         # we sometimes wire signals that send parameters for url (mouse events for example) which
         # we do not like
         if isinstance(path, str):
@@ -264,11 +236,13 @@ class Client:
 
         Is invoked when pressing F2.
         """
+        logger.debug('show_server_monitor')
+
         # TODO Do we want that non-modal?
         monitor_widget = ServerMonitorWidget()
-        dialog = graphics.GameDialog(self.main_window, monitor_widget, modal=False,
-                                     delete_on_close=True, title='Server Monitor',
-                                     help_callback=self.show_help_browser)
+        dialog = GameDialog(self.main_window, monitor_widget, modal=False,
+                            delete_on_close=True, title='Server Monitor',
+                            help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
@@ -276,6 +250,8 @@ class Client:
         """
         Switches the content of the main window to the start screen.
         """
+        logger.debug('switch_to_start_screen')
+
         actions = {'exit': self.quit,
                    'help': self.show_help_browser,
                    'lobby': self.show_game_lobby_dialog,
@@ -288,9 +264,11 @@ class Client:
         """
         Shows the game lobby dialog.
         """
+        logger.debug('show_game_lobby_dialog')
+
         lobby_widget = GameLobbyWidget()
-        dialog = graphics.GameDialog(self.main_window, lobby_widget, delete_on_close=True,
-                                     title='Game Lobby', help_callback=self.show_help_browser)
+        dialog = GameDialog(self.main_window, lobby_widget, delete_on_close=True,
+                            title='Game Lobby', help_callback=self.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         lobby_widget.single_player_start.connect(self.single_player_start)
         dialog.show()
@@ -299,14 +277,19 @@ class Client:
         """
         Shows the main game screen which will start a scenario file and a selected nation.
         """
-#       lobby_dialog.close()
-        widget = GameMainScreen(self)
+        logger.debug('single_player_start scenario_file:%s, selected_nation:%s', scenario_file, selected_nation)
+
+        # lobby_widget.close()
+
+        widget = GameMainScreen(self, scenario_file, selected_nation)
         self.widget_switcher.switch(widget)
 
     def switch_to_editor_screen(self):
         """
         Switches the content of the main window to the editor screen.
         """
+        logger.debug('switch_to_editor_screen')
+
         widget = EditorScreen(self)
         self.widget_switcher.switch(widget)
 
@@ -314,8 +297,10 @@ class Client:
         """
         Shows the preferences dialog.
         """
+        logger.debug('show_preferences_dialog')
+
         preferences_widget = PreferencesWidget()
-        dialog = graphics.GameDialog(
+        dialog = GameDialog(
             self.main_window, preferences_widget, delete_on_close=True, title='Preferences',
             help_callback=partial(self.show_help_browser,
                                   path=constants.DOCUMENTATION_PREFERENCES_FILE),
@@ -327,6 +312,8 @@ class Client:
         """
         Cleans up and closes the main window which causes app.exec_() to finish.
         """
+        logger.debug('quit')
+
         # store state in options
         tools.set_option(constants.Option.MAINWINDOW_BOUNDS, self.main_window.normalGeometry())
         tools.set_option(constants.Option.MAINWINDOW_MAXIMIZED, self.main_window.isMaximized())
@@ -363,6 +350,8 @@ def start_client():
     """
     Creates the Qt application and shows the main window.
     """
+
+    logger.debug('start_client')
 
     # create app
     app = QtWidgets.QApplication([])

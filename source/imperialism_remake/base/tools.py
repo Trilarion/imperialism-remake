@@ -55,7 +55,7 @@ def load_options(file_name):
     :param file_name:
     """
     global options
-    options = utils.read_as_yaml(file_name)
+    options = utils.read_from_file(file_name)
 
     # if for some reason no dict, make it a dict
     if type(options) is not dict:
@@ -96,10 +96,10 @@ def set_option(option, value):
 
 def save_options(file_name):
     """
-    Saves the options into a YAML file after performing some conversions from types like QtCore.QRect to list, ...
+    Saves the options into a file
 
     :param file_name:
     """
 
     # write to file
-    utils.write_as_yaml(file_name, options)
+    utils.write_to_file(file_name, options)

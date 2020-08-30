@@ -17,16 +17,15 @@
 """
 Basic general network functionality (client and server) wrapping around QtNetwork.QTcpSocket and QtNetwork.QTcpServer.
 
-Messages are sent using yaml (for serialization) and zlib (for compression).
+Messages are sent using pickle (for serialization) and zlib (for compression).
 """
 
 import logging
+import pickle
 import time
 import zlib
 
 from PyQt5 import QtCore, QtNetwork
-from imperialism_remake.lib.utils import yaml
-from ruamel.yaml.compat import StringIO
 
 #: shortcut for QtNetwork.QHostAddress.LocalHost/Any
 SCOPE = {'local': QtNetwork.QHostAddress.LocalHost, 'any': QtNetwork.QHostAddress.Any}
@@ -37,7 +36,7 @@ logger = logging.getLogger(__name__)
 class ExtendedTcpSocket(QtCore.QObject):
     """
     Wrapper around QtNetwork.QTcpSocket. The socket can either be given in the initialization or be created there.
-    Sends and reads messages via serialization (yaml), compression (zlib) and wrapping (QByteArray) as well as
+    Sends and reads messages via serialization (pickle), compression (zlib) and wrapping (QByteArray) as well as
     un-wrapping, de-compressing and de-serialization on the other side.
     """
 
@@ -139,8 +138,7 @@ class ExtendedTcpSocket(QtCore.QObject):
             # security validator (check for everything that we do not like (!!python)
             # TODO implement this
 
-            # decode from utf-8 bytes to unicode and deserialize from yaml
-            value = yaml.load(uncompressed.decode())
+            value = pickle.loads(uncompressed)
 
             logger.debug('socket received: %s', value)
 
@@ -156,20 +154,15 @@ class ExtendedTcpSocket(QtCore.QObject):
             raise RuntimeError('Try to send on unconnected socket.')
 
         logger.debug('socket send: %s', value)
-        # serialize value to yaml
-        stream = StringIO()
-        yaml.dump(value, stream)
-        serialized = stream.getvalue()
 
-        # encode to utf-8 bytes and compress
-        compressed = zlib.compress(serialized.encode())
+        compressed = zlib.compress(pickle.dumps(value))
 
         # wrap in QByteArray
         bytearray = QtCore.QByteArray(compressed)
 
         # write using a data stream
         writer = QtCore.QDataStream(self.socket)
-        writer.setVersion(QtCore.QDataStream.Qt_5_5)
+        writer.setVersion(QtCore.QDataStream.Qt_5_10)
         writer << bytearray
 
     def count_bytes_written(self, bytes):

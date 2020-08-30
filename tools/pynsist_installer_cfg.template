@@ -14,8 +14,7 @@ include_msvcrt=false
 
 [Include]
 pypi_wheels=imperialism_remake==$version
-PyQt5==5.9
-PyYaml==3.12
+PyQt5==5.10
 	
 [Build]
 #directory=../build/nsis

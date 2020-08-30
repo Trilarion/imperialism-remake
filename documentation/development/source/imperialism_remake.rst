@@ -5,36 +5,36 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    imperialism_remake.base
-    imperialism_remake.client
-    imperialism_remake.lib
-    imperialism_remake.server
+   imperialism_remake.base
+   imperialism_remake.client
+   imperialism_remake.lib
+   imperialism_remake.server
 
 Submodules
 ----------
 
-imperialism\_remake\.start module
----------------------------------
+imperialism\_remake.start module
+--------------------------------
 
 .. automodule:: imperialism_remake.start
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-imperialism\_remake\.version module
------------------------------------
+imperialism\_remake.version module
+----------------------------------
 
 .. automodule:: imperialism_remake.version
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
 
 .. automodule:: imperialism_remake
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
