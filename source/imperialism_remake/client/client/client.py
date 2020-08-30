@@ -27,7 +27,8 @@ from functools import partial
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake import version
-from imperialism_remake.base import constants, tools, network as base_network
+from imperialism_remake.base import constants, tools
+from imperialism_remake.base.network import local_network_client
 from imperialism_remake.client import audio
 from imperialism_remake.client.client.map_item import MapItem
 from imperialism_remake.client.config import config_log
@@ -38,9 +39,6 @@ from imperialism_remake.client.lobby.game_lobby_widget import GameLobbyWidget
 from imperialism_remake.client.preferences import PreferencesWidget
 from imperialism_remake.client.server_monitor import ServerMonitorWidget
 from imperialism_remake.lib import qt, utils
-
-# TODO like in audio, set the network client singleton somewhere else
-local_network_client = base_network.NetworkClient()
 
 logger = logging.getLogger(__name__)
 

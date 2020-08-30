@@ -22,7 +22,7 @@ import logging
 from PyQt5 import QtCore, QtWidgets
 
 from imperialism_remake.base import constants
-from imperialism_remake.client.client.client import local_network_client
+from imperialism_remake.base.network import local_network_client
 
 logger = logging.getLogger(__name__)
 
