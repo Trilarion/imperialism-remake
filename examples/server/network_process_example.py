@@ -56,10 +56,10 @@ if __name__ == '__main__':
         sys.path.insert(0, source_directory)
 
     from imperialism_remake.base import constants, network as base_network
-    from imperialism_remake.server import server
+    from imperialism_remake.server import server_process
 
     # create server process and start it
-    server_process = server.ServerProcess()
+    server_process = server_process.ServerProcess()
     server_process.start()
 
     # create app in this process

@@ -19,11 +19,14 @@ Graphics elements that are dependent on the tools and lib.graphics library, but 
 scenario or otherwise) logic. Therefore kind of a intermediate abstraction between the fully independent lib.graphics
 module and the client game specific logic under folder client.
 """
+import logging
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
 from imperialism_remake.base import tools
 from imperialism_remake.lib import qt
+
+logger = logging.getLogger(__name__)
 
 
 class GameDialog(QtWidgets.QWidget):
@@ -100,43 +103,3 @@ class GameDialog(QtWidgets.QWidget):
         """
         if self.close_callback and not self.close_callback(self):
             event.ignore()
-
-
-class MiniMapNationItem(qt.ClickablePathItem):
-    """
-    The outline of a nation in any mini map that should be clickable. Has an effect.
-    """
-
-    def __init__(self, path, z_left=1, z_entered=2):
-        """
-        Adds a QGraphicsDropShadowEffect when hovering over the item. Otherwise it is just a clickable
-        QGraphicsPathItem.
-        """
-        super().__init__(path)
-
-        self.z_entered = z_entered
-        self.z_left = z_left
-
-        self.signaller.entered.connect(self.entered_item)
-        self.signaller.left.connect(self.left_item)
-
-        self.hover_effect = QtWidgets.QGraphicsDropShadowEffect()
-        self.hover_effect.setOffset(4, 4)
-        self.setGraphicsEffect(self.hover_effect)
-
-        # the graphics effect is enabled initially, disable by calling left_item
-        self.left_item()
-
-    def entered_item(self):
-        """
-        Set z value and enables the hover effect.
-        """
-        self.setZValue(self.z_entered)
-        self.hover_effect.setEnabled(True)
-
-    def left_item(self):
-        """
-        Set the z value and disables the hover effect.
-        """
-        self.hover_effect.setEnabled(False)
-        self.setZValue(self.z_left)

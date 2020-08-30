@@ -37,7 +37,7 @@ Client Scenario
 Scenario File Format
 ====================
 
-Game data is stored in zipped YAML (JSON like) files. We have scenarios. Saved games are also valid scenarios. There is automatic saving. Upon starting (loading) a scenario, some parameters can be changed, but not all.
+Game data is stored in zipped pickle (binary) files. We have scenarios. Saved games are also valid scenarios. There is automatic saving. Upon starting (loading) a scenario, some parameters can be changed, but not all.
 
 Adjustable parameters of stored save games upon load:
 * Player nation

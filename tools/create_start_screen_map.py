@@ -71,4 +71,4 @@ if __name__ == '__main__':
     # write
     file_name = os.path.join(constants.GRAPHICS_UI_FOLDER, 'start.overlay.info')
     print('write to {}'.format(file_name))
-    utils.write_as_yaml(file_name, map)
+    utils.write_to_file(file_name, map)

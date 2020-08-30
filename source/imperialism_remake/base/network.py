@@ -26,7 +26,6 @@ from PyQt5 import QtCore, QtNetwork
 from imperialism_remake.base import constants
 from imperialism_remake.lib import network as lib_network
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -160,3 +159,6 @@ class Channel(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self.message_counter = 0
+
+
+local_network_client = NetworkClient()

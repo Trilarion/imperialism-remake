@@ -37,4 +37,4 @@ if __name__ == '__main__':
     # save
     file = constants.SCENARIO_CLIENT_STANDARD_FILE
     print('write to {}'.format(file))
-    utils.write_as_yaml(file, config)
+    utils.write_to_file(file, config)

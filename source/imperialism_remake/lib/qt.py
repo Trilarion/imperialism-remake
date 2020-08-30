@@ -20,9 +20,9 @@ Graphics (PyQt5) based objects and algorithms that do not depend specifically on
 Abstraction of the used elements in the project to achieve an intermediate layer and to minimize dependencies.
 """
 
-from datetime import datetime
 import os
 import sys
+from datetime import datetime
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -618,7 +618,7 @@ def make_GraphicsItem_clickable(parent):
             So we need to turn both on.
             """
             parent.__init__(self, *args, **kwargs)
-#           QtCore.QObject.__init__(self)
+            #           QtCore.QObject.__init__(self)
             self.parent = parent
             self.setAcceptHoverEvents(True)
             self.setAcceptedMouseButtons(QtCore.Qt.LeftButton)
@@ -832,6 +832,7 @@ def local_url(relative_path):
     absolute_path = os.path.abspath(relative_path)
     url = QtCore.QUrl.fromLocalFile(absolute_path)
     return url
+
 
 class WidgetSwitcher:
     """

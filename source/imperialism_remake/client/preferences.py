@@ -18,12 +18,12 @@
 Preferences Widget
 """
 
-from PyQt5 import QtCore, QtWidgets, QtNetwork
+from PyQt5 import QtCore, QtWidgets
 
 from imperialism_remake.base import constants, tools
+from imperialism_remake.base.network import local_network_client
 from imperialism_remake.client import audio
 from imperialism_remake.lib import qt
-from imperialism_remake.client.client import local_network_client
 
 
 class PreferencesWidget(QtWidgets.QWidget):
@@ -195,8 +195,9 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # local server group box
         layout = QtWidgets.QVBoxLayout()
-        import ipgetter
-        local_ip = ipgetter.myip()
+        import ipgetter2
+        local_ip = ipgetter2.IPGetter().get()
+
         layout.addWidget(QtWidgets.QLabel('Local public IP address: {}'.format(local_ip)))
         # accepts incoming connections checkbox
         checkbox = QtWidgets.QCheckBox('Accepts incoming connections')

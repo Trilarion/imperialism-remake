@@ -40,4 +40,4 @@ if __name__ == '__main__':
 
     # write
     print('write to {}'.format(constants.SOUNDTRACK_INFO_FILE))
-    utils.write_as_yaml(constants.SOUNDTRACK_INFO_FILE, playlist)
+    utils.write_to_file(constants.SOUNDTRACK_INFO_FILE, playlist)

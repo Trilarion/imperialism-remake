@@ -18,11 +18,10 @@
 General utility functions (not graphics related) only based on Python or common libraries (not Qt) and not specific
 to the project.
 """
+import pickle
 import zipfile
 from enum import Enum
 
-from ruamel.yaml import YAML
-yaml = YAML(typ='unsafe')
 
 class AutoNumberedEnum(Enum):
     """
@@ -36,27 +35,26 @@ class AutoNumberedEnum(Enum):
         return obj
 
 
-def read_as_yaml(file_name):
+def read_from_file(file_name):
     """
-    Read YAML serialized Python value from file.
+    Read serialized Python value from file.
 
     :param file_name: File name
     :return: Python value
     """
-    with open(file_name) as file:  # open is 'r' by default
-        return yaml.load(file)
+    with open(file_name, 'rb') as file:  # open is 'r' by default
+        return pickle.load(file)
 
 
-def write_as_yaml(file_name, value):
+def write_to_file(file_name, value):
     """
-    Writes Python value as YAML serialization to a file.
+    Writes Python value to a file.
 
     :param file_name: File name.
     :param value: Python value
     """
-    with open(file_name, 'w') as file:
-        yaml.dump(value, file)
-        # TODO are keys of dictionaries in YAML sorted automatically? If not we might want to do that here.
+    with open(file_name, 'wb') as file:
+        pickle.dump(value, file)
 
 
 class ZipArchiveReader:
@@ -74,24 +72,15 @@ class ZipArchiveReader:
         """
         self.zip = zipfile.ZipFile(file)  # mode is 'r' by default
 
-    def read(self, name):
+    def read_from_file(self, name):
         """
-        Reads the file name from the zip archive.
-
-        :param name: File name.
-        :return: byte array
-        """
-        return self.zip.read(name)
-
-    def read_as_yaml(self, name):
-        """
-        Reads the file name from the zip archive and interprets the byte array as UTF-8 YAML.
+        Reads the file name from the zip archive
 
         :param name: File name.
         :return: De-serialized Python value.
         """
-        data = self.read(name)
-        obj = yaml.load(data.decode())
+        data = self.zip.read(name)
+        obj = pickle.loads(data)
         return obj
 
     def __del__(self):
@@ -103,7 +92,7 @@ class ZipArchiveReader:
 
 class ZipArchiveWriter:
     """
-    Encapsulates a zip file to write files into it or even whole Python objects via YAML.
+    Encapsulates a zip file to write files into it or even whole Python objects
 
     See also: https://docs.python.org/3.4/library/zipfile.html
     """
@@ -116,24 +105,15 @@ class ZipArchiveWriter:
         """
         self.zip = zipfile.ZipFile(file, mode='w', compression=zipfile.ZIP_DEFLATED)
 
-    def write(self, name, data):
+    def write_to_file(self, name, obj):
         """
-        Writes a byte array to a file in the archive.
-
-        :param name: File name
-        :param data: byte array
-        """
-        self.zip.writestr(name, data)
-
-    def write_as_yaml(self, name, obj):
-        """
-        Writes a Python value as UTF-8 YAML into a file in the archive.
+        Writes a Python value into a file in the archive.
 
         :param name: File name
         :param obj: Python value
         """
-        data = yaml.dump(obj).encode()
-        self.write(name, data)
+        data = pickle.dumps(obj)
+        self.zip.writestr(name, data)
 
     def __del__(self):
         """
