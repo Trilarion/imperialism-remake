@@ -22,6 +22,8 @@ import os, sys
 
 from PyQt5 import QtCore
 
+import imperialism_remake.server.server_manager
+
 
 def clients_connect():
     """
@@ -79,11 +81,11 @@ if __name__ == '__main__':
         sys.path.insert(0, source_directory)
 
     from imperialism_remake.base import constants, network as base_network
-    from imperialism_remake.server import server
+    from imperialism_remake.server import server_process
 
     app = QtCore.QCoreApplication([])
 
-    server_manager = server.ServerManager()
+    server_manager = imperialism_remake.server.server_manager.ServerManager()
     clientA = base_network.NetworkClient()
     clientB = base_network.NetworkClient()
 

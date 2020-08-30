@@ -18,12 +18,14 @@
 Generate the default rules.
 """
 
-import os, sys
+import os
+import sys
 
 if __name__ == '__main__':
 
     # add source directory to path if needed
-    source_directory = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, 'source'))
+    source_directory = os.path.realpath(
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), os.path.pardir, 'source'))
     if source_directory not in sys.path:
         sys.path.insert(0, source_directory)
 
@@ -33,18 +35,18 @@ if __name__ == '__main__':
     rules = {}
 
     # terrain names
-    terrain_names = {
-        0: 'Sea',
-        1: 'Plain',
-        2: 'Hills',
-        3: 'Mountains',
-        4: 'Tundra',
-        5: 'Swamp',
-        6: 'Desert'
+    terrain_settings = {
+        0: {'name': 'Sea', 'texture_filename': 'terrain.sea.png'},
+        1: {'name': 'Plain', 'texture_filename': 'terrain.plains.png'},
+        2: {'name': 'Hills', 'texture_filename': 'terrain.hills.outer.png'},
+        3: {'name': 'Mountains', 'texture_filename': 'terrain.mountains.outer.png'},
+        4: {'name': 'Tundra', 'texture_filename': 'terrain.tundra.outer.png'},
+        5: {'name': 'Swamp', 'texture_filename': 'terrain.swamp.outer.png'},
+        6: {'name': 'Desert', 'texture_filename': 'terrain.desert.outer.png'}
     }
-    rules['terrain.names'] = terrain_names
+    rules['terrain_settings'] = terrain_settings
 
     # save
     file = constants.SCENARIO_RULESET_STANDARD_FILE
     print('write to {}'.format(file))
-    utils.write_as_yaml(file, rules)
+    utils.write_to_file(file, rules)

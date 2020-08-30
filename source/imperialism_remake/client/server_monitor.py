@@ -23,7 +23,7 @@ from datetime import datetime
 from PyQt5 import QtCore, QtWidgets
 
 from imperialism_remake.base import constants, network as base_network
-from imperialism_remake.client.client import local_network_client
+from imperialism_remake.client.client.client import local_network_client
 
 
 class ServerMonitorWidget(QtWidgets.QWidget):

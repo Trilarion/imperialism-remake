@@ -26,8 +26,9 @@ import os
 import shutil
 import glob
 
-import sphinx
-from sphinx import apidoc
+from sphinx.cmd.build import build_main
+from sphinx.ext import apidoc
+
 
 def sphinx_build(rst_directory):
     """
@@ -55,7 +56,7 @@ def sphinx_build(rst_directory):
 
     # call to sphinx
     for builder_name in ('html', 'latex'):
-        sphinx.build_main(argv=['', '-b', builder_name, rst_directory, os.path.join(build_directory, builder_name)])
+        build_main(argv=['-b', builder_name, rst_directory, os.path.join(build_directory, builder_name)])
 
 def sphinx_api_build(source_directory, out_directory):
     """
@@ -69,7 +70,7 @@ def sphinx_api_build(source_directory, out_directory):
     if os.path.exists(out_directory):
         shutil.rmtree(out_directory)
 
-    apidoc.main(argv=['', '-o', out_directory, source_directory])
+    apidoc.main(argv=['-o', out_directory, source_directory])
 
 def copy_manual(source, target):
     """

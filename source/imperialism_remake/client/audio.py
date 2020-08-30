@@ -43,7 +43,7 @@ def load_soundtrack_playlist():
     soundtrack_playlist.setPlaybackMode(QtMultimedia.QMediaPlaylist.Loop)
 
     # read information file
-    data = utils.read_as_yaml(constants.SOUNDTRACK_INFO_FILE)
+    data = utils.read_from_file(constants.SOUNDTRACK_INFO_FILE)
 
     # add the soundtrack folder to each file name
     for entry in data:

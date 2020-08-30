@@ -26,7 +26,6 @@ from PyQt5 import QtCore, QtNetwork
 from imperialism_remake.base import constants
 from imperialism_remake.lib import network as lib_network
 
-
 logger = logging.getLogger(__name__)
 
 

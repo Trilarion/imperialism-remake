@@ -20,6 +20,7 @@ backward functionality.
 """
 
 from PyQt5 import QtWidgets
+
 # TODO export new document title when load finished
 
 try:

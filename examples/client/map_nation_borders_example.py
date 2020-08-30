@@ -14,10 +14,10 @@ if __name__ == '__main__':
         sys.path.insert(0, source_directory)
 
     from imperialism_remake.base import constants
-    from imperialism_remake.server.scenario import Scenario
+    from imperialism_remake.server.server_scenario import ServerScenario
 
     # load scenario
-    scenario = Scenario.from_file(constants.extend(constants.CORE_SCENARIO_FOLDER, 'Europe1814.scenario'))
+    scenario = ServerScenario.from_file(constants.extend(constants.CORE_SCENARIO_FOLDER, 'Europe1814.scenario'))
 
     # nation map
     columns = scenario[constants.ScenarioProperty.MAP_COLUMNS]
