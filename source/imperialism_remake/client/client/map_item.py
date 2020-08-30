@@ -24,11 +24,7 @@ import logging
 
 from PyQt5 import QtCore
 
-from imperialism_remake.base import network as base_network
 from imperialism_remake.lib import qt
-
-# TODO like in audio, set the network client singleton somewhere else
-local_network_client = base_network.NetworkClient()
 
 logger = logging.getLogger(__name__)
 

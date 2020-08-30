@@ -23,7 +23,7 @@ from functools import partial
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake.base import constants, tools
-from imperialism_remake.client.client.client import local_network_client
+from imperialism_remake.base.network import local_network_client
 from imperialism_remake.client.graphics.minimap_nation_item import MiniMapNationItem
 from imperialism_remake.lib import qt, utils
 

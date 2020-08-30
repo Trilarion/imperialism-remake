@@ -159,3 +159,6 @@ class Channel(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self.message_counter = 0
+
+
+local_network_client = NetworkClient()

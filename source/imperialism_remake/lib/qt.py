@@ -833,6 +833,7 @@ def local_url(relative_path):
     url = QtCore.QUrl.fromLocalFile(absolute_path)
     return url
 
+
 class WidgetSwitcher:
     """
     Holds a simple layout that can switch between widgets. No margins.

@@ -167,6 +167,7 @@ class TileDirections(utils.AutoNumberedEnum):
     def __init__(self):
         self.default = None
 
+
 # TODO are all these properties in use (how to find out)
 @unique
 class ScenarioProperty(utils.AutoNumberedEnum):
