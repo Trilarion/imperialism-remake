@@ -14,14 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-from PyQt5 import QtWidgets, QtGui
+class PlayerAssets:
+    def __init__(self, player_id):
+        self._player_id = player_id
 
-from imperialism_remake.base import constants
+        self._workforce_map = {}
+        self._raw_resources_map = {}
+        self._processed_resources_map = {}
 
-
-def put_pixmap_in_tile_center(scene: QtWidgets.QGraphicsScene, pixmap: QtGui.QPixmap, row, column, z_value):
-    x = (row + 0.5) * constants.TILE_SIZE - pixmap.width() / 2
-    y = (column + 0.5) * constants.TILE_SIZE - pixmap.height() / 2
-    item = scene.addPixmap(pixmap)
-    item.setOffset(x, y)
-    item.setZValue(z_value)
+    def get_id(self):
+        return self._player_id

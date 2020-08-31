@@ -504,3 +504,6 @@ class ServerScenario(QtCore.QObject):
 
     def get_terrain_settings(self):
         return self._rules['terrain_settings']
+
+    def get_workforce_settings(self):
+        return self._rules['workforce_settings']
