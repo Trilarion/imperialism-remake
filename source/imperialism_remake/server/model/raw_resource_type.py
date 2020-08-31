@@ -13,15 +13,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-
-from PyQt5 import QtWidgets, QtGui
-
-from imperialism_remake.base import constants
+from enum import Enum
 
 
-def put_pixmap_in_tile_center(scene: QtWidgets.QGraphicsScene, pixmap: QtGui.QPixmap, row, column, z_value):
-    x = (row + 0.5) * constants.TILE_SIZE - pixmap.width() / 2
-    y = (column + 0.5) * constants.TILE_SIZE - pixmap.height() / 2
-    item = scene.addPixmap(pixmap)
-    item.setOffset(x, y)
-    item.setZValue(z_value)
+class RawResourceType(Enum):
+    BUFFALO = 0
+    COAL = 1
+    COTTON = 2
+    FOREST = 3
+    GRAIN = 4
+    HORSE = 5
+    OIL = 6
+    ORCHARD = 7
+    ORE = 8
+    SCRUBFOREST = 9
+    SHEEP = 10

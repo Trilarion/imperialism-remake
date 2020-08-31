@@ -18,10 +18,15 @@
 The main game screen.
 """
 import logging
+import uuid
 
 from imperialism_remake.client.common.generic_screen import GenericScreen
 from imperialism_remake.client.common.mainmap import MainMap
 from imperialism_remake.client.game.game_scenario import GameScenario
+from imperialism_remake.client.graphics.workforce_graphics import WorkforceGraphics
+from imperialism_remake.server.model.workforce_action import WorkforceAction
+from imperialism_remake.server.model.workforce_impl.workforce_engineer import WorkforceEngineer
+from imperialism_remake.server.model.workforce_type import WorkforceType
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +41,13 @@ class GameMainScreen(GenericScreen):
 
         self.scenario = GameScenario()
 
-        super().__init__(client, self.scenario, MainMap(self.scenario))
+        main_map = MainMap(self.scenario)
+
+        super().__init__(client, self.scenario, main_map)
 
         self.scenario.load(scenario_file)
+
+        # TODO this is just to test, remove me!!!
+        workforce_engineer01 = WorkforceEngineer(self.scenario.server_scenario, uuid.uuid4(), 5, 5)
+        workforce_engineer01_graphics = WorkforceGraphics(main_map, workforce_engineer01)
+        workforce_engineer01_graphics.plan_action(5, 5, WorkforceAction.STAND)

@@ -29,10 +29,10 @@ class TileTypeToTextureMapper:
         terrain_settings = scenario.server_scenario.get_terrain_settings()
 
         self.pixmaps = {}
-        for t in range(0, len(terrain_settings)):
+        for terrain_type in terrain_settings:
             pixmap = QtGui.QPixmap(
-                constants.extend(constants.GRAPHICS_TEXTURES_FOLDER, terrain_settings[t]['texture_filename']))
-            self.pixmaps[t] = pixmap.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
+                constants.extend(constants.GRAPHICS_TERRAINS_FOLDER, terrain_settings[terrain_type]['texture_filename']))
+            self.pixmaps[terrain_type] = pixmap.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
 
     def get_pixmap_of_type(self, tile_type: int):
         if tile_type >= len(self.pixmaps):
