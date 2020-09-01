@@ -45,6 +45,9 @@ class Workforce:
     def get_new_position(self):
         return self._new_row, self._new_column
 
+    def get_current_position(self):
+        return self._row, self._column
+
     def plan_action(self, new_row: int, new_column: int, workforce_action: WorkforceAction):
         self._workforce_action = workforce_action
         self._new_row = new_row

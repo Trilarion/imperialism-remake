@@ -24,6 +24,8 @@ import os
 from PyQt5 import QtCore
 
 from imperialism_remake.base import constants
+from imperialism_remake.client.graphics.mappers.tile_type_to_texture_mapper import TileTypeToTextureMapper
+from imperialism_remake.client.graphics.mappers.workforce_to_texture_mapper import WorkforceToTextureMapper
 from imperialism_remake.lib import utils
 from imperialism_remake.server.server_scenario import ServerScenario
 
@@ -39,6 +41,9 @@ class GenericScenario(QtCore.QObject):
 
         self.server_scenario = None
 
+        self._tile_to_texture_mapper = None
+        self._workforce_to_texture_mapper = None
+
     def load(self, file_name):
         """
         :param file_name:
@@ -47,6 +52,10 @@ class GenericScenario(QtCore.QObject):
 
         if os.path.isfile(file_name):
             self.server_scenario = ServerScenario.from_file(file_name)
+
+            self._tile_to_texture_mapper = TileTypeToTextureMapper(self.server_scenario)
+            self._workforce_to_texture_mapper = WorkforceToTextureMapper(self.server_scenario)
+
             self.changed.emit()
 
     def create(self, properties):
@@ -70,5 +79,14 @@ class GenericScenario(QtCore.QObject):
                                      self.server_scenario[constants.ScenarioProperty.RULES])
         self.server_scenario._rules = utils.read_from_file(rule_file)
 
+        self._tile_to_texture_mapper = TileTypeToTextureMapper(self.server_scenario)
+        self._workforce_to_texture_mapper = WorkforceToTextureMapper(self.server_scenario)
+
         # emit that everything has changed
         self.changed.emit()
+
+    def get_tile_to_texture_mapper(self):
+        return self._tile_to_texture_mapper
+
+    def get_workforce_to_texture_mapper(self):
+        return self._workforce_to_texture_mapper
