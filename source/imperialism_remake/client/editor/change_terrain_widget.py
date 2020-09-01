@@ -18,7 +18,6 @@ import math
 
 from PyQt5 import QtWidgets, QtCore
 
-from imperialism_remake.client.graphics.mappers.tile_type_to_texture_mapper import TileTypeToTextureMapper
 from imperialism_remake.client.utils import scene_utils
 
 logger = logging.getLogger(__name__)
@@ -47,15 +46,13 @@ class ChangeTerrainWidget(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
-        self._tile_to_texture_mapper = TileTypeToTextureMapper(self.screen.scenario)
-
         for i in range(0, len(screen.scenario.server_scenario.get_terrain_settings())):
             y = i // self.COLUMNS_IN_A_ROW
             x = i % self.COLUMNS_IN_A_ROW
 
             scene_utils.put_pixmap_in_tile_center(self.scene,
-                                                  self._tile_to_texture_mapper.get_pixmap_of_type(i),
-                                                  x, y, 1)
+                                                  self.scene.scenario.get_tile_to_texture_mapper().get_pixmap_of_type(
+                                                      i), x, y, 1)
 
     def mousePressEvent(self, event):
         logger.debug("mousePressEvent x:%s, y:%s", event.x(), event.y())

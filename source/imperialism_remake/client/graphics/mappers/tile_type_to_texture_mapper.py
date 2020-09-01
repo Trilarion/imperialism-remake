@@ -23,10 +23,10 @@ logger = logging.getLogger(__name__)
 
 
 class TileTypeToTextureMapper:
-    def __init__(self, scenario):
+    def __init__(self, server_scenario):
         super().__init__()
 
-        terrain_settings = scenario.server_scenario.get_terrain_settings()
+        terrain_settings = server_scenario.get_terrain_settings()
 
         self.pixmaps = {}
         for terrain_type in terrain_settings:

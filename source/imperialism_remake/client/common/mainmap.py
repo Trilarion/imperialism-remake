@@ -18,7 +18,6 @@ import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake.base import constants
-from imperialism_remake.client.graphics.mappers.tile_type_to_texture_mapper import TileTypeToTextureMapper
 from imperialism_remake.client.utils import scene_utils
 from imperialism_remake.lib import qt
 
@@ -68,9 +67,6 @@ class MainMap(QtWidgets.QGraphicsView):
 
         self.scene.clear()
 
-        # TODO move to better place (make TileTypeToTextureMapper as singleton)
-        self._tile_to_texture_mapper = TileTypeToTextureMapper(self.scenario)
-
         columns = self.scenario.server_scenario[constants.ScenarioProperty.MAP_COLUMNS]
         rows = self.scenario.server_scenario[constants.ScenarioProperty.MAP_ROWS]
 
@@ -104,8 +100,7 @@ class MainMap(QtWidgets.QGraphicsView):
     def fill_tile_texture(self, column, row):
         t = self.scenario.server_scenario.terrain_at(column, row)
         sx, sy = self.scenario.server_scenario.scene_position(column, row)
-        scene_utils.put_pixmap_in_tile_center(self.scene,
-                                              self._tile_to_texture_mapper.get_pixmap_of_type(t),
+        scene_utils.put_pixmap_in_tile_center(self.scene, self.scenario.get_tile_to_texture_mapper().get_pixmap_of_type(t),
                                               sx, sy, 1)
 
     def _fill_half_tiles(self, columns, rows):

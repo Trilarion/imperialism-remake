@@ -24,10 +24,10 @@ logger = logging.getLogger(__name__)
 
 
 class WorkforceToTextureMapper:
-    def __init__(self, scenario):
+    def __init__(self, server_scenario):
         super().__init__()
 
-        workforce_settings = scenario.server_scenario.get_workforce_settings()
+        workforce_settings = server_scenario.get_workforce_settings()
 
         self.pixmaps_stand = {}
         self.pixmaps_busy = {}
