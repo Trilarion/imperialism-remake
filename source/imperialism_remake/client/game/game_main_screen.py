@@ -21,12 +21,12 @@ import logging
 import uuid
 
 from imperialism_remake.client.common.generic_screen import GenericScreen
-from imperialism_remake.client.common.mainmap import MainMap
+from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.client.game.game_scenario import GameScenario
-from imperialism_remake.client.graphics.workforce_graphics import WorkforceGraphics
-from imperialism_remake.server.model.workforce_action import WorkforceAction
-from imperialism_remake.server.model.workforce_impl.workforce_engineer import WorkforceEngineer
-from imperialism_remake.server.model.workforce_type import WorkforceType
+from imperialism_remake.client.workforce.workforce_geologist import WorkforceGeologist
+from imperialism_remake.client.workforce.workforce_widget import WorkforceWidget
+from imperialism_remake.server.models.workforce_action import WorkforceAction
+from imperialism_remake.client.workforce.workforce_engineer import WorkforceEngineer
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,13 @@ class GameMainScreen(GenericScreen):
 
         self.scenario.load(scenario_file)
 
-        # TODO this is just to test, remove me!!!
+        # !!! TODO this is just to test, remove me!!!
         workforce_engineer01 = WorkforceEngineer(self.scenario.server_scenario, uuid.uuid4(), 5, 5)
-        workforce_engineer01_graphics = WorkforceGraphics(main_map, workforce_engineer01)
-        workforce_engineer01_graphics.plan_action(5, 5, WorkforceAction.STAND)
+        workforce_engineer01_widget = WorkforceWidget(main_map, self.info_panel, workforce_engineer01)
+        workforce_engineer01_widget.plan_action(5, 5, WorkforceAction.STAND)
+
+        workforce_geologist01 = WorkforceGeologist(self.scenario.server_scenario, uuid.uuid4(), 10, 10)
+        workforce_geologist01_widget = WorkforceWidget(main_map, self.info_panel, workforce_geologist01)
+        workforce_geologist01_widget.plan_action(10, 10, WorkforceAction.STAND)
+        # !!! TODO remove above
+

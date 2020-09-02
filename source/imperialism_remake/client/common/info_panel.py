@@ -18,6 +18,7 @@ import logging
 from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import constants
+from imperialism_remake.client.common.generic_scenario import GenericScenario
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,7 @@ class InfoPanel(QtWidgets.QWidget):
     Info box on the right side of the editor.
     """
 
-    def __init__(self, scenario):
+    def __init__(self, scenario: GenericScenario):
         """
         Layout.
         """
@@ -50,6 +51,9 @@ class InfoPanel(QtWidgets.QWidget):
         self.nation_label = QtWidgets.QLabel()
         layout.addWidget(self.nation_label)
 
+        self.workforce_label = QtWidgets.QLabel()
+        layout.addWidget(self.workforce_label)
+
         layout.addStretch()
 
     def update_tile_info(self, column, row):
@@ -71,3 +75,9 @@ class InfoPanel(QtWidgets.QWidget):
             text += '<br>Province: {}'.format(name)
 
         self.tile_label.setText(text)
+
+    def update_workforce_info(self, name):
+        if name is None:
+            self.workforce_label.setText('')
+        else:
+            self.workforce_label.setText('<br>Worker: {}'.format(name))

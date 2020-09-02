@@ -19,7 +19,7 @@ from functools import partial
 from PyQt5 import QtWidgets
 
 from imperialism_remake.base import constants, tools
-from imperialism_remake.client.common.mainmap import MainMap
+from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.lib import qt
 
 logger = logging.getLogger(__name__)

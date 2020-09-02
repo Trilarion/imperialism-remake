@@ -13,18 +13,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from imperialism_remake.server.model.workforce_action import WorkforceAction
-from imperialism_remake.server.model.workforce_impl.workforce_common import WorkforceCommon
-from imperialism_remake.server.model.workforce_type import WorkforceType
+from imperialism_remake.server.models.workforce_action import WorkforceAction
+from imperialism_remake.client.workforce.workforce_common import WorkforceCommon
+from imperialism_remake.server.models.workforce_type import WorkforceType
 
 
-class WorkforceEngineer(WorkforceCommon):
+class WorkforceGeologist(WorkforceCommon):
     def __init__(self, server_scenario, workforce_id, row, column):
-        super().__init__(server_scenario, workforce_id, row, column, WorkforceType.ENGINEER)
+        super().__init__(server_scenario, workforce_id, row, column, WorkforceType.GEOLOGIST)
 
     def is_action_allowed(self, new_column, new_row, workforce_action: WorkforceAction):
         is_action_allowed = self.is_action_allowed(new_column, new_row)
         if not is_action_allowed:
             return False
 
-        # TODO other specific rules for Engineer (e.g no building through Mountains/swamp if technology is not available yet)
+        # TODO other specific rules for Geologist (e.g no building through Mountains/swamp if technology is not available yet)

@@ -13,26 +13,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import uuid
-
-from imperialism_remake.server.model.terrain_type import TerrainType
-from imperialism_remake.server.model.workforce import Workforce
-from imperialism_remake.server.model.workforce_action import WorkforceAction
-from imperialism_remake.server.model.workforce_type import WorkforceType
+from imperialism_remake.server.models.workforce_action import WorkforceAction
+from imperialism_remake.client.workforce.workforce_common import WorkforceCommon
+from imperialism_remake.server.models.workforce_type import WorkforceType
 
 
-class WorkforceCommon(Workforce):
-    def __init__(self, server_scenario, workforce_id, row, column, workforce_type: WorkforceType):
-        super().__init__(workforce_id, row, column, workforce_type)
-
-        self._server_scenario = server_scenario
+class WorkforceEngineer(WorkforceCommon):
+    def __init__(self, server_scenario, workforce_id, row, column):
+        super().__init__(server_scenario, workforce_id, row, column, WorkforceType.ENGINEER)
 
     def is_action_allowed(self, new_column, new_row, workforce_action: WorkforceAction):
-        if self._row < 0 or self._column < 0:
+        is_action_allowed = self.is_action_allowed(new_column, new_row)
+        if not is_action_allowed:
             return False
 
-        terrain_type = self._server_scenario.terrain_at(new_column, new_row)
-        if terrain_type == TerrainType.SEA:
-            return False
-
-
+        # TODO other specific rules for Engineer (e.g no building through Mountains/swamp if technology is not available yet)

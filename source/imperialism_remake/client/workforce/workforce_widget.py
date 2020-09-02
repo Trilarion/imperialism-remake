@@ -15,23 +15,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
+from imperialism_remake.client.common.info_panel import InfoPanel
 from imperialism_remake.client.utils import scene_utils
-from imperialism_remake.server.model.workforce_action import WorkforceAction
-from imperialism_remake.server.model.workforce_impl.workforce_common import WorkforceCommon
+from imperialism_remake.lib.blinking_widget import BlinkingWidget
+from imperialism_remake.server.models.workforce_action import WorkforceAction
+from imperialism_remake.client.workforce.workforce_common import WorkforceCommon
 
 logger = logging.getLogger(__name__)
 
 
-class WorkforceGraphics(QtWidgets.QLabel):
-    def __init__(self, main_map, workforce: WorkforceCommon):
+class WorkforceWidget(BlinkingWidget):
+    def __init__(self, main_map, info_panel: InfoPanel, workforce: WorkforceCommon):
         super().__init__()
 
         self.setStyleSheet("background-color: rgba(0,0,0,0%)")
 
         self.setWindowFlags(QtCore.Qt.Popup | QtCore.Qt.FramelessWindowHint)
 
+        self._info_panel = info_panel
         self._workforce = workforce
         self._scenario = main_map.scenario
         self._scene = main_map.scene
@@ -48,6 +51,13 @@ class WorkforceGraphics(QtWidgets.QLabel):
             self._workforce.get_action()))
 
         scene_utils.put_label_in_tile_center(self._scene, self, row, column, 10)
+
+        if self._workforce.get_action() == WorkforceAction.DUTY_ACTION:
+            self.start_animation(self.pixmap())
+        else:
+            self.stop_animation()
+
+        self.stop_blinking()
 
     def plan_action(self, new_row: int, new_column: int, workforce_action: WorkforceAction):
         logger.debug("plan_action id:%s, type:%s, new_row:%s, new_column:%s, workforce_action:%s",
@@ -68,10 +78,22 @@ class WorkforceGraphics(QtWidgets.QLabel):
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction):
         return self._workforce.is_action_allowed(new_row, new_column, workforce_action)
 
+    def get_workforce(self):
+        return self._workforce
+
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         super().mousePressEvent(event)
 
-        logger.debug("mousePressEvent id:%s, type:%s, ev:%s", self._workforce.get_id(), self._workforce.get_type(),
-                     event)
+        logger.debug("mousePressEvent id:%s, type:%s", self._workforce.get_id(), self._workforce.get_type())
 
-    # TODO How to detect outside mouse click event ?
+        self.start_blinking(self.pixmap())
+
+    def enterEvent(self, event: QtCore.QEvent) -> None:
+        logger.debug("enterEvent id:%s, type:%s", self._workforce.get_id(), self._workforce.get_type())
+
+        self._info_panel.update_workforce_info(self._workforce.get_name())
+
+    def leaveEvent(self, event: QtCore.QEvent) -> None:
+        logger.debug("leaveEvent id:%s, type:%s", self._workforce.get_id(), self._workforce.get_type())
+
+        self._info_panel.update_workforce_info(None)
