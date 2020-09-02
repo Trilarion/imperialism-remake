@@ -31,7 +31,8 @@ class TileTypeToTextureMapper:
         self.pixmaps = {}
         for terrain_type in terrain_settings:
             pixmap = QtGui.QPixmap(
-                constants.extend(constants.GRAPHICS_TERRAINS_FOLDER, terrain_settings[terrain_type]['texture_filename']))
+                constants.extend(constants.GRAPHICS_TERRAINS_FOLDER,
+                                 terrain_settings[terrain_type]['texture_filename']))
             self.pixmaps[terrain_type] = pixmap.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
 
     def get_pixmap_of_type(self, tile_type: int):

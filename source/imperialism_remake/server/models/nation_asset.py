@@ -13,14 +13,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+from imperialism_remake.server.models.workforce import Workforce
 
-class PlayerAssets:
-    def __init__(self, player_id):
-        self._player_id = player_id
 
-        self._workforce_map = {}
-        self._raw_resources_map = {}
-        self._processed_resources_map = {}
+class NationAsset:
+    def __init__(self, nation_id):
+        self._nation_id = nation_id
+
+        self._workforces = {}
+        self._raw_resources = {}
+        self._processed_resources = {}
 
     def get_id(self):
-        return self._player_id
+        return self._nation_id
+
+    def add_workforce(self, workforce: Workforce):
+        if self._workforces.get(workforce.get_id()):
+            raise Exception("Nation has already this worker")
+
+        self._workforces[workforce.get_id()] = workforce
+
+    def get_workforces(self):
+        return self._workforces

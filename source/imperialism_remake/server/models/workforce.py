@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import uuid
 
-from imperialism_remake.server.model.workforce_action import WorkforceAction
-from imperialism_remake.server.model.workforce_type import WorkforceType
+from imperialism_remake.server.models.workforce_action import WorkforceAction
+from imperialism_remake.server.models.workforce_type import WorkforceType
 
 
 class Workforce:

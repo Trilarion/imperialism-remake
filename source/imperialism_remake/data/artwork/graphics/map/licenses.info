@@ -1,3 +1,20 @@
-file: city.png
-source: Amplio tileset (http://download.gna.org/freeciv/contrib/tilesets/amplio/)
-license: GPL v2+
+Copyright information about ui graphics files
+
+License is CC-BY-SA 3.0 if not otherwise indicated
+
+- Veneteaou
+  - resources/resource.*.png
+  - terrains/terrain.*.png
+
+
+- Trapets
+  - units/*.png
+
+- Trilarion
+  - river.overlays.png
+  - template.overlays.png
+
+
+- city.png
+  Amplio tileset (http://download.gna.org/freeciv/contrib/tilesets/amplio/)
+  GPLv2+

@@ -18,7 +18,7 @@ import logging
 from PyQt5 import QtGui
 
 from imperialism_remake.base import constants
-from imperialism_remake.server.model.workforce_action import WorkforceAction
+from imperialism_remake.server.models.workforce_action import WorkforceAction
 
 logger = logging.getLogger(__name__)
 
@@ -30,21 +30,22 @@ class WorkforceToTextureMapper:
         workforce_settings = server_scenario.get_workforce_settings()
 
         self.pixmaps_stand = {}
-        self.pixmaps_busy = {}
+        self.pixmaps_on_duty = {}
         for workforce_type in workforce_settings:
             pixmap_stand = QtGui.QPixmap(
                 constants.extend(constants.GRAPHICS_WORKFORCE_FOLDER, workforce_settings[workforce_type]['texture_filename_stand']))
             self.pixmaps_stand[workforce_type] = pixmap_stand.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
 
-            pixmap_busy = QtGui.QPixmap(
-                constants.extend(constants.GRAPHICS_WORKFORCE_FOLDER, workforce_settings[workforce_type]['texture_filename_in_action']))
-            self.pixmaps_busy[workforce_type] = pixmap_busy.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
+            pixmap_on_duty = QtGui.QPixmap(
+                constants.extend(constants.GRAPHICS_WORKFORCE_FOLDER, workforce_settings[workforce_type]['texture_filename_on_duty']))
+            self.pixmaps_on_duty[workforce_type] = pixmap_on_duty.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
 
     def get_pixmap_of_type(self, workforce_type: int, action):
         if workforce_type >= len(self.pixmaps_stand):
             raise RuntimeError('Tile type undefined: %s', workforce_type)
 
         if action == WorkforceAction.DUTY_ACTION:
-            return self.pixmaps_busy[workforce_type]
+            # TODO use dynamic image
+            return self.pixmaps_on_duty[workforce_type]
         else:
             return self.pixmaps_stand[workforce_type]

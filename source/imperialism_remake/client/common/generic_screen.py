@@ -18,8 +18,8 @@ import logging
 from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import tools
-from imperialism_remake.client.common.infopanel import InfoPanel
-from imperialism_remake.client.common.minimap import MiniMap
+from imperialism_remake.client.common.info_panel import InfoPanel
+from imperialism_remake.client.common.mini_map import MiniMap
 from imperialism_remake.lib import qt
 
 logger = logging.getLogger(__name__)
