@@ -24,14 +24,30 @@ class NationAsset:
         self._raw_resources = {}
         self._processed_resources = {}
 
-    def get_id(self):
+        # This is coordinates for each of resources/workforces
+        self.asset_locations = {}
+
+    def get_nation_id(self):
         return self._nation_id
 
     def add_workforce(self, workforce: Workforce):
         if self._workforces.get(workforce.get_id()):
             raise Exception("Nation has already this worker")
 
+        row, column = workforce.get_current_position()
+        if self.asset_locations[row] and self.asset_locations[row][column] and isinstance(
+                self.asset_locations[row][column], Workforce):
+            raise Exception("There is Workforce:%s, %s in this place already",
+                            self.asset_locations[row][column].get_id(), self.asset_locations[row][column].get_type())
+
         self._workforces[workforce.get_id()] = workforce
 
-    def get_workforces(self):
-        return self._workforces
+        if self.asset_locations[row] is None:
+            self.asset_locations[row] = {}
+        self.asset_locations[row][column] = workforce
+
+    def get_workforce(self, row, column):
+        if self.asset_locations[row] is not None and isinstance(self.asset_locations[row][column], Workforce):
+            return self.asset_locations[row][column]
+        else:
+            return None

@@ -27,7 +27,9 @@ logger = logging.getLogger(__name__)
 
 
 class WorkforceWidget(BlinkingWidget):
-    def __init__(self, main_map, info_panel: InfoPanel, workforce: WorkforceCommon):
+    event_widget_selected = QtCore. pyqtSignal(object)
+
+    def __init__(self, main_map, info_panel: InfoPanel, workforce_common: WorkforceCommon):
         super().__init__()
 
         self.setStyleSheet("background-color: rgba(0,0,0,0%)")
@@ -35,65 +37,75 @@ class WorkforceWidget(BlinkingWidget):
         self.setWindowFlags(QtCore.Qt.Popup | QtCore.Qt.FramelessWindowHint)
 
         self._info_panel = info_panel
-        self._workforce = workforce
+        self._workforce_common = workforce_common
         self._scenario = main_map.scenario
         self._scene = main_map.scene
 
+        self._item = self._scene.addWidget(self)
+        self._item.setZValue(10)
+
     def _display(self):
-        if self._workforce.get_action() == WorkforceAction.DUTY_ACTION or self._workforce.get_action() == WorkforceAction.MOVE:
-            row, column = self._workforce.get_new_position()
+        if self._workforce_common.get_action() == WorkforceAction.DUTY_ACTION or self._workforce_common.get_action() == WorkforceAction.MOVE:
+            row, column = self._workforce_common.get_new_position()
         else:
-            row, column = self._workforce.get_current_position()
+            row, column = self._workforce_common.get_current_position()
+
+        logger.debug("_display row:%s, col:%s", row, column)
 
         # add workforce pixmap to myself (I am label) and display in scene
-        self.setPixmap(self._scenario.get_workforce_to_texture_mapper().get_pixmap_of_type(
-            self._workforce.get_type().value,
-            self._workforce.get_action()))
+        pixmap = self._scenario.get_workforce_to_texture_mapper().get_pixmap_of_type(
+            self._workforce_common.get_type().value,
+            self._workforce_common.get_action())
+        if pixmap != self.pixmap():
+            self.setPixmap(pixmap)
 
-        scene_utils.put_label_in_tile_center(self._scene, self, row, column, 10)
+        scene_utils.put_widget_in_tile_center(self, row, column)
 
-        if self._workforce.get_action() == WorkforceAction.DUTY_ACTION:
-            self.start_animation(self.pixmap())
+        if self._workforce_common.get_action() == WorkforceAction.DUTY_ACTION:
+            self.start_animation()
         else:
             self.stop_animation()
 
-        self.stop_blinking()
-
     def plan_action(self, new_row: int, new_column: int, workforce_action: WorkforceAction):
         logger.debug("plan_action id:%s, type:%s, new_row:%s, new_column:%s, workforce_action:%s",
-                     self._workforce.get_id(),
-                     self._workforce.get_type(), new_row, new_column, workforce_action)
+                     self._workforce_common.get_id(),
+                     self._workforce_common.get_type(), new_row, new_column, workforce_action)
 
-        self._workforce.plan_action(new_row, new_column, workforce_action)
+        self._workforce_common.plan_action(new_row, new_column, workforce_action)
 
         self._display()
 
     def cancel_action(self):
-        logger.debug("cancel_action id:%s, type:%s", self._workforce.get_id(), self._workforce.get_type())
+        logger.debug("cancel_action id:%s, type:%s", self._workforce_common.get_id(), self._workforce_common.get_type())
 
-        self._workforce.cancel_action()
+        self._workforce_common.cancel_action()
 
         self._display()
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction):
-        return self._workforce.is_action_allowed(new_row, new_column, workforce_action)
+        return self._workforce_common.is_action_allowed(new_row, new_column, workforce_action)
 
     def get_workforce(self):
-        return self._workforce
+        return self._workforce_common
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        logger.debug("mousePressEvent id:%s, type:%s", self._workforce_common.get_id(), self._workforce_common.get_type())
+
+        if event.button() == QtCore.Qt.LeftButton:
+            self.event_widget_selected.emit(self)
+
         super().mousePressEvent(event)
 
-        logger.debug("mousePressEvent id:%s, type:%s", self._workforce.get_id(), self._workforce.get_type())
-
-        self.start_blinking(self.pixmap())
-
     def enterEvent(self, event: QtCore.QEvent) -> None:
-        logger.debug("enterEvent id:%s, type:%s", self._workforce.get_id(), self._workforce.get_type())
+        logger.debug("enterEvent id:%s, type:%s", self._workforce_common.get_id(), self._workforce_common.get_type())
 
-        self._info_panel.update_workforce_info(self._workforce.get_name())
+        self._info_panel.update_workforce_info(self._workforce_common.get_name())
+
+        super().enterEvent(event)
 
     def leaveEvent(self, event: QtCore.QEvent) -> None:
-        logger.debug("leaveEvent id:%s, type:%s", self._workforce.get_id(), self._workforce.get_type())
+        logger.debug("leaveEvent id:%s, type:%s", self._workforce_common.get_id(), self._workforce_common.get_type())
 
         self._info_panel.update_workforce_info(None)
+
+        super().leaveEvent(event)

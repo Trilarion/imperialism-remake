@@ -23,8 +23,10 @@ class WorkforceGeologist(WorkforceCommon):
         super().__init__(server_scenario, workforce_id, row, column, WorkforceType.GEOLOGIST)
 
     def is_action_allowed(self, new_column, new_row, workforce_action: WorkforceAction):
-        is_action_allowed = self.is_action_allowed(new_column, new_row)
+        is_action_allowed = super().is_action_allowed(new_column, new_row, workforce_action)
         if not is_action_allowed:
             return False
 
         # TODO other specific rules for Geologist (e.g no building through Mountains/swamp if technology is not available yet)
+
+        return True

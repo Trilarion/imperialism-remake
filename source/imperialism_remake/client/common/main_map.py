@@ -19,6 +19,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake.base import constants
 from imperialism_remake.client.utils import scene_utils
+from imperialism_remake.client.utils.scene_utils import scene_position
 from imperialism_remake.lib import qt
 
 logger = logging.getLogger(__name__)
@@ -40,6 +41,8 @@ class MainMap(QtWidgets.QGraphicsView):
 
     #: signal, emitted if a nation info is requested
     nation_info = QtCore.pyqtSignal(int)
+
+    mouse_press_event = QtCore.pyqtSignal(object, QtGui.QMouseEvent)
 
     def __init__(self, scenario):
         super().__init__()
@@ -99,7 +102,7 @@ class MainMap(QtWidgets.QGraphicsView):
 
     def fill_tile_texture(self, column, row):
         t = self.scenario.server_scenario.terrain_at(column, row)
-        sx, sy = self.scenario.server_scenario.scene_position(column, row)
+        sx, sy = scene_position(column, row)
         scene_utils.put_pixmap_in_tile_center(self.scene, self.scenario.get_tile_to_texture_mapper().get_pixmap_of_type(t),
                                               sx, sy, 1)
 
@@ -121,7 +124,7 @@ class MainMap(QtWidgets.QGraphicsView):
         # draw the grid and the coordinates
         for column in range(0, columns):
             for row in range(0, rows):
-                sx, sy = self.scenario.server_scenario.scene_position(column, row)
+                sx, sy = scene_position(column, row)
                 # item = self.scene.addRect(sx * constants.TILE_SIZE, sy * constants.TILE_SIZE,  constants.TILE_SIZE,  constants.TILE_SIZE)
                 # item.setZValue(1000)
                 text = '({},{})'.format(column, row)
@@ -141,7 +144,7 @@ class MainMap(QtWidgets.QGraphicsView):
             for province in provinces:
                 column, row = self.scenario.server_scenario.province_property(province,
                                                                               constants.ProvinceProperty.TOWN_LOCATION)
-                sx, sy = self.scenario.server_scenario.scene_position(column, row)
+                sx, sy = scene_position(column, row)
                 # center city image on center of tile
                 scene_utils.put_pixmap_in_tile_center(self.scene, city_pixmap, sx, sy, 6)
                 # display province name below
@@ -186,7 +189,7 @@ class MainMap(QtWidgets.QGraphicsView):
                 province_path = QtGui.QPainterPath()
                 tiles = self.scenario.server_scenario.province_property(province, constants.ProvinceProperty.TILES)
                 for column, row in tiles:
-                    sx, sy = self.scenario.server_scenario.scene_position(column, row)
+                    sx, sy = scene_position(column, row)
                     province_path.addRect(sx * constants.TILE_SIZE, sy * constants.TILE_SIZE, constants.TILE_SIZE,
                                           constants.TILE_SIZE)
                 province_path = province_path.simplified()
@@ -207,7 +210,7 @@ class MainMap(QtWidgets.QGraphicsView):
             tiles = river['tiles']
             path = QtGui.QPainterPath()
             for tile in tiles:
-                sx, sy = self.scenario.server_scenario.scene_position(tile[0], tile[1])
+                sx, sy = scene_position(tile[0], tile[1])
                 x = (sx + 0.5) * constants.TILE_SIZE
                 y = (sy + 0.5) * constants.TILE_SIZE
                 if tile == tiles[0]:
@@ -261,3 +264,10 @@ class MainMap(QtWidgets.QGraphicsView):
                 self.focus_changed.emit(column, row)
 
         super().mouseMoveEvent(event)
+
+    def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
+        logger.debug("mousePressEvent")
+
+        self.mouse_press_event.emit(self, event)
+
+        super().mousePressEvent(event)

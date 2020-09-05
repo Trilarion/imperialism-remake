@@ -19,6 +19,7 @@ import math
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake.base import constants, tools
+from imperialism_remake.client.utils.scene_utils import scene_position
 from imperialism_remake.lib import qt
 
 logger = logging.getLogger(__name__)
@@ -159,7 +160,7 @@ class MiniMap(QtWidgets.QWidget):
                 # get rectangular path for each tile
                 path = QtGui.QPainterPath()
                 for tile in tiles:
-                    sx, sy = self.scenario.server_scenario.scene_position(*tile)
+                    sx, sy = scene_position(*tile)
                     path.addRect(sx * tile_size, sy * tile_size, tile_size, tile_size)
                 # simply (creates outline)
                 path = path.simplified()
@@ -189,7 +190,7 @@ class MiniMap(QtWidgets.QWidget):
                     t = self.scenario.server_scenario.terrain_at(column, row)
                     if t != 0:
                         # not for sea
-                        sx, sy = self.scenario.server_scenario.scene_position(column, row)
+                        sx, sy = scene_position(column, row)
                         paths[t].addRect(sx * tile_size, sy * tile_size, tile_size, tile_size)
             colors = {1: QtCore.Qt.green, 2: QtCore.Qt.darkGreen, 3: QtCore.Qt.darkGray, 4: QtCore.Qt.white,
                       5: QtCore.Qt.darkYellow, 6: QtCore.Qt.yellow}

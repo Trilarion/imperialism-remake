@@ -28,14 +28,25 @@ class WorkforceCommon(Workforce):
         self._server_scenario = server_scenario
 
     def is_action_allowed(self, new_column, new_row, workforce_action: WorkforceAction):
-        if self._row < 0 or self._column < 0:
+        if new_column < 0 or new_row < 0:
             return False
 
-        terrain_type = self._server_scenario.terrain_at(new_column, new_row)
-        if terrain_type == TerrainType.SEA:
-            return False
+        # TODO
+        #terrain_type = self._server_scenario.terrain_at(new_column, new_row)
+        #if terrain_type == TerrainType.SEA:
+        #    return False
+
+        return True
 
     def get_name(self):
         return self._server_scenario.get_workforce_settings()[self.get_type().value]['name']
+
+    def plan_action(self, new_row, new_column, workforce_action):
+        if self.is_action_allowed(new_row, new_column, workforce_action):
+            super().plan_action(new_row, new_column, workforce_action)
+        else:
+            if workforce_action == WorkforceAction.DUTY_ACTION:
+                if self.is_action_allowed(new_row, new_column, WorkforceAction.MOVE):
+                    super().plan_action(new_row, new_column, WorkforceAction.MOVE)
 
 

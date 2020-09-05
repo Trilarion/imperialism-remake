@@ -54,6 +54,9 @@ class InfoPanel(QtWidgets.QWidget):
         self.workforce_label = QtWidgets.QLabel()
         layout.addWidget(self.workforce_label)
 
+        self.selected_object_label = QtWidgets.QLabel()
+        layout.addWidget(self.selected_object_label)
+
         layout.addStretch()
 
     def update_tile_info(self, column, row):
@@ -63,7 +66,7 @@ class InfoPanel(QtWidgets.QWidget):
         :param column: The tile column.
         :param row: The tile row.
         """
-        logger.debug('update_tile_info column:%s, row:%s', column, row)
+        #logger.debug('update_tile_info column:%s, row:%s', column, row)
 
         text = 'Position ({}, {})'.format(column, row)
         terrain = self.scenario.server_scenario.terrain_at(column, row)
@@ -81,3 +84,9 @@ class InfoPanel(QtWidgets.QWidget):
             self.workforce_label.setText('')
         else:
             self.workforce_label.setText('<br>Worker: {}'.format(name))
+
+    def update_selected_object_info(self, name):
+        if name is None:
+            self.selected_object_label.setText('')
+        else:
+            self.selected_object_label.setText('<br>Selected: {}'.format(name))
