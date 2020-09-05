@@ -19,14 +19,14 @@ from PyQt5 import QtGui, QtCore
 
 from imperialism_remake.client.common.info_panel import InfoPanel
 from imperialism_remake.client.utils import scene_utils
-from imperialism_remake.lib.blinking_widget import BlinkingWidget
+from imperialism_remake.lib.blinking_animated_widget import BlinkingAnimatedWidget
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.client.workforce.workforce_common import WorkforceCommon
 
 logger = logging.getLogger(__name__)
 
 
-class WorkforceWidget(BlinkingWidget):
+class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
     event_widget_selected = QtCore. pyqtSignal(object)
 
     def __init__(self, main_map, info_panel: InfoPanel, workforce_common: WorkforceCommon):
@@ -44,6 +44,16 @@ class WorkforceWidget(BlinkingWidget):
         self._item = self._scene.addWidget(self)
         self._item.setZValue(10)
 
+        pixmap_stand = self._scenario.get_workforce_to_texture_mapper().get_pixmap_of_type(
+            self._workforce_common.get_type().value,
+            WorkforceAction.STAND)
+        self.setPixmap(pixmap_stand)
+
+        pixmaps_duty_action = self._scenario.get_workforce_to_texture_mapper().get_pixmap_of_type(
+            self._workforce_common.get_type().value,
+            WorkforceAction.DUTY_ACTION)
+        self.add_animation_pixmaps(pixmaps_duty_action)
+
     def _display(self):
         if self._workforce_common.get_action() == WorkforceAction.DUTY_ACTION or self._workforce_common.get_action() == WorkforceAction.MOVE:
             row, column = self._workforce_common.get_new_position()
@@ -51,13 +61,6 @@ class WorkforceWidget(BlinkingWidget):
             row, column = self._workforce_common.get_current_position()
 
         logger.debug("_display row:%s, col:%s", row, column)
-
-        # add workforce pixmap to myself (I am label) and display in scene
-        pixmap = self._scenario.get_workforce_to_texture_mapper().get_pixmap_of_type(
-            self._workforce_common.get_type().value,
-            self._workforce_common.get_action())
-        if pixmap != self.pixmap():
-            self.setPixmap(pixmap)
 
         scene_utils.put_widget_in_tile_center(self, row, column)
 

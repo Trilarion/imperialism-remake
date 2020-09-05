@@ -28,7 +28,7 @@ from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.client.game.game_scenario import GameScenario
 from imperialism_remake.client.game.game_selected_object import GameSelectedObject
 from imperialism_remake.client.workforce.workforce_geologist import WorkforceGeologist
-from imperialism_remake.client.workforce.workforce_widget import WorkforceWidget
+from imperialism_remake.client.workforce.workforce_animated_widget import WorkforceAnimatedWidget
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.client.workforce.workforce_engineer import WorkforceEngineer
 
@@ -56,13 +56,13 @@ class GameMainScreen(GenericScreen):
 
         # !!! TODO this is just to test, remove me a little bit later!!!
         workforce_engineer01 = WorkforceEngineer(self.scenario.server_scenario, uuid.uuid4(), 4, 13)
-        workforce_engineer01_widget = WorkforceWidget(main_map, self.info_panel, workforce_engineer01)
+        workforce_engineer01_widget = WorkforceAnimatedWidget(main_map, self.info_panel, workforce_engineer01)
         workforce_engineer01_widget.plan_action(4, 13, WorkforceAction.STAND)
 
         workforce_engineer01_widget.event_widget_selected.connect(self._selected_object.select_widget_object)
 
         workforce_geologist01 = WorkforceGeologist(self.scenario.server_scenario, uuid.uuid4(), 8, 11)
-        workforce_geologist01_widget = WorkforceWidget(main_map, self.info_panel, workforce_geologist01)
+        workforce_geologist01_widget = WorkforceAnimatedWidget(main_map, self.info_panel, workforce_geologist01)
         workforce_geologist01_widget.plan_action(8, 11, WorkforceAction.STAND)
 
         workforce_geologist01_widget.event_widget_selected.connect(self._selected_object.select_widget_object)
