@@ -13,16 +13,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+import uuid
+
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.client.workforce.workforce_common import WorkforceCommon
 from imperialism_remake.server.models.workforce_type import WorkforceType
+from imperialism_remake.server.server_scenario import ServerScenario
 
 
 class WorkforceEngineer(WorkforceCommon):
-    def __init__(self, server_scenario, workforce_id, row, column):
+    def __init__(self, server_scenario: ServerScenario, workforce_id: uuid, row: int, column: int):
         super().__init__(server_scenario, workforce_id, row, column, WorkforceType.ENGINEER)
 
-    def is_action_allowed(self, new_column, new_row, workforce_action: WorkforceAction):
+    def is_action_allowed(self, new_column: int, new_row: int, workforce_action: WorkforceAction) -> bool:
         is_action_allowed = super().is_action_allowed(new_column, new_row, workforce_action)
         if not is_action_allowed:
             return False

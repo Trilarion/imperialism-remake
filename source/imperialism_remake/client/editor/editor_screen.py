@@ -50,13 +50,13 @@ class EditorScreen(GenericScreen):
         # new, load, save scenario actions
         a = qt.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
                              self.new_scenario_dialog)
-        self.toolbar.addAction(a)
+        self._toolbar.addAction(a)
         a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
                              self.load_scenario_dialog)
-        self.toolbar.addAction(a)
+        self._toolbar.addAction(a)
         a = qt.create_action(tools.load_ui_icon('icon.scenario.save.png'), 'Save scenario', self,
                              self.save_scenario_dialog)
-        self.toolbar.addAction(a)
+        self._toolbar.addAction(a)
 
         # main map
         self.main_map.change_terrain.connect(self.map_change_terrain)
@@ -66,12 +66,12 @@ class EditorScreen(GenericScreen):
         # edit properties (general, nations, provinces) actions
         a = qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self,
                              self.general_properties_dialog)
-        self.toolbar.addAction(a)
+        self._toolbar.addAction(a)
         a = qt.create_action(tools.load_ui_icon('icon.editor.nations.png'), 'Edit nations', self, self.nations_dialog)
-        self.toolbar.addAction(a)
+        self._toolbar.addAction(a)
         a = qt.create_action(tools.load_ui_icon('icon.editor.provinces.png'), 'Edit provinces', self,
                              self.provinces_dialog)
-        self.toolbar.addAction(a)
+        self._toolbar.addAction(a)
 
     def new_scenario_dialog(self):
         """
@@ -79,8 +79,8 @@ class EditorScreen(GenericScreen):
         """
         content_widget = NewScenarioWidget()
         content_widget.finished.connect(self.scenario.create)
-        dialog = GameDialog(self.client.main_window, content_widget, title='New Scenario',
-                            delete_on_close=True, help_callback=self.client.show_help_browser)
+        dialog = GameDialog(self._client.main_window, content_widget, title='New Scenario',
+                            delete_on_close=True, help_callback=self._client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(600, 400))
         dialog.show()
 
@@ -107,7 +107,7 @@ class EditorScreen(GenericScreen):
         if file_name:
             self.scenario.server_scenario.save(file_name)
             path, name = os.path.split(file_name)
-            self.client.schedule_notification('Saved to {}'.format(name))
+            self._client.schedule_notification('Saved to {}'.format(name))
 
     def map_change_terrain(self, column, row):
         """
@@ -115,8 +115,8 @@ class EditorScreen(GenericScreen):
         :param row:
         """
         content_widget = ChangeTerrainWidget(self, column, row)
-        dialog = GameDialog(self.client.main_window, content_widget, title='Change terrain',
-                            delete_on_close=True, help_callback=self.client.show_help_browser)
+        dialog = GameDialog(self._client.main_window, content_widget, title='Change terrain',
+                            delete_on_close=True, help_callback=self._client.show_help_browser)
         # dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
@@ -128,8 +128,8 @@ class EditorScreen(GenericScreen):
             return
 
         content_widget = ScenarioPropertiesWidget(self.scenario)
-        dialog = GameDialog(self.client.main_window, content_widget, title='General Properties',
-                            delete_on_close=True, help_callback=self.client.show_help_browser,
+        dialog = GameDialog(self._client.main_window, content_widget, title='General Properties',
+                            delete_on_close=True, help_callback=self._client.show_help_browser,
                             close_callback=content_widget.close_request)
         # TODO derive meaningful size depending on screen size
         dialog.setFixedSize(QtCore.QSize(900, 700))
@@ -143,8 +143,8 @@ class EditorScreen(GenericScreen):
             return
 
         content_widget = NationPropertiesWidget(self.scenario, nation)
-        dialog = GameDialog(self.client.main_window, content_widget, title='Nations', delete_on_close=True,
-                            help_callback=self.client.show_help_browser)
+        dialog = GameDialog(self._client.main_window, content_widget, title='Nations', delete_on_close=True,
+                            help_callback=self._client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
@@ -156,7 +156,7 @@ class EditorScreen(GenericScreen):
             return
 
         content_widget = ProvincePropertiesWidget(self.scenario, province)
-        dialog = GameDialog(self.client.main_window, content_widget, title='Provinces', delete_on_close=True,
-                            help_callback=self.client.show_help_browser)
+        dialog = GameDialog(self._client.main_window, content_widget, title='Provinces', delete_on_close=True,
+                            help_callback=self._client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()

@@ -20,7 +20,7 @@ from imperialism_remake.server.models.workforce_type import WorkforceType
 
 
 class Workforce:
-    def __init__(self, workforce_id, row, column, workforce_type: WorkforceType):
+    def __init__(self, workforce_id: uuid, row: int, column: int, workforce_type: WorkforceType):
         self._workforce_id = workforce_id
         self._workforce_type = workforce_type
         self._workforce_action = WorkforceAction.STAND
@@ -33,27 +33,27 @@ class Workforce:
         # Overriden in inherited workforce class implementations
         self._build_expenses = None
 
-    def get_id(self):
+    def get_id(self) -> uuid:
         return self._workforce_id
 
-    def get_type(self):
+    def get_type(self) -> WorkforceType:
         return self._workforce_type
 
-    def get_action(self):
+    def get_action(self) -> WorkforceAction:
         return self._workforce_action
 
-    def get_new_position(self):
+    def get_new_position(self) -> (int, int):
         return self._new_row, self._new_column
 
-    def get_current_position(self):
+    def get_current_position(self) -> (int, int):
         return self._row, self._column
 
-    def plan_action(self, new_row: int, new_column: int, workforce_action: WorkforceAction):
+    def plan_action(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> None:
         self._workforce_action = workforce_action
         self._new_row = new_row
         self._new_column = new_column
 
-    def cancel_action(self):
+    def cancel_action(self) -> None:
         self._workforce_action = WorkforceAction.STAND
         self._new_row = self._row
         self._new_column = self._column
