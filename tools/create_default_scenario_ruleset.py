@@ -21,8 +21,8 @@ Generate the default rules.
 import os
 import sys
 
-from imperialism_remake.server.model.terrain_type import TerrainType
-from imperialism_remake.server.model.workforce_type import WorkforceType
+from imperialism_remake.server.models.terrain_type import TerrainType
+from imperialism_remake.server.models.workforce_type import WorkforceType
 
 if __name__ == '__main__':
 
@@ -51,9 +51,9 @@ if __name__ == '__main__':
 
     workforce_settings = {
         WorkforceType.ENGINEER.value: {'name': 'Engineer', 'texture_filename_stand': 'engineer.stand.png',
-                                 'texture_filename_in_action': 'engineer.busy.png'},
+                                 'texture_filename_on_duty': 'engineer.on_duty.png'},
         WorkforceType.GEOLOGIST.value: {'name': 'Geologist', 'texture_filename_stand': 'geologist.stand.png',
-                                  'texture_filename_in_action': 'geologist.busy.png'}
+                                  'texture_filename_on_duty': 'geologist.on_duty.png'}
     }
     rules['workforce_settings'] = workforce_settings
 

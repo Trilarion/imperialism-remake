@@ -333,7 +333,7 @@ class ServerScenario(QtCore.QObject):
         """
             Sets a province property.
         """
-        logger.debug('set_province_property province:%s, key:%s, value:%s', province, key, value)
+        #logger.debug('set_province_property province:%s, key:%s, value:%s', province, key, value)
 
         if province not in self._provinces:
             raise RuntimeError('Unknown province {}.'.format(province))
@@ -346,7 +346,7 @@ class ServerScenario(QtCore.QObject):
             Gets a province property. One can only obtain properties that have been set before and only for provinces
             that exist.
         """
-        logger.debug('set_province_property province:%s, key:%s', province, key)
+        #logger.debug('province_property province:%s, key:%s', province, key)
 
         if province in self._provinces and key in self._provinces[province]:
             return self._provinces[province][key]
@@ -394,7 +394,7 @@ class ServerScenario(QtCore.QObject):
         :param row: Map row
         :return: Province
         """
-        logger.debug('province_at column:%s, row:%s', column, row)
+        #logger.debug('province_at column:%s, row:%s', column, row)
 
         #  TODO speed up by having a reference in the map. (see also programmers.SE question)
         position = [column, row]
