@@ -19,15 +19,17 @@ from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.models.workforce import Workforce
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.models.workforce_type import WorkforceType
+from imperialism_remake.server.server_scenario import ServerScenario
 
 
 class WorkforceCommon(Workforce):
-    def __init__(self, server_scenario, workforce_id, row, column, workforce_type: WorkforceType):
+    def __init__(self, server_scenario: ServerScenario, workforce_id: uuid, row: int, column: int,
+                 workforce_type: WorkforceType):
         super().__init__(workforce_id, row, column, workforce_type)
 
         self._server_scenario = server_scenario
 
-    def is_action_allowed(self, new_row, new_column, workforce_action: WorkforceAction):
+    def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         if new_column < 0 or new_row < 0:
             return False
 
@@ -37,15 +39,13 @@ class WorkforceCommon(Workforce):
 
         return True
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self._server_scenario.get_workforce_settings()[self.get_type().value]['name']
 
-    def plan_action(self, new_row, new_column, workforce_action):
+    def plan_action(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> None:
         if self.is_action_allowed(new_row, new_column, workforce_action):
             super().plan_action(new_row, new_column, workforce_action)
         else:
             if workforce_action == WorkforceAction.DUTY_ACTION:
                 if self.is_action_allowed(new_row, new_column, WorkforceAction.MOVE):
                     super().plan_action(new_row, new_column, WorkforceAction.MOVE)
-
-

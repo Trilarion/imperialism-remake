@@ -13,11 +13,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+import uuid
+
 from imperialism_remake.server.models.workforce import Workforce
 
 
 class NationAsset:
-    def __init__(self, nation_id):
+    def __init__(self, nation_id: uuid):
         self._nation_id = nation_id
 
         self._workforces = {}
@@ -27,10 +29,10 @@ class NationAsset:
         # This is coordinates for each of resources/workforces
         self.asset_locations = {}
 
-    def get_nation_id(self):
+    def get_nation_id(self) -> uuid:
         return self._nation_id
 
-    def add_workforce(self, workforce: Workforce):
+    def add_workforce(self, workforce: Workforce) -> None:
         if self._workforces.get(workforce.get_id()):
             raise Exception("Nation has already this worker")
 
@@ -46,7 +48,7 @@ class NationAsset:
             self.asset_locations[row] = {}
         self.asset_locations[row][column] = workforce
 
-    def get_workforce(self, row, column):
+    def get_workforce(self, row: int, column: int) -> Workforce:
         if self.asset_locations[row] is not None and isinstance(self.asset_locations[row][column], Workforce):
             return self.asset_locations[row][column]
         else:

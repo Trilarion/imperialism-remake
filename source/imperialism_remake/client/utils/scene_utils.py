@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import QWidget
 from imperialism_remake.base import constants
 
 
-def put_pixmap_in_tile_center(scene: QtWidgets.QGraphicsScene, pixmap: QtGui.QPixmap, row, column, z_value):
+def put_pixmap_in_tile_center(scene: QtWidgets.QGraphicsScene, pixmap: QtGui.QPixmap, row: int, column: int, z_value: int) -> None:
     x = (row + 0.5) * constants.TILE_SIZE - pixmap.width() / 2
     y = (column + 0.5) * constants.TILE_SIZE - pixmap.height() / 2
     item = scene.addPixmap(pixmap)
@@ -28,7 +28,7 @@ def put_pixmap_in_tile_center(scene: QtWidgets.QGraphicsScene, pixmap: QtGui.QPi
     item.setZValue(z_value)
 
 
-def put_widget_in_tile_center(widget: QWidget, row, column):
+def put_widget_in_tile_center(widget: QWidget, row: int, column: int) -> None:
     column, row = scene_position(column, row)
     y = row * constants.TILE_SIZE
     x = column * constants.TILE_SIZE
@@ -36,7 +36,7 @@ def put_widget_in_tile_center(widget: QWidget, row, column):
     widget.move(x, y)
 
 
-def scene_position(column, row):
+def scene_position(column: int, row: int) -> (int, int):
     """
         Converts a map position to a scene position.
 

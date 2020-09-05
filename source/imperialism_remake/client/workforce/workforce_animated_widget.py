@@ -18,18 +18,20 @@ import logging
 from PyQt5 import QtGui, QtCore
 
 from imperialism_remake.client.common.info_panel import InfoPanel
+from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.client.utils import scene_utils
-from imperialism_remake.lib.blinking_animated_widget import BlinkingAnimatedWidget
-from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.client.workforce.workforce_common import WorkforceCommon
+from imperialism_remake.lib.blinking_animated_widget import BlinkingAnimatedWidget
+from imperialism_remake.server.models.workforce import Workforce
+from imperialism_remake.server.models.workforce_action import WorkforceAction
 
 logger = logging.getLogger(__name__)
 
 
 class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
-    event_widget_selected = QtCore. pyqtSignal(object)
+    event_widget_selected = QtCore.pyqtSignal(object)
 
-    def __init__(self, main_map, info_panel: InfoPanel, workforce_common: WorkforceCommon):
+    def __init__(self, main_map: MainMap, info_panel: InfoPanel, workforce_common: WorkforceCommon):
         super().__init__()
 
         self.setStyleSheet("background-color: rgba(0,0,0,0%)")
@@ -54,7 +56,7 @@ class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
             WorkforceAction.DUTY_ACTION)
         self.add_animation_pixmaps(pixmaps_duty_action)
 
-    def _display(self):
+    def _display(self) -> None:
         if self._workforce_common.get_action() == WorkforceAction.DUTY_ACTION or self._workforce_common.get_action() == WorkforceAction.MOVE:
             row, column = self._workforce_common.get_new_position()
         else:
@@ -69,7 +71,7 @@ class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
         else:
             self.stop_animation()
 
-    def plan_action(self, new_row: int, new_column: int, workforce_action: WorkforceAction):
+    def plan_action(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> None:
         logger.debug("plan_action id:%s, type:%s, new_row:%s, new_column:%s, workforce_action:%s",
                      self._workforce_common.get_id(),
                      self._workforce_common.get_type(), new_row, new_column, workforce_action)
@@ -78,21 +80,22 @@ class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
 
         self._display()
 
-    def cancel_action(self):
+    def cancel_action(self) -> None:
         logger.debug("cancel_action id:%s, type:%s", self._workforce_common.get_id(), self._workforce_common.get_type())
 
         self._workforce_common.cancel_action()
 
         self._display()
 
-    def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction):
+    def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         return self._workforce_common.is_action_allowed(new_row, new_column, workforce_action)
 
-    def get_workforce(self):
+    def get_workforce(self) -> Workforce:
         return self._workforce_common
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
-        logger.debug("mousePressEvent id:%s, type:%s", self._workforce_common.get_id(), self._workforce_common.get_type())
+        logger.debug("mousePressEvent id:%s, type:%s", self._workforce_common.get_id(),
+                     self._workforce_common.get_type())
 
         if event.button() == QtCore.Qt.LeftButton:
             self.event_widget_selected.emit(self)

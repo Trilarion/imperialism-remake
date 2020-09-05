@@ -28,7 +28,7 @@ class GameSelectedObject:
         self._info_panel = info_panel
 
     # TODO use for selected_widget_object common base class og objects, not only workforce
-    def select_widget_object(self, selected_widget_object):
+    def select_widget_object(self, selected_widget_object: WorkforceAnimatedWidget) -> None:
         self.deselect_widget_object_rather_than(-1, -1)
 
         self._selected_widget_object = selected_widget_object
@@ -46,7 +46,7 @@ class GameSelectedObject:
 
         # TODO draw buttons with actions  for this object on toolbar
 
-    def deselect_widget_object_rather_than(self, row, column):
+    def deselect_widget_object_rather_than(self, row: int, column: int) -> None:
         logger.debug("deselect_object")
 
         if self._selected_widget_object is not None:
@@ -65,7 +65,7 @@ class GameSelectedObject:
 
             self._info_panel.update_selected_object_info(None)
 
-    def do_action(self, row, column):
+    def do_action(self, row: int, column: int) -> None:
         logger.debug("do_action in row:%s, column:%s", row, column)
         # if action is allowed do duty or move if allowed
 

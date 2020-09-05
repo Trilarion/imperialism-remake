@@ -52,17 +52,17 @@ class GameMainScreen(GenericScreen):
 
         self.scenario.load(scenario_file)
 
-        self._selected_object = GameSelectedObject(self.info_panel)
+        self._selected_object = GameSelectedObject(self._info_panel)
 
         # !!! TODO this is just to test, remove me a little bit later!!!
         workforce_engineer01 = WorkforceEngineer(self.scenario.server_scenario, uuid.uuid4(), 4, 13)
-        workforce_engineer01_widget = WorkforceAnimatedWidget(main_map, self.info_panel, workforce_engineer01)
+        workforce_engineer01_widget = WorkforceAnimatedWidget(main_map, self._info_panel, workforce_engineer01)
         workforce_engineer01_widget.plan_action(4, 13, WorkforceAction.STAND)
 
         workforce_engineer01_widget.event_widget_selected.connect(self._selected_object.select_widget_object)
 
         workforce_geologist01 = WorkforceGeologist(self.scenario.server_scenario, uuid.uuid4(), 8, 11)
-        workforce_geologist01_widget = WorkforceAnimatedWidget(main_map, self.info_panel, workforce_geologist01)
+        workforce_geologist01_widget = WorkforceAnimatedWidget(main_map, self._info_panel, workforce_geologist01)
         workforce_geologist01_widget.plan_action(8, 11, WorkforceAction.STAND)
 
         workforce_geologist01_widget.event_widget_selected.connect(self._selected_object.select_widget_object)
