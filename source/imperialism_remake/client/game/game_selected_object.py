@@ -76,6 +76,6 @@ class GameSelectedObject:
         if isinstance(self._selected_widget_object, WorkforceWidget):
             logger.debug("do_action for workforce")
             self._selected_widget_object.plan_action(row, column, WorkforceAction.DUTY_ACTION)
-        # elif obj is ??? e.g. Naval or army?
+        # TODO elif obj is ??? e.g. Naval or army?
 
         self.deselect_widget_object_rather_than(-1, -1)
