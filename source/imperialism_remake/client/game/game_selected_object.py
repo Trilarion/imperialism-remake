@@ -16,7 +16,7 @@
 import logging
 
 from imperialism_remake.client.common.info_panel import InfoPanel
-from imperialism_remake.client.workforce.workforce_widget import WorkforceWidget
+from imperialism_remake.client.workforce.workforce_animated_widget import WorkforceAnimatedWidget
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ class GameSelectedObject:
 
         self._selected_widget_object = selected_widget_object
 
-        if isinstance(self._selected_widget_object, WorkforceWidget):
+        if isinstance(self._selected_widget_object, WorkforceAnimatedWidget):
             logger.debug("set_selected_object id:%s, type:%s", selected_widget_object.get_workforce().get_id(),
                          selected_widget_object.get_workforce().get_type())
 
@@ -73,7 +73,7 @@ class GameSelectedObject:
             logger.error("do_action something bad happened. Cannot do action for unknown object")
             return
 
-        if isinstance(self._selected_widget_object, WorkforceWidget):
+        if isinstance(self._selected_widget_object, WorkforceAnimatedWidget):
             logger.debug("do_action for workforce")
             self._selected_widget_object.plan_action(row, column, WorkforceAction.DUTY_ACTION)
         # TODO elif obj is ??? e.g. Naval or army?

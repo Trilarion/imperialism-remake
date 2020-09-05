@@ -33,19 +33,30 @@ class WorkforceToTextureMapper:
         self.pixmaps_on_duty = {}
         for workforce_type in workforce_settings:
             pixmap_stand = QtGui.QPixmap(
-                constants.extend(constants.GRAPHICS_WORKFORCE_FOLDER, workforce_settings[workforce_type]['texture_filename_stand']))
-            self.pixmaps_stand[workforce_type] = pixmap_stand.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
+                constants.extend(constants.GRAPHICS_WORKFORCE_FOLDER,
+                                 workforce_settings[workforce_type]['texture_filename_stand']))
+            self.pixmaps_stand[workforce_type] = pixmap_stand.scaled(constants.WORKFORCE_SIZE[0],
+                                                                     constants.WORKFORCE_SIZE[1])
 
-            pixmap_on_duty = QtGui.QPixmap(
-                constants.extend(constants.GRAPHICS_WORKFORCE_FOLDER, workforce_settings[workforce_type]['texture_filename_on_duty']))
-            self.pixmaps_on_duty[workforce_type] = pixmap_on_duty.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
+            duty_image = QtGui.QImage(constants.extend(constants.GRAPHICS_WORKFORCE_FOLDER,
+                                                       workforce_settings[workforce_type]['texture_filename_on_duty']))
+
+            # must be sure that sprite is divided evenly
+            hor_count = int(duty_image.width() / constants.WORKFORCE_SIZE[0])
+            ver_count = int(duty_image.height() / constants.WORKFORCE_SIZE[1])
+            width = constants.WORKFORCE_SIZE[0]
+            height = constants.WORKFORCE_SIZE[1]
+            self.pixmaps_on_duty[workforce_type] = [
+                QtGui.QPixmap.fromImage(duty_image.copy(row * height, col * width, width, height)).scaled(
+                    constants.WORKFORCE_SIZE[0],
+                    constants.WORKFORCE_SIZE[1]) for row
+                in range(hor_count) for col in range(ver_count)]
 
     def get_pixmap_of_type(self, workforce_type: int, action):
         if workforce_type >= len(self.pixmaps_stand):
             raise RuntimeError('Tile type undefined: %s', workforce_type)
 
         if action == WorkforceAction.DUTY_ACTION:
-            # TODO use dynamic image
             return self.pixmaps_on_duty[workforce_type]
         else:
             return self.pixmaps_stand[workforce_type]

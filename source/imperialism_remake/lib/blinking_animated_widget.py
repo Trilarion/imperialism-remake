@@ -21,43 +21,70 @@ from PyQt5.QtWidgets import QGraphicsOpacityEffect
 logger = logging.getLogger(__name__)
 
 
-class BlinkingWidget(QtWidgets.QLabel):
+class BlinkingAnimatedWidget(QtWidgets.QLabel):
     BLINK_DURATION = 700
+    ANIMATION_PIXMAP_DURATION = 700
 
     def __init__(self):
-        super(BlinkingWidget, self).__init__()
+        super(BlinkingAnimatedWidget, self).__init__()
 
         self._effect = QGraphicsOpacityEffect()
         self._animation = QtCore.QPropertyAnimation(self._effect, b"opacity")
         self._animation.setDuration(self.BLINK_DURATION / 2)
 
-        self._timer = QtCore.QTimer()
-        self._timer.setInterval(self.BLINK_DURATION)
-        self._timer.timeout.connect(self._timer_fired)
+        self._timer_blink = QtCore.QTimer()
+        self._timer_blink.setInterval(self.BLINK_DURATION)
+        self._timer_blink.timeout.connect(self._timer_blink_fired)
+
+        self._timer_animation_pixmap = QtCore.QTimer()
+        self._timer_animation_pixmap.setInterval(self.ANIMATION_PIXMAP_DURATION)
+        self._timer_animation_pixmap.timeout.connect(self._animation_pixmap_step)
 
         self.setGraphicsEffect(self._effect)
 
         self._do_blink(1, 1)
 
-    def _timer_fired(self):
+        self._animation_pixmaps = []
+        self._current_animation_pixmap_index = 0
+        self._original_pixmap = None
+
+    def _timer_blink_fired(self):
         self._do_blink(1, 0)
         self._do_blink(0, 1)
 
     def start_animation(self):
         logger.debug("start_animation")
-        # TODO
+        self._original_pixmap = self.pixmap()
+
+        if self._current_animation_pixmap_index < len(self._animation_pixmaps):
+            self._timer_animation_pixmap.start()
+            self.setPixmap(self._animation_pixmaps[self._current_animation_pixmap_index])
+            self._current_animation_pixmap_index += 1
+        else:
+            logger.warning("No animation pixmap is set")
 
     def stop_animation(self):
         logger.debug("stop_animation")
-        # TODO
+        self._timer_animation_pixmap.stop()
+
+        self._original_pixmap = self._original_pixmap
+
+    def add_animation_pixmaps(self, pixmaps):
+        [self._animation_pixmaps.append(pixmap) for pixmap in pixmaps]
+
+    def _animation_pixmap_step(self):
+        self.setPixmap(self._animation_pixmaps[self._current_animation_pixmap_index])
+        self._current_animation_pixmap_index += 1
+        if self._current_animation_pixmap_index == len(self._animation_pixmaps):
+            self._current_animation_pixmap_index = 0
 
     def start_blinking(self):
         logger.debug("start_blinking")
-        self._timer.start()
+        self._timer_blink.start()
 
     def stop_blinking(self):
         logger.debug("stop_blinking")
-        self._timer.stop()
+        self._timer_blink.stop()
 
         self._do_blink(1, 1)
 
