@@ -47,7 +47,6 @@ def create_start_screen_widget(actions):
     """
     Creates the start screen.
 
-    :param client:
     :return:
     """
     logger.debug('create_start_screen_widget actions:%s', actions)
@@ -387,7 +386,6 @@ def start_client():
     # start audio player if wished
     if not tools.get_option(constants.Option.SOUNDTRACK_MUTE):
         audio.soundtrack_player.play()
-    pass
 
     # create client object and switch to start screen
     client = Client()

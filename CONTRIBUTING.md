@@ -6,25 +6,24 @@ Volunteers are always welcome. There are plenty of chances to take part in codin
 graphics design, discussing the game rules or just giving feedback.
 
 Most of these tasks can be discussed in the [community forum](http://remake.twelvepm.de/forum/),
-please consider registering there.
+please consider registering there. Alterantively, use this [issue tracker](https://github.com/Trilarion/imperialism-remake/issues)
+for inquiries.
 
 ## Feedback
 
-For programmers direct interaction with the [github repository](https://github.com/Trilarion/imperialism-remake)
-by forking and pushing merge requests are preferred. Please use the
-[issues tracker](https://github.com/Trilarion/imperialism-remake/issues) to report problems.
-Requests for enhancement should be posted in the community forum or if they are more technical
-(coding related) also at the issues tracker.
+For programmers direct interaction with the [source repository](https://github.com/Trilarion/imperialism-remake)
+by forking and pushing merge requests (please rebase first) are preferred. Please use the
+[issue tracker](https://github.com/Trilarion/imperialism-remake/issues) to report problems.
+Requests for enhancement should be posted at the issues tracker or in the community forum.
 
 ## Getting started (programming)
 
 ### Sources
 
-The [source code](https://github.com/Trilarion/Imperialism-Remake) is on GitHub.
+The [source code](https://github.com/Trilarion/imperialism-Remake) is on GitHub.
 
 The folder structure is as follow:
 
-- `.idea` Workspace for Pycharm IDE
 - `documentation` Game manuals as sphinx projects
 - `examples` Code snippets demonstrating certain aspects of the code base. No tests
 - `prototypes` Showcase implementation of larger parts of the game before they are integrated in the code base.
@@ -52,7 +51,7 @@ Only PyQt5 is required for running. Sphinx and sphinx_rtd_theme for creating the
 
 #### PyQt5
 
-[PyQt5](https://www.riverbankcomputing.com/software/pyqt/download5) is a Python binding of the Qt framework and is required for running.
+[PyQt5](https://pypi.org/project/PyQt5/) is a Python binding of the Qt framework and is required for running.
 
 PyQt5 has not much [documentation](http://pyqt.sourceforge.net/Docs/PyQt5/) on its own but the [API classes overview](http://doc.qt.io/qt-5/classes.html)
 of the underlying C++ Qt 5.X framework is very useful since PyQt5 is almost 100% recreating it. 
@@ -72,10 +71,8 @@ automatically.
 
 ### IDE
 
-I use [PyCharm Community Edition](http://www.jetbrains.com/pycharm/download/). The `.idea` folder is included in the source, the project
-can probably be opened directly with PyCharm.
+I use [PyCharm Community Edition](http://www.jetbrains.com/pycharm/download/).
 
 ### Packaging
 
 Packaging on Linux and macOS has not progressed much so far. Windows packaging is with pynsist. Instructions will be added later.
-

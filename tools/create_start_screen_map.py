@@ -31,42 +31,37 @@ if __name__ == '__main__':
     from imperialism_remake.base import constants
 
     # hot areas map
-    map = {}
-
-    # exit
-    map['exit'] = {
+    map = {'exit': {
         'overlay': 'start.overlay.door.right.png',
         'offset': [575, 412],
         'label': 'Exit'
-    }
-
-    # help browser
-    map['help'] = {
+    }, 'help': {
         'overlay': 'start.overlay.window.left.png',
         'offset': [127, 397],
         'label': 'Help'
-    }
-
-    # game lobby
-    map['lobby'] = {
+    }, 'lobby': {
         'overlay': 'start.overlay.throne.png',
         'offset': [421, 459],
         'label': 'Game Lobby'
-    }
-
-    # editor
-    map['editor'] = {
+    }, 'editor': {
         'overlay': 'start.overlay.map.png',
         'offset': [821, 60],
         'label': 'Scenario Editor'
-    }
-
-    # options
-    map['options'] = {
+    }, 'options': {
         'overlay': 'start.overlay.fireplace.png',
         'offset': [832, 505],
         'label': 'Preferences'
-    }
+    }}
+
+    # exit
+
+    # help browser
+
+    # game lobby
+
+    # editor
+
+    # options
 
     # write
     file_name = os.path.join(constants.GRAPHICS_UI_FOLDER, 'start.overlay.info')
