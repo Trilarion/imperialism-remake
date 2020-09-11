@@ -21,6 +21,9 @@ Generate the default rules.
 import os
 import sys
 
+from imperialism_remake.server.models.terrain_type import TerrainType
+from imperialism_remake.server.models.workforce_type import WorkforceType
+
 if __name__ == '__main__':
 
     # add source directory to path if needed
@@ -36,15 +39,23 @@ if __name__ == '__main__':
 
     # terrain names
     terrain_settings = {
-        0: {'name': 'Sea', 'texture_filename': 'terrain.sea.png'},
-        1: {'name': 'Plain', 'texture_filename': 'terrain.plains.png'},
-        2: {'name': 'Hills', 'texture_filename': 'terrain.hills.outer.png'},
-        3: {'name': 'Mountains', 'texture_filename': 'terrain.mountains.outer.png'},
-        4: {'name': 'Tundra', 'texture_filename': 'terrain.tundra.outer.png'},
-        5: {'name': 'Swamp', 'texture_filename': 'terrain.swamp.outer.png'},
-        6: {'name': 'Desert', 'texture_filename': 'terrain.desert.outer.png'}
+        TerrainType.SEA.value: {'name': 'Sea', 'texture_filename': 'terrain.sea.png'},
+        TerrainType.PLAIN.value: {'name': 'Plain', 'texture_filename': 'terrain.plains.png'},
+        TerrainType.HILLS.value: {'name': 'Hills', 'texture_filename': 'terrain.hills.outer.png'},
+        TerrainType.MOUNTAINS.value: {'name': 'Mountains', 'texture_filename': 'terrain.mountains.outer.png'},
+        TerrainType.TUNDRA.value: {'name': 'Tundra', 'texture_filename': 'terrain.tundra.outer.png'},
+        TerrainType.SWAMP.value: {'name': 'Swamp', 'texture_filename': 'terrain.swamp.outer.png'},
+        TerrainType.DESERT.value: {'name': 'Desert', 'texture_filename': 'terrain.desert.outer.png'}
     }
     rules['terrain_settings'] = terrain_settings
+
+    workforce_settings = {
+        WorkforceType.ENGINEER.value: {'name': 'Engineer', 'texture_filename_stand': 'engineer.stand.png',
+                                 'texture_filename_on_duty': 'engineer.on_duty.png'},
+        WorkforceType.GEOLOGIST.value: {'name': 'Geologist', 'texture_filename_stand': 'geologist.stand.png',
+                                  'texture_filename_on_duty': 'geologist.on_duty.png'}
+    }
+    rules['workforce_settings'] = workforce_settings
 
     # save
     file = constants.SCENARIO_RULESET_STANDARD_FILE

@@ -18,8 +18,8 @@ import logging
 from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import tools
-from imperialism_remake.client.common.infopanel import InfoPanel
-from imperialism_remake.client.common.minimap import MiniMap
+from imperialism_remake.client.common.info_panel import InfoPanel
+from imperialism_remake.client.common.mini_map import MiniMap
 from imperialism_remake.lib import qt
 
 logger = logging.getLogger(__name__)
@@ -40,53 +40,53 @@ class GenericScreen(QtWidgets.QWidget):
         logger.debug('GenericScreen __init__')
 
         # store the client
-        self.client = client
+        self._client = client
 
         self.scenario = scenario
 
         # toolbar on top of the window
-        self.toolbar = QtWidgets.QToolBar()
-        self.toolbar.setIconSize(QtCore.QSize(32, 32))
+        self._toolbar = QtWidgets.QToolBar()
+        self._toolbar.setIconSize(QtCore.QSize(32, 32))
 
-        self.toolbar.addSeparator()
+        self._toolbar.addSeparator()
 
         # spacer
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.toolbar.addWidget(spacer)
+        self._toolbar.addWidget(spacer)
 
         clock = qt.ClockLabel()
-        self.toolbar.addWidget(clock)
+        self._toolbar.addWidget(clock)
 
         # help and exit action
         a = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Show help', self)
         a.triggered.connect(client.show_help_browser)  # TODO with partial make reference to specific page
-        self.toolbar.addAction(a)
+        self._toolbar.addAction(a)
 
         a = QtWidgets.QAction(tools.load_ui_icon('icon.back_to_startscreen.png'), 'Exit to main menu', self)
         a.triggered.connect(client.switch_to_start_screen)
         # TODO ask if something is changed we should save.. (you might loose progress)
-        self.toolbar.addAction(a)
+        self._toolbar.addAction(a)
 
         # info box widget
-        self.info_panel = InfoPanel(scenario)
+        self._info_panel = InfoPanel(scenario)
 
         # main map
         self.main_map = main_map
-        self.main_map.focus_changed.connect(self.info_panel.update_tile_info)
+        self.main_map.focus_changed.connect(self._info_panel.update_tile_info)
 
         # mini map
-        self.mini_map = MiniMap(scenario)
-        self.mini_map.roi_changed.connect(self.main_map.set_center_position)
+        self._mini_map = MiniMap(scenario)
+        self._mini_map.roi_changed.connect(self.main_map.set_center_position)
 
         # connect to scenario
         scenario.changed.connect(self.scenario_changed)
 
         # layout of widgets and toolbar
         layout = QtWidgets.QGridLayout(self)
-        layout.addWidget(self.toolbar, 0, 0, 1, 2)
-        layout.addWidget(self.mini_map, 1, 0)
-        layout.addWidget(self.info_panel, 2, 0)
+        layout.addWidget(self._toolbar, 0, 0, 1, 2)
+        layout.addWidget(self._mini_map, 1, 0)
+        layout.addWidget(self._info_panel, 2, 0)
         layout.addWidget(self.main_map, 1, 1, 2, 1)
         layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
@@ -102,7 +102,7 @@ class GenericScreen(QtWidgets.QWidget):
         self.main_map.redraw()
 
         # repaint the overview
-        self.mini_map.redraw()
+        self._mini_map.redraw()
 
         # show the tracker rectangle in the overview with the right size
-        self.mini_map.activate_tracker(self.main_map.visible_rect())
+        self._mini_map.activate_tracker(self.main_map.visible_rect())
