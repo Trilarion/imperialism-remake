@@ -195,11 +195,14 @@ class RelativeLayout(QtWidgets.QLayout):
         :param rect: Position and size of the parent.
         """
         for item in self.items:
-            o_size = item.widget().size()
+            o_size = item.widget().size()  # TODO not sure if size should be used here, it might got resized by earlier setGeometry calls
 
             c = item.widget().layout_constraint
 
             x, y = calculate_relative_position(rect, o_size, c)
+
+            x = max(x, 0)  # setGeometry does respect negative upper left coordinates and sets them to zero, effectively cutting the widgets position and affecting the size of the widget
+            y = max(y, 0)
 
             item.setGeometry(QtCore.QRect(x, y, o_size.width(), o_size.height()))
 
