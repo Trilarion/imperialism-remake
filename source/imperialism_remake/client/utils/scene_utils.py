@@ -30,8 +30,8 @@ def put_pixmap_in_tile_center(scene: QtWidgets.QGraphicsScene, pixmap: QtGui.QPi
 
 def put_widget_in_tile_center(widget: QWidget, row: int, column: int) -> None:
     column, row = scene_position(column, row)
-    y = row * constants.TILE_SIZE
-    x = column * constants.TILE_SIZE
+    y = (row + 0.5) * constants.TILE_SIZE - widget.width() / 2
+    x = (column + 0.5) * constants.TILE_SIZE - widget.height() / 2
 
     widget.move(x, y)
 

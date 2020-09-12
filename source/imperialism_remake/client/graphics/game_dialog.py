@@ -66,7 +66,7 @@ class GameDialog(QtWidgets.QWidget):
         title.setObjectName('game-dialog-title')
         title_bar.addWidget(title)
 
-        # spacer between titlebar and help/close icons
+        # spacer between titlebar and help/close cursors
         spacer = QtWidgets.QWidget()
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         title_bar.addWidget(spacer)

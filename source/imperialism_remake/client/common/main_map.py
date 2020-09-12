@@ -31,7 +31,7 @@ class MainMap(QtWidgets.QGraphicsView):
     """
 
     #: signal, emitted if the tile at the mouse pointer (focus) changes
-    focus_changed = QtCore.pyqtSignal(int, int)
+    mouse_move_event = QtCore.pyqtSignal(int, int)
 
     #: signal, emitted if the change terrain context menu action is called on a terrain
     change_terrain = QtCore.pyqtSignal(int, int)
@@ -90,7 +90,7 @@ class MainMap(QtWidgets.QGraphicsView):
         self._draw_grid_and_coords(columns, rows)
 
         # emit focus changed with -1, -1
-        self.focus_changed.emit(-1, -1)
+        self.mouse_move_event.emit(-1, -1)
 
         logger.debug('redraw finished')
 
@@ -251,7 +251,7 @@ class MainMap(QtWidgets.QGraphicsView):
 
     def mouseMoveEvent(self, event):  # noqa: N802
         """
-        The mouse on the view has been moved. Emit signal focus_changed if we now hover over a different tile.
+        The mouse on the view has been moved. Emit signal mouse_position_changed if we now hover over a different tile.
         """
         if self.scenario.server_scenario is not None:
             # get mouse position in scene coordinates
@@ -261,7 +261,7 @@ class MainMap(QtWidgets.QGraphicsView):
             if column != self.current_column or row != self.current_row:
                 self.current_column = column
                 self.current_row = row
-                self.focus_changed.emit(column, row)
+                self.mouse_move_event.emit(column, row)
 
         super().mouseMoveEvent(event)
 

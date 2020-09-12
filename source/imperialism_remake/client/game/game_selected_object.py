@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
 
+from PyQt5 import QtGui
+
 from imperialism_remake.client.common.info_panel import InfoPanel
 from imperialism_remake.client.workforce.workforce_animated_widget import WorkforceAnimatedWidget
 from imperialism_remake.server.models.workforce_action import WorkforceAction
@@ -61,6 +63,7 @@ class GameSelectedObject:
                 return
 
             self._selected_widget_object.stop_blinking()
+            self._selected_widget_object.event_widget_deselected.emit(self._selected_widget_object)
             self._selected_widget_object = None
 
             self._info_panel.update_selected_object_info(None)
@@ -79,3 +82,24 @@ class GameSelectedObject:
         # TODO elif obj is ??? e.g. Naval or army?
 
         self.deselect_widget_object_rather_than(-1, -1)
+
+    def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
+        if self._selected_widget_object is None:
+            logger.error("do_action something bad happened. Cannot do action for unknown object")
+            return False
+
+        return self._selected_widget_object.is_action_allowed(new_row, new_column, workforce_action)
+
+    def is_selected(self) -> bool:
+        return self._selected_widget_object is not None
+
+    def get_workforce_to_action_cursor(self, row: int, column: int) -> QtGui.QCursor:
+        if self._selected_widget_object is None:
+            logger.error("do_action something bad happened. Cannot do action for unknown object")
+            return None
+
+        # TODO use for selected_widget_object common base class og objects, not only workforce
+        if isinstance(self._selected_widget_object, WorkforceAnimatedWidget):
+            return self._selected_widget_object.get_workforce_to_action_cursor(row, column)
+
+        return None

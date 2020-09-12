@@ -53,10 +53,7 @@ class GenericScenario(QtCore.QObject):
         if os.path.isfile(file_name):
             self.server_scenario = ServerScenario.from_file(file_name)
 
-            self._tile_to_texture_mapper = TileTypeToTextureMapper(self.server_scenario)
-            self._workforce_to_texture_mapper = WorkforceToTextureMapper(self.server_scenario)
-
-            self.changed.emit()
+            self._init()
 
     def create(self, properties):
         """
@@ -79,9 +76,11 @@ class GenericScenario(QtCore.QObject):
                                      self.server_scenario[constants.ScenarioProperty.RULES])
         self.server_scenario._rules = utils.read_from_file(rule_file)
 
+        self._init()
+
+    def _init(self):
         self._tile_to_texture_mapper = TileTypeToTextureMapper(self.server_scenario)
         self._workforce_to_texture_mapper = WorkforceToTextureMapper(self.server_scenario)
-
         # emit that everything has changed
         self.changed.emit()
 

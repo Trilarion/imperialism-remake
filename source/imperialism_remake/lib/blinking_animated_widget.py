@@ -25,7 +25,7 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
     BLINK_DURATION = 700
     ANIMATION_PIXMAP_DURATION = 700
 
-    def __init__(self):
+    def __init__(self, pixmap_stand):
         super(BlinkingAnimatedWidget, self).__init__()
 
         self._effect = QGraphicsOpacityEffect()
@@ -46,7 +46,8 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
 
         self._animation_pixmaps = []
         self._current_animation_pixmap_index = 0
-        self._original_pixmap = None
+        self._original_pixmap = pixmap_stand
+        self.setPixmap(self._original_pixmap)
 
     def _timer_blink_fired(self):
         self._do_blink(1, 0)
@@ -54,12 +55,10 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
 
     def start_animation(self):
         logger.debug("start_animation")
-        self._original_pixmap = self.pixmap()
-
         if self._current_animation_pixmap_index < len(self._animation_pixmaps):
             self._timer_animation_pixmap.start()
             self.setPixmap(self._animation_pixmaps[self._current_animation_pixmap_index])
-            self._current_animation_pixmap_index += 1
+            self._current_animation_pixmap_index = 1
         else:
             logger.warning("No animation pixmap is set")
 
@@ -67,7 +66,7 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
         logger.debug("stop_animation")
         self._timer_animation_pixmap.stop()
 
-        self._original_pixmap = self._original_pixmap
+        self.setPixmap(self._original_pixmap)
 
     def add_animation_pixmaps(self, pixmaps):
         [self._animation_pixmaps.append(pixmap) for pixmap in pixmaps]
