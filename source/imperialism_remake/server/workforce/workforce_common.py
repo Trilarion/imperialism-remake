@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import uuid
 
+from imperialism_remake.server.models.technology_type import TechnologyType
 from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.models.workforce import Workforce
 from imperialism_remake.server.models.workforce_action import WorkforceAction
@@ -49,3 +50,10 @@ class WorkforceCommon(Workforce):
             if workforce_action == WorkforceAction.DUTY_ACTION:
                 if self.is_action_allowed(new_row, new_column, WorkforceAction.MOVE):
                     super().plan_action(new_row, new_column, WorkforceAction.MOVE)
+
+    def _is_tech_allowed_on_map(self, terrain_type_on_map: int, terrain_type_for_tech: int,
+                                technology_type: TechnologyType) -> bool:
+        if terrain_type_on_map == terrain_type_for_tech and self._server_scenario.is_technology_available(
+                technology_type):
+            return True
+        return False

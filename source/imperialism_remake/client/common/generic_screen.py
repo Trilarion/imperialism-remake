@@ -19,6 +19,7 @@ from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import tools
 from imperialism_remake.client.common.info_panel import InfoPanel
+from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.client.common.mini_map import MiniMap
 from imperialism_remake.lib import qt
 
@@ -31,7 +32,7 @@ class GenericScreen(QtWidgets.QWidget):
     clicks on the editor pixmap in the client main screen.
     """
 
-    def __init__(self, client, scenario, main_map):
+    def __init__(self, client, scenario, main_map: MainMap):
         """
         Create and setup all the elements.
         """
@@ -73,7 +74,7 @@ class GenericScreen(QtWidgets.QWidget):
 
         # main map
         self.main_map = main_map
-        self.main_map.focus_changed.connect(self._info_panel.update_tile_info)
+        self.main_map.mouse_move_event.connect(self._info_panel.update_tile_info)
 
         # mini map
         self._mini_map = MiniMap(scenario)

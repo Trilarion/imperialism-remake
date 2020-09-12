@@ -25,6 +25,7 @@ from PyQt5 import QtCore
 
 from imperialism_remake.base import constants
 from imperialism_remake.lib import utils
+from imperialism_remake.server.models.technology_type import TechnologyType
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,16 @@ class ServerScenario(QtCore.QObject):
         self._nations = {}
         self._maps = {}
         self._rules = {}
+
+        self._available_technologies = set()
+
+        # TODO read technologies from scenario/properties/rules...
+        self._available_technologies.add(TechnologyType.ROAD_THROUGH_HILLS)
+        self._available_technologies.add(TechnologyType.ROAD_THROUGH_PLAINS)
+        self._available_technologies.add(TechnologyType.GEOLOGY_WORK_HILLS)
+
+    def is_technology_available(self, tech_type: TechnologyType) -> bool:
+        return tech_type in self._available_technologies
 
     @staticmethod
     def from_file(file_path):
@@ -333,7 +344,7 @@ class ServerScenario(QtCore.QObject):
         """
             Sets a province property.
         """
-        #logger.debug('set_province_property province:%s, key:%s, value:%s', province, key, value)
+        # logger.debug('set_province_property province:%s, key:%s, value:%s', province, key, value)
 
         if province not in self._provinces:
             raise RuntimeError('Unknown province {}.'.format(province))
@@ -346,7 +357,7 @@ class ServerScenario(QtCore.QObject):
             Gets a province property. One can only obtain properties that have been set before and only for provinces
             that exist.
         """
-        #logger.debug('province_property province:%s, key:%s', province, key)
+        # logger.debug('province_property province:%s, key:%s', province, key)
 
         if province in self._provinces and key in self._provinces[province]:
             return self._provinces[province][key]
@@ -394,7 +405,7 @@ class ServerScenario(QtCore.QObject):
         :param row: Map row
         :return: Province
         """
-        #logger.debug('province_at column:%s, row:%s', column, row)
+        # logger.debug('province_at column:%s, row:%s', column, row)
 
         #  TODO speed up by having a reference in the map. (see also programmers.SE question)
         position = [column, row]
@@ -507,3 +518,6 @@ class ServerScenario(QtCore.QObject):
 
     def get_workforce_settings(self):
         return self._rules['workforce_settings']
+
+    def get_workforce_action_cursor_settings(self):
+        return self._rules['workforce_action_cursors']

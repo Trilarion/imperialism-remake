@@ -52,7 +52,7 @@ class WorkforceToTextureMapper:
                     constants.WORKFORCE_SIZE[1]) for row
                 in range(hor_count) for col in range(ver_count)]
 
-    def get_pixmap_of_type(self, workforce_type: int, action):
+    def get_pixmap_of_type(self, workforce_type: int, action: WorkforceAction):
         if workforce_type >= len(self.pixmaps_stand):
             raise RuntimeError('Tile type undefined: %s', workforce_type)
 

@@ -27,7 +27,7 @@ from imperialism_remake.lib import utils
 
 def load_ui_icon(name):
     """
-    Loads an icon from a base icon path.
+    Loads an ui icon from a base icon path.
 
     :param name:
     :return:

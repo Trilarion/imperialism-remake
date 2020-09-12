@@ -51,11 +51,21 @@ if __name__ == '__main__':
 
     workforce_settings = {
         WorkforceType.ENGINEER.value: {'name': 'Engineer', 'texture_filename_stand': 'engineer.stand.png',
-                                 'texture_filename_on_duty': 'engineer.on_duty.png'},
+                                       'texture_filename_on_duty': 'engineer.on_duty.png'},
         WorkforceType.GEOLOGIST.value: {'name': 'Geologist', 'texture_filename_stand': 'geologist.stand.png',
-                                  'texture_filename_on_duty': 'geologist.on_duty.png'}
+                                        'texture_filename_on_duty': 'geologist.on_duty.png'}
     }
     rules['workforce_settings'] = workforce_settings
+
+    workforce_action_cursors = {
+        WorkforceType.ENGINEER: {'workforce_action_cursor_move': 'cursor.action.move.png',
+                                 'workforce_action_cursor_duty_action': 'cursor.engineer.build.construction.png',
+                                 'workforce_action_cursor_not_allowed': 'cursor.action.not.allowed.png'},
+        WorkforceType.GEOLOGIST: {'workforce_action_cursor_move': 'cursor.action.move.png',
+                                  'workforce_action_cursor_duty_action': 'cursor.geologist.explore.png',
+                                  'workforce_action_cursor_not_allowed': 'cursor.action.not.allowed.png'}
+    }
+    rules['workforce_action_cursors'] = workforce_action_cursors
 
     # save
     file = constants.SCENARIO_RULESET_STANDARD_FILE
