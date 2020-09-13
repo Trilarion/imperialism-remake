@@ -18,13 +18,13 @@ import logging
 from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import tools
-from imperialism_remake.client.turn.turn_manager import Turn
+from imperialism_remake.client.turn.turn_manager import TurnManager
 
 logger = logging.getLogger(__name__)
 
 
 class TurnEndWidget(QtWidgets.QWidget):
-    def __init__(self, turn_manager: Turn):
+    def __init__(self, turn_manager: TurnManager):
         super().__init__()
 
         button = QtWidgets.QPushButton( "", self)

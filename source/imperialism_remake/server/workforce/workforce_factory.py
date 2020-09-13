@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import uuid
 
-from imperialism_remake.server.models.turn import Turn
+from imperialism_remake.server.models.turn_planned import TurnPlanned
 from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
@@ -25,9 +25,9 @@ from imperialism_remake.server.workforce.workforce_geologist import WorkforceGeo
 
 class WorkforceFactory:
     @staticmethod
-    def create_new_workforce(server_scenario: ServerScenario, turn: Turn, uuid: uuid.uuid4, row: int, column: int,
+    def create_new_workforce(server_scenario: ServerScenario, turn_planned: TurnPlanned, uuid: uuid.uuid4, row: int, column: int,
                              workforce_type: WorkforceType) -> WorkforceCommon:
         if workforce_type == WorkforceType.GEOLOGIST:
-            return WorkforceGeologist(server_scenario, turn, uuid, row, column)
+            return WorkforceGeologist(server_scenario, turn_planned, uuid, row, column)
         elif workforce_type == WorkforceType.ENGINEER:
-            return WorkforceEngineer(server_scenario, turn, uuid, row, column)
+            return WorkforceEngineer(server_scenario, turn_planned, uuid, row, column)

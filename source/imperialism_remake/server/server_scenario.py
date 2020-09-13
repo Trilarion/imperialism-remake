@@ -49,6 +49,10 @@ class ServerScenario(QtCore.QObject):
     * Each nation has province ids stored.
     """
 
+    RESOURCE = 'resource'
+    TERRAIN = 'terrain'
+    ROAD = 'road'
+
     def __init__(self):
         """
         Start with a clean state.
@@ -96,6 +100,9 @@ class ServerScenario(QtCore.QObject):
         rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, scenario[constants.ScenarioProperty.RULES])
         scenario._rules = utils.read_from_file(rule_file)
 
+        if ServerScenario.ROAD not in scenario._maps:
+            scenario._maps[ServerScenario.ROAD] = []
+
         return scenario
 
     def create_empty_map(self, columns, rows):
@@ -111,8 +118,9 @@ class ServerScenario(QtCore.QObject):
         self._properties[constants.ScenarioProperty.MAP_COLUMNS] = columns
         self._properties[constants.ScenarioProperty.MAP_ROWS] = rows
         number_tiles = columns * rows
-        self._maps['terrain'] = [0] * number_tiles
-        self._maps['resource'] = [0] * number_tiles
+        self._maps[ServerScenario.TERRAIN] = [0] * number_tiles
+        self._maps[ServerScenario.RESOURCE] = [0] * number_tiles
+        self._maps[ServerScenario.ROAD] = [0] * number_tiles
 
     def add_river(self, name, tiles):
         """
@@ -124,6 +132,16 @@ class ServerScenario(QtCore.QObject):
         river = {'name': name, 'tiles': tiles}
         self._properties[constants.ScenarioProperty.RIVERS].extend([river])
 
+    def add_road(self, start: (), stop: ()) -> None:
+        """
+            Adds road
+        """
+        logger.debug('add_road section start:%s, stop:%s', start, stop)
+        self._maps[ServerScenario.ROAD].append((start, stop))
+
+    def get_roads(self) -> []:
+        return self._maps[ServerScenario.ROAD]
+
     def set_terrain_at(self, column, row, terrain):
         """
         Sets the terrain at a given position. Here, no check is performed for valid terrain.
@@ -134,7 +152,7 @@ class ServerScenario(QtCore.QObject):
         """
         logger.debug('set_terrain_at column:%s, row:%s, terrain:%s', column, row, terrain)
 
-        self._maps['terrain'][self._map_index(column, row)] = terrain
+        self._maps[ServerScenario.TERRAIN][self._map_index(column, row)] = terrain
 
     def terrain_at(self, column, row):
         """
@@ -144,7 +162,7 @@ class ServerScenario(QtCore.QObject):
         :param row: Row position
         :return: Terrain value
         """
-        return self._maps['terrain'][self._map_index(column, row)]
+        return self._maps[ServerScenario.TERRAIN][self._map_index(column, row)]
 
     def terrain_name(self, terrain):
         """
@@ -162,7 +180,7 @@ class ServerScenario(QtCore.QObject):
         :param resource: Resource value
         """
         logger.debug('set_resource_at column:%s, row:%s, resource:%s', column, row, resource)
-        self._maps['resource'][self._map_index(column, row)] = resource
+        self._maps[ServerScenario.RESOURCE][self._map_index(column, row)] = resource
 
     def resource_at(self, column, row):
         """
@@ -172,7 +190,7 @@ class ServerScenario(QtCore.QObject):
         :param row: Row position
         :return: Resource value
         """
-        return self._maps['resource'][self._map_index(column, row)]
+        return self._maps[ServerScenario.RESOURCE][self._map_index(column, row)]
 
     @staticmethod
     def scene_position(column, row):

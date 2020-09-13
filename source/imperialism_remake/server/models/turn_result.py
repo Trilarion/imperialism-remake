@@ -16,15 +16,13 @@
 from imperialism_remake.server.models.workforce import Workforce
 
 
-class Turn:
+class TurnResult:
     def __init__(self):
         self._workforces = {}
-
-    def add_workforce(self, workforce: Workforce) -> None:
-        self._workforces[workforce.get_id()] = workforce
-
-    def remove_workforce(self, workforce: Workforce) -> None:
-        del self._workforces[workforce.get_id()]
+        self._roads = []
 
     def get_workforces(self) -> {}:
         return self._workforces
+
+    def get_roads(self) -> []:
+        return self._roads
