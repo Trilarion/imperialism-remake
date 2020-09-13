@@ -30,7 +30,7 @@ from imperialism_remake.client.game.game_selected_object import GameSelectedObje
 from imperialism_remake.client.turn.turn_end_widget import TurnEndWidget
 from imperialism_remake.client.turn.turn_manager import TurnManager
 from imperialism_remake.client.workforce.workforce_animated_widget import WorkforceAnimatedWidget
-from imperialism_remake.server.models.turn import Turn
+from imperialism_remake.server.models.turn_result import TurnResult
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.workforce.workforce_factory import WorkforceFactory
@@ -74,7 +74,7 @@ class GameMainScreen(GenericScreen):
 
         # !!! TODO this is just to test, remove me a little bit later!!!
         workforce_engineer01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
-                                                                     self._turn_manager.get_turn(), uuid.uuid4(),
+                                                                     self._turn_manager.get_turn_planned(), uuid.uuid4(),
                                                                      4, 13, WorkforceType.ENGINEER)
         workforce_engineer01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_engineer01)
         workforce_engineer01_widget.plan_action(4, 13, WorkforceAction.STAND)
@@ -83,7 +83,7 @@ class GameMainScreen(GenericScreen):
         workforce_engineer01_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
 
         workforce_geologist01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
-                                                                      self._turn_manager.get_turn(), uuid.uuid4(),
+                                                                      self._turn_manager.get_turn_planned(), uuid.uuid4(),
                                                                       8, 11, WorkforceType.GEOLOGIST)
         workforce_geologist01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_geologist01)
         workforce_geologist01_widget.plan_action(8, 11, WorkforceAction.STAND)
@@ -150,7 +150,7 @@ class GameMainScreen(GenericScreen):
         logger.debug("_deselected_widget_object_event object type:%s", widget_object.get_workforce().get_type())
         self._set_default_cursor()
 
-    def _event_turn_completed(self, turn: Turn) -> None:
+    def _event_turn_completed(self, turn_result: TurnResult) -> None:
         logger.debug("_event_turn_completed")
 
         for k, wf_widget in self._workforce_widgets.items():
@@ -158,7 +158,7 @@ class GameMainScreen(GenericScreen):
             del wf_widget
         self._workforce_widgets = {}
 
-        for k, new_workforce in turn.get_workforces().items():
+        for k, new_workforce in turn_result.get_workforces().items():
             r, c = new_workforce.get_current_position()
             new_workforce_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, new_workforce)
             new_workforce_widget.plan_action(r, c, WorkforceAction.STAND)
@@ -167,3 +167,6 @@ class GameMainScreen(GenericScreen):
             new_workforce_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
 
             self._workforce_widgets[new_workforce_widget.get_workforce().get_id()] = new_workforce_widget
+
+        for road_section in turn_result.get_roads():
+            self._main_map.draw_road(road_section[0], road_section[1])

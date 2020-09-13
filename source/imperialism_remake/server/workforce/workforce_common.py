@@ -17,7 +17,7 @@ import uuid
 
 from imperialism_remake.server.models.technology_type import TechnologyType
 from imperialism_remake.server.models.terrain_type import TerrainType
-from imperialism_remake.server.models.turn import Turn
+from imperialism_remake.server.models.turn_planned import TurnPlanned
 from imperialism_remake.server.models.workforce import Workforce
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.models.workforce_type import WorkforceType
@@ -25,12 +25,12 @@ from imperialism_remake.server.server_scenario import ServerScenario
 
 
 class WorkforceCommon(Workforce):
-    def __init__(self, server_scenario: ServerScenario, turn: Turn, workforce_id: uuid, row: int, column: int,
+    def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce_id: uuid, row: int, column: int,
                  workforce_type: WorkforceType):
         super().__init__(workforce_id, row, column, workforce_type)
 
         self._server_scenario = server_scenario
-        self._turn = turn
+        self._turn_planned = turn_planned
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         if new_column < 0 or new_row < 0:
@@ -49,18 +49,18 @@ class WorkforceCommon(Workforce):
         if self.is_action_allowed(new_row, new_column, workforce_action):
             super().plan_action(new_row, new_column, workforce_action)
 
-            self._turn.add_workforce(self)
+            self._turn_planned.add_workforce(self)
         else:
             if workforce_action == WorkforceAction.DUTY_ACTION:
                 if self.is_action_allowed(new_row, new_column, WorkforceAction.MOVE):
                     super().plan_action(new_row, new_column, WorkforceAction.MOVE)
 
-                    self._turn.add_workforce(self)
+                    self._turn_planned.add_workforce(self)
 
     def cancel_action(self) -> None:
         super().cancel_action()
 
-        self._turn.remove_workforce(self)
+        self._turn_planned.remove_workforce(self)
 
     def _is_tech_allowed_on_map(self, terrain_type_on_map: int, terrain_type_for_tech: int,
                                 technology_type: TechnologyType) -> bool:

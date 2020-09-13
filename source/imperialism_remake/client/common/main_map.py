@@ -15,7 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, Qt
+from PyQt5.QtGui import QPainter, QPen
 
 from imperialism_remake.base import constants
 from imperialism_remake.client.utils import scene_utils
@@ -62,7 +63,7 @@ class MainMap(QtWidgets.QGraphicsView):
         self.current_column = -1
         self.current_row = -1
 
-    def redraw(self):
+    def redraw(self) -> None:
         """
         Whenever a scenario is been created or loaded new we need to draw the whole map.
         """
@@ -83,6 +84,8 @@ class MainMap(QtWidgets.QGraphicsView):
 
         self._draw_rivers()
 
+        self._draw_roads()
+
         self._draw_province_and_nation_borders()
 
         self._draw_towns_and_names()
@@ -94,19 +97,20 @@ class MainMap(QtWidgets.QGraphicsView):
 
         logger.debug('redraw finished')
 
-    def _fill_tile_textures(self, columns, rows):
+    def _fill_tile_textures(self, columns, rows) -> None:
         # fill plains, hills, mountains, tundra, swamp, desert with texture
         for column in range(0, columns):
             for row in range(0, rows):
                 self.fill_tile_texture(column, row)
 
-    def fill_tile_texture(self, column, row):
+    def fill_tile_texture(self, column, row) -> None:
         t = self.scenario.server_scenario.terrain_at(column, row)
         sx, sy = scene_position(column, row)
-        scene_utils.put_pixmap_in_tile_center(self.scene, self.scenario.get_tile_to_texture_mapper().get_pixmap_of_type(t),
+        scene_utils.put_pixmap_in_tile_center(self.scene,
+                                              self.scenario.get_tile_to_texture_mapper().get_pixmap_of_type(t),
                                               sx, sy, 1)
 
-    def _fill_half_tiles(self, columns, rows):
+    def _fill_half_tiles(self, columns, rows) -> None:
         # fill the half tiles which are not part of the map
         brush = QtGui.QBrush(QtCore.Qt.darkGray)
         for row in range(0, rows):
@@ -120,7 +124,7 @@ class MainMap(QtWidgets.QGraphicsView):
             item.setBrush(brush)
             item.setZValue(1)
 
-    def _draw_grid_and_coords(self, columns, rows):
+    def _draw_grid_and_coords(self, columns, rows) -> None:
         # draw the grid and the coordinates
         for column in range(0, columns):
             for row in range(0, rows):
@@ -135,7 +139,7 @@ class MainMap(QtWidgets.QGraphicsView):
                 item.setZValue(1001)
                 self.scene.addItem(item)
 
-    def _draw_towns_and_names(self):
+    def _draw_towns_and_names(self) -> None:
         # draw towns and names
         city_pixmap = QtGui.QPixmap(constants.extend(constants.GRAPHICS_MAP_FOLDER, 'city.png'))
         for nation in self.scenario.server_scenario.nations():
@@ -169,7 +173,7 @@ class MainMap(QtWidgets.QGraphicsView):
                                           brush=QtGui.QBrush(QtGui.QColor(128, 128, 255, 64)))
                 item.setZValue(5)
 
-    def _draw_province_and_nation_borders(self):
+    def _draw_province_and_nation_borders(self) -> None:
         # draw province and nation borders
         # TODO the whole border drawing is a crude approximation, implement it the right way
         province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
@@ -201,7 +205,7 @@ class MainMap(QtWidgets.QGraphicsView):
             item = self.scene.addPath(nation_path, pen=nation_border_pen)
             item.setZValue(5)
 
-    def _draw_rivers(self):
+    def _draw_rivers(self) -> None:
         # draw rivers
         river_pen = QtGui.QPen(QtGui.QColor(64, 64, 255))
         river_pen.setWidth(5)
@@ -220,7 +224,30 @@ class MainMap(QtWidgets.QGraphicsView):
             item = self.scene.addPath(path, pen=river_pen)
             item.setZValue(2)
 
-    def visible_rect(self):
+    def _draw_roads(self) -> None:
+        for road_section in self.scenario.server_scenario.get_roads():
+            self.draw_road(road_section[0], road_section[1])
+
+    def draw_road(self, start: (), stop: ()) -> None:
+        # TODO use proper icons/pixmaps
+        road_pen = QtGui.QPen(QtGui.QColor(164, 64, 155))
+        road_pen.setWidth(15)
+
+        path = QtGui.QPainterPath()
+        startx, starty = scene_position(start[1], start[0])
+        startx = (startx + 0.5) * constants.TILE_SIZE
+        starty = (starty + 0.5) * constants.TILE_SIZE
+        path.moveTo(startx, starty)
+
+        stopx, stopy = scene_position(stop[1], stop[0])
+        stopx = (stopx + 0.5) * constants.TILE_SIZE
+        stopy = (stopy + 0.5) * constants.TILE_SIZE
+        path.lineTo(stopx, stopy)
+
+        item = self.scene.addPath(path, pen=road_pen)
+        item.setZValue(2)
+
+    def visible_rect(self) -> None:
         """
         Returns the visible part of the map view relative to the total scene rectangle as a rectangle with normalized
         values between 0 and 1, relative to the total size of the map.
@@ -233,7 +260,7 @@ class MainMap(QtWidgets.QGraphicsView):
         v = self.mapToScene(self.rect()).boundingRect()
         return QtCore.QRectF(v.x() / s.width(), v.y() / s.height(), v.width() / s.width(), v.height() / s.height())
 
-    def set_center_position(self, x, y):
+    def set_center_position(self, x, y) -> None:
         """
         Changes the visible part of the view by centering the map on normalized positions [0,1) (x,y).
         """
@@ -249,7 +276,7 @@ class MainMap(QtWidgets.QGraphicsView):
         # center on it
         self.centerOn(x, y)
 
-    def mouseMoveEvent(self, event):  # noqa: N802
+    def mouseMoveEvent(self, event) -> None:  # noqa: N802
         """
         The mouse on the view has been moved. Emit signal mouse_position_changed if we now hover over a different tile.
         """
