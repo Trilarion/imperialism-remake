@@ -73,6 +73,10 @@ class EditorScreen(GenericScreen):
                              self.provinces_dialog)
         self._toolbar.addAction(a)
 
+        self._layout.addWidget(self.main_map, 1, 1, 2, 1)
+        self._layout.setRowStretch(2, 1)  # the info box will take all vertical space left
+        self._layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
+
     def new_scenario_dialog(self):
         """
         Shows the dialog for creation of a new scenario dialog and connect the "create new scenario" signal.

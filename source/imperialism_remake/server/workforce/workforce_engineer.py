@@ -15,8 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import uuid
 
+
 from imperialism_remake.server.models.technology_type import TechnologyType
 from imperialism_remake.server.models.terrain_type import TerrainType
+from imperialism_remake.server.models.turn import Turn
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.server_scenario import ServerScenario
@@ -24,8 +26,9 @@ from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
 
 class WorkforceEngineer(WorkforceCommon):
-    def __init__(self, server_scenario: ServerScenario, workforce_id: uuid, row: int, column: int):
-        super().__init__(server_scenario, workforce_id, row, column, WorkforceType.ENGINEER)
+    def __init__(self, server_scenario: ServerScenario, turn: Turn, workforce_id: uuid, row: int,
+                 column: int):
+        super().__init__(server_scenario, turn, workforce_id, row, column, WorkforceType.ENGINEER)
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         is_action_allowed = super().is_action_allowed(new_row, new_column, workforce_action)

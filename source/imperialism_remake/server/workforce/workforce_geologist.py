@@ -17,6 +17,7 @@ import uuid
 
 from imperialism_remake.server.models.technology_type import TechnologyType
 from imperialism_remake.server.models.terrain_type import TerrainType
+from imperialism_remake.server.models.turn import Turn
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.server_scenario import ServerScenario
@@ -24,8 +25,8 @@ from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
 
 class WorkforceGeologist(WorkforceCommon):
-    def __init__(self, server_scenario: ServerScenario, workforce_id: uuid, row: int, column: int):
-        super().__init__(server_scenario, workforce_id, row, column, WorkforceType.GEOLOGIST)
+    def __init__(self, server_scenario: ServerScenario, turn: Turn, workforce_id: uuid, row: int, column: int):
+        super().__init__(server_scenario, turn, workforce_id, row, column, WorkforceType.GEOLOGIST)
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         is_action_allowed = super().is_action_allowed(new_row, new_column, workforce_action)
@@ -33,13 +34,10 @@ class WorkforceGeologist(WorkforceCommon):
             return False
 
         if workforce_action == WorkforceAction.DUTY_ACTION:
-            self_terrain_type = self._server_scenario.terrain_at(self._column, self._row)
-            self_tile_action_allowed = self._is_tile_action_allowed(self_terrain_type)
-
             terrain_type = self._server_scenario.terrain_at(new_column, new_row)
             tile_action_allowed = self._is_tile_action_allowed(terrain_type)
 
-            return self_tile_action_allowed or tile_action_allowed
+            return tile_action_allowed
         return True
 
     def _is_tile_action_allowed(self, terrain_type):
