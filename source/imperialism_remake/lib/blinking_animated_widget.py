@@ -49,11 +49,11 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
         self._original_pixmap = pixmap_stand
         self.setPixmap(self._original_pixmap)
 
-    def _timer_blink_fired(self):
+    def _timer_blink_fired(self) -> None:
         self._do_blink(1, 0)
         self._do_blink(0, 1)
 
-    def start_animation(self):
+    def start_animation(self) -> None:
         logger.debug("start_animation")
         if self._current_animation_pixmap_index < len(self._animation_pixmaps):
             self._timer_animation_pixmap.start()
@@ -62,32 +62,32 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
         else:
             logger.warning("No animation pixmap is set")
 
-    def stop_animation(self):
+    def stop_animation(self) -> None:
         logger.debug("stop_animation")
         self._timer_animation_pixmap.stop()
 
         self.setPixmap(self._original_pixmap)
 
-    def add_animation_pixmaps(self, pixmaps):
+    def _add_animation_pixmaps(self, pixmaps) -> None:
         [self._animation_pixmaps.append(pixmap) for pixmap in pixmaps]
 
-    def _animation_pixmap_step(self):
+    def _animation_pixmap_step(self) -> None:
         self.setPixmap(self._animation_pixmaps[self._current_animation_pixmap_index])
         self._current_animation_pixmap_index += 1
         if self._current_animation_pixmap_index == len(self._animation_pixmaps):
             self._current_animation_pixmap_index = 0
 
-    def start_blinking(self):
+    def start_blinking(self) -> None:
         logger.debug("start_blinking")
         self._timer_blink.start()
 
-    def stop_blinking(self):
+    def stop_blinking(self) -> None:
         logger.debug("stop_blinking")
         self._timer_blink.stop()
 
         self._do_blink(1, 1)
 
-    def _do_blink(self, start, stop):
+    def _do_blink(self, start: int, stop: int) -> None:
         self._animation.setStartValue(start)
         self._animation.setEndValue(stop)
         self._animation.start()

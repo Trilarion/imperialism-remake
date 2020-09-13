@@ -84,13 +84,10 @@ class GenericScreen(QtWidgets.QWidget):
         scenario.changed.connect(self.scenario_changed)
 
         # layout of widgets and toolbar
-        layout = QtWidgets.QGridLayout(self)
-        layout.addWidget(self._toolbar, 0, 0, 1, 2)
-        layout.addWidget(self._mini_map, 1, 0)
-        layout.addWidget(self._info_panel, 2, 0)
-        layout.addWidget(self.main_map, 1, 1, 2, 1)
-        layout.setRowStretch(2, 1)  # the info box will take all vertical space left
-        layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
+        self._layout = QtWidgets.QGridLayout(self)
+        self._layout.addWidget(self._toolbar, 0, 0, 1, 2)
+        self._layout.addWidget(self._mini_map, 1, 0)
+        self._layout.addWidget(self._info_panel, 2, 0)
 
     def scenario_changed(self):
         """

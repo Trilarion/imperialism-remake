@@ -27,10 +27,13 @@ from imperialism_remake.client.common.generic_screen import GenericScreen
 from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.client.game.game_scenario import GameScenario
 from imperialism_remake.client.game.game_selected_object import GameSelectedObject
+from imperialism_remake.client.turn.turn_end_widget import TurnEndWidget
+from imperialism_remake.client.turn.turn_manager import TurnManager
 from imperialism_remake.client.workforce.workforce_animated_widget import WorkforceAnimatedWidget
+from imperialism_remake.server.models.turn import Turn
 from imperialism_remake.server.models.workforce_action import WorkforceAction
-from imperialism_remake.server.workforce.workforce_engineer import WorkforceEngineer
-from imperialism_remake.server.workforce.workforce_geologist import WorkforceGeologist
+from imperialism_remake.server.models.workforce_type import WorkforceType
+from imperialism_remake.server.workforce.workforce_factory import WorkforceFactory
 
 logger = logging.getLogger(__name__)
 
@@ -45,9 +48,9 @@ class GameMainScreen(GenericScreen):
 
         self.scenario = GameScenario()
 
-        main_map = MainMap(self.scenario)
+        self._main_map = MainMap(self.scenario)
 
-        super().__init__(client, self.scenario, main_map)
+        super().__init__(client, self.scenario, self._main_map)
 
         self.scenario.load(scenario_file)
 
@@ -55,23 +58,41 @@ class GameMainScreen(GenericScreen):
 
         self._default_cursor = self.main_map.viewport().cursor()
 
-        main_map.mouse_press_event.connect(self._main_map_mouse_press_event)
-        main_map.mouse_move_event.connect(self._main_map_mouse_move_event)
+        self._main_map.mouse_press_event.connect(self._main_map_mouse_press_event)
+        self._main_map.mouse_move_event.connect(self._main_map_mouse_move_event)
+
+        self._turn_manager = TurnManager(self.scenario)
+        self._turn_manager.event_turn_completed.connect(self._event_turn_completed)
+        self._turn_end_widget = TurnEndWidget(self._turn_manager)
+
+        self._layout.addWidget(self._turn_end_widget, 3, 0)
+        self._layout.addWidget(self.main_map, 1, 1, 3, 1)
+        self._layout.setRowStretch(2, 1)  # the info box will take all vertical space left
+        self._layout.setColumnStretch(1, 1)  # the main map will take all horizontal space lef
+
+        self._workforce_widgets = {}
 
         # !!! TODO this is just to test, remove me a little bit later!!!
-        workforce_engineer01 = WorkforceEngineer(self.scenario.server_scenario, uuid.uuid4(), 4, 13)
-        workforce_engineer01_widget = WorkforceAnimatedWidget(main_map, self._info_panel, workforce_engineer01)
+        workforce_engineer01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
+                                                                     self._turn_manager.get_turn(), uuid.uuid4(),
+                                                                     4, 13, WorkforceType.ENGINEER)
+        workforce_engineer01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_engineer01)
         workforce_engineer01_widget.plan_action(4, 13, WorkforceAction.STAND)
 
         workforce_engineer01_widget.event_widget_selected.connect(self._selected_widget_object_event)
         workforce_engineer01_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
 
-        workforce_geologist01 = WorkforceGeologist(self.scenario.server_scenario, uuid.uuid4(), 8, 11)
-        workforce_geologist01_widget = WorkforceAnimatedWidget(main_map, self._info_panel, workforce_geologist01)
+        workforce_geologist01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
+                                                                      self._turn_manager.get_turn(), uuid.uuid4(),
+                                                                      8, 11, WorkforceType.GEOLOGIST)
+        workforce_geologist01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_geologist01)
         workforce_geologist01_widget.plan_action(8, 11, WorkforceAction.STAND)
 
         workforce_geologist01_widget.event_widget_selected.connect(self._selected_widget_object_event)
         workforce_geologist01_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
+
+        self._workforce_widgets[workforce_engineer01_widget.get_workforce().get_id()] = workforce_engineer01_widget
+        self._workforce_widgets[workforce_geologist01_widget.get_workforce().get_id()] = workforce_geologist01_widget
         # !!! TODO remove above
 
     def _main_map_mouse_press_event(self, main_map, event: QtGui.QMouseEvent) -> None:
@@ -128,3 +149,21 @@ class GameMainScreen(GenericScreen):
     def _deselected_widget_object_event(self, widget_object: WorkforceAnimatedWidget) -> None:
         logger.debug("_deselected_widget_object_event object type:%s", widget_object.get_workforce().get_type())
         self._set_default_cursor()
+
+    def _event_turn_completed(self, turn: Turn) -> None:
+        logger.debug("_event_turn_completed")
+
+        for k, wf_widget in self._workforce_widgets.items():
+            wf_widget.destroy()
+            del wf_widget
+        self._workforce_widgets = {}
+
+        for k, new_workforce in turn.get_workforces().items():
+            r, c = new_workforce.get_current_position()
+            new_workforce_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, new_workforce)
+            new_workforce_widget.plan_action(r, c, WorkforceAction.STAND)
+
+            new_workforce_widget.event_widget_selected.connect(self._selected_widget_object_event)
+            new_workforce_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
+
+            self._workforce_widgets[new_workforce_widget.get_workforce().get_id()] = new_workforce_widget

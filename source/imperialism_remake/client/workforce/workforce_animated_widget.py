@@ -55,9 +55,13 @@ class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
         pixmaps_duty_action = self._scenario.get_workforce_to_texture_mapper().get_pixmap_of_type(
             self._workforce_common.get_type().value,
             WorkforceAction.DUTY_ACTION)
-        self.add_animation_pixmaps(pixmaps_duty_action)
+        self._add_animation_pixmaps(pixmaps_duty_action)
 
         self._workforce_to_action_icon_mapper = WorkforceToActionCursorMapper(main_map.scenario.server_scenario)
+
+    def destroy(self) -> None:
+        logger.debug("destroy:%s", self._workforce_common.get_id())
+        self._scene.removeItem(self._item)
 
     def _display(self) -> None:
         if self._workforce_common.get_action() == WorkforceAction.DUTY_ACTION or self._workforce_common.get_action() == WorkforceAction.MOVE:
@@ -139,4 +143,3 @@ class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
         logger.debug("leaveEvent id:%s, type:%s", self._workforce_common.get_id(), self._workforce_common.get_type())
 
         self._info_panel.update_workforce_info(None)
-
