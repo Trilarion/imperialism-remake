@@ -226,11 +226,11 @@ class ServerManager(QtCore.QObject):
         A client got a message on the constants.C.SCENARIO_PREVIEW channel. In the message should be a scenario file name
         (key = 'scenario'). Assemble a preview and send it back.
         """
-        t0 = time.clock()
+        t0 = time.perf_counter()
 
         # TODO existing? can be loaded?
         scenario = ServerScenario.from_file(scenario_file_name)
-        logger.info('reading of the file took {}s'.format(time.clock() - t0))
+        logger.info('reading of the file took {}s'.format(time.perf_counter() - t0))
 
         preview = {'scenario': scenario_file_name}
 
@@ -265,6 +265,6 @@ class ServerManager(QtCore.QObject):
                     nations_map[row * columns + column] = nation_id
         preview['map'] = nations_map
 
-        logger.info('generating preview took {}s'.format(time.clock() - t0))
+        logger.info('generating preview took {}s'.format(time.perf_counter() - t0))
 
         return preview

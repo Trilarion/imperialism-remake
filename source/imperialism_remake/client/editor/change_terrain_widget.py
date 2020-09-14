@@ -51,7 +51,7 @@ class ChangeTerrainWidget(QtWidgets.QGraphicsView):
             x = i % self.COLUMNS_IN_A_ROW
 
             scene_utils.put_pixmap_in_tile_center(self.scene,
-                                                  self.scene.scenario.get_tile_to_texture_mapper().get_pixmap_of_type(
+                                                  screen.scenario.get_tile_to_texture_mapper().get_pixmap_of_type(
                                                       i), x, y, 1)
 
     def mousePressEvent(self, event):
