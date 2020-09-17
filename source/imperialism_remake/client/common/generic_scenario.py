@@ -24,8 +24,9 @@ import os
 from PyQt5 import QtCore
 
 from imperialism_remake.base import constants
-from imperialism_remake.client.graphics.mappers.tile_type_to_texture_mapper import TileTypeToTextureMapper
-from imperialism_remake.client.graphics.mappers.workforce_to_texture_mapper import WorkforceToTextureMapper
+from imperialism_remake.client.graphics.mappers.terrain_resource_to_pixmap_mapper import TerrainResourceToPixmapMapper
+from imperialism_remake.client.graphics.mappers.terrain_type_to_pixmap_mapper import TerrainTypeToPixmapMapper
+from imperialism_remake.client.graphics.mappers.workforce_to_pixmap_mapper import WorkforceToTextureMapper
 from imperialism_remake.lib import utils
 from imperialism_remake.server.server_scenario import ServerScenario
 
@@ -41,7 +42,7 @@ class GenericScenario(QtCore.QObject):
 
         self.server_scenario = None
 
-        self._tile_to_texture_mapper = None
+        self._terrain_type_to_pixmap_mapper = None
         self._workforce_to_texture_mapper = None
 
     def load(self, file_name):
@@ -79,13 +80,17 @@ class GenericScenario(QtCore.QObject):
         self._init()
 
     def _init(self):
-        self._tile_to_texture_mapper = TileTypeToTextureMapper(self.server_scenario)
+        self._terrain_type_to_pixmap_mapper = TerrainTypeToPixmapMapper(self.server_scenario)
         self._workforce_to_texture_mapper = WorkforceToTextureMapper(self.server_scenario)
+        self._terrain_resource_to_pixmap_mapper = TerrainResourceToPixmapMapper(self.server_scenario)
         # emit that everything has changed
         self.changed.emit()
 
-    def get_tile_to_texture_mapper(self):
-        return self._tile_to_texture_mapper
+    def get_terrain_type_to_pixmap_mapper(self):
+        return self._terrain_type_to_pixmap_mapper
+
+    def get_terrain_resource_to_pixmap_mapper(self):
+        return self._terrain_resource_to_pixmap_mapper
 
     def get_workforce_to_texture_mapper(self):
         return self._workforce_to_texture_mapper

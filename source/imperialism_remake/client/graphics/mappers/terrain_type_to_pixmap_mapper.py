@@ -22,7 +22,7 @@ from imperialism_remake.base import constants
 logger = logging.getLogger(__name__)
 
 
-class TileTypeToTextureMapper:
+class TerrainTypeToPixmapMapper:
     def __init__(self, server_scenario):
         super().__init__()
 

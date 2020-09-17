@@ -20,6 +20,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from imperialism_remake.base import tools, constants
 from imperialism_remake.client.common.generic_screen import GenericScreen
+from imperialism_remake.client.editor.change_terrain_resource_widget import ChangeTerrainResourceWidget
 from imperialism_remake.client.editor.change_terrain_widget import ChangeTerrainWidget
 from imperialism_remake.client.editor.editor_mainmap import EditorMainMap
 from imperialism_remake.client.editor.editor_scenario import EditorScenario
@@ -60,6 +61,7 @@ class EditorScreen(GenericScreen):
 
         # main map
         self.main_map.change_terrain.connect(self.map_change_terrain)
+        self.main_map.change_terrain_resource.connect(self.map_change_terrain_resource)
         self.main_map.province_info.connect(self.provinces_dialog)
         self.main_map.nation_info.connect(self.nations_dialog)
 
@@ -120,6 +122,17 @@ class EditorScreen(GenericScreen):
         """
         content_widget = ChangeTerrainWidget(self, column, row)
         dialog = GameDialog(self._client.main_window, content_widget, title='Change terrain',
+                            delete_on_close=True, help_callback=self._client.show_help_browser)
+        # dialog.setFixedSize(QtCore.QSize(900, 700))
+        dialog.show()
+
+    def map_change_terrain_resource(self, column, row):
+        """
+        :param column:
+        :param row:
+        """
+        content_widget = ChangeTerrainResourceWidget(self, column, row)
+        dialog = GameDialog(self._client.main_window, content_widget, title='Change resource',
                             delete_on_close=True, help_callback=self._client.show_help_browser)
         # dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()

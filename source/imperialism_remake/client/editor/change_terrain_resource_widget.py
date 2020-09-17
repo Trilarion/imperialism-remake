@@ -23,7 +23,7 @@ from imperialism_remake.client.utils import scene_utils
 logger = logging.getLogger(__name__)
 
 
-class ChangeTerrainWidget(QtWidgets.QGraphicsView):
+class ChangeTerrainResourceWidget(QtWidgets.QGraphicsView):
     """
 
     """
@@ -46,23 +46,24 @@ class ChangeTerrainWidget(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
-        for i in range(0, len(self.screen.scenario.server_scenario.get_terrain_settings())):
+        for i in range(1, len(self.screen.scenario.server_scenario.get_terrain_resources_settings())):
             y = i // self.COLUMNS_IN_A_ROW
             x = i % self.COLUMNS_IN_A_ROW
 
             scene_utils.put_pixmap_in_tile_center(self.scene,
-                                                  self.screen.scenario.get_terrain_type_to_pixmap_mapper().get_pixmap_of_type(
+                                                  self.screen.scenario.get_terrain_resource_to_pixmap_mapper().get_pixmap_of_type(
                                                       i), x, y, 1)
 
     def mousePressEvent(self, event):
         logger.debug("mousePressEvent x:%s, y:%s", event.x(), event.y())
 
         tile_x = math.floor(self.COLUMNS_IN_A_ROW * event.x() / self.width())
-        tile_y = math.floor(self.COLUMNS_IN_A_ROW * event.y() / self.height() / 2)
+        tile_y = math.floor((1 + len(
+            self.screen.scenario.server_scenario.get_terrain_resources_settings()) // self.COLUMNS_IN_A_ROW) * event.y() / self.height())
 
         tile_number = tile_x + tile_y * self.COLUMNS_IN_A_ROW
 
         logger.debug("mousePressEvent tile_x:%s, tile_y:%s, tile_number:%s", tile_x, tile_y, tile_number)
 
-        self.screen.scenario.server_scenario.set_terrain_at(self.column, self.row, tile_number)
-        self.screen.main_map.fill_terrain_texture(self.column, self.row)
+        self.screen.scenario.server_scenario.set_resource_at(self.column, self.row, tile_number)
+        self.screen.main_map.fill_terrain_resource_texture(self.column, self.row)
