@@ -15,20 +15,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
 
+from PyQt5 import QtGui
+
 from imperialism_remake.base import constants
-from imperialism_remake.client.graphics.mappers.terrain_to_pixmap_mapper import TerrainToPixmapMapper
 
 logger = logging.getLogger(__name__)
 
 
-class TerrainResourceToPixmapMapper(TerrainToPixmapMapper):
-    def __init__(self, server_scenario):
-        super().__init__(server_scenario.get_terrain_resources_settings(), constants.GRAPHICS_TERRAIN_RESOURCES_FOLDER,
-                         'texture_filename')
+class TerrainToPixmapMapper:
+    def __init__(self, settings, folder, property_filename):
+        super().__init__()
 
-    def get_pixmap_of_type(self, resource_type: int):
-        if resource_type < 1 or resource_type >= len(self.pixmaps):
-            logger.warning('Tile type undefined: %s', resource_type)
-            return None
+        self.pixmaps = {}
+        for texture_type in settings:
+            pixmap = QtGui.QPixmap(constants.extend(folder, settings[texture_type][property_filename]))
+            self.pixmaps[texture_type] = pixmap.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
 
-        return self._get_pixmap_of_type(resource_type)
+    def _get_pixmap_of_type(self, texture_type: int):
+        return self.pixmaps[texture_type]

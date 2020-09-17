@@ -126,6 +126,8 @@ class EditorScreen(GenericScreen):
         # dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
+        {}
+
     def map_change_terrain_resource(self, column, row):
         """
         :param column:
