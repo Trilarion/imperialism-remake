@@ -21,6 +21,7 @@ from PyQt5 import QtWidgets
 from imperialism_remake.base import constants, tools
 from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.lib import qt
+from imperialism_remake.server.models.terrain_type import TerrainType
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +49,12 @@ class EditorMainMap(MainMap):
         a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain.png'), 'Set terrain', self,
                              partial(self.change_terrain.emit, column, row))
         menu.addAction(a)
+
+        terrain_type = self.scenario.server_scenario.terrain_at(column, row)
+        if terrain_type != TerrainType.SEA.value:
+            a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'), 'Set resource', self,
+                                 partial(self.change_terrain_resource.emit, column, row))
+            menu.addAction(a)
 
         # is there a province
         province = self.scenario.server_scenario.province_at(column, row)

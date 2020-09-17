@@ -21,6 +21,7 @@ Generate the default rules.
 import os
 import sys
 
+from imperialism_remake.server.models.terrain_resource_type import TerrainResourceType
 from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.models.workforce_type import WorkforceType
 
@@ -48,6 +49,21 @@ if __name__ == '__main__':
         TerrainType.DESERT.value: {'name': 'Desert', 'texture_filename': 'terrain.desert.outer.png'}
     }
     rules['terrain_settings'] = terrain_settings
+
+    terrain_resources_settings = {
+        TerrainResourceType.BUFFALO.value: {'name': 'Buffalo', 'texture_filename': 'resource.buffalo.outer.png'},
+        TerrainResourceType.ORCHARD.value: {'name': 'Orhcard', 'texture_filename': 'resource.orchard.outer.png'},
+        TerrainResourceType.COAL.value: {'name': 'Coal', 'texture_filename': 'resource.coal.png'},
+        TerrainResourceType.COTTON.value: {'name': 'Cotton', 'texture_filename': 'resource.cotton.outer.png'},
+        TerrainResourceType.FOREST.value: {'name': 'Forest', 'texture_filename': 'resource.forest.outer.png'},
+        TerrainResourceType.GRAIN.value: {'name': 'Grain', 'texture_filename': 'resource.grain.outer.png'},
+        TerrainResourceType.HORSE.value: {'name': 'Horse', 'texture_filename': 'resource.horse.png'},
+        TerrainResourceType.OIL.value: {'name': 'Oil', 'texture_filename': 'resource.oil.outer.png'},
+        TerrainResourceType.ORE.value: {'name': 'Ore', 'texture_filename': 'resource.ore.png'},
+        TerrainResourceType.SCRUBFOREST.value: {'Scrubforest': 'Swamp', 'texture_filename': 'resource.scrubforest.outer.png'},
+        TerrainResourceType.SHEEP.value: {'name': 'Sheep', 'texture_filename': 'resource.sheep.outer.png'}
+    }
+    rules['terrain_resources_settings'] = terrain_resources_settings
 
     workforce_settings = {
         WorkforceType.ENGINEER.value: {'name': 'Engineer', 'texture_filename_stand': 'engineer.stand.png',

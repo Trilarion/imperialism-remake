@@ -171,6 +171,13 @@ class ServerScenario(QtCore.QObject):
         # TODO move this to a special rules class. Only have rules() and setRules() here.
         return self._rules['terrain_settings'][terrain]['name']
 
+    def terrain_resource_name(self, terrain):
+        """
+        Get a special property from the rules.
+        """
+        # TODO move this to a special rules class. Only have rules() and setRules() here.
+        return self._rules['terrain_resources_settings'][terrain]['name']
+
     def set_resource_at(self, column, row, resource):
         """
         Sets the resource value at a given position. No check is performed for valid resources.
@@ -533,6 +540,9 @@ class ServerScenario(QtCore.QObject):
 
     def get_terrain_settings(self):
         return self._rules['terrain_settings']
+
+    def get_terrain_resources_settings(self):
+        return self._rules['terrain_resources_settings']
 
     def get_workforce_settings(self):
         return self._rules['workforce_settings']

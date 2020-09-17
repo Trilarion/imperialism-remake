@@ -15,8 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
 
-from PyQt5 import QtCore, QtGui, QtWidgets, Qt
-from PyQt5.QtGui import QPainter, QPen
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake.base import constants
 from imperialism_remake.client.utils import scene_utils
@@ -36,6 +35,9 @@ class MainMap(QtWidgets.QGraphicsView):
 
     #: signal, emitted if the change terrain context menu action is called on a terrain
     change_terrain = QtCore.pyqtSignal(int, int)
+
+    #: signal, emitted if the change terrain resource context menu action is called on a terrain
+    change_terrain_resource = QtCore.pyqtSignal(int, int)
 
     #: signal, emitted if a province info is requested
     province_info = QtCore.pyqtSignal(int)
@@ -80,6 +82,8 @@ class MainMap(QtWidgets.QGraphicsView):
 
         self._fill_tile_textures(columns, rows)
 
+        self._fill_terrain_resource_textures(columns, rows)
+
         self._fill_half_tiles(columns, rows)
 
         self._draw_rivers()
@@ -101,14 +105,27 @@ class MainMap(QtWidgets.QGraphicsView):
         # fill plains, hills, mountains, tundra, swamp, desert with texture
         for column in range(0, columns):
             for row in range(0, rows):
-                self.fill_tile_texture(column, row)
+                self.fill_terrain_texture(column, row)
 
-    def fill_tile_texture(self, column, row) -> None:
+    def fill_terrain_texture(self, column, row) -> None:
         t = self.scenario.server_scenario.terrain_at(column, row)
         sx, sy = scene_position(column, row)
         scene_utils.put_pixmap_in_tile_center(self.scene,
-                                              self.scenario.get_tile_to_texture_mapper().get_pixmap_of_type(t),
+                                              self.scenario.get_terrain_type_to_pixmap_mapper().get_pixmap_of_type(t),
                                               sx, sy, 1)
+
+    def _fill_terrain_resource_textures(self, columns, rows) -> None:
+        for column in range(0, columns):
+            for row in range(0, rows):
+                self.fill_terrain_resource_texture(column, row)
+
+    def fill_terrain_resource_texture(self, column, row) -> None:
+        t = self.scenario.server_scenario.resource_at(column, row)
+        if t > 0:
+            sx, sy = scene_position(column, row)
+            scene_utils.put_pixmap_in_tile_center(self.scene,
+                                                  self.scenario.get_terrain_resource_to_pixmap_mapper().get_pixmap_of_type(t),
+                                                  sx, sy, 1)
 
     def _fill_half_tiles(self, columns, rows) -> None:
         # fill the half tiles which are not part of the map

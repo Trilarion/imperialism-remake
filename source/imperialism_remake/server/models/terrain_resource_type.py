@@ -16,15 +16,15 @@
 from enum import Enum
 
 
-class RawResourceType(Enum):
-    BUFFALO = 0
-    COAL = 1
-    COTTON = 2
-    FOREST = 3
-    GRAIN = 4
-    HORSE = 5
-    OIL = 6
-    ORCHARD = 7
-    ORE = 8
-    SCRUBFOREST = 9
-    SHEEP = 10
+class TerrainResourceType(Enum):
+    GRAIN = 1
+    ORCHARD = 2
+    BUFFALO = 3
+    COTTON = 4
+    SHEEP = 5
+    FOREST = 6
+    SCRUBFOREST = 7
+    OIL = 8
+    COAL = 9
+    ORE = 10
+    HORSE = 11

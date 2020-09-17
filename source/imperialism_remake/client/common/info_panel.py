@@ -45,6 +45,10 @@ class InfoPanel(QtWidgets.QWidget):
         self.tile_label.setTextFormat(QtCore.Qt.RichText)
         layout.addWidget(self.tile_label)
 
+        self.resource_label = QtWidgets.QLabel()
+        self.resource_label.setTextFormat(QtCore.Qt.RichText)
+        layout.addWidget(self.resource_label)
+
         self.province_label = QtWidgets.QLabel()
         layout.addWidget(self.province_label)
 
@@ -76,6 +80,11 @@ class InfoPanel(QtWidgets.QWidget):
         if province is not None:
             name = self.scenario.server_scenario.province_property(province, constants.ProvinceProperty.NAME)
             text += '<br>Province: {}'.format(name)
+
+        resource = self.scenario.server_scenario.resource_at(column, row)
+        if resource > 0:
+            resource_name = self.scenario.server_scenario.terrain_resource_name(resource)
+            text += '<br>Resource: {}'.format(resource_name)
 
         self.tile_label.setText(text)
 
