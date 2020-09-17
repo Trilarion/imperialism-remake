@@ -18,25 +18,18 @@ import logging
 from PyQt5 import QtGui
 
 from imperialism_remake.base import constants
+from imperialism_remake.client.graphics.mappers.terrain_to_pixmap_mapper import TerrainToPixmapMapper
 
 logger = logging.getLogger(__name__)
 
 
-class TerrainTypeToPixmapMapper:
+class TerrainTypeToPixmapMapper(TerrainToPixmapMapper):
     def __init__(self, server_scenario):
-        super().__init__()
+        super().__init__(server_scenario.get_terrain_settings(), constants.GRAPHICS_TERRAINS_FOLDER, 'texture_filename')
 
-        terrain_settings = server_scenario.get_terrain_settings()
+    def get_pixmap_of_type(self, resource_type: int):
+        if resource_type < 0 or resource_type >= len(self.pixmaps):
+            logger.warning('Tile type undefined: %s', resource_type)
+            return None
 
-        self.pixmaps = {}
-        for terrain_type in terrain_settings:
-            pixmap = QtGui.QPixmap(
-                constants.extend(constants.GRAPHICS_TERRAINS_FOLDER,
-                                 terrain_settings[terrain_type]['texture_filename']))
-            self.pixmaps[terrain_type] = pixmap.scaled(constants.TILE_SIZE, constants.TILE_SIZE)
-
-    def get_pixmap_of_type(self, tile_type: int):
-        if tile_type >= len(self.pixmaps):
-            raise RuntimeError('Tile type undefined: %s', tile_type)
-
-        return self.pixmaps[tile_type]
+        return self._get_pixmap_of_type(resource_type)

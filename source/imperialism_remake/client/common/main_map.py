@@ -80,9 +80,11 @@ class MainMap(QtWidgets.QGraphicsView):
         height = rows * constants.TILE_SIZE
         self.scene.setSceneRect(0, 0, width, height)
 
-        self._fill_tile_textures(columns, rows)
+        self._fill_textures(columns, rows, self.scenario.get_terrain_type_to_pixmap_mapper(),
+                            self.scenario.server_scenario.terrain_at)
 
-        self._fill_terrain_resource_textures(columns, rows)
+        self._fill_textures(columns, rows, self.scenario.get_terrain_resource_to_pixmap_mapper(),
+                            self.scenario.server_scenario.resource_at)
 
         self._fill_half_tiles(columns, rows)
 
@@ -101,31 +103,19 @@ class MainMap(QtWidgets.QGraphicsView):
 
         logger.debug('redraw finished')
 
-    def _fill_tile_textures(self, columns, rows) -> None:
-        # fill plains, hills, mountains, tundra, swamp, desert with texture
+    def _fill_textures(self, columns, rows, mapper, obj_type_getter) -> None:
         for column in range(0, columns):
             for row in range(0, rows):
-                self.fill_terrain_texture(column, row)
+                self.fill_texture(column, row, mapper, obj_type_getter(column, row))
 
-    def fill_terrain_texture(self, column, row) -> None:
-        t = self.scenario.server_scenario.terrain_at(column, row)
+    def fill_texture(self, column, row, mapper, obj_type, z_value=1) -> None:
+        pixmap = mapper.get_pixmap_of_type(obj_type)
+        if pixmap is None:
+            logger.warning("No pixmap defined for type:%s, col:%s, row:%s", obj_type, column, row)
+            return
+
         sx, sy = scene_position(column, row)
-        scene_utils.put_pixmap_in_tile_center(self.scene,
-                                              self.scenario.get_terrain_type_to_pixmap_mapper().get_pixmap_of_type(t),
-                                              sx, sy, 1)
-
-    def _fill_terrain_resource_textures(self, columns, rows) -> None:
-        for column in range(0, columns):
-            for row in range(0, rows):
-                self.fill_terrain_resource_texture(column, row)
-
-    def fill_terrain_resource_texture(self, column, row) -> None:
-        t = self.scenario.server_scenario.resource_at(column, row)
-        if t > 0:
-            sx, sy = scene_position(column, row)
-            scene_utils.put_pixmap_in_tile_center(self.scene,
-                                                  self.scenario.get_terrain_resource_to_pixmap_mapper().get_pixmap_of_type(t),
-                                                  sx, sy, 1)
+        scene_utils.put_pixmap_in_tile_center(self.scene, pixmap, sx, sy, z_value)
 
     def _fill_half_tiles(self, columns, rows) -> None:
         # fill the half tiles which are not part of the map

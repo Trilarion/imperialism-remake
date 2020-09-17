@@ -21,6 +21,9 @@ from imperialism_remake.base import constants
 
 
 def put_pixmap_in_tile_center(scene: QtWidgets.QGraphicsScene, pixmap: QtGui.QPixmap, row: int, column: int, z_value: int) -> None:
+    if pixmap is None:
+        return
+
     x = (row + 0.5) * constants.TILE_SIZE - pixmap.width() / 2
     y = (column + 0.5) * constants.TILE_SIZE - pixmap.height() / 2
     item = scene.addPixmap(pixmap)
