@@ -15,13 +15,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
 import time
+import uuid
 
 from PyQt5 import QtCore
 
+from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.turn_planned import TurnPlanned
 from imperialism_remake.server.models.turn_result import TurnResult
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.models.workforce_type import WorkforceType
+from imperialism_remake.server.structures.structure_factory import StructureFactory
 from imperialism_remake.server.workforce.workforce_factory import WorkforceFactory
 
 logger = logging.getLogger(__name__)
@@ -61,12 +64,23 @@ class TurnManager(QtCore.QObject):
 
             turn_result._workforces[workforce.get_id()] = workforce
 
+            # add roads
             old_r, old_c = w.get_current_position()
             if w.get_action() == WorkforceAction.DUTY_ACTION and w.get_type() == WorkforceType.ENGINEER and (
                     old_r != r or old_c != c):
                 self._scenario.server_scenario.add_road((r, c), (old_r, old_c))
 
                 turn_result._roads.append(((r, c), (old_r, old_c)))
+
+            # add structures
+            if w.get_action() == WorkforceAction.DUTY_ACTION and w.get_type() == WorkforceType.ENGINEER and (
+                    old_r == r and old_c == c):
+                wh = StructureFactory.create_new_structure(self._scenario.server_scenario, uuid.uuid4(), r, c,
+                                                           StructureType.WAREHOUSE)
+                self._scenario.server_scenario.add_structure(r, c, wh)
+
+                turn_result._structures.append(wh)
+
         # end of TODO
 
         self.event_turn_completed.emit(turn_result)

@@ -92,6 +92,8 @@ class MainMap(QtWidgets.QGraphicsView):
 
         self._draw_roads()
 
+        self._draw_structures()
+
         self._draw_province_and_nation_borders()
 
         self._draw_towns_and_names()
@@ -235,7 +237,25 @@ class MainMap(QtWidgets.QGraphicsView):
         for road_section in self.scenario.server_scenario.get_roads():
             self.draw_road(road_section[0], road_section[1])
 
+    def _draw_structures(self) -> None:
+        for structure in self.scenario.server_scenario.get_structures():
+            row, column = structure.get_position()
+            self.draw_structure(row, column, structure)
+
+    def draw_structure(self, row, column, structure) -> None:
+        pixmap = self.scenario.get_structure_type_to_pixmap_mapper().get_pixmap_of_type(structure.get_type().value)
+        if pixmap is None:
+            logger.warning("No pixmap defined for type:%s, col:%s, row:%s", structure.get_type(), column, row)
+            return
+
+        logger.debug("Draw structure:%s, row:%s, col:%s", structure.get_type(), row, column)
+        sx, sy = scene_position(column, row)
+        # TODO draw same count of structures as structure level
+        scene_utils.put_pixmap_in_tile_center(self.scene, pixmap, sx, sy, 20)
+
     def draw_road(self, start: (), stop: ()) -> None:
+        logger.debug("Draw road from:%s, to:%s", start, stop)
+
         # TODO use proper icons/pixmaps
         road_pen = QtGui.QPen(QtGui.QColor(164, 64, 155))
         road_pen.setWidth(15)

@@ -52,6 +52,7 @@ class ServerScenario(QtCore.QObject):
     RESOURCE = 'resource'
     TERRAIN = 'terrain'
     ROAD = 'road'
+    STRUCTURE = 'structure'
 
     def __init__(self):
         """
@@ -103,6 +104,9 @@ class ServerScenario(QtCore.QObject):
         if ServerScenario.ROAD not in scenario._maps:
             scenario._maps[ServerScenario.ROAD] = []
 
+        if ServerScenario.STRUCTURE not in scenario._maps:
+            scenario._maps[ServerScenario.STRUCTURE] = {}
+
         return scenario
 
     def create_empty_map(self, columns, rows):
@@ -120,7 +124,9 @@ class ServerScenario(QtCore.QObject):
         number_tiles = columns * rows
         self._maps[ServerScenario.TERRAIN] = [0] * number_tiles
         self._maps[ServerScenario.RESOURCE] = [0] * number_tiles
-        self._maps[ServerScenario.ROAD] = [0] * number_tiles
+
+        self._maps[ServerScenario.ROAD] = []
+        self._maps[ServerScenario.STRUCTURE] = {}
 
     def add_river(self, name, tiles):
         """
@@ -141,6 +147,21 @@ class ServerScenario(QtCore.QObject):
 
     def get_roads(self) -> []:
         return self._maps[ServerScenario.ROAD]
+
+    def add_structure(self, row: int, col: int, structure) -> None:
+        """
+            Adds structure
+        """
+        logger.debug('add_structure r:%s, c:%s', row, col)
+        if row not in self._maps[ServerScenario.STRUCTURE]:
+            self._maps[ServerScenario.STRUCTURE][row] = {}
+        if col not in self._maps[ServerScenario.STRUCTURE][row]:
+            self._maps[ServerScenario.STRUCTURE][row][col] = []
+
+        self._maps[ServerScenario.STRUCTURE][row][col].append(structure)
+
+    def get_structures(self) -> []:
+        return self._maps[ServerScenario.STRUCTURE]
 
     def set_terrain_at(self, column, row, terrain):
         """
@@ -549,3 +570,6 @@ class ServerScenario(QtCore.QObject):
 
     def get_workforce_action_cursor_settings(self):
         return self._rules['workforce_action_cursors']
+
+    def get_structure_settings(self):
+        return self._rules['structure_settings']
