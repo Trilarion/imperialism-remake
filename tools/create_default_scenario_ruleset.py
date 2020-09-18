@@ -21,6 +21,7 @@ Generate the default rules.
 import os
 import sys
 
+from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.terrain_resource_type import TerrainResourceType
 from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.models.workforce_type import WorkforceType
@@ -60,7 +61,8 @@ if __name__ == '__main__':
         TerrainResourceType.HORSE.value: {'name': 'Horse', 'texture_filename': 'resource.horse.png'},
         TerrainResourceType.OIL.value: {'name': 'Oil', 'texture_filename': 'resource.oil.outer.png'},
         TerrainResourceType.ORE.value: {'name': 'Ore', 'texture_filename': 'resource.ore.png'},
-        TerrainResourceType.SCRUBFOREST.value: {'Scrubforest': 'Swamp', 'texture_filename': 'resource.scrubforest.outer.png'},
+        TerrainResourceType.SCRUBFOREST.value: {'Scrubforest': 'Swamp',
+                                                'texture_filename': 'resource.scrubforest.outer.png'},
         TerrainResourceType.SHEEP.value: {'name': 'Sheep', 'texture_filename': 'resource.sheep.outer.png'}
     }
     rules['terrain_resources_settings'] = terrain_resources_settings
@@ -82,6 +84,12 @@ if __name__ == '__main__':
                                   'workforce_action_cursor_not_allowed': 'cursor.action.not.allowed.png'}
     }
     rules['workforce_action_cursors'] = workforce_action_cursors
+
+    structure_settings = {
+        StructureType.WAREHOUSE.value: {'name': 'Warehouse', 'texture_filename': 'engineer.warehouse.png'},
+        StructureType.FARM_ELEVATOR.value: {'name': 'Elevator', 'texture_filename': 'farmer.elevator.png'}
+    }
+    rules['structure_settings'] = structure_settings
 
     # save
     file = constants.SCENARIO_RULESET_STANDARD_FILE

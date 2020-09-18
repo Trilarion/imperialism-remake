@@ -24,6 +24,7 @@ import os
 from PyQt5 import QtCore
 
 from imperialism_remake.base import constants
+from imperialism_remake.client.graphics.mappers.structure_type_to_pixmap_mapper import StructureTypeToPixmapMapper
 from imperialism_remake.client.graphics.mappers.terrain_resource_to_pixmap_mapper import TerrainResourceToPixmapMapper
 from imperialism_remake.client.graphics.mappers.terrain_type_to_pixmap_mapper import TerrainTypeToPixmapMapper
 from imperialism_remake.client.graphics.mappers.workforce_to_pixmap_mapper import WorkforceToTextureMapper
@@ -83,6 +84,7 @@ class GenericScenario(QtCore.QObject):
         self._terrain_type_to_pixmap_mapper = TerrainTypeToPixmapMapper(self.server_scenario)
         self._workforce_to_texture_mapper = WorkforceToTextureMapper(self.server_scenario)
         self._terrain_resource_to_pixmap_mapper = TerrainResourceToPixmapMapper(self.server_scenario)
+        self._structure_type_to_pixmap_mapper = StructureTypeToPixmapMapper(self.server_scenario)
         # emit that everything has changed
         self.changed.emit()
 
@@ -94,3 +96,8 @@ class GenericScenario(QtCore.QObject):
 
     def get_workforce_to_texture_mapper(self):
         return self._workforce_to_texture_mapper
+
+    def get_structure_type_to_pixmap_mapper(self):
+        return self._structure_type_to_pixmap_mapper
+
+
