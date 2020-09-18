@@ -13,20 +13,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from imperialism_remake.server.models.workforce import Workforce
+from enum import Enum
 
 
-class TurnResult:
-    def __init__(self):
-        self._workforces = {}
-        self._roads = []
-        self._structures = []
-
-    def get_workforces(self) -> {}:
-        return self._workforces
-
-    def get_roads(self) -> []:
-        return self._roads
-
-    def get_structures(self) -> []:
-        return self._structures
+class StructureType(Enum):
+    WAREHOUSE = 1
+    FARM_ELEVATOR = 2

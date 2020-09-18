@@ -74,7 +74,8 @@ class GameMainScreen(GenericScreen):
 
         # !!! TODO this is just to test, remove me a little bit later!!!
         workforce_engineer01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
-                                                                     self._turn_manager.get_turn_planned(), uuid.uuid4(),
+                                                                     self._turn_manager.get_turn_planned(),
+                                                                     uuid.uuid4(),
                                                                      4, 13, WorkforceType.ENGINEER)
         workforce_engineer01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_engineer01)
         workforce_engineer01_widget.plan_action(4, 13, WorkforceAction.STAND)
@@ -83,7 +84,8 @@ class GameMainScreen(GenericScreen):
         workforce_engineer01_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
 
         workforce_geologist01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
-                                                                      self._turn_manager.get_turn_planned(), uuid.uuid4(),
+                                                                      self._turn_manager.get_turn_planned(),
+                                                                      uuid.uuid4(),
                                                                       8, 11, WorkforceType.GEOLOGIST)
         workforce_geologist01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_geologist01)
         workforce_geologist01_widget.plan_action(8, 11, WorkforceAction.STAND)
@@ -170,3 +172,7 @@ class GameMainScreen(GenericScreen):
 
         for road_section in turn_result.get_roads():
             self._main_map.draw_road(road_section[0], road_section[1])
+
+        for structure in turn_result.get_structures():
+            r, c = structure.get_position()
+            self._main_map.draw_structure(r, c, structure)
