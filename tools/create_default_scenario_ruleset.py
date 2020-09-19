@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     terrain_resources_settings = {
         TerrainResourceType.BUFFALO.value: {'name': 'Buffalo', 'texture_filename': 'resource.buffalo.outer.png'},
-        TerrainResourceType.ORCHARD.value: {'name': 'Orhcard', 'texture_filename': 'resource.orchard.outer.png'},
+        TerrainResourceType.ORCHARD.value: {'name': 'Orchard', 'texture_filename': 'resource.orchard.outer.png'},
         TerrainResourceType.COAL.value: {'name': 'Coal', 'texture_filename': 'resource.coal.png'},
         TerrainResourceType.COTTON.value: {'name': 'Cotton', 'texture_filename': 'resource.cotton.outer.png'},
         TerrainResourceType.FOREST.value: {'name': 'Forest', 'texture_filename': 'resource.forest.outer.png'},
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         TerrainResourceType.HORSE.value: {'name': 'Horse', 'texture_filename': 'resource.horse.png'},
         TerrainResourceType.OIL.value: {'name': 'Oil', 'texture_filename': 'resource.oil.outer.png'},
         TerrainResourceType.ORE.value: {'name': 'Ore', 'texture_filename': 'resource.ore.png'},
-        TerrainResourceType.SCRUBFOREST.value: {'name': 'Scrubforest',
+        TerrainResourceType.SCRUBFOREST.value: {'name': 'Scrub forest',
                                                 'texture_filename': 'resource.scrubforest.outer.png'},
         TerrainResourceType.SHEEP.value: {'name': 'Sheep', 'texture_filename': 'resource.sheep.outer.png'}
     }
