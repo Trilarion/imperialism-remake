@@ -61,7 +61,7 @@ if __name__ == '__main__':
         TerrainResourceType.HORSE.value: {'name': 'Horse', 'texture_filename': 'resource.horse.png'},
         TerrainResourceType.OIL.value: {'name': 'Oil', 'texture_filename': 'resource.oil.outer.png'},
         TerrainResourceType.ORE.value: {'name': 'Ore', 'texture_filename': 'resource.ore.png'},
-        TerrainResourceType.SCRUBFOREST.value: {'Scrubforest': 'Swamp',
+        TerrainResourceType.SCRUBFOREST.value: {'name': 'Scrubforest',
                                                 'texture_filename': 'resource.scrubforest.outer.png'},
         TerrainResourceType.SHEEP.value: {'name': 'Sheep', 'texture_filename': 'resource.sheep.outer.png'}
     }
