@@ -19,22 +19,18 @@ from imperialism_remake.server.models.structure import Structure
 from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.server_scenario import ServerScenario
+from imperialism_remake.server.structures.structure_common import StructureCommon
 
 
-class StructureFarmElevator(Structure):
-    def __init__(self, server_scenario: ServerScenario, structure_id: uuid, row: int, column: int):
-        super().__init__(structure_id, row, column, StructureType.FARM_ELEVATOR)
-
-        self._server_scenario = server_scenario
+class StructureFarmElevator(StructureCommon):
+    def __init__(self, server_scenario: ServerScenario, structure):
+        super().__init__(server_scenario, structure)
         self._level = 1
         self._max_level = 4
 
     def can_build(self, row, column) -> bool:
-        if column < 0 or row < 0:
-            return False
-
-        terrain_type = self._server_scenario.terrain_at(column, row)
-        if terrain_type == TerrainType.SEA.value:
+        can_build = super().can_build(row, column)
+        if not can_build:
             return False
 
         # TODO check for tech

@@ -14,16 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
-import time
-import uuid
 
 from PyQt5 import QtCore
 
-from imperialism_remake.server.models.structure_type import StructureType
+from imperialism_remake.base import constants
+from imperialism_remake.base.network import local_network_client
 from imperialism_remake.server.models.turn_planned import TurnPlanned
 from imperialism_remake.server.models.turn_result import TurnResult
-from imperialism_remake.server.models.workforce_action import WorkforceAction
-from imperialism_remake.server.models.workforce_type import WorkforceType
+from imperialism_remake.server.models.workforce import Workforce
+from imperialism_remake.server.server_network_client import ServerNetworkClient
 from imperialism_remake.server.structures.structure_factory import StructureFactory
 from imperialism_remake.server.workforce.workforce_factory import WorkforceFactory
 
@@ -39,6 +38,8 @@ class TurnManager(QtCore.QObject):
         self._scenario = scenario
         self._turn_planned = TurnPlanned()
 
+        local_network_client.connect_to_channel(constants.C.GAME, self._game_message_received)
+
     def get_turn_planned(self) -> TurnPlanned:
         return self._turn_planned
 
@@ -46,42 +47,33 @@ class TurnManager(QtCore.QObject):
         logger.debug("make_turn start")
 
         logger.debug("send next planned state for workforces: %s", self._turn_planned.get_workforces())
-        # TODO send planned actions and other stuff to server and emit event once response is received
-        time.sleep(1)
+        self._send_turn_planned_to_server(self._turn_planned)
 
-        # TODO this is just for test. It is server action simulation and MUST be removed a little bit later
-        old_workforces = self._turn_planned.get_workforces()
+        logger.debug("turn planned")
+
+    def _process_turn_result(self, turn_result) -> None:
+        logger.debug("_process_turn_result")
+
         del self._turn_planned
         self._turn_planned = TurnPlanned()
 
-        turn_result = TurnResult()
-        for k, w in old_workforces.items():
-            r, c = w.get_new_position()
-            workforce = WorkforceFactory.create_new_workforce(self._scenario.server_scenario, self._turn_planned,
-                                                              w.get_id(),
-                                                              r, c, w.get_type())
+        for w_id, w in turn_result.get_workforces().items():
+            workforce = WorkforceFactory.create_new_workforce(self._scenario.server_scenario, self._turn_planned, w)
             self._turn_planned.add_workforce(workforce)
+            turn_result.get_workforces()[workforce.get_id()] = workforce
 
-            turn_result._workforces[workforce.get_id()] = workforce
-
-            # add roads
-            old_r, old_c = w.get_current_position()
-            if w.get_action() == WorkforceAction.DUTY_ACTION and w.get_type() == WorkforceType.ENGINEER and (
-                    old_r != r or old_c != c):
-                self._scenario.server_scenario.add_road((r, c), (old_r, old_c))
-
-                turn_result._roads.append(((r, c), (old_r, old_c)))
-
-            # add structures
-            if w.get_action() == WorkforceAction.DUTY_ACTION and w.get_type() == WorkforceType.ENGINEER and (
-                    old_r == r and old_c == c):
-                wh = StructureFactory.create_new_structure(self._scenario.server_scenario, uuid.uuid4(), r, c,
-                                                           StructureType.WAREHOUSE)
-                self._scenario.server_scenario.add_structure(r, c, wh)
-
-                turn_result._structures.append(wh)
-
-        # end of TODO
+        for s_id, s in turn_result.get_structures().items():
+            structure = StructureFactory.create_new_structure(self._scenario.server_scenario, s)
+            turn_result.get_structures()[s.get_id()] = structure
 
         self.event_turn_completed.emit(turn_result)
-        logger.debug("make_turn completed")
+
+    def _send_turn_planned_to_server(self, turn_planned: TurnPlanned):
+        logger.debug("_send_message_to_server send message:%s", turn_planned)
+
+        local_network_client.send(constants.C.GAME, constants.M.GAME_TURN_PROCESS_REQUEST, turn_planned)
+
+    def _game_message_received(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
+        logger.debug("_game_message_received send message action:%s, content:%s", action, content)
+        if action == constants.M.GAME_TURN_PROCESS_RESPONSE:
+            self._process_turn_result(content)

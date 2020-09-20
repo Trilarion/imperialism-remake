@@ -22,6 +22,7 @@ Starts the client and delivers most of the code responsible for the main client 
 
 import logging
 import logging.config
+import os
 from functools import partial
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -392,7 +393,8 @@ def start_client():
     client.switch_to_start_screen()
 
     # start Qt app execution and immediately try to connect to local server
-    logger.info('client initialized, start Qt app execution')
+    logger.info('client initialized (pid=%d), start Qt app execution', os.getpid())
+
     # noinspection PyCallByClass
     QtCore.QTimer.singleShot(0, local_network_connect)
     app.exec_()

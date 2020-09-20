@@ -26,6 +26,7 @@ from imperialism_remake.base import constants
 from imperialism_remake.lib import network as lib_network, utils
 from imperialism_remake.server.server_network_client import ServerNetworkClient
 from imperialism_remake.server.server_scenario import ServerScenario
+from imperialism_remake.server.turn_processing.server_turn_processor import ServerTurnProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +50,15 @@ class ServerManager(QtCore.QObject):
         self.server.new_client.connect(self._new_client)
         self.server_clients = []
         self.chat_log = []
+
+        self._server_turn_processor = ServerTurnProcessor()
+        self._server_turn_processor.set_turn_processing_finished_event_handler(
+            self._turn_processing_finished_event_handler)
+
+    def _turn_processing_finished_event_handler(self, client, turn_result):
+        logger.debug('_turn_processing_finished_event_handler client_id:%s turn_result:%s', client.client_id,
+                     turn_result)
+        client.send(constants.C.GAME, constants.M.GAME_TURN_PROCESS_RESPONSE, turn_result)
 
     def start(self):
         """
@@ -89,10 +99,19 @@ class ServerManager(QtCore.QObject):
         # chat message system, handled by a single central routine
         client.connect_to_channel(constants.C.CHAT, self._chat_system)
 
+        client.connect_to_channel(constants.C.GAME, self._game_message_received)
+
         # finally add to list of clients
         self.server_clients.append(client)
 
+        self._server_turn_processor.add_client(client)
+
         logger.info('server server_clients len: %d', len(self.server_clients))
+
+    def _game_message_received(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
+        logger.debug('_chat_system action: %s, content:%s', action, content)
+        if action == constants.M.GAME_TURN_PROCESS_REQUEST:
+            self._server_turn_processor.client_turn_ended(client, content)
 
     def _chat_system(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
         """
@@ -200,11 +219,14 @@ class ServerManager(QtCore.QObject):
         A server client received a message on the constants.C.SCENARIO_CORE_TITLES channel. Return all available core
         scenario titles and file names.
         """
+
         # get all core scenario files
         scenario_files = [x for x in os.listdir(constants.CORE_SCENARIO_FOLDER) if x.endswith('.scenario')]
 
         # join the path
         scenario_files = [os.path.join(constants.CORE_SCENARIO_FOLDER, x) for x in scenario_files]
+
+        logger.debug("_scenario_core_titles scenario_files:%s", scenario_files)
 
         # read scenario titles
         scenario_titles = []
@@ -251,7 +273,7 @@ class ServerManager(QtCore.QObject):
             nations[nation] = {}
             for key in nation_copy_keys:
                 nations[nation][key] = scenario.nation_property(nation, key)
-        preview['nations'] = nations
+        preview[constants.SCENARIO_FILE_NATIONS] = nations
 
         # assemble a nations map (-1 means no nation)
         columns = scenario[constants.ScenarioProperty.MAP_COLUMNS]

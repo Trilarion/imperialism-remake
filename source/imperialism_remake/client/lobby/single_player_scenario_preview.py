@@ -64,7 +64,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         local_network_client.disconnect_from_channel(constants.C.LOBBY, self.received_preview)
 
         # unpack message
-        nations = [(message['nations'][key][constants.NationProperty.NAME], key) for key in message['nations']]
+        nations = [(message[constants.SCENARIO_FILE_NATIONS][key][constants.NationProperty.NAME], key) for key in message[constants.SCENARIO_FILE_NATIONS]]
         nations = sorted(nations)  # by first element, which is the name
         nation_names, self.nation_ids = zip(*nations)
 
@@ -134,7 +134,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         item.setZValue(0)
 
         # for all nations
-        for nation_id, nation in message['nations'].items():
+        for nation_id, nation in message[constants.SCENARIO_FILE_NATIONS].items():
 
             # get nation color
             color_string = nation[constants.NationProperty.COLOR]
@@ -194,7 +194,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         nation_id = self.nation_ids[row]
         #       self.selected_nation = self.preview['nations'][nation_id][constants.NationProperty.NAME]
         self.selected_nation = nation_id
-        nation_description = self.preview['nations'][nation_id][constants.NationProperty.DESCRIPTION]
+        nation_description = self.preview[constants.SCENARIO_FILE_NATIONS][nation_id][constants.NationProperty.DESCRIPTION]
         self.nation_info.setPlainText(nation_description)
 
     def start_scenario_clicked(self):
