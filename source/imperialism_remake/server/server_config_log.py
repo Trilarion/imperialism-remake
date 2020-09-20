@@ -13,13 +13,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-
+import logging
 import os
-from logging import DEBUG
 
 from imperialism_remake.base import constants
 
-LOG_LEVEL = DEBUG
+LOG_LEVEL = logging.DEBUG
 LOG_FILE_SIZE = 100 * 1024 ** 2  # 100 MB
 LOG_BACKUP_COUNT = 5
 
@@ -42,7 +41,16 @@ LOG_CONFIG = {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': LOG_LEVEL,
             'formatter': 'detailed',
-            'filename': os.path.join(constants.get_user_directory(), 'remake_client.log'),
+            'filename': os.path.join(constants.get_user_directory(), 'remake_server.log'),
+            'mode': 'a',
+            'maxBytes': LOG_FILE_SIZE,
+            'backupCount': LOG_BACKUP_COUNT,
+        },
+        'file_error': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'level': logging.ERROR,
+            'formatter': 'detailed',
+            'filename': os.path.join(constants.get_user_directory(), 'remake_server.log'),
             'mode': 'a',
             'maxBytes': LOG_FILE_SIZE,
             'backupCount': LOG_BACKUP_COUNT,
@@ -50,6 +58,6 @@ LOG_CONFIG = {
     },
     'root': {
         'level': LOG_LEVEL,
-        'handlers': ['console', 'file']
+        'handlers': ['console', 'file', 'file_error']
     }
 }

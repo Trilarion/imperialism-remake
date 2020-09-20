@@ -15,17 +15,30 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import uuid
 
-from imperialism_remake.server.models.structure import Structure
 from imperialism_remake.server.models.structure_type import StructureType
-from imperialism_remake.server.server_scenario import ServerScenario
-from imperialism_remake.server.structures.structure_farm_elevator import StructureFarmElevator
-from imperialism_remake.server.structures.structure_warehouse import StructureWarehouse
+from imperialism_remake.server.models.terrain_type import TerrainType
 
 
-class StructureFactory:
-    @staticmethod
-    def create_new_structure(server_scenario: ServerScenario, structure) -> Structure:
-        if structure.get_type() == StructureType.FARM_ELEVATOR:
-            return StructureFarmElevator(server_scenario, structure)
-        elif structure.get_type() == StructureType.WAREHOUSE:
-            return StructureWarehouse(server_scenario, structure)
+class StructureCommon:
+    def __init__(self, server_scenario, structure):
+        self._structure = structure
+        self._server_scenario = server_scenario
+
+    def can_build(self, row, column) -> bool:
+        if column < 0 or row < 0:
+            return False
+
+        terrain_type = self._server_scenario.terrain_at(column, row)
+        if terrain_type == TerrainType.SEA.value:
+            return False
+
+        return True
+
+    def get_id(self) -> uuid:
+        return self._structure.get_id()
+
+    def get_type(self) -> StructureType:
+        return self._structure.get_type()
+
+    def get_position(self) -> (int, int):
+        return self._structure.get_position()

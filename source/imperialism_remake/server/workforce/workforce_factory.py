@@ -16,6 +16,7 @@
 import uuid
 
 from imperialism_remake.server.models.turn_planned import TurnPlanned
+from imperialism_remake.server.models.workforce import Workforce
 from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
@@ -25,9 +26,9 @@ from imperialism_remake.server.workforce.workforce_geologist import WorkforceGeo
 
 class WorkforceFactory:
     @staticmethod
-    def create_new_workforce(server_scenario: ServerScenario, turn_planned: TurnPlanned, uuid: uuid.uuid4, row: int, column: int,
-                             workforce_type: WorkforceType) -> WorkforceCommon:
-        if workforce_type == WorkforceType.GEOLOGIST:
-            return WorkforceGeologist(server_scenario, turn_planned, uuid, row, column)
-        elif workforce_type == WorkforceType.ENGINEER:
-            return WorkforceEngineer(server_scenario, turn_planned, uuid, row, column)
+    def create_new_workforce(server_scenario: ServerScenario, turn_planned: TurnPlanned,
+                             workforce: Workforce) -> WorkforceCommon:
+        if workforce.get_type() == WorkforceType.GEOLOGIST:
+            return WorkforceGeologist(server_scenario, turn_planned, workforce)
+        elif workforce.get_type() == WorkforceType.ENGINEER:
+            return WorkforceEngineer(server_scenario, turn_planned, workforce)

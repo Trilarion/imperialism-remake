@@ -86,6 +86,7 @@ MINIMAL_SCREEN_SIZE = (1024, 768)
 TILE_SIZE = 80
 WORKFORCE_SIZE = [48, 60]
 
+
 # options
 
 @unique
@@ -133,6 +134,7 @@ class C(utils.AutoNumberedEnum):
     CHAT = ()
     SYSTEM = ()
     LOBBY = ()
+    GAME = ()
 
 
 @unique
@@ -154,6 +156,9 @@ class M(utils.AutoNumberedEnum):
     LOBBY_SCENARIO_CORE_LIST = ()
     LOBBY_SCENARIO_PREVIEW = ()
     LOBBY_CONNECTED_CLIENTS = ()
+
+    GAME_TURN_PROCESS_REQUEST = ()
+    GAME_TURN_PROCESS_RESPONSE = ()
 
 
 @unique

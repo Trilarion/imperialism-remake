@@ -31,6 +31,7 @@ from imperialism_remake.client.turn.turn_end_widget import TurnEndWidget
 from imperialism_remake.client.turn.turn_manager import TurnManager
 from imperialism_remake.client.workforce.workforce_animated_widget import WorkforceAnimatedWidget
 from imperialism_remake.server.models.turn_result import TurnResult
+from imperialism_remake.server.models.workforce import Workforce
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.workforce.workforce_factory import WorkforceFactory
@@ -73,20 +74,20 @@ class GameMainScreen(GenericScreen):
         self._workforce_widgets = {}
 
         # !!! TODO this is just to test, remove me a little bit later!!!
+        workforce_engineer01_primitive = Workforce(uuid.uuid4(), 4, 13, WorkforceType.ENGINEER)
         workforce_engineer01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
                                                                      self._turn_manager.get_turn_planned(),
-                                                                     uuid.uuid4(),
-                                                                     4, 13, WorkforceType.ENGINEER)
+                                                                     workforce_engineer01_primitive)
         workforce_engineer01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_engineer01)
         workforce_engineer01_widget.plan_action(4, 13, WorkforceAction.STAND)
 
         workforce_engineer01_widget.event_widget_selected.connect(self._selected_widget_object_event)
         workforce_engineer01_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
 
+        workforce_geologist01_primitive = Workforce(uuid.uuid4(), 8, 11, WorkforceType.GEOLOGIST)
         workforce_geologist01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
                                                                       self._turn_manager.get_turn_planned(),
-                                                                      uuid.uuid4(),
-                                                                      8, 11, WorkforceType.GEOLOGIST)
+                                                                      workforce_geologist01_primitive)
         workforce_geologist01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_geologist01)
         workforce_geologist01_widget.plan_action(8, 11, WorkforceAction.STAND)
 
@@ -171,8 +172,10 @@ class GameMainScreen(GenericScreen):
             self._workforce_widgets[new_workforce_widget.get_workforce().get_id()] = new_workforce_widget
 
         for road_section in turn_result.get_roads():
+            self.scenario.server_scenario.add_road(road_section[0], road_section[1])
             self._main_map.draw_road(road_section[0], road_section[1])
 
-        for structure in turn_result.get_structures():
+        for s_id, structure in turn_result.get_structures().items():
             r, c = structure.get_position()
+            self.scenario.server_scenario.add_structure(r, c, structure)
             self._main_map.draw_structure(r, c, structure)

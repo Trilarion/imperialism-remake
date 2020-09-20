@@ -41,66 +41,6 @@ def get_arguments():
     return parser.parse_args()
 
 
-def get_configured_logger(user_folder, is_debug):
-    """
-    Obtain configured logger, depending on location of user folder and debug mode (set by command line).
-    """
-    log_level = logging.DEBUG if is_debug else logging.INFO
-    logger = logging.getLogger()
-    logger.setLevel(log_level)
-    log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    log_console_handler = logging.StreamHandler()
-    log_console_handler.setFormatter(log_formatter)
-    logger.addHandler(log_console_handler)
-    if is_debug:
-        logger.info('debug mode is on')
-
-    # redirect output to log files (will be overwritten at each start)
-    log_filename = os.path.join(user_folder, 'remake.log')
-    log_details_handler = logging.FileHandler(log_filename, mode='w', encoding='utf-8')
-    log_details_handler.setFormatter(log_formatter)
-    logger.addHandler(log_details_handler)
-    logger.info('writing detailed log messages to %s', log_filename)
-
-    error_filename = os.path.join(user_folder, 'remake.error.log')
-    log_error_handler = logging.FileHandler(error_filename, mode='w', encoding='utf-8')
-    log_error_handler.setFormatter(log_formatter)
-    log_error_handler.setLevel(logging.ERROR)
-    logger.addHandler(log_error_handler)
-    logger.info('writing error log messages to %s', error_filename)
-
-    # the "log_queue" can be used by forked processes (e.g. ServerProcess) for log delivery
-    log_queue = multiprocessing.Queue()
-
-    def run_logger_thread(log_queue, logging=logging):
-        """ Listen to a queue waiting for new log records
-
-        This queue can be filled by other processes (e.g. ServerProcess). Each sending process should configure its
-        own log handler (logging.handlers.QueueHandler) connected to this queue.
-        """
-        logger = logging.getLogger(__name__)
-        logger.info("created log receiver thread (pid=%d)", os.getpid())
-        while True:
-            record = log_queue.get()
-            if record is None:
-                break
-            logger = logging.getLogger(record.name)
-            logger.handle(record)
-
-    logger_thread = threading.Thread(target=run_logger_thread, args=(log_queue,))
-    logger_thread.start()
-
-    def logger_thread_cleanup(log_queue=log_queue, logger_thread=logger_thread):
-        """
-        The logger thread will exit as soon as he receives None in the log_queue
-        This function should be called immediately before exiting.
-        """
-        log_queue.put(None)
-        logger_thread.join()
-
-    return logger, log_queue, log_formatter, log_level, logger_thread_cleanup
-
-
 def main():
     """
     Main entry point. Called from the script generated in setup.py and called when running this module with python.
@@ -157,8 +97,9 @@ def main():
     from imperialism_remake.base import switches
     args = get_arguments()
     switches.DEBUG_MODE = args.debug
-    logger, log_queue, log_formatter, log_level, logger_cleanup = get_configured_logger(user_folder,
-                                                                                        switches.DEBUG_MODE)
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG if switches.DEBUG_MODE else logging.INFO)
+
     logger.info('user data stored in: {}'.format(user_folder))
 
     # search for existing options file, if not existing, save it once (should just save an empty dictionary)
@@ -190,7 +131,7 @@ def main():
     # start server
     from imperialism_remake.server.server_process import ServerProcess
 
-    server_process = ServerProcess(log_queue, log_formatter, log_level)
+    server_process = ServerProcess()
     server_process.start()
 
     logger.info('server process started (%s)', server_process.pid)
@@ -214,7 +155,6 @@ def main():
 
     # good bye message and shutdown logger
     logger.info('will exit soon - good bye')
-    logger_cleanup()
 
 
 if __name__ == '__main__':

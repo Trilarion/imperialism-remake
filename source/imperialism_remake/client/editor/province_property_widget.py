@@ -49,7 +49,7 @@ class ProvincePropertiesWidget(QtWidgets.QWidget):
         self.provinces_combobox.setFixedWidth(200)
         self.provinces_combobox.currentIndexChanged.connect(self.province_combobox_index_changed)
         widget_layout.addWidget(qt.wrap_in_groupbox(qt.wrap_in_boxlayout((label, self.provinces_combobox)),
-                                                    'provinces'))
+                                                    constants.SCENARIO_FILE_PROVINCES))
 
         # province info panel
         layout = QtWidgets.QVBoxLayout()

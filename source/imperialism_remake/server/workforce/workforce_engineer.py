@@ -13,22 +13,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import uuid
-
 
 from imperialism_remake.server.models.technology_type import TechnologyType
 from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.models.turn_planned import TurnPlanned
 from imperialism_remake.server.models.workforce_action import WorkforceAction
-from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
 
 class WorkforceEngineer(WorkforceCommon):
-    def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce_id: uuid, row: int,
-                 column: int):
-        super().__init__(server_scenario, turn_planned, workforce_id, row, column, WorkforceType.ENGINEER)
+    def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce):
+        super().__init__(server_scenario, turn_planned, workforce)
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         is_action_allowed = super().is_action_allowed(new_row, new_column, workforce_action)
@@ -36,17 +32,18 @@ class WorkforceEngineer(WorkforceCommon):
             return False
 
         if workforce_action == WorkforceAction.DUTY_ACTION:
+            row, column = self.get_current_position()
             # TODO check if can do duty action where i am standing now (build port or extend city, etc.)
-            if new_column == self._column and new_row == self._row:
+            if new_column == column and new_row == row:
                 return True
 
-            if [new_column, new_row] not in self._server_scenario.neighbored_tiles(self._column, self._row):
+            if [new_column, new_row] not in self._server_scenario.neighbored_tiles(column, row):
                 return False
 
             neighbour_terrain_type = self._server_scenario.terrain_at(new_column, new_row)
             neighbour_tile_action_allowed = self._is_tile_action_allowed(neighbour_terrain_type)
 
-            current_terrain_type = self._server_scenario.terrain_at(self._column, self._row)
+            current_terrain_type = self._server_scenario.terrain_at(column, row)
             current_tile_action_allowed = self._is_tile_action_allowed(current_terrain_type)
 
             return neighbour_tile_action_allowed and current_tile_action_allowed

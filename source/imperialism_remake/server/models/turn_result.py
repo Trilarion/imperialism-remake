@@ -20,7 +20,7 @@ class TurnResult:
     def __init__(self):
         self._workforces = {}
         self._roads = []
-        self._structures = []
+        self._structures = {}
 
     def get_workforces(self) -> {}:
         return self._workforces
@@ -28,5 +28,5 @@ class TurnResult:
     def get_roads(self) -> []:
         return self._roads
 
-    def get_structures(self) -> []:
+    def get_structures(self) -> {}:
         return self._structures
