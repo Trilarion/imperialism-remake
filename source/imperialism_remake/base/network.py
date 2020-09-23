@@ -52,7 +52,7 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
         self.received.connect(self._process)
         self.channels = {}
 
-    def create_new_channel(self, channel: constants.C):
+    def _create_new_channel(self, channel: constants.C):
         """
         Given a new channel name (cannot already exist, otherwise an error will be thrown) creates
         a channel of this name.
@@ -63,7 +63,7 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
             raise RuntimeError('Channel with this name already existing.')
         self.channels[channel] = Channel()
 
-    def remove_channel(self, channel: constants.C, ignore_not_existing=False):
+    def _remove_channel(self, channel: constants.C, ignore_not_existing=False):
         """
         Given a channel name, removes this channel if it is existing. Raises an error if not
         existing and ignore_not_existing is not True.
@@ -88,7 +88,7 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
         :param callback: A callable
         """
         if channel not in self.channels:
-            self.create_new_channel(channel)
+            self._create_new_channel(channel)
         self.channels[channel].received.connect(callback)
 
     def disconnect_from_channel(self, channel: constants.C, callback: callable):
@@ -102,6 +102,7 @@ class NetworkClient(lib_network.ExtendedTcpSocket):
         if channel not in self.channels:
             raise RuntimeError('Channel with this name not existing.')
         self.channels[channel].received.disconnect(callback)
+        self._remove_channel(channel, ignore_not_existing=True)
 
     def _process(self, letter):
         """
@@ -159,6 +160,3 @@ class Channel(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self.message_counter = 0
-
-
-local_network_client = NetworkClient()

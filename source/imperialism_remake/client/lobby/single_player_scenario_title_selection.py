@@ -21,8 +21,7 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 
-from imperialism_remake.base import constants
-from imperialism_remake.base.network import local_network_client
+from imperialism_remake.client.client.client_network_connection import network_connection
 
 logger = logging.getLogger(__name__)
 
@@ -46,10 +45,10 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
         self.layout = QtWidgets.QVBoxLayout(self)
 
         # add a channel for us
-        local_network_client.connect_to_channel(constants.C.LOBBY, self.received_titles)
+        network_connection.connect_to_lobby(self.received_titles)
 
         # send message and ask for scenario titles
-        local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_SCENARIO_CORE_LIST)
+        network_connection.request_scenario_list_from_lobby()
 
     def received_titles(self, client, channel, action, content):
         """
@@ -58,7 +57,7 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
         """
 
         # immediately close the channel, we do not want to get this content twice
-        client.remove_channel(channel)
+        network_connection.disconnect_from_lobby(self.received_titles)
 
         # unpack content
         scenario_titles, self.scenario_files = zip(*content)
@@ -90,4 +89,4 @@ class SinglePlayerScenarioTitleSelection(QtWidgets.QGroupBox):
             Interruption. Clean up network channels and the like.
         """
         # network channel might still be open
-        local_network_client.remove_channel(self.CH_TITLES, ignore_not_existing=True)
+        network_connection.disconnect_from_lobby(self.received_titles)

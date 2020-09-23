@@ -34,7 +34,7 @@ class InfoPanel(QtWidgets.QWidget):
         """
         super().__init__()
 
-        logger.debug('GenericScreen __init__')
+        logger.debug('__init__')
 
         self.scenario = scenario
 

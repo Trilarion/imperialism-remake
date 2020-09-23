@@ -14,11 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
-import os
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
 
-from imperialism_remake.base import tools, constants
+from imperialism_remake.base import tools
 from imperialism_remake.client.common.generic_screen import GenericScreen
 from imperialism_remake.client.editor.change_terrain_resource_widget import ChangeTerrainResourceWidget
 from imperialism_remake.client.editor.change_terrain_widget import ChangeTerrainWidget
@@ -79,6 +78,8 @@ class EditorScreen(GenericScreen):
         self._layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         self._layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
 
+        self._add_help_and_exit_buttons(client)
+
     def new_scenario_dialog(self):
         """
         Shows the dialog for creation of a new scenario dialog and connect the "create new scenario" signal.
@@ -90,31 +91,6 @@ class EditorScreen(GenericScreen):
         dialog.setFixedSize(QtCore.QSize(600, 400))
         dialog.show()
 
-    def load_scenario_dialog(self):
-        """
-        Show the load a scenario dialog. Then loads it if the user has selected one.
-        """
-        # noinspection PyCallByClass
-        file_name = QtWidgets.QFileDialog.getOpenFileName(self, 'Load Scenario', constants.SCENARIO_FOLDER,
-                                                          'Scenario Files (*.scenario)')[0]
-        if file_name:
-            self.scenario.load(file_name)
-            # TODO: on fast PC notification is shown after loading and leads to black screen
-            # self.client.schedule_notification('Loaded scenario {}'
-            #                                  .format(editor_scenario.scenario[constants.ScenarioProperty.TITLE]))
-
-    def save_scenario_dialog(self):
-        """
-            Show the save a scenario dialog. Then saves it.
-        """
-        # noinspection PyCallByClass
-        file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Scenario', constants.SCENARIO_FOLDER,
-                                                          'Scenario Files (*.scenario)')[0]
-        if file_name:
-            self.scenario.server_scenario.save(file_name)
-            path, name = os.path.split(file_name)
-            self._client.schedule_notification('Saved to {}'.format(name))
-
     def map_change_terrain(self, column, row):
         """
         :param column:
@@ -125,8 +101,6 @@ class EditorScreen(GenericScreen):
                             delete_on_close=True, help_callback=self._client.show_help_browser)
         # dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
-
-        {}
 
     def map_change_terrain_resource(self, column, row):
         """

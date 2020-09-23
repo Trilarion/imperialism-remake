@@ -28,7 +28,7 @@ class TerrainResourceToPixmapMapper(TerrainToPixmapMapper):
 
     def get_pixmap_of_type(self, resource_type: int):
         if resource_type < 1 or resource_type >= len(self.pixmaps):
-            logger.warning('Tile type undefined: %s', resource_type)
+            #logger.warning('Tile type undefined: %s', resource_type)
             return None
 
         return self._get_pixmap_of_type(resource_type)

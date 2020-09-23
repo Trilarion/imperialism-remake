@@ -23,7 +23,7 @@ from functools import partial
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake.base import constants, tools
-from imperialism_remake.base.network import local_network_client
+from imperialism_remake.client.client.client_network_connection import network_connection
 from imperialism_remake.client.graphics.minimap_nation_item import MiniMapNationItem
 from imperialism_remake.lib import qt, utils
 
@@ -48,10 +48,10 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         super().__init__()
 
         # add a channel for us
-        local_network_client.connect_to_channel(constants.C.LOBBY, self.received_preview)
+        network_connection.connect_to_lobby(self.received_preview)
 
         # send a message and ask for preview
-        local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_SCENARIO_PREVIEW, scenario_file)
+        network_connection.request_scenario_preview_from_lobby(scenario_file)
 
         self.selected_nation = None
 
@@ -61,7 +61,7 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
         """
 
         # immediately unsubscribe, we need it only once
-        local_network_client.disconnect_from_channel(constants.C.LOBBY, self.received_preview)
+        network_connection.disconnect_from_lobby(self.received_preview)
 
         # unpack message
         nations = [(message[constants.SCENARIO_FILE_NATIONS][key][constants.NationProperty.NAME], key) for key in message[constants.SCENARIO_FILE_NATIONS]]
@@ -209,4 +209,4 @@ class SinglePlayerScenarioPreview(QtWidgets.QWidget):
             Interruption. Clean up network channels and the like.
         """
         # TODO is this right? network channel might still be open
-#       local_network_client.remove_channel(self.CH_PREVIEW, ignore_not_existing=True)
+        network_connection.disconnect_from_lobby(self.received_preview)

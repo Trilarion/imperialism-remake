@@ -19,12 +19,36 @@ GUI and internal working of the scenario editor. This is also partly of the clie
 know anything about the scenario, we put it in the server module.
 """
 import logging
+import os
 
+from imperialism_remake.client.client.client_network_connection import network_connection
 from imperialism_remake.client.common.generic_scenario import GenericScenario
+from imperialism_remake.server.server_scenario import ServerScenario
 
 logger = logging.getLogger(__name__)
 
 
 class GameScenario(GenericScenario):
-    def __init__(self):
-        super().__init__()
+    def init(self, server_base_scenario):
+        logger.debug("init")
+
+        self.server_scenario = ServerScenario(server_base_scenario)
+
+        self._init()
+
+    def load(self, file_name):
+        """
+        :param file_name:
+        """
+        logger.debug('load file_name:%s', file_name)
+
+        if os.path.isfile(file_name):
+            network_connection.send_game_to_load({'filename': file_name, 'nation': -1})
+
+    def save(self, file_name):
+        """
+        :param file_name:
+        """
+        logger.debug('save file_name:%s', file_name)
+
+        network_connection.request_game_to_save(file_name)

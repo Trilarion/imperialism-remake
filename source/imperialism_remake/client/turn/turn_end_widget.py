@@ -27,6 +27,8 @@ class TurnEndWidget(QtWidgets.QWidget):
     def __init__(self, turn_manager: TurnManager):
         super().__init__()
 
+        logger.debug('__init__')
+
         button = QtWidgets.QPushButton( "", self)
         button.setIcon(tools.load_ui_icon('icon.end_turn.png'))
         button.setIconSize(QtCore.QSize(24, 24))

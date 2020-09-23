@@ -22,7 +22,7 @@ import logging
 from PyQt5 import QtCore, QtWidgets
 
 from imperialism_remake.base import constants, network as base_network
-from imperialism_remake.base.network import local_network_client
+from imperialism_remake.client.client.client_network_connection import network_connection
 from imperialism_remake.lib import qt
 
 logger = logging.getLogger(__name__)
@@ -59,11 +59,11 @@ class ServerLobby(QtWidgets.QWidget):
         # connection to server
 
         # chat messages
-        local_network_client.connect_to_channel(constants.C.CHAT, self.receive_chat_messages)
-        local_network_client.send(constants.C.CHAT, constants.M.CHAT_SUBSCRIBE)
+        network_connection.connect_to_chat(self.receive_chat_messages)
 
         # LOBBY
-        local_network_client.connect_to_channel(constants.C.LOBBY, self.receive_lobby_messages)
+        network_connection.connect_to_lobby(self.receive_lobby_messages)
+
         self.request_updated_client_list()
 
         # set timer for connected client updates
@@ -76,8 +76,8 @@ class ServerLobby(QtWidgets.QWidget):
         """
         Sends a chat message.
         """
-        chat_message = self.chat_input_edit.text()
-        local_network_client.send(constants.C.CHAT, constants.M.CHAT_MESSAGE, chat_message)
+        network_connection.send_message_to_chat(self.chat_input_edit.text())
+
         self.chat_input_edit.setText('')
 
     def receive_chat_messages(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M,
@@ -97,7 +97,7 @@ class ServerLobby(QtWidgets.QWidget):
         """
         Sends a request to get an updated connected client list.
         """
-        local_network_client.send(constants.C.LOBBY, constants.M.LOBBY_CONNECTED_CLIENTS)
+        network_connection.request_client_list_for_chat()
 
     def receive_lobby_messages(self, client: base_network.NetworkClient, channel: constants.C, action: constants.M,
                                content):
@@ -119,9 +119,7 @@ class ServerLobby(QtWidgets.QWidget):
 
         :param parent_widget:
         """
-        local_network_client.send(constants.C.CHAT, constants.M.CHAT_UNSUBSCRIBE)
-        local_network_client.disconnect_from_channel(constants.C.CHAT, self.receive_chat_messages)
-
-        local_network_client.disconnect_from_channel(constants.C.LOBBY, self.receive_lobby_messages)
+        network_connection.disconnect_from_chat(self.receive_chat_messages)
+        network_connection.disconnect_from_lobby(self.receive_lobby_messages)
 
         return True

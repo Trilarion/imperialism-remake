@@ -159,6 +159,10 @@ class M(utils.AutoNumberedEnum):
 
     GAME_TURN_PROCESS_REQUEST = ()
     GAME_TURN_PROCESS_RESPONSE = ()
+    GAME_SAVE_REQUEST = ()
+    GAME_SAVE_RESPONSE = ()
+    GAME_LOAD_REQUEST = ()
+    GAME_LOAD_RESPONSE = ()
 
 
 @unique
@@ -203,7 +207,7 @@ class NationProperty(utils.AutoNumberedEnum):
     NAME = ()
     DESCRIPTION = ()
     CAPITAL_PROVINCE = ()
-
+    ASSETS = ()
 
 @unique
 class ProvinceProperty(utils.AutoNumberedEnum):

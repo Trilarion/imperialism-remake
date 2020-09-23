@@ -29,8 +29,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from imperialism_remake import version
 from imperialism_remake.base import constants, tools
-from imperialism_remake.base.network import local_network_client
 from imperialism_remake.client import audio
+from imperialism_remake.client.client.client_network_connection import network_connection
 from imperialism_remake.client.client.map_item import MapItem
 from imperialism_remake.client.config import config_log
 from imperialism_remake.client.editor.editor_screen import EditorScreen
@@ -40,6 +40,7 @@ from imperialism_remake.client.lobby.game_lobby_widget import GameLobbyWidget
 from imperialism_remake.client.preferences import PreferencesWidget
 from imperialism_remake.client.server_monitor import ServerMonitorWidget
 from imperialism_remake.lib import qt, utils
+from imperialism_remake.server.server_network_client import ServerNetworkClient
 
 logger = logging.getLogger(__name__)
 
@@ -179,6 +180,8 @@ class Client:
         # set it active again or it doesn't get keyboard focus
         self.main_window.activateWindow()
 
+        network_connection.connect_to_system(self._system_messages)
+
         logger.debug('Client initialized')
 
     def schedule_notification(self, text):
@@ -277,9 +280,7 @@ class Client:
         logger.debug('single_player_start scenario_file:%s, selected_nation:%s', scenario_file, selected_nation)
 
         # lobby_widget.close()
-
-        widget = GameMainScreen(self, scenario_file, selected_nation)
-        self.widget_switcher.switch(widget)
+        network_connection.send_game_to_load({'filename': scenario_file, 'nation': selected_nation})
 
     def switch_to_editor_screen(self):
         """
@@ -305,6 +306,16 @@ class Client:
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
+    def _system_messages(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
+        if action == constants.M.GAME_LOAD_RESPONSE:
+            logger.debug("_system_messages message action:%s, scenario:%s", action, content)
+            server_scenario_base = content['server_scenario_base']
+            selected_nation = content['nation']
+
+            self.widget_switcher.remove_previous_widget()
+            widget = GameMainScreen(self, server_scenario_base, selected_nation)
+            self.widget_switcher.switch(widget)
+
     def quit(self):
         """
         Cleans up and closes the main window which causes app.exec_() to finish.
@@ -319,9 +330,7 @@ class Client:
         audio.soundtrack_player.stop()
 
         # stop the local server
-        local_network_client.send(constants.C.SYSTEM, constants.M.SYSTEM_SHUTDOWN)
-        # TODO is this okay, is there a better way
-        local_network_client.socket.flush()
+        network_connection.stop()
 
         # close the main window
         self.main_window.close()
@@ -334,13 +343,12 @@ def local_network_connect():
 
     # connect network client of client
     logger.info('client tries to connect to server')
-    local_network_client.connect_to_host(constants.NETWORK_PORT)
+    network_connection.start()
     # TODO what if this is not possible
     # that should always be possible, if not, we should try again, and then throw an error
 
     # tell name
-    local_network_client.send(constants.C.GENERAL, constants.M.GENERAL_NAME,
-                              tools.get_option(constants.Option.LOCALCLIENT_NAME))
+    network_connection.send_client_name()
 
 
 def start_client():
