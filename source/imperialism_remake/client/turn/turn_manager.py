@@ -18,10 +18,9 @@ import logging
 from PyQt5 import QtCore
 
 from imperialism_remake.base import constants
-from imperialism_remake.base.network import local_network_client
+from imperialism_remake.client.client.client_network_connection import network_connection
 from imperialism_remake.server.models.turn_planned import TurnPlanned
 from imperialism_remake.server.models.turn_result import TurnResult
-from imperialism_remake.server.models.workforce import Workforce
 from imperialism_remake.server.server_network_client import ServerNetworkClient
 from imperialism_remake.server.structures.structure_factory import StructureFactory
 from imperialism_remake.server.workforce.workforce_factory import WorkforceFactory
@@ -32,13 +31,16 @@ logger = logging.getLogger(__name__)
 class TurnManager(QtCore.QObject):
     event_turn_completed = QtCore.pyqtSignal(TurnResult)
 
-    def __init__(self, scenario):
+    def __init__(self, scenario, selected_nation):
         super().__init__()
 
-        self._scenario = scenario
-        self._turn_planned = TurnPlanned()
+        logger.debug('__init__')
 
-        local_network_client.connect_to_channel(constants.C.GAME, self._game_message_received)
+        self._scenario = scenario
+        self._selected_nation = selected_nation
+        self._turn_planned = TurnPlanned(self._selected_nation)
+
+        network_connection.connect_to_game(self._game_message_received)
 
     def get_turn_planned(self) -> TurnPlanned:
         return self._turn_planned
@@ -55,7 +57,7 @@ class TurnManager(QtCore.QObject):
         logger.debug("_process_turn_result")
 
         del self._turn_planned
-        self._turn_planned = TurnPlanned()
+        self._turn_planned = TurnPlanned(self._selected_nation)
 
         for w_id, w in turn_result.get_workforces().items():
             workforce = WorkforceFactory.create_new_workforce(self._scenario.server_scenario, self._turn_planned, w)
@@ -69,11 +71,15 @@ class TurnManager(QtCore.QObject):
         self.event_turn_completed.emit(turn_result)
 
     def _send_turn_planned_to_server(self, turn_planned: TurnPlanned):
-        logger.debug("_send_message_to_server send message:%s", turn_planned)
+        logger.debug("_send_turn_planned_to_server message:%s", turn_planned)
 
-        local_network_client.send(constants.C.GAME, constants.M.GAME_TURN_PROCESS_REQUEST, turn_planned)
+        network_connection.request_turn_process_for_game(turn_planned)
 
     def _game_message_received(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
-        logger.debug("_game_message_received send message action:%s, content:%s", action, content)
+        logger.debug("_game_message_received message action:%s, content:%s", action, content)
         if action == constants.M.GAME_TURN_PROCESS_RESPONSE:
             self._process_turn_result(content)
+
+    def destroy(self):
+        logger.debug("destroy")
+        network_connection.disconnect_from_game(self._game_message_received)

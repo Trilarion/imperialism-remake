@@ -21,8 +21,8 @@ Preferences Widget
 from PyQt5 import QtCore, QtWidgets
 
 from imperialism_remake.base import constants, tools
-from imperialism_remake.base.network import local_network_client
 from imperialism_remake.client import audio
+from imperialism_remake.client.client.client_network_connection import network_connection
 from imperialism_remake.lib import qt
 
 
@@ -179,8 +179,8 @@ class PreferencesWidget(QtWidgets.QWidget):
 
         # client
         layout = QtWidgets.QVBoxLayout()
-        if local_network_client.is_connected():
-            peer_address, peer_port = local_network_client.peer_address()
+        if network_connection.is_connected():
+            peer_address, peer_port = network_connection.peer_address()
             status = 'Connected to {}:{}'.format(peer_address.toString(), peer_port)
         else:
             status = 'Disconnected'

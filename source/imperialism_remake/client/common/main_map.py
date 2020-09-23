@@ -50,7 +50,7 @@ class MainMap(QtWidgets.QGraphicsView):
     def __init__(self, scenario):
         super().__init__()
 
-        logger.debug('MainMap __init__')
+        logger.debug('__init__')
 
         self.scenario = scenario
 
@@ -106,6 +106,7 @@ class MainMap(QtWidgets.QGraphicsView):
         logger.debug('redraw finished')
 
     def _fill_textures(self, columns, rows, mapper, obj_type_getter) -> None:
+        logger.debug("_fill_textures")
         for column in range(0, columns):
             for row in range(0, rows):
                 self.fill_texture(column, row, mapper, obj_type_getter(column, row))
@@ -113,13 +114,14 @@ class MainMap(QtWidgets.QGraphicsView):
     def fill_texture(self, column, row, mapper, obj_type, z_value=1) -> None:
         pixmap = mapper.get_pixmap_of_type(obj_type)
         if pixmap is None:
-            logger.warning("No pixmap defined for type:%s, col:%s, row:%s", obj_type, column, row)
+            # logger.warning("No pixmap defined for type:%s, col:%s, row:%s", obj_type, column, row)
             return
 
         sx, sy = scene_position(column, row)
         scene_utils.put_pixmap_in_tile_center(self.scene, pixmap, sx, sy, z_value)
 
     def _fill_half_tiles(self, columns, rows) -> None:
+        logger.debug("_fill_half_tiles")
         # fill the half tiles which are not part of the map
         brush = QtGui.QBrush(QtCore.Qt.darkGray)
         for row in range(0, rows):
@@ -134,6 +136,7 @@ class MainMap(QtWidgets.QGraphicsView):
             item.setZValue(1)
 
     def _draw_grid_and_coords(self, columns, rows) -> None:
+        logger.debug("_draw_grid_and_coords")
         # draw the grid and the coordinates
         for column in range(0, columns):
             for row in range(0, rows):
@@ -149,6 +152,7 @@ class MainMap(QtWidgets.QGraphicsView):
                 self.scene.addItem(item)
 
     def _draw_towns_and_names(self) -> None:
+        logger.debug("_draw_towns_and_names")
         # draw towns and names
         city_pixmap = QtGui.QPixmap(constants.extend(constants.GRAPHICS_MAP_FOLDER, 'city.png'))
         for nation in self.scenario.server_scenario.nations():
@@ -183,6 +187,7 @@ class MainMap(QtWidgets.QGraphicsView):
                 item.setZValue(5)
 
     def _draw_province_and_nation_borders(self) -> None:
+        logger.debug("_draw_province_and_nation_borders")
         # draw province and nation borders
         # TODO the whole border drawing is a crude approximation, implement it the right way
         province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
@@ -215,6 +220,7 @@ class MainMap(QtWidgets.QGraphicsView):
             item.setZValue(5)
 
     def _draw_rivers(self) -> None:
+        logger.debug("_draw_rivers")
         # draw rivers
         river_pen = QtGui.QPen(QtGui.QColor(64, 64, 255))
         river_pen.setWidth(5)
@@ -234,13 +240,16 @@ class MainMap(QtWidgets.QGraphicsView):
             item.setZValue(2)
 
     def _draw_roads(self) -> None:
+        logger.debug("_draw_roads")
         for road_section in self.scenario.server_scenario.get_roads():
             self.draw_road(road_section[0], road_section[1])
 
     def _draw_structures(self) -> None:
-        for structure in self.scenario.server_scenario.get_structures():
-            row, column = structure.get_position()
-            self.draw_structure(row, column, structure)
+        logger.debug("_draw_structures")
+        for row, structure_in_row in self.scenario.server_scenario.get_structures().items():
+            for column, structures in structure_in_row.items():
+                for structure in structures:
+                    self.draw_structure(row, column, structure)
 
     def draw_structure(self, row, column, structure) -> None:
         pixmap = self.scenario.get_structure_type_to_pixmap_mapper().get_pixmap_of_type(structure.get_type().value)

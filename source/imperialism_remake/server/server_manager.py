@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-
+import copy
 import logging
 import os
 import time
@@ -177,6 +177,32 @@ class ServerManager(QtCore.QObject):
             }
             client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE, update)
 
+        elif action == constants.M.GAME_SAVE_REQUEST:
+            filename = content
+            self._server_turn_processor.get_scenario().save(filename)
+            client.send(channel, constants.M.GAME_SAVE_RESPONSE)
+
+        elif action == constants.M.GAME_LOAD_REQUEST:
+            filename = content['filename']
+            selected_nation = content['nation']
+
+            new_server_scenario = ServerScenario.from_file(filename)
+
+            self._server_turn_processor.set_scenario(new_server_scenario)
+
+            if selected_nation == -1:
+                # TODO This is load from file, not lobby, get player nation from file?
+                pass
+
+            new_server_scenario_base_for_nation = copy.deepcopy(new_server_scenario.get_scenario_base())
+            for key, nation in new_server_scenario_base_for_nation.nations.items():
+                # TODO check for -1 is only for debugging!
+                if key != selected_nation and selected_nation != -1:
+                    del nation
+
+            client.send(channel, constants.M.GAME_LOAD_RESPONSE,
+                        {'server_scenario_base': new_server_scenario_base_for_nation, 'nation': selected_nation})
+
     def _lobby_messages(self, client: ServerNetworkClient, channel: constants.C, action: constants.M, content):
         """
 
@@ -251,7 +277,7 @@ class ServerManager(QtCore.QObject):
         t0 = time.perf_counter()
 
         # TODO existing? can be loaded?
-        scenario = ServerScenario.from_file(scenario_file_name)
+        server_scenario = ServerScenario.from_file(scenario_file_name)
         logger.info('reading of the file took {}s'.format(time.perf_counter() - t0))
 
         preview = {'scenario': scenario_file_name}
@@ -262,31 +288,33 @@ class ServerManager(QtCore.QObject):
                               constants.ScenarioProperty.TITLE,
                               constants.ScenarioProperty.DESCRIPTION]
         for key in scenario_copy_keys:
-            preview[key] = scenario[key]
+            preview[key] = server_scenario[key]
 
         # some nations properties should be copied
         nations = {}
         nation_copy_keys = [constants.NationProperty.COLOR,
                             constants.NationProperty.NAME,
                             constants.NationProperty.DESCRIPTION]
-        for nation in scenario.nations():
+        for nation in server_scenario.nations():
             nations[nation] = {}
             for key in nation_copy_keys:
-                nations[nation][key] = scenario.nation_property(nation, key)
+                nations[nation][key] = server_scenario.nation_property(nation, key)
         preview[constants.SCENARIO_FILE_NATIONS] = nations
 
         # assemble a nations map (-1 means no nation)
-        columns = scenario[constants.ScenarioProperty.MAP_COLUMNS]
-        rows = scenario[constants.ScenarioProperty.MAP_ROWS]
+        columns = server_scenario[constants.ScenarioProperty.MAP_COLUMNS]
+        rows = server_scenario[constants.ScenarioProperty.MAP_ROWS]
         nations_map = [-1] * (columns * rows)
-        for nation_id in scenario.nations():
-            provinces = scenario.provinces_of_nation(nation_id)
+        for nation_id in server_scenario.nations():
+            provinces = server_scenario.provinces_of_nation(nation_id)
             for province in provinces:
-                tiles = scenario.province_property(province, constants.ProvinceProperty.TILES)
+                tiles = server_scenario.province_property(province, constants.ProvinceProperty.TILES)
                 for column, row in tiles:
                     nations_map[row * columns + column] = nation_id
         preview['map'] = nations_map
 
         logger.info('generating preview took {}s'.format(time.perf_counter() - t0))
+
+        self._server_turn_processor.set_scenario(server_scenario)
 
         return preview

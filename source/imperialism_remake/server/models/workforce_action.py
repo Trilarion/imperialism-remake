@@ -23,3 +23,4 @@ class WorkforceAction(Enum):
     STAND = 3
     SLEEP = 4
     READY = 5
+    CREATE = 6

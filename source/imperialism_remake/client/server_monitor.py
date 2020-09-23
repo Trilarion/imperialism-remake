@@ -23,7 +23,7 @@ from datetime import datetime
 from PyQt5 import QtCore, QtWidgets
 
 from imperialism_remake.base import constants, network as base_network
-from imperialism_remake.base.network import local_network_client
+from imperialism_remake.client.client.client_network_connection import network_connection
 
 
 class ServerMonitorWidget(QtWidgets.QWidget):
@@ -40,7 +40,7 @@ class ServerMonitorWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.status)
         self.layout.addStretch()
 
-        local_network_client.connect_to_channel(constants.C.SYSTEM, self.update_monitor)
+        network_connection.connect_to_system(self.update_monitor)
 
         # one initial update
         self.request_monitor_update()
@@ -55,7 +55,7 @@ class ServerMonitorWidget(QtWidgets.QWidget):
         """
         Sends a request for an update of the system monitor.
         """
-        local_network_client.send(constants.C.SYSTEM, constants.M.SYSTEM_MONITOR_UPDATE)
+        network_connection.request_monitor_update_from_system()
 
     def update_monitor(self, client: base_network.NetworkClient, channel: constants.C,
                        action: constants.M, content):
@@ -75,6 +75,5 @@ class ServerMonitorWidget(QtWidgets.QWidget):
 
         :param parent_widget:
         """
-        local_network_client.disconnect_from_channel(constants.C.SYSTEM,
-                                                     self.request_monitor_update)
+        network_connection.disconnect_from_system(self.request_monitor_update)
         return True

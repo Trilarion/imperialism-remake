@@ -31,6 +31,13 @@ class ServerTurnProcessor:
         self._clients = []
         self._clients_turn_planned = {}
         self._turn_processing_finished_event_handler = None
+        self._server_scenario = None
+
+    def set_scenario(self, server_scenario):
+        self._server_scenario = server_scenario
+
+    def get_scenario(self):
+        return self._server_scenario
 
     def client_turn_ended(self, client, turn_planned):
         logger.debug('client_turn_ended: %s', client)
@@ -63,12 +70,17 @@ class ServerTurnProcessor:
         old_workforces = self._clients_turn_planned[client.client_id].get_workforces()
         for k, w in old_workforces.items():
             r, c = w.get_new_position()
-            # Move worker to new position
-            personal_turn_result.get_workforces()[w.get_id()] = Workforce(w.get_id(), r, c, w.get_type())
 
             if w.get_action() == WorkforceAction.DUTY_ACTION:
                 if w.get_type() == WorkforceType.GEOLOGIST:
                     self._process_geologist(c, r, personal_turn_result, w)
+
+            # Move worker to new position
+            new_workforce = Workforce(w.get_id(), r, c, w.get_type())
+            personal_turn_result.get_workforces()[w.get_id()] = new_workforce
+
+            self._server_scenario.get_nation_asset(
+                self._clients_turn_planned[client.client_id].get_nation()).add_or_update_workforce(new_workforce)
 
         return personal_turn_result
 
@@ -91,15 +103,13 @@ class ServerTurnProcessor:
         # add roads
         old_r, old_c = w.get_current_position()
         if old_r != r or old_c != c:
-            # TODO we must add road to server scenario on server, but where is our server scenario instance on server???
-            # self._server_scenario.add_road((r, c), (old_r, old_c))
+            self._server_scenario.add_road((r, c), (old_r, old_c))
             turn_result.get_roads().append(((r, c), (old_r, old_c)))
 
         # add structures
         if old_r == r and old_c == c:
             wh = Structure(uuid.uuid4(), r, c, StructureType.WAREHOUSE)
-            # TODO we must add structure to server scenario on server, but where is our server scenario instance on server???
-            # self._scenario.server_scenario.add_structure(r, c, wh)
+            self._server_scenario.add_structure(r, c, wh)
             turn_result.get_structures()[wh.get_id()] = wh
 
     def _process_geologist(self, c, r, turn_result, w):

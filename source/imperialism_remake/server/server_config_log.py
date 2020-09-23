@@ -50,7 +50,7 @@ LOG_CONFIG = {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': logging.ERROR,
             'formatter': 'detailed',
-            'filename': os.path.join(constants.get_user_directory(), 'remake_server.log'),
+            'filename': os.path.join(constants.get_user_directory(), 'remake_server_error.log'),
             'mode': 'a',
             'maxBytes': LOG_FILE_SIZE,
             'backupCount': LOG_BACKUP_COUNT,

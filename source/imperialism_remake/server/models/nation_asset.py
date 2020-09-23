@@ -32,24 +32,13 @@ class NationAsset:
     def get_nation_id(self) -> uuid:
         return self._nation_id
 
-    def add_workforce(self, workforce: Workforce) -> None:
-        if self._workforces.get(workforce.get_id()):
-            raise Exception("Nation has already this worker")
-
-        row, column = workforce.get_current_position()
-        if self.asset_locations[row] and self.asset_locations[row][column] and isinstance(
-                self.asset_locations[row][column], Workforce):
-            raise Exception("There is Workforce:%s, %s in this place already",
-                            self.asset_locations[row][column].get_id(), self.asset_locations[row][column].get_type())
-
+    def add_or_update_workforce(self, workforce: Workforce) -> None:
         self._workforces[workforce.get_id()] = workforce
 
-        if self.asset_locations[row] is None:
+        row, column = workforce.get_current_position()
+        if row not in self.asset_locations:
             self.asset_locations[row] = {}
         self.asset_locations[row][column] = workforce
 
-    def get_workforce(self, row: int, column: int) -> Workforce:
-        if self.asset_locations[row] is not None and isinstance(self.asset_locations[row][column], Workforce):
-            return self.asset_locations[row][column]
-        else:
-            return None
+    def get_workforces(self) -> Workforce:
+        return self._workforces

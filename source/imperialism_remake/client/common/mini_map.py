@@ -45,7 +45,7 @@ class MiniMap(QtWidgets.QWidget):
         """
         super().__init__()
 
-        logger.debug('MainMap __init__')
+        logger.debug('__init__')
 
         self.scenario = scenario
 

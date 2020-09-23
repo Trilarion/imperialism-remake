@@ -21,10 +21,10 @@ thin client).
 import logging
 import math
 
-from PyQt5 import QtCore
-
 from imperialism_remake.base import constants
 from imperialism_remake.lib import utils
+from imperialism_remake.server.models.nation_asset import NationAsset
+from imperialism_remake.server.models.server_scenario_base import ServerScenarioBase
 from imperialism_remake.server.models.technology_type import TechnologyType
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 # TODO rivers are implemented inefficiently
 
-class ServerScenario(QtCore.QObject):
+class ServerScenario():
     """
     Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
 
@@ -49,31 +49,15 @@ class ServerScenario(QtCore.QObject):
     * Each nation has province ids stored.
     """
 
-    RESOURCE = 'resource'
-    TERRAIN = 'terrain'
-    ROAD = 'road'
-    STRUCTURE = 'structure'
+    def __init__(self, _scenario_base):
+        logger.debug("__init__")
+        self._scenario_base = _scenario_base
 
-    def __init__(self):
-        """
-        Start with a clean state.
-        """
-        super().__init__()
-        self._properties = {constants.ScenarioProperty.RIVERS: []}
-        self._provinces = {}
-        self._nations = {}
-        self._maps = {}
-        self._rules = {}
-
-        self._available_technologies = set()
-
-        # TODO read technologies from scenario/properties/rules...
-        self._available_technologies.add(TechnologyType.ROAD_THROUGH_HILLS)
-        self._available_technologies.add(TechnologyType.ROAD_THROUGH_PLAINS)
-        self._available_technologies.add(TechnologyType.GEOLOGY_WORK_HILLS)
+    def get_scenario_base(self):
+        return self._scenario_base
 
     def is_technology_available(self, tech_type: TechnologyType) -> bool:
-        return tech_type in self._available_technologies
+        return tech_type in self._scenario_base.available_technologies
 
     @staticmethod
     def from_file(file_path):
@@ -84,30 +68,30 @@ class ServerScenario(QtCore.QObject):
 
         logger.debug('from_file file: %s', file_path)
 
-        scenario = ServerScenario()
+        server_scenario = ServerScenario(ServerScenarioBase())
 
         reader = utils.ZipArchiveReader(file_path)
 
-        scenario._properties = reader.read_from_file(constants.SCENARIO_FILE_PROPERTIES)
-        scenario._maps = reader.read_from_file(constants.SCENARIO_FILE_MAPS)
-        scenario._provinces = reader.read_from_file(constants.SCENARIO_FILE_PROVINCES)
+        server_scenario.get_scenario_base().properties = reader.read_from_file(constants.SCENARIO_FILE_PROPERTIES)
+        server_scenario.get_scenario_base().maps = reader.read_from_file(constants.SCENARIO_FILE_MAPS)
+        server_scenario.get_scenario_base().provinces = reader.read_from_file(constants.SCENARIO_FILE_PROVINCES)
         # TODO check all ids are smaller then len()
 
-        scenario._nations = reader.read_from_file(constants.SCENARIO_FILE_NATIONS)
+        server_scenario.get_scenario_base().nations = reader.read_from_file(constants.SCENARIO_FILE_NATIONS)
         # TODO check all ids are smaller then len()
 
         # read rule file
         # TODO how to specify which rules file apply
-        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, scenario[constants.ScenarioProperty.RULES])
-        scenario._rules = utils.read_from_file(rule_file)
+        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, server_scenario[constants.ScenarioProperty.RULES])
+        server_scenario.get_scenario_base().rules = utils.read_from_file(rule_file)
 
-        if ServerScenario.ROAD not in scenario._maps:
-            scenario._maps[ServerScenario.ROAD] = []
+        if ServerScenarioBase.ROAD not in server_scenario._scenario_base.maps:
+            server_scenario._scenario_base.maps[ServerScenarioBase.ROAD] = []
 
-        if ServerScenario.STRUCTURE not in scenario._maps:
-            scenario._maps[ServerScenario.STRUCTURE] = {}
+        if ServerScenarioBase.STRUCTURE not in server_scenario._scenario_base.maps:
+            server_scenario._scenario_base.maps[ServerScenarioBase.STRUCTURE] = {}
 
-        return scenario
+        return server_scenario
 
     def create_empty_map(self, columns, rows):
         """
@@ -119,14 +103,14 @@ class ServerScenario(QtCore.QObject):
 
         logger.debug('create_empty_map columns:%s, rows:%s', columns, rows)
 
-        self._properties[constants.ScenarioProperty.MAP_COLUMNS] = columns
-        self._properties[constants.ScenarioProperty.MAP_ROWS] = rows
+        self._scenario_base.properties[constants.ScenarioProperty.MAP_COLUMNS] = columns
+        self._scenario_base.properties[constants.ScenarioProperty.MAP_ROWS] = rows
         number_tiles = columns * rows
-        self._maps[ServerScenario.TERRAIN] = [0] * number_tiles
-        self._maps[ServerScenario.RESOURCE] = [0] * number_tiles
+        self._scenario_base.maps[ServerScenarioBase.TERRAIN] = [0] * number_tiles
+        self._scenario_base.maps[ServerScenarioBase.RESOURCE] = [0] * number_tiles
 
-        self._maps[ServerScenario.ROAD] = []
-        self._maps[ServerScenario.STRUCTURE] = {}
+        self._scenario_base.maps[ServerScenarioBase.ROAD] = []
+        self._scenario_base.maps[ServerScenarioBase.STRUCTURE] = {}
 
     def add_river(self, name, tiles):
         """
@@ -136,32 +120,35 @@ class ServerScenario(QtCore.QObject):
         logger.debug('add_river name:%s, tiles:%s', name, tiles)
 
         river = {'name': name, 'tiles': tiles}
-        self._properties[constants.ScenarioProperty.RIVERS].extend([river])
+        self._scenario_base.properties[constants.ScenarioProperty.RIVERS].extend([river])
 
     def add_road(self, start: (), stop: ()) -> None:
         """
             Adds road
         """
         logger.debug('add_road section start:%s, stop:%s', start, stop)
-        self._maps[ServerScenario.ROAD].append((start, stop))
+        self._scenario_base.maps[ServerScenarioBase.ROAD].append((start, stop))
 
     def get_roads(self) -> []:
-        return self._maps[ServerScenario.ROAD]
+        return self._scenario_base.maps[ServerScenarioBase.ROAD]
 
     def add_structure(self, row: int, col: int, structure) -> None:
         """
             Adds structure
         """
         logger.debug('add_structure r:%s, c:%s', row, col)
-        if row not in self._maps[ServerScenario.STRUCTURE]:
-            self._maps[ServerScenario.STRUCTURE][row] = {}
-        if col not in self._maps[ServerScenario.STRUCTURE][row]:
-            self._maps[ServerScenario.STRUCTURE][row][col] = []
+        if row not in self._scenario_base.maps[ServerScenarioBase.STRUCTURE]:
+            self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row] = {}
+        if col not in self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row]:
+            self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row][col] = []
 
-        self._maps[ServerScenario.STRUCTURE][row][col].append(structure)
+        self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row][col].append(structure)
 
     def get_structures(self) -> []:
-        return self._maps[ServerScenario.STRUCTURE]
+        return self._scenario_base.maps[ServerScenarioBase.STRUCTURE]
+
+    def get_nation_asset(self, nation):
+        return self.nation_property(nation, constants.NationProperty.ASSETS)
 
     def set_terrain_at(self, column, row, terrain):
         """
@@ -173,7 +160,7 @@ class ServerScenario(QtCore.QObject):
         """
         logger.debug('set_terrain_at column:%s, row:%s, terrain:%s', column, row, terrain)
 
-        self._maps[ServerScenario.TERRAIN][self._map_index(column, row)] = terrain
+        self._scenario_base.maps[ServerScenarioBase.TERRAIN][self._map_index(column, row)] = terrain
 
     def terrain_at(self, column, row):
         """
@@ -183,21 +170,21 @@ class ServerScenario(QtCore.QObject):
         :param row: Row position
         :return: Terrain value
         """
-        return self._maps[ServerScenario.TERRAIN][self._map_index(column, row)]
+        return self._scenario_base.maps[ServerScenarioBase.TERRAIN][self._map_index(column, row)]
 
     def terrain_name(self, terrain):
         """
         Get a special property from the rules.
         """
         # TODO move this to a special rules class. Only have rules() and setRules() here.
-        return self._rules['terrain_settings'][terrain]['name']
+        return self._scenario_base.rules['terrain_settings'][terrain]['name']
 
     def terrain_resource_name(self, terrain):
         """
         Get a special property from the rules.
         """
         # TODO move this to a special rules class. Only have rules() and setRules() here.
-        return self._rules['terrain_resources_settings'][terrain]['name']
+        return self._scenario_base.rules['terrain_resources_settings'][terrain]['name']
 
     def set_resource_at(self, column, row, resource):
         """
@@ -208,7 +195,7 @@ class ServerScenario(QtCore.QObject):
         :param resource: Resource value
         """
         logger.debug('set_resource_at column:%s, row:%s, resource:%s', column, row, resource)
-        self._maps[ServerScenario.RESOURCE][self._map_index(column, row)] = resource
+        self._scenario_base.maps[ServerScenarioBase.RESOURCE][self._map_index(column, row)] = resource
 
     def resource_at(self, column, row):
         """
@@ -218,7 +205,7 @@ class ServerScenario(QtCore.QObject):
         :param row: Row position
         :return: Resource value
         """
-        return self._maps[ServerScenario.RESOURCE][self._map_index(column, row)]
+        return self._scenario_base.maps[ServerScenarioBase.RESOURCE][self._map_index(column, row)]
 
     @staticmethod
     def scene_position(column, row):
@@ -246,8 +233,9 @@ class ServerScenario(QtCore.QObject):
         """
         row = math.floor(y)
         column = math.floor(x - (row % 2) / 2)
-        if row < 0 or row >= self._properties[constants.ScenarioProperty.MAP_ROWS] or column < 0 or column >= \
-                self._properties[constants.ScenarioProperty.MAP_COLUMNS]:
+        if row < 0 or row >= self._scenario_base.properties[
+            constants.ScenarioProperty.MAP_ROWS] or column < 0 or column >= \
+                self._scenario_base.properties[constants.ScenarioProperty.MAP_COLUMNS]:
             return -1, -1
         return column, row
 
@@ -255,7 +243,7 @@ class ServerScenario(QtCore.QObject):
         """
             Internal function. Calculates the index in the linear map for a given 2D position (first row, then column)?
         """
-        index = row * self._properties[constants.ScenarioProperty.MAP_COLUMNS] + column
+        index = row * self._scenario_base.properties[constants.ScenarioProperty.MAP_COLUMNS] + column
         return index
 
     def neighbor_position(self, column, row, direction):
@@ -294,13 +282,13 @@ class ServerScenario(QtCore.QObject):
                 return None
         elif direction is constants.TileDirections.EAST:
             # east
-            if column < self._properties[constants.ScenarioProperty.MAP_COLUMNS] - 1:
+            if column < self._scenario_base.properties[constants.ScenarioProperty.MAP_COLUMNS] - 1:
                 return [column + 1, row]
             else:
                 return None
         elif direction is constants.TileDirections.SOUTH_EAST:
             # south-east
-            if row < self._properties[constants.ScenarioProperty.MAP_ROWS] - 1:
+            if row < self._scenario_base.properties[constants.ScenarioProperty.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column, row + 1]
@@ -311,7 +299,7 @@ class ServerScenario(QtCore.QObject):
                 return None
         elif direction is constants.TileDirections.SOUTH_WEST:
             # south-west
-            if row < self._properties[constants.ScenarioProperty.MAP_ROWS] - 1:
+            if row < self._scenario_base.properties[constants.ScenarioProperty.MAP_ROWS] - 1:
                 if row % 2 == 0:
                     # even rows (0, 2, 4, ..)
                     return [column - 1, row + 1]
@@ -340,7 +328,7 @@ class ServerScenario(QtCore.QObject):
         """
         if key not in constants.ScenarioProperty.__members__.values():
             raise RuntimeError('Not a valid ScenarioProperty: {}.'.format(key))
-        self._properties[key] = value
+        self._scenario_base.properties[key] = value
 
     def __getitem__(self, key):
         """
@@ -349,20 +337,21 @@ class ServerScenario(QtCore.QObject):
         :param key: The key
         :return: The value
         """
-        if key not in self._properties:
+        if key not in self._scenario_base.properties:
             raise RuntimeError('Unknown property {}.'.format(key))
-        return self._properties[key]
+        return self._scenario_base.properties[key]
 
     def add_province(self):
         """
         Creates a new (nation-less) province and returns the id of it.
         """
-        province = len(self._provinces)  # this always works because we check after loading the integrity of the keys
+        province = len(
+            self._scenario_base.provinces)  # this always works because we check after loading the integrity of the keys
 
         logger.debug('add_province province:%s', province)
 
         # TODO unless we delete provinces, some more checks might be good here (like first non-used)
-        self._provinces[province] = {
+        self._scenario_base.provinces[province] = {
             constants.ProvinceProperty.TILES: [],
             constants.ProvinceProperty.NATION: None
         }
@@ -376,15 +365,15 @@ class ServerScenario(QtCore.QObject):
         """
         logger.debug('remove_province province:%s', province)
 
-        if province not in self._provinces:
+        if province not in self._scenario_base.provinces:
             raise RuntimeError('Unknown province {}.'.format(province))
 
         # delete reference to province in nation
-        nation = self._provinces[province][constants.ProvinceProperty.NATION]
-        self._nations[nation][constants.NationProperty.PROVINCES].remove(province)
+        nation = self._scenario_base.provinces[province][constants.ProvinceProperty.NATION]
+        self._scenario_base.nations[nation][constants.NationProperty.PROVINCES].remove(province)
 
         # delete province
-        del self._provinces[province]
+        del self._scenario_base.provinces[province]
 
     def set_province_property(self, province, key, value):
         """
@@ -392,11 +381,11 @@ class ServerScenario(QtCore.QObject):
         """
         # logger.debug('set_province_property province:%s, key:%s, value:%s', province, key, value)
 
-        if province not in self._provinces:
+        if province not in self._scenario_base.provinces:
             raise RuntimeError('Unknown province {}.'.format(province))
         if key not in constants.ProvinceProperty.__members__.values():
             raise RuntimeError('Not a valid ProvinceProperty: {}.'.format(key))
-        self._provinces[province][key] = value
+        self._scenario_base.provinces[province][key] = value
 
     def province_property(self, province, key):
         """
@@ -405,8 +394,8 @@ class ServerScenario(QtCore.QObject):
         """
         # logger.debug('province_property province:%s, key:%s', province, key)
 
-        if province in self._provinces and key in self._provinces[province]:
-            return self._provinces[province][key]
+        if province in self._scenario_base.provinces and key in self._scenario_base.provinces[province]:
+            return self._scenario_base.provinces[province][key]
         else:
             raise RuntimeError('Unknown province {} or property {}.'.format(province, key))
 
@@ -422,14 +411,14 @@ class ServerScenario(QtCore.QObject):
 
         # TODO TODO we should check that this position is not yet in another province (it should be cleared before).
         #     fail fast, fail often
-        if province in self._provinces and self.is_valid_position(position):
-            self._provinces[province][constants.ProvinceProperty.TILES].append(position)
+        if province in self._scenario_base.provinces and self.is_valid_position(position):
+            self._scenario_base.provinces[province][constants.ProvinceProperty.TILES].append(position)
 
     def provinces(self):
         """
         Return a list of ids for all provinces. A province is just an id for us.
         """
-        return self._provinces.keys()
+        return self._scenario_base.provinces.keys()
 
     def provinces_of_nation(self, nation):
         """
@@ -438,8 +427,8 @@ class ServerScenario(QtCore.QObject):
         logger.debug('provinces_of_nation nation:%s', nation)
 
         # TODO not needed, replace
-        if nation in self._nations:
-            return self._nations[nation][constants.NationProperty.PROVINCES]
+        if nation in self._scenario_base.nations:
+            return self._scenario_base.nations[nation][constants.NationProperty.PROVINCES]
         else:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
@@ -455,8 +444,8 @@ class ServerScenario(QtCore.QObject):
 
         #  TODO speed up by having a reference in the map. (see also programmers.SE question)
         position = [column, row]
-        for province in self._provinces:
-            if position in self._provinces[province][constants.ProvinceProperty.TILES]:
+        for province in self._scenario_base.provinces:
+            if position in self._scenario_base.provinces[province][constants.ProvinceProperty.TILES]:
                 return province
         return None
 
@@ -468,25 +457,26 @@ class ServerScenario(QtCore.QObject):
 
         # TODO this is not right yet
         # wire it in both ways
-        self._nations[nation][constants.NationProperty.PROVINCES].append(province)
-        self._provinces[province][constants.ProvinceProperty.NATION] = nation
+        self._scenario_base.nations[nation][constants.NationProperty.PROVINCES].append(province)
+        self._scenario_base.provinces[province][constants.ProvinceProperty.NATION] = nation
 
     def nations(self):
         """
         Return a list of ids for all nations. A nation is just an id for us.
         """
-        return self._nations.keys()
+        return self._scenario_base.nations.keys()
 
     def add_nation(self):
         """
         Add a new nation and returns it.
         """
-        nation = len(self._nations)  # this always gives a new unique number because we check after loading
+        nation = len(
+            self._scenario_base.nations)  # this always gives a new unique number because we check after loading
 
         logger.debug('add_nation nation:%s', nation)
 
         # TODO as long as we do not delete nations, some more checks here might be good
-        self._nations[nation] = {
+        self._scenario_base.nations[nation] = {
             constants.NationProperty.PROVINCES: [],
         }
         return nation
@@ -499,15 +489,15 @@ class ServerScenario(QtCore.QObject):
         """
         logger.debug('remove_nation nation:%s', nation)
 
-        if nation not in self._nations:
+        if nation not in self._scenario_base.nations:
             raise RuntimeError('Unknown nation {}.'.format(nation))
 
         # delete reference to nation in provinces
-        for province in self._nations[nation][constants.NationProperty.PROVINCES]:
+        for province in self._scenario_base.nations[nation][constants.NationProperty.PROVINCES]:
             self.set_province_property(province, constants.ProvinceProperty.NATION, None)
 
         # delete nation
-        del self._nations[nation]
+        del self._scenario_base.nations[nation]
 
     def set_nation_property(self, nation, key, value):
         """
@@ -520,12 +510,12 @@ class ServerScenario(QtCore.QObject):
         """
         logger.debug('set_nation_property nation:%s, key:%s, value:%s', nation, key, value)
 
-        if nation not in self._nations:
+        if nation not in self._scenario_base.nations:
             raise RuntimeError('Unknown nation {}.'.format(nation))
         if key not in constants.NationProperty.__members__.values():
             raise RuntimeError('Not a valid NationProperty: {}.'.format(key))
 
-        self._nations[nation][key] = value
+        self._scenario_base.nations[nation][key] = value
 
     def nation_property(self, nation_key, property_key):
         """
@@ -535,10 +525,14 @@ class ServerScenario(QtCore.QObject):
         logger.debug('set_nation_property nation_key:%s, property_key:%s', nation_key, property_key)
 
         try:
-            nation = self._nations[nation_key]
+            nation = self._scenario_base.nations[nation_key]
         except KeyError:
             raise RuntimeError('Unknown nation "{}" (known nations: {}).'
-                               .format(nation_key, ", ".join([str(key) for key in self._nations])))
+                               .format(nation_key, ", ".join([str(key) for key in self._scenario_base.nations])))
+        # TODO remove thia once scnario is saved with this property
+        if constants.NationProperty.ASSETS not in nation:
+            nation[constants.NationProperty.ASSETS] = NationAsset(nation_key)
+        # end of TODO
         try:
             return nation[property_key]
         except KeyError:
@@ -552,24 +546,24 @@ class ServerScenario(QtCore.QObject):
         logger.debug('save file_name:%s', file_name)
 
         writer = utils.ZipArchiveWriter(file_name)
-        writer.write_to_file(constants.SCENARIO_FILE_PROPERTIES, self._properties)
-        writer.write_to_file(constants.SCENARIO_FILE_MAPS, self._maps)
-        writer.write_to_file(constants.SCENARIO_FILE_PROVINCES, self._provinces)
-        writer.write_to_file(constants.SCENARIO_FILE_NATIONS, self._nations)
+        writer.write_to_file(constants.SCENARIO_FILE_PROPERTIES, self._scenario_base.properties)
+        writer.write_to_file(constants.SCENARIO_FILE_MAPS, self._scenario_base.maps)
+        writer.write_to_file(constants.SCENARIO_FILE_PROVINCES, self._scenario_base.provinces)
+        writer.write_to_file(constants.SCENARIO_FILE_NATIONS, self._scenario_base.nations)
 
         # rules are never updated by this mechanism
 
     def get_terrain_settings(self):
-        return self._rules['terrain_settings']
+        return self._scenario_base.rules['terrain_settings']
 
     def get_terrain_resources_settings(self):
-        return self._rules['terrain_resources_settings']
+        return self._scenario_base.rules['terrain_resources_settings']
 
     def get_workforce_settings(self):
-        return self._rules['workforce_settings']
+        return self._scenario_base.rules['workforce_settings']
 
     def get_workforce_action_cursor_settings(self):
-        return self._rules['workforce_action_cursors']
+        return self._scenario_base.rules['workforce_action_cursors']
 
     def get_structure_settings(self):
-        return self._rules['structure_settings']
+        return self._scenario_base.rules['structure_settings']

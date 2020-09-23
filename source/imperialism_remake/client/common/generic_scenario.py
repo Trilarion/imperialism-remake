@@ -19,24 +19,20 @@ GUI and internal working of the scenario editor. This is also partly of the clie
 know anything about the scenario, we put it in the server module.
 """
 import logging
-import os
 
 from PyQt5 import QtCore
 
-from imperialism_remake.base import constants
 from imperialism_remake.client.graphics.mappers.structure_type_to_pixmap_mapper import StructureTypeToPixmapMapper
 from imperialism_remake.client.graphics.mappers.terrain_resource_to_pixmap_mapper import TerrainResourceToPixmapMapper
 from imperialism_remake.client.graphics.mappers.terrain_type_to_pixmap_mapper import TerrainTypeToPixmapMapper
 from imperialism_remake.client.graphics.mappers.workforce_to_pixmap_mapper import WorkforceToTextureMapper
-from imperialism_remake.lib import utils
-from imperialism_remake.server.server_scenario import ServerScenario
 
 logger = logging.getLogger(__name__)
 
 
 class GenericScenario(QtCore.QObject):
     #: signal, scenario has changed completely
-    changed = QtCore.pyqtSignal()
+    scenario_changed = QtCore.pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -46,47 +42,18 @@ class GenericScenario(QtCore.QObject):
         self._terrain_type_to_pixmap_mapper = None
         self._workforce_to_texture_mapper = None
 
-    def load(self, file_name):
-        """
-        :param file_name:
-        """
-        logger.debug('load file_name:%s', file_name)
-
-        if os.path.isfile(file_name):
-            self.server_scenario = ServerScenario.from_file(file_name)
-
-            self._init()
-
-    def create(self, properties):
-        """
-        Create new scenario (from the create new scenario dialog).
-
-        :param properties:
-        """
-        logger.debug('create properties:%s', properties)
-
-        self.server_scenario = ServerScenario()
-        self.server_scenario[constants.ScenarioProperty.TITLE] = properties[constants.ScenarioProperty.TITLE]
-        self.server_scenario.create_empty_map(properties[constants.ScenarioProperty.MAP_COLUMNS],
-                                              properties[constants.ScenarioProperty.MAP_ROWS])
-
-        # standard rules
-        self.server_scenario[constants.ScenarioProperty.RULES] = 'standard.rules'
-        # self.scenario.load_rules()
-        # TODO rules as extra?
-        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER,
-                                     self.server_scenario[constants.ScenarioProperty.RULES])
-        self.server_scenario._rules = utils.read_from_file(rule_file)
-
-        self._init()
+        logger.debug("__init__")
 
     def _init(self):
+        logger.debug("_init")
+
         self._terrain_type_to_pixmap_mapper = TerrainTypeToPixmapMapper(self.server_scenario)
         self._workforce_to_texture_mapper = WorkforceToTextureMapper(self.server_scenario)
         self._terrain_resource_to_pixmap_mapper = TerrainResourceToPixmapMapper(self.server_scenario)
         self._structure_type_to_pixmap_mapper = StructureTypeToPixmapMapper(self.server_scenario)
+
         # emit that everything has changed
-        self.changed.emit()
+        self.scenario_changed.emit()
 
     def get_terrain_type_to_pixmap_mapper(self):
         return self._terrain_type_to_pixmap_mapper
@@ -99,5 +66,3 @@ class GenericScenario(QtCore.QObject):
 
     def get_structure_type_to_pixmap_mapper(self):
         return self._structure_type_to_pixmap_mapper
-
-

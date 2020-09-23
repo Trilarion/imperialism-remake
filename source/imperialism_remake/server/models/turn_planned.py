@@ -17,8 +17,9 @@ from imperialism_remake.server.models.workforce import Workforce
 
 
 class TurnPlanned:
-    def __init__(self):
+    def __init__(self, nation):
         self._workforces = {}
+        self._nation = nation
 
     def add_workforce(self, workforce: Workforce) -> None:
         self._workforces[workforce.get_id()] = workforce
@@ -28,3 +29,6 @@ class TurnPlanned:
 
     def get_workforces(self) -> {}:
         return self._workforces
+
+    def get_nation(self):
+        return self._nation
