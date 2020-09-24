@@ -191,13 +191,15 @@ class ServerManager(QtCore.QObject):
             self._server_turn_processor.set_scenario(new_server_scenario)
 
             if selected_nation == -1:
-                # TODO This is load from file, not lobby, get player nation from file?
-                pass
+                selected_nation = new_server_scenario.get_player_nation()
+                logger.info("This is loading saved file. Use nation from it: %s", selected_nation)
+            else:
+                new_server_scenario.set_player_nation(selected_nation)
+                logger.info("This is loading saved file. Set current player nation to: %s", selected_nation)
 
             new_server_scenario_base_for_nation = copy.deepcopy(new_server_scenario.get_scenario_base())
             for key, nation in new_server_scenario_base_for_nation.nations.items():
-                # TODO check for -1 is only for debugging!
-                if key != selected_nation and selected_nation != -1:
+                if key != selected_nation:
                     del nation
 
             client.send(channel, constants.M.GAME_LOAD_RESPONSE,

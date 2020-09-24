@@ -181,7 +181,7 @@ class GameMainScreen(GenericScreen):
             del wf_widget
         self._workforce_widgets = {}
 
-        self.add_workforces(turn_result.get_workforces().items())
+        self.add_workforces([w for k, w in turn_result.get_workforces().items()])
 
         for road_section in turn_result.get_roads():
             self.scenario.server_scenario.add_road(road_section[0], road_section[1])

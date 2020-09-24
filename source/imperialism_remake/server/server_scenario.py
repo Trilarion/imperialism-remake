@@ -59,6 +59,12 @@ class ServerScenario():
     def is_technology_available(self, tech_type: TechnologyType) -> bool:
         return tech_type in self._scenario_base.available_technologies
 
+    def set_player_nation(self, player_nation):
+        self._scenario_base.properties[constants.ScenarioProperty.PLAYER_NATION] = player_nation
+
+    def get_player_nation(self):
+        return self._scenario_base.properties[constants.ScenarioProperty.PLAYER_NATION]
+
     @staticmethod
     def from_file(file_path):
         """
