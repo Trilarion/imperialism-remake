@@ -24,7 +24,7 @@ class ChangeTerrainResourceWidget(ChangeTextureWidget):
     def __init__(self, screen, column, row):
         super().__init__(screen.main_map, column, row, screen.scenario.server_scenario.get_terrain_resources_settings(),
                          screen.scenario.get_terrain_resource_to_pixmap_mapper(),
-                         screen.scenario.server_scenario.set_resource_at)
+                         screen.scenario.server_scenario.set_terrain_resource_at)
 
     def mousePressEvent(self, event):
         logger.debug("mousePressEvent x:%s, y:%s", event.x(), event.y())

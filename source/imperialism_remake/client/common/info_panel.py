@@ -63,6 +63,9 @@ class InfoPanel(QtWidgets.QWidget):
 
         layout.addStretch()
 
+        self.nation_asset_label = QtWidgets.QLabel()
+        layout.addWidget(self.nation_asset_label)
+
     def update_tile_info(self, column, row):
         """
         Displays data of a new tile (hovered or clicked in the main map).
@@ -70,7 +73,7 @@ class InfoPanel(QtWidgets.QWidget):
         :param column: The tile column.
         :param row: The tile row.
         """
-        #logger.debug('update_tile_info column:%s, row:%s', column, row)
+        # logger.debug('update_tile_info column:%s, row:%s', column, row)
 
         text = 'Position ({}, {})'.format(column, row)
         terrain = self.scenario.server_scenario.terrain_at(column, row)
@@ -81,10 +84,11 @@ class InfoPanel(QtWidgets.QWidget):
             name = self.scenario.server_scenario.province_property(province, constants.ProvinceProperty.NAME)
             text += '<br>Province: {}'.format(name)
 
-        resource = self.scenario.server_scenario.resource_at(column, row)
+        resource = self.scenario.server_scenario.terrain_resource_at(column, row)
         if resource > 0:
             resource_name = self.scenario.server_scenario.terrain_resource_name(resource)
-            text += '<br>Resource: {}'.format(resource_name)
+            resource_text = 'Resource: {}'.format(resource_name)
+            self.resource_label.setText(resource_text)
 
         self.tile_label.setText(text)
 
@@ -99,3 +103,10 @@ class InfoPanel(QtWidgets.QWidget):
             self.selected_object_label.setText('')
         else:
             self.selected_object_label.setText('<br>Selected: {}'.format(name))
+
+    def refresh_nation_asset_info(self):
+        asset_text = ''
+        for name, raw_resource in self.scenario.server_scenario.get_nation_asset(
+                self.scenario.server_scenario.get_player_nation()).get_raw_resources().items():
+            asset_text += '<br>{}: {}'.format(self.scenario.server_scenario.raw_resource_name(name.value), raw_resource)
+        self.selected_object_label.setText(asset_text)

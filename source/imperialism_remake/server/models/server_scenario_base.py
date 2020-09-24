@@ -61,6 +61,9 @@ class ServerScenarioBase:
         self._available_technologies.add(TechnologyType.ROAD_THROUGH_HILLS)
         self._available_technologies.add(TechnologyType.ROAD_THROUGH_PLAINS)
         self._available_technologies.add(TechnologyType.GEOLOGY_WORK_HILLS)
+        self._available_technologies.add(TechnologyType.FARMER_WORK_ORCHARD)
+        self._available_technologies.add(TechnologyType.FARMER_WORK_GRAIN)
+        self._available_technologies.add(TechnologyType.FORESTER_WORK_FOREST)
 
     @property
     def available_technologies(self):

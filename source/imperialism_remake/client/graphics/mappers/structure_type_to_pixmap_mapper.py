@@ -27,7 +27,7 @@ class StructureTypeToPixmapMapper(TerrainToPixmapMapper):
                          'texture_filename')
 
     def get_pixmap_of_type(self, structure_type: int):
-        if structure_type < 1 or structure_type >= len(self.pixmaps):
+        if structure_type < 1 or structure_type > len(self.pixmaps):
             logger.warning('Tile type undefined: %s', structure_type)
             return None
 

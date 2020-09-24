@@ -59,9 +59,9 @@ class WorkforceCommon:
 
         self._turn_planned.remove_workforce(self._workforce)
 
-    def _is_tech_allowed_on_map(self, terrain_type_on_map: int, terrain_type_for_tech: int,
+    def _is_tech_allowed_on_map(self, type_on_map: int, type_for_tech: int,
                                 technology_type: TechnologyType) -> bool:
-        if terrain_type_on_map == terrain_type_for_tech and self._server_scenario.is_technology_available(
+        if type_on_map == type_for_tech and self._server_scenario.is_technology_available(
                 technology_type):
             return True
         return False

@@ -192,7 +192,7 @@ class ServerScenario():
         # TODO move this to a special rules class. Only have rules() and setRules() here.
         return self._scenario_base.rules['terrain_resources_settings'][terrain]['name']
 
-    def set_resource_at(self, column, row, resource):
+    def set_terrain_resource_at(self, column, row, resource):
         """
         Sets the resource value at a given position. No check is performed for valid resources.
 
@@ -203,7 +203,7 @@ class ServerScenario():
         logger.debug('set_resource_at column:%s, row:%s, resource:%s', column, row, resource)
         self._scenario_base.maps[ServerScenarioBase.RESOURCE][self._map_index(column, row)] = resource
 
-    def resource_at(self, column, row):
+    def terrain_resource_at(self, column, row):
         """
         Returns the resource value at a given position of the map.
 
@@ -212,6 +212,13 @@ class ServerScenario():
         :return: Resource value
         """
         return self._scenario_base.maps[ServerScenarioBase.RESOURCE][self._map_index(column, row)]
+
+    def raw_resource_name(self, resource_type_value):
+        """
+        Get a special property from the rules.
+        """
+        # TODO move this to a special rules class. Only have rules() and setRules() here.
+        return self._scenario_base.rules['raw_resources_settings'][resource_type_value]['name']
 
     @staticmethod
     def scene_position(column, row):
@@ -564,6 +571,9 @@ class ServerScenario():
 
     def get_terrain_resources_settings(self):
         return self._scenario_base.rules['terrain_resources_settings']
+
+    def get_raw_resources_settings(self):
+        return self._scenario_base.rules['raw_resources_settings']
 
     def get_workforce_settings(self):
         return self._scenario_base.rules['workforce_settings']

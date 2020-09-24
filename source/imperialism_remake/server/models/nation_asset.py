@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import uuid
 
+from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.workforce import Workforce
 
 
@@ -25,6 +26,10 @@ class NationAsset:
         self._workforces = {}
         self._raw_resources = {}
         self._processed_resources = {}
+
+        # TODO what are default resources values?
+        for raw_resource in RawResourceType:
+            self._raw_resources[raw_resource] = 0
 
         # This is coordinates for each of resources/workforces
         self.asset_locations = {}
@@ -39,6 +44,9 @@ class NationAsset:
         if row not in self.asset_locations:
             self.asset_locations[row] = {}
         self.asset_locations[row][column] = workforce
+
+    def get_raw_resources(self):
+        return self._raw_resources
 
     def get_workforces(self) -> Workforce:
         return self._workforces

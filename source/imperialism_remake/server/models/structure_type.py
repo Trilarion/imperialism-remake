@@ -19,3 +19,4 @@ from enum import Enum
 class StructureType(Enum):
     WAREHOUSE = 1
     FARM_ELEVATOR = 2
+    LOGGING = 3
