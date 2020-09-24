@@ -95,6 +95,10 @@ class ServerTurnProcessor:
                 if w.get_action() == WorkforceAction.DUTY_ACTION:
                     if w.get_type() == WorkforceType.ENGINEER:
                         self._process_engineer(c, r, turn_result, w)
+                    elif w.get_type() == WorkforceType.FORESTER:
+                        self._process_forester(c, r, turn_result)
+                    elif w.get_type() == WorkforceType.FARMER:
+                        self._process_farmer(c, r, turn_result)
         return turn_result
 
     def _process_engineer(self, c, r, turn_result, w):
@@ -112,5 +116,21 @@ class ServerTurnProcessor:
             self._server_scenario.add_structure(r, c, wh)
             turn_result.get_structures()[wh.get_id()] = wh
 
-    def _process_geologist(self, c, r, turn_result, w):
+    def _process_forester(self, c, r, turn_result):
+        logger.debug('_process_forester c:%s, r:%s', c, r)
+
+        # add structures
+        structure = Structure(uuid.uuid4(), r, c, StructureType.LOGGING)
+        self._server_scenario.add_structure(r, c, structure)
+        turn_result.get_structures()[structure.get_id()] = structure
+
+    def _process_farmer(self, c, r, turn_result):
+        logger.debug('_process_farmer c:%s, r:%s', c, r)
+
+        # add structures
+        structure = Structure(uuid.uuid4(), r, c, StructureType.FARM_ELEVATOR)
+        self._server_scenario.add_structure(r, c, structure)
+        turn_result.get_structures()[structure.get_id()] = structure
+
+    def _process_geologist(self, c, r, turn_result):
         logger.debug('_process_geologist c:%s, r:%s', c, r)

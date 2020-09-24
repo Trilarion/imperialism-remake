@@ -21,6 +21,8 @@ from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 from imperialism_remake.server.workforce.workforce_engineer import WorkforceEngineer
+from imperialism_remake.server.workforce.workforce_farmer import WorkforceFarmer
+from imperialism_remake.server.workforce.workforce_forester import WorkforceForester
 from imperialism_remake.server.workforce.workforce_geologist import WorkforceGeologist
 
 
@@ -32,3 +34,7 @@ class WorkforceFactory:
             return WorkforceGeologist(server_scenario, turn_planned, workforce)
         elif workforce.get_type() == WorkforceType.ENGINEER:
             return WorkforceEngineer(server_scenario, turn_planned, workforce)
+        elif workforce.get_type() == WorkforceType.FORESTER:
+            return WorkforceForester(server_scenario, turn_planned, workforce)
+        elif workforce.get_type() == WorkforceType.FARMER:
+            return WorkforceFarmer(server_scenario, turn_planned, workforce)

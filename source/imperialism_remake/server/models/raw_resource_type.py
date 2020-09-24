@@ -16,8 +16,15 @@
 from enum import Enum
 
 
-class WorkforceType(Enum):
-    ENGINEER = 0
-    GEOLOGIST = 1
-    FORESTER = 2
-    FARMER = 3
+class RawResourceType(Enum):
+    APPLE = 1
+    WHEAT = 2
+    MEAT = 3
+    FISH = 4
+    WOOD = 5
+    OIL = 6
+    ORE = 7
+    COAL = 8
+    MONEY = 9
+    WOOL = 10
+    COTTON = 11

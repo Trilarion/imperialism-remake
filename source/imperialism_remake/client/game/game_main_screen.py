@@ -75,28 +75,10 @@ class GameMainScreen(GenericScreen):
         self._workforce_widgets = {}
 
         # !!! TODO this is just to test, remove me a little bit later!!!
-        workforce_engineer01_primitive = Workforce(uuid.uuid4(), 4, 13, WorkforceType.ENGINEER)
-        workforce_engineer01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
-                                                                     self._turn_manager.get_turn_planned(),
-                                                                     workforce_engineer01_primitive)
-        workforce_engineer01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_engineer01)
-        workforce_engineer01_widget.plan_action(4, 13, WorkforceAction.CREATE)
-
-        workforce_engineer01_widget.event_widget_selected.connect(self._selected_widget_object_event)
-        workforce_engineer01_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
-
-        workforce_geologist01_primitive = Workforce(uuid.uuid4(), 8, 11, WorkforceType.GEOLOGIST)
-        workforce_geologist01 = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
-                                                                      self._turn_manager.get_turn_planned(),
-                                                                      workforce_geologist01_primitive)
-        workforce_geologist01_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce_geologist01)
-        workforce_geologist01_widget.plan_action(8, 11, WorkforceAction.CREATE)
-
-        workforce_geologist01_widget.event_widget_selected.connect(self._selected_widget_object_event)
-        workforce_geologist01_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
-
-        self._workforce_widgets[workforce_engineer01_widget.get_workforce().get_id()] = workforce_engineer01_widget
-        self._workforce_widgets[workforce_geologist01_widget.get_workforce().get_id()] = workforce_geologist01_widget
+        self._create_workforce_widget(4, 13, WorkforceType.ENGINEER)
+        self._create_workforce_widget(8, 11, WorkforceType.GEOLOGIST)
+        self._create_workforce_widget(8, 13, WorkforceType.FARMER)
+        self._create_workforce_widget(8, 15, WorkforceType.FORESTER)
         # !!! TODO remove above
 
         a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
@@ -116,7 +98,22 @@ class GameMainScreen(GenericScreen):
                                                                         workforce))
             self.add_workforces(workforces)
 
+        self._info_panel.refresh_nation_asset_info()
+
         logger.debug('__init__ finished')
+
+    def _create_workforce_widget(self, row, col, workforce_type):
+        workforce_primitive = Workforce(uuid.uuid4(), row, col, workforce_type)
+        workforce = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
+                                                          self._turn_manager.get_turn_planned(),
+                                                          workforce_primitive)
+        workforce_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce)
+        workforce_widget.plan_action(row, col, WorkforceAction.CREATE)
+
+        workforce_widget.event_widget_selected.connect(self._selected_widget_object_event)
+        workforce_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
+
+        self._workforce_widgets[workforce_widget.get_workforce().get_id()] = workforce_widget
 
     def _main_map_mouse_press_event(self, main_map, event: QtGui.QMouseEvent) -> None:
         scene_position = main_map.mapToScene(event.pos()) / constants.TILE_SIZE
@@ -191,6 +188,8 @@ class GameMainScreen(GenericScreen):
             r, c = structure.get_position()
             self.scenario.server_scenario.add_structure(r, c, structure)
             self._main_map.draw_structure(r, c, structure)
+
+        self._info_panel.refresh_nation_asset_info()
 
     def add_workforces(self, workforces):
         for new_workforce in workforces:

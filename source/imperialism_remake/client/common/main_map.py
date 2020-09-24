@@ -84,7 +84,7 @@ class MainMap(QtWidgets.QGraphicsView):
                             self.scenario.server_scenario.terrain_at)
 
         self._fill_textures(columns, rows, self.scenario.get_terrain_resource_to_pixmap_mapper(),
-                            self.scenario.server_scenario.resource_at)
+                            self.scenario.server_scenario.terrain_resource_at)
 
         self._fill_half_tiles(columns, rows)
 
