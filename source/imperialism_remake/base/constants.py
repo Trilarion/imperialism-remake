@@ -195,7 +195,7 @@ class ScenarioProperty(utils.AutoNumberedEnum):
     RIVERS = ()
     RULES = ()
     GAME_YEAR_RANGE = ()
-
+    PLAYER_NATION = ()
 
 @unique
 class NationProperty(utils.AutoNumberedEnum):
