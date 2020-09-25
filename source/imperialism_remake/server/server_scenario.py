@@ -18,6 +18,7 @@
 Defines a scenario, can be loaded and saved. Should only be known to the server, never to the client (which is a
 thin client).
 """
+import copy
 import logging
 import math
 
@@ -49,12 +50,15 @@ class ServerScenario():
     * Each nation has province ids stored.
     """
 
-    def __init__(self, _scenario_base):
+    def __init__(self, scenario_base):
         logger.debug("__init__")
-        self._scenario_base = _scenario_base
+        self._scenario_base = scenario_base
 
     def get_scenario_base(self):
         return self._scenario_base
+
+    def update_scenario_base(self, scenario_base):
+        self._scenario_base = scenario_base
 
     def is_technology_available(self, tech_type: TechnologyType) -> bool:
         return tech_type in self._scenario_base.available_technologies
@@ -88,7 +92,8 @@ class ServerScenario():
 
         # read rule file
         # TODO how to specify which rules file apply
-        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER, server_scenario[constants.ScenarioProperty.RULES])
+        rule_file = constants.extend(constants.SCENARIO_RULESET_FOLDER,
+                                     server_scenario[constants.ScenarioProperty.RULES])
         server_scenario.get_scenario_base().rules = utils.read_from_file(rule_file)
 
         if ServerScenarioBase.ROAD not in server_scenario._scenario_base.maps:
@@ -156,6 +161,9 @@ class ServerScenario():
     def get_nation_asset(self, nation):
         return self.nation_property(nation, constants.NationProperty.ASSETS)
 
+    def set_nation_asset(self, nation, asset):
+        return self.set_nation_property(nation, constants.NationProperty.ASSETS, asset)
+
     def set_terrain_at(self, column, row, terrain):
         """
         Sets the terrain at a given position. Here, no check is performed for valid terrain.
@@ -219,6 +227,9 @@ class ServerScenario():
         """
         # TODO move this to a special rules class. Only have rules() and setRules() here.
         return self._scenario_base.rules['raw_resources_settings'][resource_type_value]['name']
+
+    def get_raw_resource_type(self, row, column):
+        return self.get_terrain_resources_settings()[self.terrain_resource_at(column, row)]['raw_resource_type']
 
     @staticmethod
     def scene_position(column, row):
@@ -552,6 +563,13 @@ class ServerScenario():
             raise RuntimeError('Unknown nation property "{}" (known properties: {}).'
                                .format(property_key, ", ".join([str(key) for key in nation])))
 
+    def get_capital_position(self, nation_id):
+        logger.debug('get_capital_position nation_id:%s', nation_id)
+        province_id = self.nation_property(nation_id, constants.NationProperty.CAPITAL_PROVINCE)
+        column, row = self.province_property(province_id, constants.ProvinceProperty.TOWN_LOCATION)
+        logger.debug('get_capital_position column:%s, row:%s', column, row)
+        return column, row
+
     def save(self, file_name):
         """
             Saves/serializes all internal variables into a zipped archive.
@@ -583,3 +601,10 @@ class ServerScenario():
 
     def get_structure_settings(self):
         return self._scenario_base.rules['structure_settings']
+
+    def get_scenario_base_for_nation(self, nation_id):
+        scenario_base_for_nation = copy.deepcopy(self.get_scenario_base())
+        for key, nation in scenario_base_for_nation.nations.items():
+            if key != nation_id:
+                del nation
+        return scenario_base_for_nation

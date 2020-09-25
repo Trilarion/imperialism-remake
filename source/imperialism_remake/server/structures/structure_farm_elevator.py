@@ -13,20 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import uuid
-
 from imperialism_remake.server.models.structure import Structure
-from imperialism_remake.server.models.structure_type import StructureType
-from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.structures.structure_common import StructureCommon
 
 
 class StructureFarmElevator(StructureCommon):
-    def __init__(self, server_scenario: ServerScenario, structure):
+    def __init__(self, server_scenario: ServerScenario, structure: Structure):
         super().__init__(server_scenario, structure)
-        self._level = 1
-        self._max_level = 4
 
     def can_build(self, row, column) -> bool:
         can_build = super().can_build(row, column)
@@ -40,15 +34,12 @@ class StructureFarmElevator(StructureCommon):
     def get_collectable_resource_positions(self) -> ():
         return self._column, self._row
 
-    def get_level(self) -> int:
-        return self._level
-
     def can_upgrade(self) -> bool:
-        if self._level > self._max_level:
+        if not super().can_upgrade():
             return False
 
         # TODO check for technology
 
     def upgrade(self) -> None:
         if self.can_upgrade():
-            self._level += 1
+            self.upgrade()

@@ -75,10 +75,10 @@ class GameMainScreen(GenericScreen):
         self._workforce_widgets = {}
 
         # !!! TODO this is just to test, remove me a little bit later!!!
-        self._create_workforce_widget(4, 13, WorkforceType.ENGINEER)
-        self._create_workforce_widget(8, 11, WorkforceType.GEOLOGIST)
-        self._create_workforce_widget(8, 13, WorkforceType.FARMER)
-        self._create_workforce_widget(8, 15, WorkforceType.FORESTER)
+        self._create_workforce_widget(13, 29, WorkforceType.ENGINEER)
+        self._create_workforce_widget(11, 27, WorkforceType.GEOLOGIST)
+        self._create_workforce_widget(12, 30, WorkforceType.FARMER)
+        self._create_workforce_widget(15, 29, WorkforceType.FORESTER)
         # !!! TODO remove above
 
         a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
@@ -90,13 +90,7 @@ class GameMainScreen(GenericScreen):
 
         self._add_help_and_exit_buttons(client)
 
-        for nation in self.scenario.server_scenario.nations():
-            workforces = []
-            for k, workforce in self.scenario.server_scenario.get_nation_asset(nation).get_workforces().items():
-                workforces.append(WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
-                                                                        self._turn_manager.get_turn_planned(),
-                                                                        workforce))
-            self.add_workforces(workforces)
+        self._add_workforces()
 
         self._info_panel.refresh_nation_asset_info()
 
@@ -178,29 +172,28 @@ class GameMainScreen(GenericScreen):
             del wf_widget
         self._workforce_widgets = {}
 
-        self.add_workforces([w for k, w in turn_result.get_workforces().items()])
+        self.scenario.server_scenario.update_scenario_base(turn_result.get_server_scenario_base())
 
-        for road_section in turn_result.get_roads():
-            self.scenario.server_scenario.add_road(road_section[0], road_section[1])
-            self._main_map.draw_road(road_section[0], road_section[1])
+        self._add_workforces()
 
-        for s_id, structure in turn_result.get_structures().items():
-            r, c = structure.get_position()
-            self.scenario.server_scenario.add_structure(r, c, structure)
-            self._main_map.draw_structure(r, c, structure)
+        self._main_map.partial_redraw()
 
         self._info_panel.refresh_nation_asset_info()
 
-    def add_workforces(self, workforces):
-        for new_workforce in workforces:
-            r, c = new_workforce.get_current_position()
-            new_workforce_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, new_workforce)
-            new_workforce_widget.plan_action(r, c, new_workforce.get_action())
+    def _add_workforces(self):
+        for nation in self.scenario.server_scenario.nations():
+            for k, workforce in self.scenario.server_scenario.get_nation_asset(nation).get_workforces().items():
+                new_workforce = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
+                                                                      self._turn_manager.get_turn_planned(),
+                                                                      workforce)
+                r, c = new_workforce.get_current_position()
+                new_workforce_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, new_workforce)
+                new_workforce_widget.plan_action(r, c, new_workforce.get_action())
 
-            new_workforce_widget.event_widget_selected.connect(self._selected_widget_object_event)
-            new_workforce_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
+                new_workforce_widget.event_widget_selected.connect(self._selected_widget_object_event)
+                new_workforce_widget.event_widget_deselected.connect(self._deselected_widget_object_event)
 
-            self._workforce_widgets[new_workforce_widget.get_workforce().get_id()] = new_workforce_widget
+                self._workforce_widgets[new_workforce_widget.get_workforce().get_id()] = new_workforce_widget
 
     def deleteLater(self) -> None:
         logger.debug('deleteLater')

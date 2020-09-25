@@ -17,16 +17,8 @@ from imperialism_remake.server.models.workforce import Workforce
 
 
 class TurnResult:
-    def __init__(self):
-        self._workforces = {}
-        self._roads = []
-        self._structures = {}
+    def __init__(self, server_scenario_base):
+        self._server_scenario_base = server_scenario_base
 
-    def get_workforces(self) -> {}:
-        return self._workforces
-
-    def get_roads(self) -> []:
-        return self._roads
-
-    def get_structures(self) -> {}:
-        return self._structures
+    def get_server_scenario_base(self) -> {}:
+        return self._server_scenario_base

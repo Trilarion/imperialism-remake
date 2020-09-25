@@ -90,20 +90,27 @@ class MainMap(QtWidgets.QGraphicsView):
 
         self._draw_rivers()
 
+        self._draw_towns_and_names()
+
+        self._draw_grid_and_coords(columns, rows)
+
+        self.partial_redraw()
+
+        # emit focus changed with -1, -1
+        self.mouse_move_event.emit(-1, -1)
+
+        logger.debug('redraw finished')
+
+    def partial_redraw(self):
+        logger.debug('partial_redraw started')
+
         self._draw_roads()
 
         self._draw_structures()
 
         self._draw_province_and_nation_borders()
 
-        self._draw_towns_and_names()
-
-        self._draw_grid_and_coords(columns, rows)
-
-        # emit focus changed with -1, -1
-        self.mouse_move_event.emit(-1, -1)
-
-        logger.debug('redraw finished')
+        logger.debug('partial_redraw finished')
 
     def _fill_textures(self, columns, rows, mapper, obj_type_getter) -> None:
         logger.debug("_fill_textures")

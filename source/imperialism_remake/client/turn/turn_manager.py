@@ -59,17 +59,6 @@ class TurnManager(QtCore.QObject):
         del self._turn_planned
         self._turn_planned = TurnPlanned(self._selected_nation)
 
-        for w_id, w in turn_result.get_workforces().items():
-            logger.debug("_process_turn_result create_new_workforce:%s", w.get_type())
-            workforce = WorkforceFactory.create_new_workforce(self._scenario.server_scenario, self._turn_planned, w)
-            self._turn_planned.add_workforce(workforce)
-            turn_result.get_workforces()[workforce.get_id()] = workforce
-
-        for s_id, s in turn_result.get_structures().items():
-            logger.debug("_process_turn_result create_new_structure:%s", s.get_type())
-            structure = StructureFactory.create_new_structure(self._scenario.server_scenario, s)
-            turn_result.get_structures()[s.get_id()] = structure
-
         self.event_turn_completed.emit(turn_result)
 
     def _send_turn_planned_to_server(self, turn_planned: TurnPlanned):

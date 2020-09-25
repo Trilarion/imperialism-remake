@@ -16,17 +16,21 @@
 import uuid
 
 from imperialism_remake.server.models.structure_type import StructureType
-from imperialism_remake.server.models.workforce_action import WorkforceAction
-from imperialism_remake.server.models.workforce_type import WorkforceType
 
 
 class Structure:
-    def __init__(self, structure_id: uuid, row: int, column: int, structure_type: StructureType):
+    def __init__(self, structure_id: uuid, row: int, column: int, structure_type: StructureType, raw_resource_type,
+                 max_level):
         self._structure_id = structure_id
         self._structure_type = structure_type
 
         self._row = row
         self._column = column
+
+        self._level = 1
+        self._max_level = max_level
+
+        self._raw_resource_type = raw_resource_type
 
         # Overriden in inherited workforce class implementations
         self._build_expenses = None
@@ -39,3 +43,15 @@ class Structure:
 
     def get_position(self) -> (int, int):
         return self._row, self._column
+
+    def get_level(self) -> int:
+        return self._level
+
+    def set_level(self, level) -> None:
+        self._level = level
+
+    def get_max_level(self) -> int:
+        return self._max_level
+
+    def get_raw_resource_type(self):
+        return self._raw_resource_type

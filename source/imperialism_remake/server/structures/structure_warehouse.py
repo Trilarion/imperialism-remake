@@ -13,17 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import uuid
 
 from imperialism_remake.server.models.structure import Structure
-from imperialism_remake.server.models.structure_type import StructureType
-from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.structures.structure_common import StructureCommon
 
 
 class StructureWarehouse(StructureCommon):
-    def __init__(self, server_scenario: ServerScenario, structure):
+    def __init__(self, server_scenario: ServerScenario, structure: Structure):
         super().__init__(server_scenario, structure)
 
     def can_build(self, row, column) -> bool:
