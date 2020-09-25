@@ -53,18 +53,29 @@ if __name__ == '__main__':
     rules['terrain_settings'] = terrain_settings
 
     terrain_resources_settings = {
-        TerrainResourceType.BUFFALO.value: {'name': 'Buffalo', 'texture_filename': 'resource.buffalo.outer.png'},
-        TerrainResourceType.ORCHARD.value: {'name': 'Orchard', 'texture_filename': 'resource.orchard.outer.png'},
-        TerrainResourceType.COAL.value: {'name': 'Coal', 'texture_filename': 'resource.coal.png'},
-        TerrainResourceType.COTTON.value: {'name': 'Cotton', 'texture_filename': 'resource.cotton.outer.png'},
-        TerrainResourceType.FOREST.value: {'name': 'Forest', 'texture_filename': 'resource.forest.outer.png'},
-        TerrainResourceType.GRAIN.value: {'name': 'Grain', 'texture_filename': 'resource.grain.outer.png'},
-        TerrainResourceType.HORSE.value: {'name': 'Horse', 'texture_filename': 'resource.horse.png'},
-        TerrainResourceType.OIL.value: {'name': 'Oil', 'texture_filename': 'resource.oil.outer.png'},
-        TerrainResourceType.ORE.value: {'name': 'Ore', 'texture_filename': 'resource.ore.png'},
+        TerrainResourceType.BUFFALO.value: {'name': 'Buffalo', 'texture_filename': 'resource.buffalo.outer.png',
+                                            'raw_resource_type': RawResourceType.MEAT},
+        TerrainResourceType.ORCHARD.value: {'name': 'Orchard', 'texture_filename': 'resource.orchard.outer.png',
+                                            'raw_resource_type': RawResourceType.APPLE},
+        TerrainResourceType.COAL.value: {'name': 'Coal', 'texture_filename': 'resource.coal.png',
+                                         'raw_resource_type': RawResourceType.COAL},
+        TerrainResourceType.COTTON.value: {'name': 'Cotton', 'texture_filename': 'resource.cotton.outer.png',
+                                           'raw_resource_type': RawResourceType.COTTON},
+        TerrainResourceType.FOREST.value: {'name': 'Forest', 'texture_filename': 'resource.forest.outer.png',
+                                           'raw_resource_type': RawResourceType.WOOD},
+        TerrainResourceType.GRAIN.value: {'name': 'Grain', 'texture_filename': 'resource.grain.outer.png',
+                                          'raw_resource_type': RawResourceType.WHEAT},
+        TerrainResourceType.HORSE.value: {'name': 'Horse', 'texture_filename': 'resource.horse.png',
+                                          'raw_resource_type': RawResourceType.MEAT},
+        TerrainResourceType.OIL.value: {'name': 'Oil', 'texture_filename': 'resource.oil.outer.png',
+                                        'raw_resource_type': RawResourceType.ORE},
+        TerrainResourceType.ORE.value: {'name': 'Ore', 'texture_filename': 'resource.ore.png',
+                                        'raw_resource_type': RawResourceType.MEAT},
         TerrainResourceType.SCRUBFOREST.value: {'name': 'Scrub forest',
-                                                'texture_filename': 'resource.scrubforest.outer.png'},
-        TerrainResourceType.SHEEP.value: {'name': 'Sheep', 'texture_filename': 'resource.sheep.outer.png'}
+                                                'texture_filename': 'resource.scrubforest.outer.png',
+                                                'raw_resource_type': RawResourceType.WOOD},
+        TerrainResourceType.SHEEP.value: {'name': 'Sheep', 'texture_filename': 'resource.sheep.outer.png',
+                                          'raw_resource_type': RawResourceType.WOOL}
     }
     rules['terrain_resources_settings'] = terrain_resources_settings
 

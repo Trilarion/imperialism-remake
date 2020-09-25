@@ -197,10 +197,7 @@ class ServerManager(QtCore.QObject):
                 new_server_scenario.set_player_nation(selected_nation)
                 logger.info("This is loading saved file. Set current player nation to: %s", selected_nation)
 
-            new_server_scenario_base_for_nation = copy.deepcopy(new_server_scenario.get_scenario_base())
-            for key, nation in new_server_scenario_base_for_nation.nations.items():
-                if key != selected_nation:
-                    del nation
+            new_server_scenario_base_for_nation = new_server_scenario.get_scenario_base_for_nation(selected_nation)
 
             client.send(channel, constants.M.GAME_LOAD_RESPONSE,
                         {'server_scenario_base': new_server_scenario_base_for_nation, 'nation': selected_nation})

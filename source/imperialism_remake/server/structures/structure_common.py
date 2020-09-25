@@ -15,12 +15,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import uuid
 
+from imperialism_remake.server.models.structure import Structure
 from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.terrain_type import TerrainType
+from imperialism_remake.server.server_scenario import ServerScenario
 
 
 class StructureCommon:
-    def __init__(self, server_scenario, structure):
+    def __init__(self, server_scenario: ServerScenario, structure: Structure):
         self._structure = structure
         self._server_scenario = server_scenario
 
@@ -42,3 +44,15 @@ class StructureCommon:
 
     def get_position(self) -> (int, int):
         return self._structure.get_position()
+
+    def get_level(self) -> int:
+        return self._structure.get_level()
+
+    def can_upgrade(self) -> bool:
+        if self._structure.get_level() > self._structure.get_max_level():
+            return False
+        return True
+
+    def upgrade(self) -> None:
+        if self.can_upgrade():
+            self._structure.set_level(self._structure.get_level() + 1)
