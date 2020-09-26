@@ -13,8 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import uuid
-
+from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.technology_type import TechnologyType
 from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.models.turn_planned import TurnPlanned
@@ -33,16 +32,20 @@ class WorkforceGeologist(WorkforceCommon):
             return False
 
         if workforce_action == WorkforceAction.DUTY_ACTION:
-            terrain_type = self._server_scenario.terrain_at(new_column, new_row)
-            tile_action_allowed = self._is_tile_action_allowed(terrain_type)
+            tile_action_allowed = self._is_tile_duty_action_allowed(new_column, new_row)
 
             return tile_action_allowed
         return True
 
-    def _is_tile_action_allowed(self, terrain_type):
-        return self._is_tech_allowed_on_map(terrain_type, TerrainType.HILLS.value,
-                                            TechnologyType.GEOLOGY_WORK_HILLS) or self._is_tech_allowed_on_map(
+    def _is_tile_duty_action_allowed(self, new_column, new_row):
+        terrain_type = self._server_scenario.terrain_at(new_column, new_row)
+        tech_allowed = self._is_tech_allowed_on_map(terrain_type, TerrainType.HILLS.value,
+                                                    TechnologyType.GEOLOGY_WORK_HILLS) or self._is_tech_allowed_on_map(
             terrain_type, TerrainType.MOUNTAINS.value,
             TechnologyType.GEOLOGY_WORK_MOUNTAIN) or self._is_tech_allowed_on_map(terrain_type,
                                                                                   TerrainType.SWAMP.value,
                                                                                   TechnologyType.GEOLOGY_WORK_SWAMP)
+        raw_resource_type = self._server_scenario.get_raw_resource_type(new_row, new_column)
+        not_minable_raw_resource = raw_resource_type is not None and raw_resource_type != RawResourceType.COAL and raw_resource_type != RawResourceType.ORE
+
+        return tech_allowed and not not_minable_raw_resource
