@@ -33,12 +33,12 @@ class WorkforceForester(WorkforceCommon):
 
         if workforce_action == WorkforceAction.DUTY_ACTION:
             terrain_resource_type = self._server_scenario.terrain_resource_at(new_column, new_row)
-            tile_action_allowed = self._is_tile_action_allowed(terrain_resource_type)
+            tile_action_allowed = self._is_tile_duty_action_allowed(terrain_resource_type)
 
             return tile_action_allowed
         return True
 
-    def _is_tile_action_allowed(self, terrain_resource_type):
+    def _is_tile_duty_action_allowed(self, terrain_resource_type):
         # TODO check technology availability
         return self._is_tech_allowed_on_map(terrain_resource_type, TerrainResourceType.FOREST.value,
                                             TechnologyType.FORESTER_WORK_FOREST)

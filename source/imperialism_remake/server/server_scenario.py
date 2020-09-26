@@ -25,6 +25,7 @@ import math
 from imperialism_remake.base import constants
 from imperialism_remake.lib import utils
 from imperialism_remake.server.models.nation_asset import NationAsset
+from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.server_scenario_base import ServerScenarioBase
 from imperialism_remake.server.models.technology_type import TechnologyType
 
@@ -228,8 +229,13 @@ class ServerScenario():
         # TODO move this to a special rules class. Only have rules() and setRules() here.
         return self._scenario_base.rules['raw_resources_settings'][resource_type_value]['name']
 
-    def get_raw_resource_type(self, row, column):
-        return self.get_terrain_resources_settings()[self.terrain_resource_at(column, row)]['raw_resource_type']
+    def get_raw_resource_type(self, row, column) -> RawResourceType:
+        terrain_resource = self.terrain_resource_at(column, row)
+        if terrain_resource in self.get_terrain_resources_settings():
+            terrain_resource_description = self.get_terrain_resources_settings()[terrain_resource]
+            if terrain_resource_description is not None and 'raw_resource_type' in terrain_resource_description:
+                return terrain_resource_description['raw_resource_type']
+        return None
 
     @staticmethod
     def scene_position(column, row):
