@@ -61,12 +61,12 @@ class ResourceCalculator:
             else:
                 return None
 
-        def __add_neighbor_not_wh_structures(capital_reachable_structures, position):
-            for neighbour_tile in self._server_scenario.neighbored_tiles(position[1], position[0]):
-                __add_not_wh_structure(capital_reachable_structures, neighbour_tile)
+        def __add_neighbor_not_wh_structures(capital_reachable_structures, row, col):
+            for neighbour_tile_col, neighbour_tile_row in self._server_scenario.neighbored_tiles(col, row):
+                __add_not_wh_structure(capital_reachable_structures, neighbour_tile_row, neighbour_tile_col)
 
-        def __add_not_wh_structure(capital_reachable_structures, neighbour_tile):
-            not_wh = __get_not_wh_structure(self._old_structures, (neighbour_tile[1], neighbour_tile[0]))
+        def __add_not_wh_structure(capital_reachable_structures, row, col):
+            not_wh = __get_not_wh_structure(self._old_structures, (row, col))
             if not_wh is not None and not_wh[0] not in capital_reachable_structures:
                 capital_reachable_structures.add(not_wh[0])
 
@@ -95,12 +95,13 @@ class ResourceCalculator:
 
         capital_reachable_structures = set()
         for wh in capital_reachable_warehouses:
-            position = wh[0].get_position()
-            __add_not_wh_structure(capital_reachable_structures, position)
-            __add_neighbor_not_wh_structures(capital_reachable_structures, position)
+            for wh_part in wh:
+                row, col = wh_part.get_position()
+                __add_not_wh_structure(capital_reachable_structures, row, col)
+                __add_neighbor_not_wh_structures(capital_reachable_structures, row, col)
 
         __add_neighbor_not_wh_structures(capital_reachable_structures,
-                                         (self._capital_row, self._capital_col))
+                                         self._capital_row, self._capital_col)
 
         for structure in capital_reachable_structures:
             raw_resource_type = structure.get_raw_resource_type()

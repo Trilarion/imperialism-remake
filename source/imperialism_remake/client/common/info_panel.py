@@ -109,4 +109,4 @@ class InfoPanel(QtWidgets.QWidget):
         for name, raw_resource in self.scenario.server_scenario.get_nation_asset(
                 self.scenario.server_scenario.get_player_nation()).get_raw_resources().items():
             asset_text += '<br>{}: {}'.format(self.scenario.server_scenario.raw_resource_name(name.value), raw_resource)
-        self.selected_object_label.setText(asset_text)
+        self.nation_asset_label.setText(asset_text)
