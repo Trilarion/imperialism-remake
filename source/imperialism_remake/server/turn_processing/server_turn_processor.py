@@ -17,6 +17,7 @@ import copy
 import logging
 import uuid
 
+from imperialism_remake.server.models.geologist_resource_state import GeologistResourceState
 from imperialism_remake.server.models.structure import Structure
 from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.turn_result import TurnResult
@@ -81,7 +82,7 @@ class ServerTurnProcessor:
 
             if w.get_action() == WorkforceAction.DUTY_ACTION:
                 if w.get_type() == WorkforceType.GEOLOGIST:
-                    self._process_geologist(c, r)
+                    self._process_geologist(nation_id, c, r)
 
             # Move worker to new position
             new_workforce = Workforce(w.get_id(), r, c, w.get_type())
@@ -138,5 +139,8 @@ class ServerTurnProcessor:
                               self._server_scenario.get_raw_resource_type(r, c), 4)
         self._server_scenario.add_structure(r, c, structure)
 
-    def _process_geologist(self, c, r):
+    def _process_geologist(self, nation_id, c, r):
         logger.debug('_process_geologist c:%s, r:%s', c, r)
+        terrain_resource = self._server_scenario.terrain_resource_at(c, r)
+        if terrain_resource > 0:
+            self._server_scenario.set_nation_geologist_resource_state(nation_id, r, c, terrain_resource, GeologistResourceState.REVEALED)

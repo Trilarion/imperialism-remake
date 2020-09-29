@@ -89,6 +89,9 @@ class InfoPanel(QtWidgets.QWidget):
             resource_name = self.scenario.server_scenario.terrain_resource_name(resource)
             resource_text = 'Resource: {}'.format(resource_name)
             self.resource_label.setText(resource_text)
+        else:
+            # TODO get selected_nation properly. from server_scenario_base???
+            # self.scenario.server_scenario.get_nation_geologist_resource_state(selected_nation, row, column)
 
         self.tile_label.setText(text)
 
