@@ -50,7 +50,7 @@ class GameMainScreen(GenericScreen):
 
         self.scenario = GameScenario()
 
-        self._main_map = MainMap(self.scenario)
+        self._main_map = MainMap(self.scenario, selected_nation)
 
         super().__init__(client, self.scenario, self._main_map)
 

@@ -21,6 +21,7 @@ from imperialism_remake.base import constants
 from imperialism_remake.client.utils import scene_utils
 from imperialism_remake.client.utils.scene_utils import scene_position
 from imperialism_remake.lib import qt
+from imperialism_remake.server.models.geologist_resource_state import GeologistResourceState
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +48,10 @@ class MainMap(QtWidgets.QGraphicsView):
 
     mouse_press_event = QtCore.pyqtSignal(object, QtGui.QMouseEvent)
 
-    def __init__(self, scenario):
+    def __init__(self, scenario, selected_nation):
         super().__init__()
+
+        self._selected_nation = selected_nation
 
         logger.debug('__init__')
 
@@ -110,6 +113,8 @@ class MainMap(QtWidgets.QGraphicsView):
 
         self._draw_province_and_nation_borders()
 
+        self._draw_geologist_terrain_resources()
+
         logger.debug('partial_redraw finished')
 
     def _fill_textures(self, columns, rows, mapper, obj_type_getter) -> None:
@@ -126,6 +131,16 @@ class MainMap(QtWidgets.QGraphicsView):
 
         sx, sy = scene_position(column, row)
         scene_utils.put_pixmap_in_tile_center(self.scene, pixmap, sx, sy, z_value)
+
+    def _draw_geologist_terrain_resources(self):
+        logger.debug("_draw_geologist_terrain_resources")
+        for row, value in self.scenario.server_scenario.nation_property(self._selected_nation,
+                                                                        constants.NationProperty.GEOLOGIST_RESOURCE_STATE).items():
+            for column, geologist_resource_state in value.items():
+                for resource_type, resource_state in geologist_resource_state.items():
+                    if GeologistResourceState.REVEALED == resource_state:
+                        self.fill_texture(column, row, self.scenario.get_terrain_resource_to_pixmap_mapper(),
+                                          resource_type)
 
     def _fill_half_tiles(self, columns, rows) -> None:
         logger.debug("_fill_half_tiles")
