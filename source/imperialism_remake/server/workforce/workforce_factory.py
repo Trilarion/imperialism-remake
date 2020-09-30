@@ -23,18 +23,21 @@ from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 from imperialism_remake.server.workforce.workforce_engineer import WorkforceEngineer
 from imperialism_remake.server.workforce.workforce_farmer import WorkforceFarmer
 from imperialism_remake.server.workforce.workforce_forester import WorkforceForester
-from imperialism_remake.server.workforce.workforce_geologist import WorkforceGeologist
+from imperialism_remake.server.workforce.workforce_miner import WorkforceMiner
+from imperialism_remake.server.workforce.workforce_prospector import WorkforceProspector
 
 
 class WorkforceFactory:
     @staticmethod
     def create_new_workforce(server_scenario: ServerScenario, turn_planned: TurnPlanned,
                              workforce: Workforce) -> WorkforceCommon:
-        if workforce.get_type() == WorkforceType.GEOLOGIST:
-            return WorkforceGeologist(server_scenario, turn_planned, workforce)
+        if workforce.get_type() == WorkforceType.PROSPECTOR:
+            return WorkforceProspector(server_scenario, turn_planned, workforce)
         elif workforce.get_type() == WorkforceType.ENGINEER:
             return WorkforceEngineer(server_scenario, turn_planned, workforce)
         elif workforce.get_type() == WorkforceType.FORESTER:
             return WorkforceForester(server_scenario, turn_planned, workforce)
         elif workforce.get_type() == WorkforceType.FARMER:
             return WorkforceFarmer(server_scenario, turn_planned, workforce)
+        elif workforce.get_type() == WorkforceType.MINER:
+            return WorkforceMiner(server_scenario, turn_planned, workforce)

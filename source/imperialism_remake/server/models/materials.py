@@ -16,8 +16,10 @@
 from enum import Enum
 
 
-class StructureType(Enum):
-    WAREHOUSE = 1
-    FARM_ELEVATOR = 2
-    LOGGING = 3
-    MINE = 4
+class Materials(Enum):
+    CANNED_FOOD = 1
+    FABRIC = 2
+    PAPER = 3
+    STEEL = 4
+    LUMBER = 5
+    FUEL = 6

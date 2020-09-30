@@ -16,8 +16,8 @@
 from enum import Enum
 
 
-class GeologistResourceState(Enum):
-    HIDDEN = 1
-    REVEALED = 2
-    NOT_FOUND = 3
-    PROCESSED = 4
+class Goods(Enum):
+    CLOTHING = 1
+    FURNITURE = 2
+    HARDWARE = 3
+    ARMAMENTS = 4

@@ -60,11 +60,11 @@ class ServerScenarioBase:
         # TODO read technologies from scenario/properties/rules...
         self._available_technologies.add(TechnologyType.ROAD_THROUGH_HILLS)
         self._available_technologies.add(TechnologyType.ROAD_THROUGH_PLAINS)
-        self._available_technologies.add(TechnologyType.GEOLOGY_WORK_HILLS)
-        self._available_technologies.add(TechnologyType.GEOLOGY_WORK_MOUNTAIN)
-        self._available_technologies.add(TechnologyType.FARMER_WORK_ORCHARD)
-        self._available_technologies.add(TechnologyType.FARMER_WORK_GRAIN)
-        self._available_technologies.add(TechnologyType.FORESTER_WORK_FOREST)
+        self._available_technologies.add(TechnologyType.PROSPECTOR_WORK_HILLS)
+        self._available_technologies.add(TechnologyType.PROSPECTOR_WORK_MOUNTAIN)
+        self._available_technologies.add(TechnologyType.FARMER_ORCHARD_LEVEL1)
+        self._available_technologies.add(TechnologyType.FARMER_GRAIN_LEVEL1)
+        self._available_technologies.add(TechnologyType.FORESTER_FOREST_LEVEL1)
 
     @property
     def available_technologies(self):

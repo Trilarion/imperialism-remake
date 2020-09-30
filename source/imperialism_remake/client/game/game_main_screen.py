@@ -76,9 +76,10 @@ class GameMainScreen(GenericScreen):
 
         # !!! TODO this is just to test, remove me a little bit later!!!
         self._create_workforce_widget(13, 29, WorkforceType.ENGINEER)
-        self._create_workforce_widget(11, 27, WorkforceType.GEOLOGIST)
+        self._create_workforce_widget(11, 27, WorkforceType.PROSPECTOR)
         self._create_workforce_widget(12, 30, WorkforceType.FARMER)
         self._create_workforce_widget(15, 29, WorkforceType.FORESTER)
+        self._create_workforce_widget(14, 29, WorkforceType.MINER)
         # !!! TODO remove above
 
         a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,

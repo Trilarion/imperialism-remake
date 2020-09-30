@@ -208,7 +208,7 @@ class NationProperty(utils.AutoNumberedEnum):
     DESCRIPTION = ()
     CAPITAL_PROVINCE = ()
     ASSETS = ()
-    GEOLOGIST_RESOURCE_STATE = ()
+    PROSPECTOR_RESOURCE_STATE = ()
 
 @unique
 class ProvinceProperty(utils.AutoNumberedEnum):

@@ -13,9 +13,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-
 from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.structure_type import StructureType
+from imperialism_remake.server.models.terrain_resource_type import TerrainResourceType
 
 
 class ResourceCalculator:
@@ -27,6 +27,11 @@ class ResourceCalculator:
         self._capital_col, self._capital_row = self._server_scenario.get_capital_position(self._nation_id)
 
         self._produced_raw_resources = {}
+
+        self._collectable_raw_resources = [TerrainResourceType.BUFFALO.value, TerrainResourceType.HORSE.value,
+                                           TerrainResourceType.SHEEP.value, TerrainResourceType.SCRUBFOREST.value,
+                                           TerrainResourceType.GRAIN.value, TerrainResourceType.ORCHARD.value,
+                                           TerrainResourceType.FOREST.value, TerrainResourceType.COTTON.value]
 
     def calculate(self):
         self._calculate_produced_raw_resources()
@@ -93,6 +98,7 @@ class ResourceCalculator:
                         queue.insert(0, road_other_part)
                         visited.add(road_other_part)
 
+        # Collect reources using structures
         capital_reachable_structures = set()
         for wh in capital_reachable_warehouses:
             for wh_part in wh:
@@ -108,6 +114,31 @@ class ResourceCalculator:
             if raw_resource_type not in self._produced_raw_resources:
                 self._produced_raw_resources[raw_resource_type] = 0
             self._produced_raw_resources[raw_resource_type] += structure.get_level()
+
+        # Collect resources with no structures
+        reachable_terrain_resources = []
+        for wh in capital_reachable_warehouses:
+            for wh_part in wh:
+                row, col = wh_part.get_position()
+                terrain_resource = self._server_scenario.terrain_resource_at(col, row)
+                if terrain_resource in self._collectable_raw_resources:
+                    reachable_terrain_resources.append((row, col))
+                for neighbour_tile_col, neighbour_tile_row in self._server_scenario.neighbored_tiles(col, row):
+                    terrain_resource = self._server_scenario.terrain_resource_at(neighbour_tile_col, neighbour_tile_row)
+                    if terrain_resource in self._collectable_raw_resources:
+                        reachable_terrain_resources.append((neighbour_tile_row, neighbour_tile_col))
+
+        for neighbour_tile_col, neighbour_tile_row in self._server_scenario.neighbored_tiles(self._capital_col, self._capital_row):
+            terrain_resource = self._server_scenario.terrain_resource_at(neighbour_tile_col, neighbour_tile_row)
+            if terrain_resource in self._collectable_raw_resources:
+                reachable_terrain_resources.append((neighbour_tile_row, neighbour_tile_col))
+
+        for position in reachable_terrain_resources:
+            raw_resource_type = self._server_scenario.get_raw_resource_type(position[0], position[1])
+            if raw_resource_type is not None:
+                if raw_resource_type not in self._produced_raw_resources:
+                    self._produced_raw_resources[raw_resource_type] = 0
+                self._produced_raw_resources[raw_resource_type] += 1
 
     def update_raw_resources(self, raw_resources):
         for name, raw_resource in self._produced_raw_resources.items():

@@ -13,16 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from imperialism_remake.server.models.raw_resource_type import RawResourceType
-from imperialism_remake.server.models.technology_type import TechnologyType
-from imperialism_remake.server.models.terrain_type import TerrainType
+from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
 from imperialism_remake.server.models.turn_planned import TurnPlanned
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
 
-class WorkforceGeologist(WorkforceCommon):
+class WorkforceMiner(WorkforceCommon):
     def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce):
         super().__init__(server_scenario, turn_planned, workforce)
 
@@ -38,14 +36,12 @@ class WorkforceGeologist(WorkforceCommon):
         return True
 
     def _is_tile_duty_action_allowed(self, new_column, new_row):
-        terrain_type = self._server_scenario.terrain_at(new_column, new_row)
-        tech_allowed = self._is_tech_allowed_on_map(terrain_type, TerrainType.HILLS.value,
-                                                    TechnologyType.GEOLOGY_WORK_HILLS) or self._is_tech_allowed_on_map(
-            terrain_type, TerrainType.MOUNTAINS.value,
-            TechnologyType.GEOLOGY_WORK_MOUNTAIN) or self._is_tech_allowed_on_map(terrain_type,
-                                                                                  TerrainType.SWAMP.value,
-                                                                                  TechnologyType.GEOLOGY_WORK_SWAMP)
-        raw_resource_type = self._server_scenario.get_raw_resource_type(new_row, new_column)
-        not_minable_raw_resource = raw_resource_type is not None and raw_resource_type != RawResourceType.COAL and raw_resource_type != RawResourceType.ORE
+        prospector_resource_state = self._server_scenario.get_nation_prospector_resource_state(
+            self._turn_planned.get_nation(), new_row, new_column)
+        # TODO check for tech and structure level
 
-        return tech_allowed and not not_minable_raw_resource
+        for raw_resource, state in prospector_resource_state.items():
+            if state == ProspectorResourceState.REVEALED:
+                return True
+
+        return False
