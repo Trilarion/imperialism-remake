@@ -17,7 +17,7 @@ import copy
 import logging
 import uuid
 
-from imperialism_remake.server.models.geologist_resource_state import GeologistResourceState
+from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
 from imperialism_remake.server.models.structure import Structure
 from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.turn_result import TurnResult
@@ -81,8 +81,8 @@ class ServerTurnProcessor:
             r, c = w.get_new_position()
 
             if w.get_action() == WorkforceAction.DUTY_ACTION:
-                if w.get_type() == WorkforceType.GEOLOGIST:
-                    self._process_geologist(nation_id, c, r)
+                if w.get_type() == WorkforceType.PROSPECTOR:
+                    self._process_prospector(nation_id, c, r)
 
             # Move worker to new position
             new_workforce = Workforce(w.get_id(), r, c, w.get_type())
@@ -102,6 +102,8 @@ class ServerTurnProcessor:
                         self._process_forester(c, r)
                     elif w.get_type() == WorkforceType.FARMER:
                         self._process_farmer(c, r)
+                    elif w.get_type() == WorkforceType.MINER:
+                        self._process_miner(c, r)
 
     def _calculate_nation_asset(self, nation_id, old_roads, old_structures):
         logger.debug('_calculate_nation_asset nation_id:%s', nation_id)
@@ -128,7 +130,7 @@ class ServerTurnProcessor:
 
         # add structures
         structure = Structure(uuid.uuid4(), r, c, StructureType.LOGGING,
-                              self._server_scenario.get_raw_resource_type(r, c), 4)
+                              self._server_scenario.get_raw_resource_type(r, c), 3)
         self._server_scenario.add_structure(r, c, structure)
 
     def _process_farmer(self, c, r):
@@ -136,11 +138,19 @@ class ServerTurnProcessor:
 
         # add structures
         structure = Structure(uuid.uuid4(), r, c, StructureType.FARM_ELEVATOR,
-                              self._server_scenario.get_raw_resource_type(r, c), 4)
+                              self._server_scenario.get_raw_resource_type(r, c), 3)
         self._server_scenario.add_structure(r, c, structure)
 
-    def _process_geologist(self, nation_id, c, r):
-        logger.debug('_process_geologist c:%s, r:%s', c, r)
+    def _process_prospector(self, nation_id, c, r):
+        logger.debug('_process_prospector c:%s, r:%s', c, r)
         terrain_resource = self._server_scenario.terrain_resource_at(c, r)
         if terrain_resource > 0:
-            self._server_scenario.set_nation_geologist_resource_state(nation_id, r, c, terrain_resource, GeologistResourceState.REVEALED)
+            self._server_scenario.set_nation_prospector_resource_state(nation_id, r, c, terrain_resource, ProspectorResourceState.REVEALED)
+
+    def _process_miner(self, c, r):
+        logger.debug('_process_miner c:%s, r:%s', c, r)
+
+        # add structures
+        structure = Structure(uuid.uuid4(), r, c, StructureType.MINE,
+                              self._server_scenario.get_raw_resource_type(r, c), 3)
+        self._server_scenario.add_structure(r, c, structure)

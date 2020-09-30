@@ -16,8 +16,8 @@
 from enum import Enum
 
 
-class StructureType(Enum):
-    WAREHOUSE = 1
-    FARM_ELEVATOR = 2
-    LOGGING = 3
-    MINE = 4
+class ProspectorResourceState(Enum):
+    HIDDEN = 1
+    REVEALED = 2
+    NOT_FOUND = 3
+    PROCESSED = 4

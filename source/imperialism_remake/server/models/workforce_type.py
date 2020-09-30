@@ -18,6 +18,10 @@ from enum import Enum
 
 class WorkforceType(Enum):
     ENGINEER = 0
-    GEOLOGIST = 1
+    PROSPECTOR = 1
     FORESTER = 2
     FARMER = 3
+    MINER = 4
+    RANCHER = 5
+    DRILLER = 6
+

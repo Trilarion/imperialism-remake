@@ -19,7 +19,7 @@ from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.structures.structure_common import StructureCommon
 
 
-class StructureLogging(StructureCommon):
+class StructureMine(StructureCommon):
     def __init__(self, server_scenario: ServerScenario, structure: Structure):
         super().__init__(server_scenario, structure)
 

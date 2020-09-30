@@ -24,7 +24,7 @@ import math
 
 from imperialism_remake.base import constants
 from imperialism_remake.lib import utils
-from imperialism_remake.server.models.geologist_resource_state import GeologistResourceState
+from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
 from imperialism_remake.server.models.nation_asset import NationAsset
 from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.server_scenario_base import ServerScenarioBase
@@ -238,25 +238,25 @@ class ServerScenario():
                 return terrain_resource_description['raw_resource_type']
         return None
 
-    def set_nation_geologist_resource_state(self, nation_key, row, column, terrain_resource, state: GeologistResourceState):
+    def set_nation_prospector_resource_state(self, nation_key, row, column, terrain_resource, state: ProspectorResourceState):
         nation = self._scenario_base.nations[nation_key]
-        if constants.NationProperty.GEOLOGIST_RESOURCE_STATE not in nation:
-            nation[constants.NationProperty.GEOLOGIST_RESOURCE_STATE] = {}
+        if constants.NationProperty.PROSPECTOR_RESOURCE_STATE not in nation:
+            nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE] = {}
 
-        if row not in nation[constants.NationProperty.GEOLOGIST_RESOURCE_STATE]:
-            nation[constants.NationProperty.GEOLOGIST_RESOURCE_STATE][row] = {}
+        if row not in nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE]:
+            nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE][row] = {}
 
-        nation[constants.NationProperty.GEOLOGIST_RESOURCE_STATE][row][column] = {terrain_resource: state}
+        nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE][row][column] = {terrain_resource: state}
 
-    def get_nation_geologist_resource_state(self, nation_key, row, column):
+    def get_nation_prospector_resource_state(self, nation_key, row, column):
         nation = self._scenario_base.nations[nation_key]
-        if constants.NationProperty.GEOLOGIST_RESOURCE_STATE not in nation:
-            return GeologistResourceState.HIDDEN
-        if row not in nation[constants.NationProperty.GEOLOGIST_RESOURCE_STATE]:
-            return GeologistResourceState.HIDDEN
-        if column not in nation[constants.NationProperty.GEOLOGIST_RESOURCE_STATE][row]:
-            return GeologistResourceState.HIDDEN
-        return nation[constants.NationProperty.GEOLOGIST_RESOURCE_STATE][row][column]
+        if constants.NationProperty.PROSPECTOR_RESOURCE_STATE not in nation:
+            return {0: ProspectorResourceState.HIDDEN}
+        if row not in nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE]:
+            return {0: ProspectorResourceState.HIDDEN}
+        if column not in nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE][row]:
+            return {0: ProspectorResourceState.HIDDEN}
+        return nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE][row][column]
 
     @staticmethod
     def scene_position(column, row):
@@ -583,8 +583,8 @@ class ServerScenario():
         # TODO remove this once scenario is saved with this property
         if constants.NationProperty.ASSETS not in nation:
             nation[constants.NationProperty.ASSETS] = NationAsset(nation_key)
-        if constants.NationProperty.GEOLOGIST_RESOURCE_STATE not in nation:
-            nation[constants.NationProperty.GEOLOGIST_RESOURCE_STATE] = {}
+        if constants.NationProperty.PROSPECTOR_RESOURCE_STATE not in nation:
+            nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE] = {}
         # end of TODO
         try:
             return nation[property_key]
@@ -637,7 +637,7 @@ class ServerScenario():
             if key != nation_id:
                 del nation
 
-        # Make geologist resources invisible on map for a client
+        # Make prospector resources invisible on map for a client
         for i, terrain_resource_on_map in enumerate(scenario_base_for_nation.maps[ServerScenarioBase.RESOURCE]):
             if terrain_resource_on_map != 0:
                 terrain_resource_description = self.get_terrain_resources_settings()[terrain_resource_on_map]

@@ -54,7 +54,7 @@ class WorkforceToTextureMapper:
 
     def get_pixmap_of_type(self, workforce_type: int, action: WorkforceAction):
         if workforce_type >= len(self.pixmaps_stand):
-            raise RuntimeError('Tile type undefined: %s', workforce_type)
+            raise RuntimeError('Workforce type undefined: %s', workforce_type)
 
         if action == WorkforceAction.DUTY_ACTION:
             return self.pixmaps_on_duty[workforce_type]

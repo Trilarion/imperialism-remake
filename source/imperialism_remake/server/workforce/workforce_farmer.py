@@ -40,6 +40,6 @@ class WorkforceFarmer(WorkforceCommon):
     def _is_tile_duty_action_allowed(self, terrain_resource_type):
         # TODO check technology availability
         return self._is_tech_allowed_on_map(terrain_resource_type, TerrainResourceType.GRAIN.value,
-                                            TechnologyType.FARMER_WORK_GRAIN) or self._is_tech_allowed_on_map(
+                                            TechnologyType.FARMER_GRAIN_LEVEL1) or self._is_tech_allowed_on_map(
             terrain_resource_type, TerrainResourceType.ORCHARD.value,
-            TechnologyType.FARMER_WORK_ORCHARD)
+            TechnologyType.FARMER_ORCHARD_LEVEL1)

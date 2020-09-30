@@ -92,6 +92,7 @@ class InfoPanel(QtWidgets.QWidget):
         else:
             # TODO get selected_nation properly. from server_scenario_base???
             # self.scenario.server_scenario.get_nation_geologist_resource_state(selected_nation, row, column)
+            pass
 
         self.tile_label.setText(text)
 
