@@ -24,7 +24,16 @@ from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
 class WorkforceEngineer(WorkforceCommon):
     def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce):
-        super().__init__(server_scenario, turn_planned, workforce)
+        super().__init__(server_scenario, turn_planned, workforce, {})
+
+        self._tech_to_terrain_type = {
+            TerrainType.SWAMP.value: TechnologyType.ROAD_THROUGH_SWAMP,
+            TerrainType.HILLS.value: TechnologyType.ROAD_THROUGH_HILLS,
+            TerrainType.MOUNTAINS.value: TechnologyType.ROAD_THROUGH_MOUNTAINS,
+            TerrainType.DESERT.value: TechnologyType.ROAD_THROUGH_DESERT,
+            TerrainType.TUNDRA.value: TechnologyType.ROAD_THROUGH_TUNDRA,
+            TerrainType.PLAIN.value: TechnologyType.ROAD_THROUGH_PLAINS
+        }
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         is_action_allowed = super().is_action_allowed(new_row, new_column, workforce_action)
@@ -41,23 +50,14 @@ class WorkforceEngineer(WorkforceCommon):
                 return False
 
             neighbour_terrain_type = self._server_scenario.terrain_at(new_column, new_row)
-            neighbour_tile_action_allowed = self._is_tile_duty_action_allowed(neighbour_terrain_type)
+            neighbour_tile_action_allowed = self._can_build_road(neighbour_terrain_type)
 
             current_terrain_type = self._server_scenario.terrain_at(column, row)
-            current_tile_action_allowed = self._is_tile_duty_action_allowed(current_terrain_type)
+            current_tile_action_allowed = self._can_build_road(current_terrain_type)
 
             return neighbour_tile_action_allowed and current_tile_action_allowed
 
         return True
 
-    def _is_tile_duty_action_allowed(self, terrain_type):
-        tile_action_allowed = self._is_tech_allowed_on_map(terrain_type, TerrainType.HILLS.value,
-                                                           TechnologyType.ROAD_THROUGH_HILLS) or self._is_tech_allowed_on_map(
-            terrain_type, TerrainType.MOUNTAINS.value,
-            TechnologyType.ROAD_THROUGH_MOUNTAINS) or self._is_tech_allowed_on_map(terrain_type,
-                                                                                   TerrainType.SWAMP.value,
-                                                                                   TechnologyType.ROAD_THROUGH_SWAMP) or self._is_tech_allowed_on_map(
-            terrain_type,
-            TerrainType.PLAIN.value,
-            TechnologyType.ROAD_THROUGH_PLAINS)
-        return tile_action_allowed
+    def _can_build_road(self, terrain_type):
+        return self._is_tech_allowed_on_map(terrain_type, terrain_type, self._tech_to_terrain_type[terrain_type])

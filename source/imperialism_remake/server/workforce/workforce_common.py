@@ -24,10 +24,12 @@ from imperialism_remake.server.server_scenario import ServerScenario
 
 
 class WorkforceCommon:
-    def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce):
+    def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce,
+                 tech_to_structure_level_map):
         self._workforce = workforce
         self._server_scenario = server_scenario
         self._turn_planned = turn_planned
+        self._tech_to_structure_level_map = tech_to_structure_level_map
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         if new_column < 0 or new_row < 0:
@@ -65,6 +67,23 @@ class WorkforceCommon:
                 technology_type):
             return True
         return False
+
+    def _can_build_or_upgrade(self, new_column, new_row, workforce_action, structure_type):
+        if workforce_action == WorkforceAction.DUTY_ACTION:
+            terrain_resource_type = self._server_scenario.terrain_resource_at(new_column, new_row)
+            structures = self._server_scenario.get_structures_at(new_row, new_column)
+            if structures is not None:
+                for structure in structures:
+                    if structure.get_type() == structure_type:
+                        return structure.can_upgrade() and self._is_upgrade_allowed(terrain_resource_type,
+                                                                                    structure.get_level())
+            return self._is_upgrade_allowed(terrain_resource_type, 0)
+        return True
+
+    def _is_upgrade_allowed(self, terrain_resource_type, current_level):
+        return self._is_tech_allowed_on_map(terrain_resource_type,
+                                            self._tech_to_structure_level_map[terrain_resource_type],
+                                            self._tech_to_structure_level_map[terrain_resource_type][current_level + 1])
 
     def get_id(self) -> uuid:
         return self._workforce.get_id()

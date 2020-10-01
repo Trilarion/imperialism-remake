@@ -27,8 +27,9 @@ from imperialism_remake.client.common.generic_screen import GenericScreen
 from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.client.game.game_scenario import GameScenario
 from imperialism_remake.client.game.game_selected_object import GameSelectedObject
-from imperialism_remake.client.turn.turn_end_widget import TurnEndWidget
-from imperialism_remake.client.turn.turn_manager import TurnManager
+from imperialism_remake.client.game.order_buttons_widget import OrderButtonsWidget
+from imperialism_remake.client.game.turn_end_widget import TurnEndWidget
+from imperialism_remake.client.game.turn_manager import TurnManager
 from imperialism_remake.client.workforce.workforce_animated_widget import WorkforceAnimatedWidget
 from imperialism_remake.lib import qt
 from imperialism_remake.server.models.turn_result import TurnResult
@@ -53,6 +54,8 @@ class GameMainScreen(GenericScreen):
         self._main_map = MainMap(self.scenario, selected_nation)
 
         super().__init__(client, self.scenario, self._main_map)
+        self._layout.addWidget(self._toolbar, 0, 0, 1, 2)
+        self._layout.addWidget(self._mini_map, 1, 0)
 
         self.scenario.init(server_base_scenario)
 
@@ -65,12 +68,16 @@ class GameMainScreen(GenericScreen):
 
         self._turn_manager = TurnManager(self.scenario, selected_nation)
         self._turn_manager.event_turn_completed.connect(self._event_turn_completed)
-        self._turn_end_widget = TurnEndWidget(self._turn_manager)
 
-        self._layout.addWidget(self._turn_end_widget, 3, 0)
+        turn_end_widget = TurnEndWidget(self._turn_manager)
+        order_buttons_widget = OrderButtonsWidget()
+
+        self._layout.addWidget(order_buttons_widget, 2, 0)
+        self._layout.addWidget(self._info_panel, 3, 0)
+        self._layout.addWidget(turn_end_widget, 4, 0)
         self._layout.addWidget(self.main_map, 1, 1, 3, 1)
-        self._layout.setRowStretch(2, 1)  # the info box will take all vertical space left
-        self._layout.setColumnStretch(1, 1)  # the main map will take all horizontal space lef
+        self._layout.setRowStretch(3, 1)  # the info box will take all vertical space left
+        self._layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
 
         self._workforce_widgets = {}
 
@@ -80,6 +87,7 @@ class GameMainScreen(GenericScreen):
         self._create_workforce_widget(12, 30, WorkforceType.FARMER)
         self._create_workforce_widget(15, 29, WorkforceType.FORESTER)
         self._create_workforce_widget(14, 29, WorkforceType.MINER)
+        self._create_workforce_widget(13, 29, WorkforceType.RANCHER)
         # !!! TODO remove above
 
         a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,

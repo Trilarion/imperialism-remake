@@ -45,7 +45,7 @@ class EditorScreen(GenericScreen):
         """
         self.scenario = EditorScenario()
 
-        super().__init__(client, self.scenario, EditorMainMap(self.scenario))
+        super().__init__(client, self.scenario, EditorMainMap(self.scenario, None))
 
         # new, load, save scenario actions
         a = qt.create_action(tools.load_ui_icon('icon.scenario.new.png'), 'Create new scenario', self,
@@ -74,7 +74,10 @@ class EditorScreen(GenericScreen):
                              self.provinces_dialog)
         self._toolbar.addAction(a)
 
+        self._layout.addWidget(self._toolbar, 0, 0, 1, 2)
+        self._layout.addWidget(self._mini_map, 1, 0)
         self._layout.addWidget(self.main_map, 1, 1, 2, 1)
+        self._layout.addWidget(self._info_panel, 2, 0)
         self._layout.setRowStretch(2, 1)  # the info box will take all vertical space left
         self._layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
 

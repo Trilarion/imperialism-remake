@@ -47,11 +47,14 @@ class Structure:
     def get_level(self) -> int:
         return self._level
 
-    def set_level(self, level) -> None:
-        self._level = level
-
-    def get_max_level(self) -> int:
-        return self._max_level
-
     def get_raw_resource_type(self):
         return self._raw_resource_type
+
+    def can_upgrade(self) -> bool:
+        if self._level >= self._max_level:
+            return False
+        return True
+
+    def upgrade(self) -> None:
+        if self.can_upgrade():
+            self._level += 1

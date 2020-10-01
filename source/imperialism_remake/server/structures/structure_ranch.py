@@ -13,37 +13,33 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import uuid
-
 from imperialism_remake.server.models.structure import Structure
-from imperialism_remake.server.models.structure_type import StructureType
-from imperialism_remake.server.models.terrain_type import TerrainType
 from imperialism_remake.server.server_scenario import ServerScenario
+from imperialism_remake.server.structures.structure_common import StructureCommon
 
 
-class StructureCommon:
+class StructureRanch(StructureCommon):
     def __init__(self, server_scenario: ServerScenario, structure: Structure):
-        self._structure = structure
-        self._server_scenario = server_scenario
+        super().__init__(server_scenario, structure)
 
     def can_build(self, row, column) -> bool:
-        if column < 0 or row < 0:
+        can_build = super().can_build(row, column)
+        if not can_build:
             return False
 
-        terrain_type = self._server_scenario.terrain_at(column, row)
-        if terrain_type == TerrainType.SEA.value:
-            return False
+        # TODO check for tech
 
         return True
 
-    def get_id(self) -> uuid:
-        return self._structure.get_id()
+    def get_collectable_resource_positions(self) -> ():
+        return self._column, self._row
 
-    def get_type(self) -> StructureType:
-        return self._structure.get_type()
+    def can_upgrade(self) -> bool:
+        if not super().can_upgrade():
+            return False
 
-    def get_position(self) -> (int, int):
-        return self._structure.get_position()
+        # TODO check for technology
 
-    def get_level(self) -> int:
-        return self._structure.get_level()
+    def upgrade(self) -> None:
+        if self.can_upgrade():
+            self.upgrade()

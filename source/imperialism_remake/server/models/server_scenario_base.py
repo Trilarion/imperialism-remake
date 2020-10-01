@@ -65,6 +65,8 @@ class ServerScenarioBase:
         self._available_technologies.add(TechnologyType.FARMER_ORCHARD_LEVEL1)
         self._available_technologies.add(TechnologyType.FARMER_GRAIN_LEVEL1)
         self._available_technologies.add(TechnologyType.FORESTER_FOREST_LEVEL1)
+        self._available_technologies.add(TechnologyType.RANCHER_WOOL_LEVEL1)
+        self._available_technologies.add(TechnologyType.RANCHER_LIVESTOCK_LEVEL1)
 
     @property
     def available_technologies(self):

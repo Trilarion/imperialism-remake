@@ -21,3 +21,4 @@ class StructureType(Enum):
     FARM_ELEVATOR = 2
     LOGGING = 3
     MINE = 4
+    RANCH = 5
