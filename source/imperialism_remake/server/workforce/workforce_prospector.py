@@ -24,7 +24,15 @@ from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
 class WorkforceProspector(WorkforceCommon):
     def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce):
-        super().__init__(server_scenario, turn_planned, workforce)
+        super().__init__(server_scenario, turn_planned, workforce, {})
+
+        self._tech_to_terrain_type = {
+            TerrainType.SWAMP.value: TechnologyType.PROSPECTOR_WORK_SWAMP,
+            TerrainType.HILLS.value: TechnologyType.PROSPECTOR_WORK_HILLS,
+            TerrainType.MOUNTAINS.value: TechnologyType.PROSPECTOR_WORK_MOUNTAIN,
+            TerrainType.DESERT.value: TechnologyType.PROSPECTOR_WORK_DESERT,
+            TerrainType.TUNDRA.value: TechnologyType.PROSPECTOR_WORK_TUNDRA
+        }
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         is_action_allowed = super().is_action_allowed(new_row, new_column, workforce_action)
@@ -39,12 +47,11 @@ class WorkforceProspector(WorkforceCommon):
 
     def _is_tile_duty_action_allowed(self, new_column, new_row):
         terrain_type = self._server_scenario.terrain_at(new_column, new_row)
-        tech_allowed = self._is_tech_allowed_on_map(terrain_type, TerrainType.HILLS.value,
-                                                    TechnologyType.PROSPECTOR_WORK_HILLS) or self._is_tech_allowed_on_map(
-            terrain_type, TerrainType.MOUNTAINS.value,
-            TechnologyType.PROSPECTOR_WORK_MOUNTAIN) or self._is_tech_allowed_on_map(terrain_type,
-                                                                                     TerrainType.SWAMP.value,
-                                                                                     TechnologyType.PROSPECTOR_WORK_SWAMP)
+        if terrain_type not in self._tech_to_terrain_type:
+            return False
+
+        tech_allowed = self._is_tech_allowed_on_map(terrain_type, terrain_type,
+                                                    self._tech_to_terrain_type[terrain_type])
         raw_resource_type = self._server_scenario.get_raw_resource_type(new_row, new_column)
         not_minable_raw_resource = raw_resource_type is not None and raw_resource_type != RawResourceType.COAL and raw_resource_type != RawResourceType.ORE
 

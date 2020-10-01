@@ -19,6 +19,7 @@ from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import constants
 from imperialism_remake.client.common.generic_scenario import GenericScenario
+from imperialism_remake.client.game.unit_buttons_widget import UnitButtonsWidget
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,10 @@ class InfoPanel(QtWidgets.QWidget):
 
         self.setObjectName('info-box-widget')
         layout = QtWidgets.QVBoxLayout(self)
+
+        self._unit_buttons_widget = UnitButtonsWidget()
+        layout.addWidget(self._unit_buttons_widget)
+        self._unit_buttons_widget.hide()
 
         self.tile_label = QtWidgets.QLabel()
         self.tile_label.setTextFormat(QtCore.Qt.RichText)
@@ -84,17 +89,26 @@ class InfoPanel(QtWidgets.QWidget):
             name = self.scenario.server_scenario.province_property(province, constants.ProvinceProperty.NAME)
             text += '<br>Province: {}'.format(name)
 
+        self._update_resource_info(column, row)
+
+        self.tile_label.setText(text)
+
+    def _update_resource_info(self, column, row):
         resource = self.scenario.server_scenario.terrain_resource_at(column, row)
         if resource > 0:
             resource_name = self.scenario.server_scenario.terrain_resource_name(resource)
             resource_text = 'Resource: {}'.format(resource_name)
             self.resource_label.setText(resource_text)
         else:
-            # TODO get selected_nation properly. from server_scenario_base???
-            # self.scenario.server_scenario.get_nation_geologist_resource_state(selected_nation, row, column)
-            pass
+            resource_text = ''
+            #prospector_resource = self.scenario.server_scenario.get_nation_prospector_resource_state(
+            #    TurnManager.get_selected_nation(), row, column)
+            #raw_resource, state = list(prospector_resource.items())[0]
+            #if state == ProspectorResourceState.REVEALED or state == ProspectorResourceState.PROCESSED:
+            #    resource_name = self.scenario.server_scenario.raw_resource_name(raw_resource)
+            #    resource_text = 'Resource: {}'.format(resource_name)
 
-        self.tile_label.setText(text)
+            self.resource_label.setText(resource_text)
 
     def update_workforce_info(self, name):
         if name is None:
@@ -114,3 +128,11 @@ class InfoPanel(QtWidgets.QWidget):
                 self.scenario.server_scenario.get_player_nation()).get_raw_resources().items():
             asset_text += '<br>{}: {}'.format(self.scenario.server_scenario.raw_resource_name(name.value), raw_resource)
         self.nation_asset_label.setText(asset_text)
+
+    def show_unit_buttons(self, workforce):
+        logger.debug('show_unit_buttons, workforce type: %s', workforce.get_type())
+        self._unit_buttons_widget.show()
+
+    def hide_unit_buttons(self, workforce):
+        logger.debug('hide_unit_buttons, workforce type: %s', workforce.get_type())
+        self._unit_buttons_widget.hide()

@@ -134,13 +134,19 @@ class MainMap(QtWidgets.QGraphicsView):
 
     def _draw_prospector_terrain_resources(self):
         logger.debug("_draw_prospector_terrain_resources")
-        for row, value in self.scenario.server_scenario.nation_property(self._selected_nation,
-                                                                        constants.NationProperty.PROSPECTOR_RESOURCE_STATE).items():
-            for column, prospector_resource_state in value.items():
-                for resource_type, resource_state in prospector_resource_state.items():
-                    if ProspectorResourceState.REVEALED == resource_state:
-                        self.fill_texture(column, row, self.scenario.get_terrain_resource_to_pixmap_mapper(),
-                                          resource_type)
+        if self._selected_nation is None:
+            selected_nations = self.scenario.server_scenario.nations()
+        else:
+            selected_nations = [self._selected_nation]
+
+        for nation in selected_nations:
+            for row, value in self.scenario.server_scenario.nation_property(nation,
+                                                                            constants.NationProperty.PROSPECTOR_RESOURCE_STATE).items():
+                for column, prospector_resource_state in value.items():
+                    for resource_type, resource_state in prospector_resource_state.items():
+                        if ProspectorResourceState.REVEALED == resource_state:
+                            self.fill_texture(column, row, self.scenario.get_terrain_resource_to_pixmap_mapper(),
+                                              resource_type)
 
     def _fill_half_tiles(self, columns, rows) -> None:
         logger.debug("_fill_half_tiles")

@@ -18,7 +18,7 @@ import logging
 from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import tools
-from imperialism_remake.client.turn.turn_manager import TurnManager
+from imperialism_remake.client.game.turn_manager import TurnManager
 
 logger = logging.getLogger(__name__)
 

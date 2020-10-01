@@ -21,6 +21,7 @@ from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.structures.structure_farm_elevator import StructureFarmElevator
 from imperialism_remake.server.structures.structure_logging import StructureLogging
 from imperialism_remake.server.structures.structure_mine import StructureMine
+from imperialism_remake.server.structures.structure_ranch import StructureRanch
 from imperialism_remake.server.structures.structure_warehouse import StructureWarehouse
 
 
@@ -35,3 +36,5 @@ class StructureFactory:
             return StructureLogging(server_scenario, structure)
         elif structure.get_type() == StructureType.MINE:
             return StructureMine(server_scenario, structure)
+        elif structure.get_type() == StructureType.RANCH:
+            return StructureRanch(server_scenario, structure)

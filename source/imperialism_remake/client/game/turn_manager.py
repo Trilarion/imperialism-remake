@@ -22,8 +22,6 @@ from imperialism_remake.client.client.client_network_connection import network_c
 from imperialism_remake.server.models.turn_planned import TurnPlanned
 from imperialism_remake.server.models.turn_result import TurnResult
 from imperialism_remake.server.server_network_client import ServerNetworkClient
-from imperialism_remake.server.structures.structure_factory import StructureFactory
-from imperialism_remake.server.workforce.workforce_factory import WorkforceFactory
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +39,9 @@ class TurnManager(QtCore.QObject):
         self._turn_planned = TurnPlanned(self._selected_nation)
 
         network_connection.connect_to_game(self._game_message_received)
+
+    def get_selected_nation(self):
+        return self._selected_nation
 
     def get_turn_planned(self) -> TurnPlanned:
         return self._turn_planned

@@ -104,7 +104,9 @@ if __name__ == '__main__':
         WorkforceType.FARMER.value: {'name': 'Farmer', 'texture_filename_stand': 'farmer.stand.png',
                                      'texture_filename_on_duty': 'farmer.on_duty.png'},
         WorkforceType.MINER.value: {'name': 'Miner', 'texture_filename_stand': 'miner.stand.png',
-                                    'texture_filename_on_duty': 'miner.on_duty.png'}
+                                    'texture_filename_on_duty': 'miner.on_duty.png'},
+        WorkforceType.RANCHER.value: {'name': 'Rancher', 'texture_filename_stand': 'rancher.stand.png',
+                                    'texture_filename_on_duty': 'rancher.on_duty.png'}
     }
     rules['workforce_settings'] = workforce_settings
 
@@ -123,6 +125,9 @@ if __name__ == '__main__':
                                'workforce_action_cursor_not_allowed': 'cursor.action.not.allowed.png'},
         WorkforceType.MINER: {'workforce_action_cursor_move': 'cursor.action.move.png',
                               'workforce_action_cursor_duty_action': 'cursor.miner.mine.png',
+                              'workforce_action_cursor_not_allowed': 'cursor.action.not.allowed.png'},
+        WorkforceType.RANCHER: {'workforce_action_cursor_move': 'cursor.action.move.png',
+                              'workforce_action_cursor_duty_action': 'cursor.rancher.build.png',
                               'workforce_action_cursor_not_allowed': 'cursor.action.not.allowed.png'}
     }
     rules['workforce_action_cursors'] = workforce_action_cursors
@@ -131,7 +136,8 @@ if __name__ == '__main__':
         StructureType.WAREHOUSE.value: {'name': 'Warehouse', 'texture_filename': 'engineer.warehouse.png'},
         StructureType.FARM_ELEVATOR.value: {'name': 'Elevator', 'texture_filename': 'farmer.elevator.png'},
         StructureType.LOGGING.value: {'name': 'Logging', 'texture_filename': 'forester.logging.png'},
-        StructureType.MINE.value: {'name': 'Mine', 'texture_filename': 'miner.mine.png'}
+        StructureType.MINE.value: {'name': 'Mine', 'texture_filename': 'miner.mine.png'},
+        StructureType.RANCH.value: {'name': 'Ranch', 'texture_filename': 'rancher.ranch.png'}
     }
     rules['structure_settings'] = structure_settings
 

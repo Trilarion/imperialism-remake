@@ -32,9 +32,6 @@ class MiniMap(QtWidgets.QWidget):
 
     # TODO fixed width -> make it selectable from outside
 
-    # Fixed width of 300 pixels
-    VIEW_WIDTH = 300
-
     #: signal, emitted if the user clicks somewhere in the mini map and the ROI rectangle changes as a result, sends
     #    the normalized x and y position of the center of the new ROI
     roi_changed = QtCore.pyqtSignal(float, float)
@@ -73,8 +70,8 @@ class MiniMap(QtWidgets.QWidget):
 
         # the width and height (fixed width throughout the game)
         # TODO make this adjustable
-        self.view.setFixedWidth(self.VIEW_WIDTH)
-        view_height = math.floor(0.6 * self.VIEW_WIDTH)
+        self.view.setFixedWidth(constants.PANEL_VIEW_WIDTH)
+        view_height = math.floor(0.6 * constants.PANEL_VIEW_WIDTH)
         self.view.setFixedHeight(view_height)
 
         # tool bar below the mini map

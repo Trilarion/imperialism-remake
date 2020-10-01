@@ -104,6 +104,8 @@ class ServerTurnProcessor:
                         self._process_farmer(c, r)
                     elif w.get_type() == WorkforceType.MINER:
                         self._process_miner(c, r)
+                    elif w.get_type() == WorkforceType.RANCHER:
+                        self._process_rancher(c, r)
 
     def _calculate_nation_asset(self, nation_id, old_roads, old_structures):
         logger.debug('_calculate_nation_asset nation_id:%s', nation_id)
@@ -152,5 +154,13 @@ class ServerTurnProcessor:
 
         # add structures
         structure = Structure(uuid.uuid4(), r, c, StructureType.MINE,
+                              self._server_scenario.get_raw_resource_type(r, c), 3)
+        self._server_scenario.add_structure(r, c, structure)
+
+    def _process_rancher(self, c, r):
+        logger.debug('_process_rancher c:%s, r:%s', c, r)
+
+        # add structures
+        structure = Structure(uuid.uuid4(), r, c, StructureType.RANCH,
                               self._server_scenario.get_raw_resource_type(r, c), 3)
         self._server_scenario.add_structure(r, c, structure)

@@ -22,17 +22,17 @@ from imperialism_remake.server.server_scenario import ServerScenario
 from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
 
-class WorkforceMiner(WorkforceCommon):
+class WorkforceRancher(WorkforceCommon):
     def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce):
         _tech_to_structure_level_map = {
-            TerrainResourceType.ORE.value: {
-                1: TechnologyType.MINER_MINE_LEVEL1,
-                2: TechnologyType.MINER_MINE_LEVEL2,
-                3: TechnologyType.MINER_MINE_LEVEL3},
-            TerrainResourceType.COAL.value: {
-                1: TechnologyType.MINER_MINE_LEVEL1,
-                2: TechnologyType.MINER_MINE_LEVEL2,
-                3: TechnologyType.MINER_MINE_LEVEL3
+            TerrainResourceType.SHEEP.value: {
+                1: TechnologyType.RANCHER_WOOL_LEVEL1,
+                2: TechnologyType.RANCHER_WOOL_LEVEL2,
+                3: TechnologyType.RANCHER_WOOL_LEVEL3},
+            TerrainResourceType.BUFFALO.value: {
+                1: TechnologyType.RANCHER_LIVESTOCK_LEVEL1,
+                2: TechnologyType.RANCHER_LIVESTOCK_LEVEL2,
+                3: TechnologyType.RANCHER_LIVESTOCK_LEVEL3
             }
         }
 
@@ -43,4 +43,4 @@ class WorkforceMiner(WorkforceCommon):
         if not is_action_allowed:
             return False
 
-        return self._can_build_or_upgrade(new_column, new_row, workforce_action, StructureType.MINE)
+        return self._can_build_or_upgrade(new_column, new_row, workforce_action, StructureType.RANCH)

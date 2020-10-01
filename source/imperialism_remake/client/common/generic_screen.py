@@ -66,9 +66,6 @@ class GenericScreen(QtWidgets.QWidget):
 
         # layout of widgets and toolbar
         self._layout = QtWidgets.QGridLayout(self)
-        self._layout.addWidget(self._toolbar, 0, 0, 1, 2)
-        self._layout.addWidget(self._mini_map, 1, 0)
-        self._layout.addWidget(self._info_panel, 2, 0)
 
     def _add_help_and_exit_buttons(self, client):
         # spacer

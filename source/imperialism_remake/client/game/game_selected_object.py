@@ -46,7 +46,7 @@ class GameSelectedObject:
 
         self._selected_widget_object.start_blinking()
 
-        # TODO draw buttons with actions  for this object on toolbar
+        self._info_panel.show_unit_buttons(self._selected_widget_object.get_workforce())
 
     def deselect_widget_object_rather_than(self, row: int, column: int) -> None:
         logger.debug("deselect_object")
@@ -61,6 +61,8 @@ class GameSelectedObject:
             elif my_row == row and my_column == column:
                 logger.debug("deselect_object do not deselect planned me")
                 return
+
+            self._info_panel.hide_unit_buttons(self._selected_widget_object.get_workforce())
 
             self._selected_widget_object.stop_blinking()
             self._selected_widget_object.event_widget_deselected.emit(self._selected_widget_object)

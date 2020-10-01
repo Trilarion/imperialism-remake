@@ -25,6 +25,7 @@ from imperialism_remake.server.workforce.workforce_farmer import WorkforceFarmer
 from imperialism_remake.server.workforce.workforce_forester import WorkforceForester
 from imperialism_remake.server.workforce.workforce_miner import WorkforceMiner
 from imperialism_remake.server.workforce.workforce_prospector import WorkforceProspector
+from imperialism_remake.server.workforce.workforce_rancher import WorkforceRancher
 
 
 class WorkforceFactory:
@@ -41,3 +42,5 @@ class WorkforceFactory:
             return WorkforceFarmer(server_scenario, turn_planned, workforce)
         elif workforce.get_type() == WorkforceType.MINER:
             return WorkforceMiner(server_scenario, turn_planned, workforce)
+        elif workforce.get_type() == WorkforceType.RANCHER:
+            return WorkforceRancher(server_scenario, turn_planned, workforce)

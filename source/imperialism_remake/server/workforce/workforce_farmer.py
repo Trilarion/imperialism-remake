@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
+from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.technology_type import TechnologyType
 from imperialism_remake.server.models.terrain_resource_type import TerrainResourceType
 from imperialism_remake.server.models.turn_planned import TurnPlanned
@@ -23,23 +24,23 @@ from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
 class WorkforceFarmer(WorkforceCommon):
     def __init__(self, server_scenario: ServerScenario, turn_planned: TurnPlanned, workforce):
-        super().__init__(server_scenario, turn_planned, workforce)
+        _tech_to_structure_level_map = {
+            TerrainResourceType.ORCHARD.value: {
+                1: TechnologyType.FARMER_GRAIN_LEVEL1,
+                2: TechnologyType.FARMER_GRAIN_LEVEL2,
+                3: TechnologyType.FARMER_GRAIN_LEVEL3},
+            TerrainResourceType.GRAIN.value: {
+                1: TechnologyType.FARMER_GRAIN_LEVEL1,
+                2: TechnologyType.FARMER_GRAIN_LEVEL2,
+                3: TechnologyType.FARMER_GRAIN_LEVEL3
+            }
+        }
+
+        super().__init__(server_scenario, turn_planned, workforce, _tech_to_structure_level_map)
 
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         is_action_allowed = super().is_action_allowed(new_row, new_column, workforce_action)
         if not is_action_allowed:
             return False
 
-        if workforce_action == WorkforceAction.DUTY_ACTION:
-            terrain_resource_type = self._server_scenario.terrain_resource_at(new_column, new_row)
-            tile_action_allowed = self._is_tile_duty_action_allowed(terrain_resource_type)
-
-            return tile_action_allowed
-        return True
-
-    def _is_tile_duty_action_allowed(self, terrain_resource_type):
-        # TODO check technology availability
-        return self._is_tech_allowed_on_map(terrain_resource_type, TerrainResourceType.GRAIN.value,
-                                            TechnologyType.FARMER_GRAIN_LEVEL1) or self._is_tech_allowed_on_map(
-            terrain_resource_type, TerrainResourceType.ORCHARD.value,
-            TechnologyType.FARMER_ORCHARD_LEVEL1)
+        return self._can_build_or_upgrade(new_column, new_row, workforce_action, StructureType.FARM_ELEVATOR)

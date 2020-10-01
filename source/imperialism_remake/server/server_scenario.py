@@ -28,6 +28,7 @@ from imperialism_remake.server.models.prospector_resource_state import Prospecto
 from imperialism_remake.server.models.nation_asset import NationAsset
 from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.server_scenario_base import ServerScenarioBase
+from imperialism_remake.server.models.structure import Structure
 from imperialism_remake.server.models.technology_type import TechnologyType
 
 logger = logging.getLogger(__name__)
@@ -145,7 +146,7 @@ class ServerScenario():
     def get_roads(self) -> []:
         return self._scenario_base.maps[ServerScenarioBase.ROAD]
 
-    def add_structure(self, row: int, col: int, structure) -> None:
+    def add_structure(self, row: int, col: int, structure: Structure) -> None:
         """
             Adds structure
         """
@@ -156,6 +157,14 @@ class ServerScenario():
             self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row][col] = []
 
         self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row][col].append(structure)
+
+    def get_structures_at(self, row, col) -> Structure:
+        if row not in self._scenario_base.maps[ServerScenarioBase.STRUCTURE]:
+            return None
+        if col not in self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row]:
+            return None
+
+        return self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row][col]
 
     def get_structures(self) -> []:
         return self._scenario_base.maps[ServerScenarioBase.STRUCTURE]
