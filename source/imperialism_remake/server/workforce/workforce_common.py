@@ -39,6 +39,12 @@ class WorkforceCommon:
         if terrain_type == TerrainType.SEA.value:
             return False
 
+        for w_id, workforce in self._server_scenario.get_nation_asset(self._turn_planned.get_nation()).get_workforces().items():
+            if w_id != self.get_id():
+                w_row, w_col = workforce.get_new_position()
+                if new_row == w_row and new_column == w_col:
+                    return False
+
         return True
 
     def get_name(self) -> str:
@@ -61,12 +67,8 @@ class WorkforceCommon:
 
         self._turn_planned.remove_workforce(self._workforce)
 
-    def _is_tech_allowed_on_map(self, type_on_map: int, type_for_tech: int,
-                                technology_type: TechnologyType) -> bool:
-        if type_on_map == type_for_tech and self._server_scenario.is_technology_available(
-                technology_type):
-            return True
-        return False
+    def _is_tech_allowed_on_map(self, technology_type: TechnologyType) -> bool:
+        return self._server_scenario.is_technology_available(technology_type)
 
     def _can_build_or_upgrade(self, new_column, new_row, workforce_action, structure_type):
         if workforce_action == WorkforceAction.DUTY_ACTION:
@@ -81,9 +83,12 @@ class WorkforceCommon:
         return True
 
     def _is_upgrade_allowed(self, terrain_resource_type, current_level):
-        return self._is_tech_allowed_on_map(terrain_resource_type,
-                                            self._tech_to_structure_level_map[terrain_resource_type],
-                                            self._tech_to_structure_level_map[terrain_resource_type][current_level + 1])
+        if terrain_resource_type not in self._tech_to_structure_level_map:
+            return False
+        if current_level + 1 not in self._tech_to_structure_level_map[terrain_resource_type]:
+            return False
+
+        return self._is_tech_allowed_on_map(self._tech_to_structure_level_map[terrain_resource_type][current_level + 1])
 
     def get_id(self) -> uuid:
         return self._workforce.get_id()

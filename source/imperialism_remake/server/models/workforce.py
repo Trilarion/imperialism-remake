@@ -27,8 +27,8 @@ class Workforce:
 
         self._row = row
         self._column = column
-        self._new_row = None
-        self._new_column = None
+        self._new_row = row
+        self._new_column = column
 
         # Overriden in inherited workforce class implementations
         self._build_expenses = None

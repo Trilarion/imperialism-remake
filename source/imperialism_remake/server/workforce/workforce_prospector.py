@@ -50,8 +50,7 @@ class WorkforceProspector(WorkforceCommon):
         if terrain_type not in self._tech_to_terrain_type:
             return False
 
-        tech_allowed = self._is_tech_allowed_on_map(terrain_type, terrain_type,
-                                                    self._tech_to_terrain_type[terrain_type])
+        tech_allowed = self._is_tech_allowed_on_map(self._tech_to_terrain_type[terrain_type])
         raw_resource_type = self._server_scenario.get_raw_resource_type(new_row, new_column)
         not_minable_raw_resource = raw_resource_type is not None and raw_resource_type != RawResourceType.COAL and raw_resource_type != RawResourceType.ORE
 

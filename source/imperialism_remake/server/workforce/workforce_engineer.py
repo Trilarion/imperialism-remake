@@ -50,14 +50,14 @@ class WorkforceEngineer(WorkforceCommon):
                 return False
 
             neighbour_terrain_type = self._server_scenario.terrain_at(new_column, new_row)
-            neighbour_tile_action_allowed = self._can_build_road(neighbour_terrain_type)
+            neighbour_tile_action_allowed = self._can_build(neighbour_terrain_type)
 
             current_terrain_type = self._server_scenario.terrain_at(column, row)
-            current_tile_action_allowed = self._can_build_road(current_terrain_type)
+            current_tile_action_allowed = self._can_build(current_terrain_type)
 
             return neighbour_tile_action_allowed and current_tile_action_allowed
 
         return True
 
-    def _can_build_road(self, terrain_type):
-        return self._is_tech_allowed_on_map(terrain_type, terrain_type, self._tech_to_terrain_type[terrain_type])
+    def _can_build(self, terrain_type):
+        return self._is_tech_allowed_on_map(self._tech_to_terrain_type[terrain_type])
