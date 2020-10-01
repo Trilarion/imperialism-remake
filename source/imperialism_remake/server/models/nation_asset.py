@@ -45,8 +45,8 @@ class NationAsset:
             self.asset_locations[row] = {}
         self.asset_locations[row][column] = workforce
 
-    def get_raw_resources(self):
+    def get_raw_resources(self) -> {}:
         return self._raw_resources
 
-    def get_workforces(self) -> Workforce:
+    def get_workforces(self) -> {}:
         return self._workforces

@@ -24,8 +24,8 @@ import math
 
 from imperialism_remake.base import constants
 from imperialism_remake.lib import utils
-from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
 from imperialism_remake.server.models.nation_asset import NationAsset
+from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
 from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.server_scenario_base import ServerScenarioBase
 from imperialism_remake.server.models.structure import Structure
@@ -169,7 +169,7 @@ class ServerScenario():
     def get_structures(self) -> []:
         return self._scenario_base.maps[ServerScenarioBase.STRUCTURE]
 
-    def get_nation_asset(self, nation):
+    def get_nation_asset(self, nation) -> NationAsset:
         return self.nation_property(nation, constants.NationProperty.ASSETS)
 
     def set_nation_asset(self, nation, asset):
@@ -247,7 +247,8 @@ class ServerScenario():
                 return terrain_resource_description['raw_resource_type']
         return None
 
-    def set_nation_prospector_resource_state(self, nation_key, row, column, terrain_resource, state: ProspectorResourceState):
+    def set_nation_prospector_resource_state(self, nation_key, row, column, terrain_resource,
+                                             state: ProspectorResourceState):
         nation = self._scenario_base.nations[nation_key]
         if constants.NationProperty.PROSPECTOR_RESOURCE_STATE not in nation:
             nation[constants.NationProperty.PROSPECTOR_RESOURCE_STATE] = {}
