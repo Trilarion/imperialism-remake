@@ -17,7 +17,9 @@ import copy
 import logging
 import uuid
 
+from imperialism_remake.server.models.materials import Materials
 from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
+from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.structure import Structure
 from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.turn_result import TurnResult
@@ -25,6 +27,7 @@ from imperialism_remake.server.models.workforce import Workforce
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.models.workforce_type import WorkforceType
 from imperialism_remake.server.turn_processing.resource_calculator import ResourceCalculator
+from imperialism_remake.server.workforce.workforce_price import WorkforcePrice
 
 logger = logging.getLogger(__name__)
 
@@ -74,18 +77,34 @@ class ServerTurnProcessor:
             self._turn_processing_finished_event_handler(client, TurnResult(scenario_base_for_nation))
 
     def _process_personal_turn_result(self, client):
+        def __add_to_nation_asset(asset, asset_type, price):
+            for name, value in price[asset_type].items():
+                asset[name] += value
+
         nation_id = self._clients_turn_planned[client.client_id].get_nation()
 
         old_workforces = self._clients_turn_planned[client.client_id].get_workforces()
         for k, w in old_workforces.items():
             r, c = w.get_new_position()
 
+            if w.get_action() == WorkforceAction.DISBAND:
+                price = WorkforcePrice.get_price(w)
+                __add_to_nation_asset(self._server_scenario.get_nation_asset(nation_id).get_raw_resources(),
+                                      RawResourceType, price)
+                __add_to_nation_asset(self._server_scenario.get_nation_asset(nation_id).get_materials(),
+                                      Materials, price)
+
+                self._server_scenario.get_nation_asset(nation_id).delete_workforce(w)
+                continue
+
             if w.get_action() == WorkforceAction.DUTY_ACTION:
                 if w.get_type() == WorkforceType.PROSPECTOR:
                     self._process_prospector(nation_id, c, r)
 
             # Move worker to new position
-            new_workforce = Workforce(w.get_id(), r, c, w.get_type())
+            new_workforce = Workforce(w.get_id(), r, c, w.get_nation(), w.get_type())
+            if w.get_action() == WorkforceAction.SLEEP:
+                new_workforce.plan_action(r, c, WorkforceAction.SLEEP)
             self._server_scenario.get_nation_asset(nation_id).add_or_update_workforce(new_workforce)
 
     def _process_common_turn_result(self):
@@ -147,7 +166,8 @@ class ServerTurnProcessor:
         logger.debug('_process_prospector c:%s, r:%s', c, r)
         terrain_resource = self._server_scenario.terrain_resource_at(c, r)
         if terrain_resource > 0:
-            self._server_scenario.set_nation_prospector_resource_state(nation_id, r, c, terrain_resource, ProspectorResourceState.REVEALED)
+            self._server_scenario.set_nation_prospector_resource_state(nation_id, r, c, terrain_resource,
+                                                                       ProspectorResourceState.REVEALED)
 
     def _process_miner(self, c, r):
         logger.debug('_process_miner c:%s, r:%s', c, r)

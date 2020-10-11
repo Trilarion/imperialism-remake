@@ -31,6 +31,3 @@ class StructureWarehouse(StructureCommon):
         # TODO check for tech
 
         return True
-
-    def get_collectable_resource_positions(self) -> {}:
-        self._server_scenario.neighbored_tiles(self._column, self._row)

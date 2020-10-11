@@ -16,6 +16,7 @@
 import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QRectF
 
 from imperialism_remake.base import constants
 from imperialism_remake.client.utils import scene_utils
@@ -311,7 +312,7 @@ class MainMap(QtWidgets.QGraphicsView):
         item = self.scene.addPath(path, pen=road_pen)
         item.setZValue(2)
 
-    def visible_rect(self) -> None:
+    def visible_rect(self) -> QRectF:
         """
         Returns the visible part of the map view relative to the total scene rectangle as a rectangle with normalized
         values between 0 and 1, relative to the total size of the map.

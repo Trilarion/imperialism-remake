@@ -13,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.terrain_resource_type import TerrainResourceType
 
@@ -128,7 +127,8 @@ class ResourceCalculator:
                     if terrain_resource in self._collectable_raw_resources:
                         reachable_terrain_resources.append((neighbour_tile_row, neighbour_tile_col))
 
-        for neighbour_tile_col, neighbour_tile_row in self._server_scenario.neighbored_tiles(self._capital_col, self._capital_row):
+        for neighbour_tile_col, neighbour_tile_row in self._server_scenario.neighbored_tiles(self._capital_col,
+                                                                                             self._capital_row):
             terrain_resource = self._server_scenario.terrain_resource_at(neighbour_tile_col, neighbour_tile_row)
             if terrain_resource in self._collectable_raw_resources:
                 reachable_terrain_resources.append((neighbour_tile_row, neighbour_tile_col))

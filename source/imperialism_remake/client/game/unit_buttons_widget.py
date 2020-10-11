@@ -18,7 +18,7 @@ import logging
 from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import tools, constants
-from imperialism_remake.client.game.turn_manager import TurnManager
+from imperialism_remake.client.common.generic_scenario import GenericScenario
 
 BUTTON_WIDTH = (constants.PANEL_VIEW_WIDTH - 32) // 5
 
@@ -26,8 +26,15 @@ logger = logging.getLogger(__name__)
 
 
 class UnitButtonsWidget(QtWidgets.QWidget):
-    def __init__(self):
+    event_unit_disband_clicked = QtCore.pyqtSignal()
+    event_unit_next_clicked = QtCore.pyqtSignal()
+    event_unit_done_clicked = QtCore.pyqtSignal()
+    event_unit_sleep_clicked = QtCore.pyqtSignal()
+
+    def __init__(self, scenario: GenericScenario):
         super().__init__()
+
+        self._scenario = scenario
 
         logger.debug('__init__')
 
@@ -70,12 +77,16 @@ class UnitButtonsWidget(QtWidgets.QWidget):
 
     def _disband_clicked(self):
         logger.debug("_disband_clicked")
+        self.event_unit_disband_clicked.emit()
 
     def _next_unit_clicked(self):
         logger.debug("_next_unit_clicked")
+        self.event_unit_next_clicked.emit()
 
     def _done_clicked(self):
         logger.debug("_done_clicked")
+        self.event_unit_done_clicked.emit()
 
     def _sleep_clicked(self):
         logger.debug("_sleep_clicked")
+        self.event_unit_sleep_clicked.emit()

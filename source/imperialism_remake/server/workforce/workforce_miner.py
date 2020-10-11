@@ -38,6 +38,19 @@ class WorkforceMiner(WorkforceCommon):
 
         super().__init__(server_scenario, turn_planned, workforce, _tech_to_structure_level_map)
 
+    def _can_build_or_upgrade(self, new_column, new_row, workforce_action, structure_type):
+        if workforce_action == WorkforceAction.DUTY_ACTION:
+            for prospector_resource_id, prospector_resource_state in self._server_scenario.get_nation_prospector_resource_state(
+                    self._workforce.get_nation(), new_row, new_column).items():
+                structures = self._server_scenario.get_structures_at(new_row, new_column)
+                if structures is not None:
+                    for structure in structures:
+                        if structure.get_type() == structure_type:
+                            return structure.can_upgrade() and self._is_upgrade_allowed(prospector_resource_id,
+                                                                                        structure.get_level())
+                return self._is_upgrade_allowed(prospector_resource_id, 0)
+        return True
+
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         is_action_allowed = super().is_action_allowed(new_row, new_column, workforce_action)
         if not is_action_allowed:
