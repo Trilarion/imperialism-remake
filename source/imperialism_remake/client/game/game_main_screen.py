@@ -49,6 +49,7 @@ class GameMainScreen(GenericScreen):
     def __init__(self, client, server_base_scenario, selected_nation):
         logger.debug('__init__ server_base_scenario:%s, selected_nation:%s', server_base_scenario, selected_nation)
 
+        self._selected_nation = selected_nation
         self.scenario = GameScenario()
 
         self._main_map = MainMap(self.scenario, selected_nation)
@@ -87,7 +88,7 @@ class GameMainScreen(GenericScreen):
         self._create_workforce_widget(12, 30, WorkforceType.FARMER)
         self._create_workforce_widget(15, 29, WorkforceType.FORESTER)
         self._create_workforce_widget(14, 29, WorkforceType.MINER)
-        self._create_workforce_widget(13, 29, WorkforceType.RANCHER)
+        self._create_workforce_widget(13, 28, WorkforceType.RANCHER)
         # !!! TODO remove above
 
         a = qt.create_action(tools.load_ui_icon('icon.scenario.load.png'), 'Load scenario', self,
@@ -103,15 +104,17 @@ class GameMainScreen(GenericScreen):
 
         self._info_panel.refresh_nation_asset_info()
 
+        self._selected_object.set_workforce_widgets_getter(lambda: self._workforce_widgets)
+
         logger.debug('__init__ finished')
 
     def _create_workforce_widget(self, row, col, workforce_type):
-        workforce_primitive = Workforce(uuid.uuid4(), row, col, workforce_type)
+        workforce_primitive = Workforce(uuid.uuid4(), row, col, self._selected_nation, workforce_type)
         workforce = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
                                                           self._turn_manager.get_turn_planned(),
                                                           workforce_primitive)
         workforce_widget = WorkforceAnimatedWidget(self._main_map, self._info_panel, workforce)
-        workforce_widget.plan_action(row, col, WorkforceAction.CREATE)
+        workforce_widget.plan_action(row, col, WorkforceAction.STAND)
 
         workforce_widget.event_widget_selected.connect(self._selected_widget_object_event)
         workforce_widget.event_widget_deselected.connect(self._deselected_widget_object_event)

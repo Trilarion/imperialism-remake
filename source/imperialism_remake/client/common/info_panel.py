@@ -20,6 +20,7 @@ from PyQt5 import QtWidgets, QtCore
 from imperialism_remake.base import constants
 from imperialism_remake.client.common.generic_scenario import GenericScenario
 from imperialism_remake.client.game.unit_buttons_widget import UnitButtonsWidget
+from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ class InfoPanel(QtWidgets.QWidget):
         self.setObjectName('info-box-widget')
         layout = QtWidgets.QVBoxLayout(self)
 
-        self._unit_buttons_widget = UnitButtonsWidget()
+        self._unit_buttons_widget = UnitButtonsWidget(self.scenario)
         layout.addWidget(self._unit_buttons_widget)
         self._unit_buttons_widget.hide()
 
@@ -70,6 +71,9 @@ class InfoPanel(QtWidgets.QWidget):
 
         self.nation_asset_label = QtWidgets.QLabel()
         layout.addWidget(self.nation_asset_label)
+
+    def get_unit_buttons_widget(self):
+        return self._unit_buttons_widget
 
     def update_tile_info(self, column, row):
         """
@@ -101,12 +105,14 @@ class InfoPanel(QtWidgets.QWidget):
             self.resource_label.setText(resource_text)
         else:
             resource_text = ''
-            #prospector_resource = self.scenario.server_scenario.get_nation_prospector_resource_state(
-            #    TurnManager.get_selected_nation(), row, column)
-            #raw_resource, state = list(prospector_resource.items())[0]
-            #if state == ProspectorResourceState.REVEALED or state == ProspectorResourceState.PROCESSED:
-            #    resource_name = self.scenario.server_scenario.raw_resource_name(raw_resource)
-            #    resource_text = 'Resource: {}'.format(resource_name)
+            for prospector_resource_id, prospector_resource_state in self.scenario.server_scenario.get_nation_prospector_resource_state(
+                    self.scenario.server_scenario.get_player_nation(), row, column).items():
+                if prospector_resource_state == ProspectorResourceState.REVEALED or prospector_resource_state == ProspectorResourceState.PROCESSED:
+                    resource_name = self.scenario.server_scenario.terrain_resource_name(prospector_resource_id)
+                    if resource_text == '':
+                        resource_text = 'Resource: {}'.format(resource_name)
+                    else:
+                        resource_text = ', {}'.format(resource_name)
 
             self.resource_label.setText(resource_text)
 
@@ -123,11 +129,40 @@ class InfoPanel(QtWidgets.QWidget):
             self.selected_object_label.setText('<br>Selected: {}'.format(name))
 
     def refresh_nation_asset_info(self):
-        asset_text = ''
-        for name, raw_resource in self.scenario.server_scenario.get_nation_asset(
-                self.scenario.server_scenario.get_player_nation()).get_raw_resources().items():
-            asset_text += '<br>{}: {}'.format(self.scenario.server_scenario.raw_resource_name(name.value), raw_resource)
+        asset_text = self._print_data_using_value(self.scenario.server_scenario.get_nation_asset(
+            self.scenario.server_scenario.get_player_nation()).get_raw_resources(),
+                                                  self.scenario.server_scenario.raw_resource_name)
+
+        asset_text += self._print_data(self.scenario.server_scenario.get_nation_asset(
+            self.scenario.server_scenario.get_player_nation()).get_materials(),
+                                       self.scenario.server_scenario.material_name)
+
+        asset_text += self._print_data(self.scenario.server_scenario.get_nation_asset(
+            self.scenario.server_scenario.get_player_nation()).get_goods(),
+                                       self.scenario.server_scenario.good_name)
         self.nation_asset_label.setText(asset_text)
+
+    def _print_data_using_value(self, resources, name_getter):
+        asset_text = '<br>==='
+        i = 0
+        for name, resource in resources.items():
+            if i % 3 == 0:
+                asset_text += '<br>{}: {} '.format(name_getter(name.value), resource)
+            else:
+                asset_text += '{}: {} '.format(name_getter(name.value), resource)
+            i += 1
+        return asset_text
+
+    def _print_data(self, resources, name_getter):
+        asset_text = '<br>==='
+        i = 0
+        for name, resource in resources.items():
+            if i % 3 == 0:
+                asset_text += '<br>{}: {} '.format(name_getter(name), resource)
+            else:
+                asset_text += '{}: {} '.format(name_getter(name), resource)
+            i += 1
+        return asset_text
 
     def show_unit_buttons(self, workforce):
         logger.debug('show_unit_buttons, workforce type: %s', workforce.get_type())

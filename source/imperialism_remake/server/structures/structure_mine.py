@@ -32,9 +32,6 @@ class StructureMine(StructureCommon):
 
         return True
 
-    def get_collectable_resource_positions(self) -> ():
-        return self._column, self._row
-
     def can_upgrade(self) -> bool:
         if not super().can_upgrade():
             return False

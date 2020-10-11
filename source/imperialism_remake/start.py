@@ -26,7 +26,6 @@ import logging
 import multiprocessing
 import os
 import sys
-import threading
 
 APPLICATION_NAME = 'imperialism_remake'
 

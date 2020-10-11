@@ -13,11 +13,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
-import uuid
 
-from imperialism_remake.server.models.structure import Structure
 from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.server_scenario import ServerScenario
+from imperialism_remake.server.structures.structure_common import StructureCommon
 from imperialism_remake.server.structures.structure_farm_elevator import StructureFarmElevator
 from imperialism_remake.server.structures.structure_logging import StructureLogging
 from imperialism_remake.server.structures.structure_mine import StructureMine
@@ -27,7 +26,7 @@ from imperialism_remake.server.structures.structure_warehouse import StructureWa
 
 class StructureFactory:
     @staticmethod
-    def create_new_structure(server_scenario: ServerScenario, structure) -> Structure:
+    def create_new_structure(server_scenario: ServerScenario, structure) -> StructureCommon:
         if structure.get_type() == StructureType.FARM_ELEVATOR:
             return StructureFarmElevator(server_scenario, structure)
         elif structure.get_type() == StructureType.WAREHOUSE:

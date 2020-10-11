@@ -97,7 +97,7 @@ class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
     def is_action_allowed(self, new_row: int, new_column: int, workforce_action: WorkforceAction) -> bool:
         return self._workforce_common.is_action_allowed(new_row, new_column, workforce_action)
 
-    def get_workforce(self) -> Workforce:
+    def get_workforce(self) -> WorkforceCommon:
         return self._workforce_common
 
     def get_workforce_to_action_cursor(self, new_row: int, new_column: int) -> QtGui.QCursor:

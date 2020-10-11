@@ -22,4 +22,4 @@ class WorkforceAction(Enum):
     MOVE = 2
     STAND = 3
     SLEEP = 4
-    CREATE = 5
+    DONE = 5

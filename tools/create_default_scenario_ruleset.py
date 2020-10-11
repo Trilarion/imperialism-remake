@@ -21,6 +21,8 @@ Generate the default rules.
 import os
 import sys
 
+from imperialism_remake.server.models.goods import Goods
+from imperialism_remake.server.models.materials import Materials
 from imperialism_remake.server.models.raw_resource_type import RawResourceType
 from imperialism_remake.server.models.structure_type import StructureType
 from imperialism_remake.server.models.terrain_resource_type import TerrainResourceType
@@ -93,6 +95,24 @@ if __name__ == '__main__':
         RawResourceType.COTTON.value: {'name': 'Cotton', 'texture_filename': '<must be proper image.png>'},
     }
     rules['raw_resources_settings'] = raw_resources_settings
+
+    material_settings = {
+        Materials.CANNED_FOOD: {'name': 'Canned Food', 'texture_filename': '<must be proper image.png>'},
+        Materials.FABRIC: {'name': 'Fabric', 'texture_filename': '<must be proper image.png>'},
+        Materials.FUEL: {'name': 'Fuel', 'texture_filename': '<must be proper image.png>'},
+        Materials.LUMBER: {'name': 'Lumber', 'texture_filename': '<must be proper image.png>'},
+        Materials.PAPER: {'name': 'Paper', 'texture_filename': '<must be proper image.png>'},
+        Materials.STEEL: {'name': 'Steel', 'texture_filename': '<must be proper image.png>'}
+   }
+    rules['material_settings'] = material_settings
+
+    goods_settings = {
+        Goods.ARMAMENTS: {'name': 'Armaments', 'texture_filename': '<must be proper image.png>'},
+        Goods.CLOTHING: {'name': 'Clothing', 'texture_filename': '<must be proper image.png>'},
+        Goods.FURNITURE: {'name': 'Furniture', 'texture_filename': '<must be proper image.png>'},
+        Goods.HARDWARE: {'name': 'Hardware', 'texture_filename': '<must be proper image.png>'}
+    }
+    rules['goods_settings'] = goods_settings
 
     workforce_settings = {
         WorkforceType.ENGINEER.value: {'name': 'Engineer', 'texture_filename_stand': 'engineer.stand.png',

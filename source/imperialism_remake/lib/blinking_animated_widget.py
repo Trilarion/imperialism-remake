@@ -30,7 +30,7 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
 
         self._effect = QGraphicsOpacityEffect()
         self._animation = QtCore.QPropertyAnimation(self._effect, b"opacity")
-        self._animation.setDuration(self.BLINK_DURATION / 2)
+        self._animation.setDuration(self.BLINK_DURATION // 2)
 
         self._timer_blink = QtCore.QTimer()
         self._timer_blink.setInterval(self.BLINK_DURATION)
@@ -79,6 +79,8 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
 
     def start_blinking(self) -> None:
         logger.debug("start_blinking")
+        self.stop_gray()
+
         self._timer_blink.start()
 
     def stop_blinking(self) -> None:
@@ -86,6 +88,14 @@ class BlinkingAnimatedWidget(QtWidgets.QLabel):
         self._timer_blink.stop()
 
         self._do_blink(1, 1)
+
+    def start_gray(self) -> None:
+        logger.debug("start_gray")
+        # TODO
+
+    def stop_gray(self) -> None:
+        logger.debug("stop_gray")
+        # TODO
 
     def _do_blink(self, start: int, stop: int) -> None:
         self._animation.setStartValue(start)

@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 # TODO rivers are implemented inefficiently
 
-class ServerScenario():
+class ServerScenario:
     """
     Has several dictionaries (properties, provinces, nations) and a list (map) defining everything.
 
@@ -158,7 +158,7 @@ class ServerScenario():
 
         self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row][col].append(structure)
 
-    def get_structures_at(self, row, col) -> Structure:
+    def get_structures_at(self, row, col):
         if row not in self._scenario_base.maps[ServerScenarioBase.STRUCTURE]:
             return None
         if col not in self._scenario_base.maps[ServerScenarioBase.STRUCTURE][row]:
@@ -246,6 +246,20 @@ class ServerScenario():
             if terrain_resource_description is not None and 'raw_resource_type' in terrain_resource_description:
                 return terrain_resource_description['raw_resource_type']
         return None
+
+    def material_name(self, material):
+        """
+        Get a special property from the rules.
+        """
+        # TODO move this to a special rules class. Only have rules() and setRules() here.
+        return self._scenario_base.rules['material_settings'][material]['name']
+
+    def good_name(self, good):
+        """
+        Get a special property from the rules.
+        """
+        # TODO move this to a special rules class. Only have rules() and setRules() here.
+        return self._scenario_base.rules['goods_settings'][good]['name']
 
     def set_nation_prospector_resource_state(self, nation_key, row, column, terrain_resource,
                                              state: ProspectorResourceState):

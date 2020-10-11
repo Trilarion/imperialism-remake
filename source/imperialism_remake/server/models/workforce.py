@@ -20,18 +20,19 @@ from imperialism_remake.server.models.workforce_type import WorkforceType
 
 
 class Workforce:
-    def __init__(self, workforce_id: uuid, row: int, column: int, workforce_type: WorkforceType):
+    def __init__(self, workforce_id: uuid, row: int, column: int, nation, workforce_type: WorkforceType):
         self._workforce_id = workforce_id
         self._workforce_type = workforce_type
         self._workforce_action = WorkforceAction.STAND
+        self._nation = nation
 
         self._row = row
         self._column = column
         self._new_row = row
         self._new_column = column
 
-        # Overriden in inherited workforce class implementations
-        self._build_expenses = None
+    def get_nation(self):
+        return self._nation
 
     def get_id(self) -> uuid:
         return self._workforce_id

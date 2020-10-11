@@ -15,10 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 
 from imperialism_remake.base import tools, constants
-from imperialism_remake.client.game.turn_manager import TurnManager
 
 BUTTON_WIDTH = constants.PANEL_VIEW_WIDTH // 5
 
