@@ -70,7 +70,10 @@ class ServerScenario:
         self._scenario_base.properties[constants.ScenarioProperty.PLAYER_NATION] = player_nation
 
     def get_player_nation(self):
-        return self._scenario_base.properties[constants.ScenarioProperty.PLAYER_NATION]
+        if constants.ScenarioProperty.PLAYER_NATION in self._scenario_base.properties:
+            return self._scenario_base.properties[constants.ScenarioProperty.PLAYER_NATION]
+        else:
+            return None
 
     @staticmethod
     def from_file(file_path):
@@ -489,6 +492,20 @@ class ServerScenario:
         if province in self._scenario_base.provinces and self.is_valid_position(position):
             self._scenario_base.provinces[province][constants.ProvinceProperty.TILES].append(position)
 
+    def remove_province_map_tile(self, province, position):
+        """
+        Adds a position to a province.
+
+        :param province:
+        :param position:
+        :return:
+        """
+        logger.debug('remove_province_map_tile province:%s, position:%s', province, position)
+
+        if province in self._scenario_base.provinces and position in self._scenario_base.provinces[province][constants.ProvinceProperty.TILES]:
+            index = self._scenario_base.provinces[province][constants.ProvinceProperty.TILES].index(position)
+            del self._scenario_base.provinces[province][constants.ProvinceProperty.TILES][index]
+
     def provinces(self):
         """
         Return a list of ids for all provinces. A province is just an id for us.
@@ -534,6 +551,14 @@ class ServerScenario:
         # wire it in both ways
         self._scenario_base.nations[nation][constants.NationProperty.PROVINCES].append(province)
         self._scenario_base.provinces[province][constants.ProvinceProperty.NATION] = nation
+
+    def nation_at(self, row, col):
+        for nation in self.nations():
+            provinces = self.provinces_of_nation(nation)
+            for province in provinces:
+                if [col, row] in self.province_property(province, constants.ProvinceProperty.TILES):
+                    return nation
+        return None
 
     def nations(self):
         """
