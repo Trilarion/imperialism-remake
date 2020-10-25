@@ -42,10 +42,10 @@ class MainMap(QtWidgets.QGraphicsView):
     change_terrain_resource = QtCore.pyqtSignal(int, int)
 
     #: signal, emitted if a province info is requested
-    province_info = QtCore.pyqtSignal(int)
+    province_info = QtCore.pyqtSignal(object)
 
     #: signal, emitted if a nation info is requested
-    nation_info = QtCore.pyqtSignal(int)
+    nation_info = QtCore.pyqtSignal(object)
 
     mouse_press_event = QtCore.pyqtSignal(object, QtGui.QMouseEvent)
 
@@ -68,6 +68,8 @@ class MainMap(QtWidgets.QGraphicsView):
         self.setMouseTracking(True)
         self.current_column = -1
         self.current_row = -1
+
+        self._borders = []
 
     def redraw(self) -> None:
         """
@@ -219,6 +221,10 @@ class MainMap(QtWidgets.QGraphicsView):
         logger.debug("_draw_province_and_nation_borders")
         # draw province and nation borders
         # TODO the whole border drawing is a crude approximation, implement it the right way
+        for border in self._borders:
+            self.scene.removeItem(border)
+            del border
+
         province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
         province_border_pen.setWidth(2)
         nation_border_pen = QtGui.QPen()
@@ -243,10 +249,14 @@ class MainMap(QtWidgets.QGraphicsView):
                 item = self.scene.addPath(province_path, pen=province_border_pen)
                 item.setZValue(4)
                 nation_path.addPath(province_path)
+
+                self._borders.append(item)
             nation_path = nation_path.simplified()
             nation_border_pen.setColor(nation_color)
             item = self.scene.addPath(nation_path, pen=nation_border_pen)
             item.setZValue(5)
+
+            self._borders.append(item)
 
     def _draw_rivers(self) -> None:
         logger.debug("_draw_rivers")

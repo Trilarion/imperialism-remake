@@ -85,11 +85,18 @@ class InfoPanel(QtWidgets.QWidget):
         # logger.debug('update_tile_info column:%s, row:%s', column, row)
 
         text = 'Position ({}, {})'.format(column, row)
+
         terrain = self.scenario.server_scenario.terrain_at(column, row)
         terrain_name = self.scenario.server_scenario.terrain_name(terrain)
         text += '<br>Terrain: {}'.format(terrain_name)
+
+        nation = self.scenario.server_scenario.nation_at(row, column)
+        if nation:
+            name = self.scenario.server_scenario.nation_property(nation, constants.NationProperty.NAME)
+            text += '<br>Nation: {}'.format(name)
+
         province = self.scenario.server_scenario.province_at(column, row)
-        if province is not None:
+        if province:
             name = self.scenario.server_scenario.province_property(province, constants.ProvinceProperty.NAME)
             text += '<br>Province: {}'.format(name)
 
@@ -105,14 +112,16 @@ class InfoPanel(QtWidgets.QWidget):
             self.resource_label.setText(resource_text)
         else:
             resource_text = ''
-            for prospector_resource_id, prospector_resource_state in self.scenario.server_scenario.get_nation_prospector_resource_state(
-                    self.scenario.server_scenario.get_player_nation(), row, column).items():
-                if prospector_resource_state == ProspectorResourceState.REVEALED or prospector_resource_state == ProspectorResourceState.PROCESSED:
-                    resource_name = self.scenario.server_scenario.terrain_resource_name(prospector_resource_id)
-                    if resource_text == '':
-                        resource_text = 'Resource: {}'.format(resource_name)
-                    else:
-                        resource_text = ', {}'.format(resource_name)
+            player_nation = self.scenario.server_scenario.get_player_nation()
+            if player_nation:
+                for prospector_resource_id, prospector_resource_state in self.scenario.server_scenario.get_nation_prospector_resource_state(
+                        self.scenario.server_scenario.get_player_nation(), row, column).items():
+                    if prospector_resource_state == ProspectorResourceState.REVEALED or prospector_resource_state == ProspectorResourceState.PROCESSED:
+                        resource_name = self.scenario.server_scenario.terrain_resource_name(prospector_resource_id)
+                        if resource_text == '':
+                            resource_text = 'Resource: {}'.format(resource_name)
+                        else:
+                            resource_text = ', {}'.format(resource_name)
 
             self.resource_label.setText(resource_text)
 

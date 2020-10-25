@@ -69,3 +69,5 @@ class ChangeTextureWidget(QtWidgets.QGraphicsView):
 
         self._texture_setter(self._column, self._row, tile_number)
         self._main_map.fill_texture(self._column, self._row, self._mapper, tile_number)
+
+        self._main_map.change_texture_tile(self._row, self._column)
