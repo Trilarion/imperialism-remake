@@ -72,6 +72,8 @@ class MainMap(QtWidgets.QGraphicsView):
         self.current_row = -1
 
         self._borders = []
+        self._rivers = []
+        self._roads = []
 
     def redraw(self) -> None:
         """
@@ -226,7 +228,7 @@ class MainMap(QtWidgets.QGraphicsView):
         for border in self._borders:
             self.scene.removeItem(border)
             del border
-            self._borders = []
+        self._borders = []
 
         province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
         province_border_pen.setWidth(2)
@@ -264,6 +266,12 @@ class MainMap(QtWidgets.QGraphicsView):
 
     def _draw_rivers(self) -> None:
         logger.debug("_draw_rivers")
+
+        for river in self._rivers:
+            self.scene.removeItem(river)
+            del river
+        self._rivers = []
+
         # draw rivers
         river_pen = QtGui.QPen(QtGui.QColor(64, 64, 255))
         river_pen.setWidth(5)
@@ -282,8 +290,15 @@ class MainMap(QtWidgets.QGraphicsView):
             item = self.scene.addPath(path, pen=river_pen)
             item.setZValue(2)
 
+            self._rivers.append(item)
+
     def _draw_roads(self) -> None:
         logger.debug("_draw_roads")
+        for road in self._roads:
+            self.scene.removeItem(road)
+            del road
+        self._roads = []
+
         for road_section in self.scenario.server_scenario.get_roads():
             self.draw_road(road_section[0], road_section[1])
 
@@ -325,6 +340,8 @@ class MainMap(QtWidgets.QGraphicsView):
 
         item = self.scene.addPath(path, pen=road_pen)
         item.setZValue(2)
+
+        self._roads.append(item)
 
     def visible_rect(self) -> QRectF:
         """
