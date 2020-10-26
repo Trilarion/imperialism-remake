@@ -57,15 +57,21 @@ class EditorMainMap(MainMap):
                                  partial(self.change_terrain_resource.emit, column, row))
             menu.addAction(a)
 
-            nation = self.scenario.server_scenario.nation_at(column, row)
-            if nation:
-                province = self.scenario.server_scenario.province_at(column, row)
+            province = self.scenario.server_scenario.province_at(column, row)
+            if province:
                 a = qt.create_action(tools.load_ui_icon('icon.editor.province_info.png'), 'Province info', self,
                                      partial(self.province_info.emit, province))
                 menu.addAction(a)
 
-            a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Nation info', self,
-                                 partial(self.nation_info.emit, nation))
+            nation = self.scenario.server_scenario.nation_at(row, column)
+            if nation:
+                a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Nation info', self,
+                                     partial(self.nation_info.emit, nation))
+                menu.addAction(a)
+
+
+            a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Set nation', self,
+                                 partial(self.set_nation_event.emit, row, column, nation, province))
             menu.addAction(a)
 
         menu.exec(event.globalPos())
@@ -81,16 +87,9 @@ class EditorMainMap(MainMap):
 
         self._draw_province_and_nation_borders()
 
-    def change_nation_tile(self, row, column) -> None:
-        logger.debug(f"change_nation_tile {row}, {column}")
+    def change_nation_tile(self, row, column, province) -> None:
+        logger.debug(f"change_nation_tile {row}, {column}, province:{province}")
 
-        #TODO
-
-        self._draw_province_and_nation_borders()
-
-    def change_province_tile(self, row, column) -> None:
-        logger.debug(f"change_province_tile {row}, {column}")
-
-        #TODO
+        self.scenario.server_scenario.change_province_map_tile(province, [column, row])
 
         self._draw_province_and_nation_borders()

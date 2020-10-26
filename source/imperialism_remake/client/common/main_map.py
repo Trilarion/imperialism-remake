@@ -47,6 +47,8 @@ class MainMap(QtWidgets.QGraphicsView):
     #: signal, emitted if a nation info is requested
     nation_info = QtCore.pyqtSignal(object)
 
+    set_nation_event = QtCore.pyqtSignal(int, int, object, object)
+
     mouse_press_event = QtCore.pyqtSignal(object, QtGui.QMouseEvent)
 
     def __init__(self, scenario, selected_nation):
@@ -224,6 +226,7 @@ class MainMap(QtWidgets.QGraphicsView):
         for border in self._borders:
             self.scene.removeItem(border)
             del border
+            self._borders = []
 
         province_border_pen = QtGui.QPen(QtGui.QColor(QtCore.Qt.black))
         province_border_pen.setWidth(2)
@@ -251,6 +254,7 @@ class MainMap(QtWidgets.QGraphicsView):
                 nation_path.addPath(province_path)
 
                 self._borders.append(item)
+
             nation_path = nation_path.simplified()
             nation_border_pen.setColor(nation_color)
             item = self.scene.addPath(nation_path, pen=nation_border_pen)

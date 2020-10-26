@@ -29,4 +29,4 @@ class ChangeTerrainWidget(ChangeTextureWidget):
     def mousePressEvent(self, event):
         logger.debug("mousePressEvent x:%s, y:%s", event.x(), event.y())
 
-        self._fill_texture(event.x(), event.y())
+        self.change_texture_tile(event.x(), event.y())

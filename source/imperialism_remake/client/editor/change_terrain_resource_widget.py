@@ -32,7 +32,7 @@ class ChangeTerrainResourceWidget(ChangeTextureWidget):
     def mousePressEvent(self, event):
         logger.debug("mousePressEvent x:%s, y:%s", event.x(), event.y())
 
-        self._fill_texture(event.x(), event.y())
+        self.change_texture_tile(event.x(), event.y())
 
     def _custom_set_terrain_resource_at(self, column, row, resource):
         self._screen.scenario.server_scenario.set_terrain_resource_at(column, row, resource)

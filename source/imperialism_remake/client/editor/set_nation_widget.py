@@ -23,31 +23,25 @@ from imperialism_remake.lib import qt, utils
 logger = logging.getLogger(__name__)
 
 
-class NationPropertiesWidget(QtWidgets.QWidget):
+class SetNationWidget(QtWidgets.QWidget):
     """
     Modify nation properties dialog
     """
 
     # TODO when exiting redraw the big map
 
-    def __init__(self, scenario, main_map, initial_nation=None):
+    def __init__(self, scenario, main_map, row, column, nation, province):
         super().__init__()
 
-        logger.debug('__init__ initial_nation:%s', initial_nation)
+        logger.debug(f'__init__ at {row}, {column}')
 
         self.scenario = scenario
 
         self._main_map = main_map
+        self._row = row
+        self._column = column
 
         widget_layout = QtWidgets.QVBoxLayout(self)
-
-        # toolbar
-        toolbar = QtWidgets.QToolBar()
-        a = qt.create_action(tools.load_ui_icon('icon.add.png'), 'Add nation', toolbar, self.add_nation)
-        toolbar.addAction(a)
-        a = qt.create_action(tools.load_ui_icon('icon.delete.png'), 'Remove nation', toolbar, self.remove_nation)
-        toolbar.addAction(a)
-        widget_layout.addLayout(qt.wrap_in_boxlayout(toolbar))
 
         # nation selection combo box
         label = QtWidgets.QLabel('Choose')
@@ -59,26 +53,15 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         # nation info panel
         layout = QtWidgets.QVBoxLayout()
 
-        # description
-        self.description_edit = QtWidgets.QLineEdit()
-        self.description_edit.setFixedWidth(300)
-        self.description_edit.setText('Test')
-        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Description'), self.description_edit)))
-
         # color
         self.color_picker = QtWidgets.QPushButton()
         self.color_picker.setFixedSize(24, 24)
-        self.color_picker.clicked.connect(self.show_color_picker)
         layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Color'), self.color_picker)))
-
-        # capital province
-        self.capital_province_edit = QtWidgets.QLineEdit()
-        self.capital_province_edit.setFixedWidth(300)
-        layout.addLayout(qt.wrap_in_boxlayout((QtWidgets.QLabel('Capital'), self.capital_province_edit)))
 
         # all provinces
         self.provinces_combobox = QtWidgets.QComboBox()
         self.provinces_combobox.setFixedWidth(300)
+        self.provinces_combobox.currentIndexChanged.connect(self.province_selected)
         self.number_provinces_label = QtWidgets.QLabel()
         layout.addLayout(qt.wrap_in_boxlayout((self.number_provinces_label, self.provinces_combobox)))
 
@@ -91,24 +74,17 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         self.reset_content()
 
         # select initial nation if given
-        if initial_nation:
-            index = utils.index_of_element(self.nations, initial_nation)
+        if nation:
+            index = utils.index_of_element(self.nations, nation)
+            self.nation_combobox.setCurrentIndex(index)
+        elif self.nations:
+            index = utils.index_of_element(self.nations, self.nations[0])
             self.nation_combobox.setCurrentIndex(index)
 
-    def show_color_picker(self):
-        """
-        Selects a color
-        """
-        logger.debug('show_color_picker')
-
-        new_color = QtWidgets.QColorDialog.getColor(self.color, parent=self)
-        # isValid() returns True if dialog wasn't cancelled
-        if new_color.isValid():
-            index = self.nation_combobox.currentIndex()
-            nation = self.nations[index]
-            self.scenario.server_scenario.set_nation_property(nation, constants.NationProperty.COLOR, new_color.name())
-
-            self.nation_selected(index)
+        if province:
+            provinces = self.scenario.server_scenario.nation_property(nation, constants.NationProperty.PROVINCES)
+            index = utils.index_of_element(provinces, province)
+            self.provinces_combobox.setCurrentIndex(index)
 
     def reset_content(self):
         """
@@ -141,16 +117,9 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         logger.debug('nation_selected index:%s', index)
 
         nation = self.nations[index]
-        self.description_edit.setText(self.scenario.server_scenario.nation_property(nation,
-                                                                                    constants.NationProperty.DESCRIPTION))
-
-        province = self.scenario.server_scenario.nation_property(nation, constants.NationProperty.CAPITAL_PROVINCE)
-        self.capital_province_edit.setText(self.scenario.server_scenario.province_property(province,
-                                                                                           constants.ProvinceProperty.NAME))
 
         # color
         color_name = self.scenario.server_scenario.nation_property(nation, constants.NationProperty.COLOR)
-        self.color = QtGui.QColor(color_name)
         self.color_picker.setStyleSheet('QPushButton { background-color: ' + color_name + '; }')
 
         provinces = self.scenario.server_scenario.nation_property(nation, constants.NationProperty.PROVINCES)
@@ -160,37 +129,12 @@ class NationPropertiesWidget(QtWidgets.QWidget):
         self.provinces_combobox.clear()
         self.provinces_combobox.addItems(provinces_names)
 
-    def add_nation(self):
-        """
-        Adds a nation.
-        """
-        logger.debug('add_nation')
+        self._main_map.change_nation_tile(self._row, self._column, provinces[0])
 
-        name, ok = QtWidgets.QInputDialog.getText(self, 'Add Nation', 'Name')
-        if ok:
-            # TODO what if nation with the same name already exists
-            # TODO check for sanity of name (no special letters, minimal number of letters)
-            nation = self.scenario.server_scenario.add_nation()
-            self.scenario.server_scenario.set_nation_property(nation, constants.NationProperty.NAME, name)
-            # reset content
-            self.reset_content()
+    def province_selected(self, index):
+        logger.debug('province_selected index:%s', index)
 
-    def remove_nation(self):
-        """
-        Removes a nation.
-        """
-        logger.debug('remove_nation')
+        nation = self.nations[self.nation_combobox.currentIndex()]
+        provinces = self.scenario.server_scenario.nation_property(nation, constants.NationProperty.PROVINCES)
 
-        index = self.nation_combobox.currentIndex()
-        name = self.nation_combobox.currentText()
-        answer = QtWidgets.QMessageBox.question(self, 'Warning', 'Remove {}'.format(name),
-                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                                QtWidgets.QMessageBox.Yes)
-        if answer == QtWidgets.QMessageBox.Yes:
-            nation = self.nations[index]
-
-            # there is no going back on this one
-            self.scenario.server_scenario.remove_nation(nation)
-
-            # reset content
-            self.reset_content()
+        self._main_map.change_nation_tile(self._row, self._column, provinces[index])
