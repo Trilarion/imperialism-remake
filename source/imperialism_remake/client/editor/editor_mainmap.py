@@ -14,13 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
+import random
 from functools import partial
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets
 
 from imperialism_remake.base import constants, tools
 from imperialism_remake.client.common.main_map import MainMap
-from imperialism_remake.client.utils.scene_utils import scene_position
 from imperialism_remake.lib import qt
 from imperialism_remake.server.models.terrain_type import TerrainType
 
@@ -53,28 +53,174 @@ class EditorMainMap(MainMap):
 
         terrain_type = self.scenario.server_scenario.terrain_at(column, row)
         if terrain_type != TerrainType.SEA.value:
-            a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'), 'Set resource', self,
-                                 partial(self.change_terrain_resource.emit, column, row))
-            menu.addAction(a)
+            self._add_menu_item_set_resource(column, menu, row)
 
-            province = self.scenario.server_scenario.province_at(column, row)
-            if province:
-                a = qt.create_action(tools.load_ui_icon('icon.editor.province_info.png'), 'Province info', self,
-                                     partial(self.province_info.emit, province))
-                menu.addAction(a)
+            province = self._add_menu_item_province_info(column, menu, row)
 
-            nation = self.scenario.server_scenario.nation_at(row, column)
-            if nation:
-                a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Nation info', self,
-                                     partial(self.nation_info.emit, nation))
-                menu.addAction(a)
+            nation = self._add_menu_item_nation_info(column, menu, row)
 
+            self._add_menu_item_set_nation(column, menu, nation, province, row)
 
-            a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Set nation', self,
-                                 partial(self.set_nation_event.emit, row, column, nation, province))
-            menu.addAction(a)
+            self._add_menu_item_river(column, menu, row)
+
+            self._add_menu_item_roads(column, menu, row)
 
         menu.exec(event.globalPos())
+
+    def _add_menu_item_roads(self, column, menu, row):
+        roads = self.scenario.server_scenario.get_roads()
+
+        not_on_road = True
+        for road in roads:
+            if [row, column] in road:
+                not_on_road = False
+
+        road_tiles = []
+        for road in roads:
+            if len(road) > 0:
+                neighbors = self.scenario.server_scenario.neighbored_tiles(column, row)
+                for neighbor in neighbors:
+                    if [neighbor[1], neighbor[0]] in road:
+                        road_tiles.append([neighbor[0], neighbor[1]])
+
+        if not_on_road:
+            province_id = self.scenario.server_scenario.province_at(column, row)
+            city_position = self.scenario.server_scenario.province_property(province_id,
+                                                                            constants.ProvinceProperty.TOWN_LOCATION)
+            if city_position in self.scenario.server_scenario.neighbored_tiles(column, row):
+                a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'),
+                                     'Start road from city',
+                                     self,
+                                     partial(self._start_road_event, column, row, city_position))
+                menu.addAction(a)
+
+            if len(road_tiles) > 0:
+                a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'), 'Add road',
+                                     self,
+                                     partial(self._add_road_event, column, row, road_tiles))
+                menu.addAction(a)
+
+        else:
+            if len(road_tiles) > 0:
+                a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'), 'Remove road',
+                                     self,
+                                     partial(self._remove_road_event, column, row, road_tiles))
+                menu.addAction(a)
+
+            # TODO allow road merge
+
+    def _add_road_event(self, column, row, road_tiles):
+        rand_road_index = random.randint(0, len(road_tiles) - 1)
+        self.scenario.server_scenario.add_road([row, column],
+                                               [road_tiles[rand_road_index][1], road_tiles[rand_road_index][0]])
+
+        self._draw_roads()
+
+    def _remove_road_event(self, column, row, road_tiles):
+        roads = self.scenario.server_scenario.get_roads()
+        for road in roads:
+            for road_tile in road_tiles:
+                if ([row, column], [road_tile[1], road_tile[0]]) == road:
+                    roads.remove(([row, column], [road_tile[1], road_tile[0]]))
+                    self._draw_roads()
+                    return
+                elif ([road_tile[1], road_tile[0]], [row, column]) == road:
+                    roads.remove(([road_tile[1], road_tile[0]], [row, column]))
+                    self._draw_roads()
+                    return
+
+    def _start_road_event(self, column, row, city_position):
+        self.scenario.server_scenario.add_road([row, column], [city_position[1], city_position[0]])
+
+        self._draw_roads()
+
+    def _add_menu_item_river(self, column, menu, row):
+        rivers = self.scenario.server_scenario.get_rivers()
+
+        for river in rivers:
+            if len(river['tiles']) > 0:
+                if river['tiles'][0][0] == column and river['tiles'][0][1] == row:
+                    a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'), 'Remove river',
+                                         self,
+                                         partial(self._remove_river_event, column, row, river['tiles']))
+                    menu.addAction(a)
+                    return
+
+        not_on_river = True
+        for river in rivers:
+            if [column, row] in river['tiles']:
+                not_on_river = False
+
+        if not_on_river:
+            for river in rivers:
+                if len(river['tiles']) > 0:
+                    neighbors = self.scenario.server_scenario.neighbored_tiles(column, row)
+                    if river['tiles'][0] in neighbors:
+                        a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'), 'Add river',
+                                             self,
+                                             partial(self._add_river_event, column, row, river['tiles']))
+                        menu.addAction(a)
+                        return
+
+            neighbors = self.scenario.server_scenario.neighbored_tiles(column, row)
+            sea_tiles = []
+            for neighbor in neighbors:
+                terrain_type = self.scenario.server_scenario.terrain_at(neighbor[0], neighbor[1])
+                if terrain_type == TerrainType.SEA.value:
+                    sea_tiles.append([neighbor[0], neighbor[1]])
+
+            if len(sea_tiles) > 0:
+                a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'),
+                                     'Start river from Sea (random tail)',
+                                     self,
+                                     partial(self._start_river_event, column, row, sea_tiles))
+                menu.addAction(a)
+                return
+
+    def _start_river_event(self, column, row, sea_tiles):
+        self.scenario.server_scenario.add_river('Unknown',
+                                                [[column, row], sea_tiles[random.randint(0, len(sea_tiles) - 1)]])
+
+        self._draw_rivers()
+
+    def _add_river_event(self, column, row, river_tiles):
+        river_tiles.insert(0, [column, row])
+
+        self._draw_rivers()
+
+    def _remove_river_event(self, column, row, river_tiles):
+        if len(river_tiles) > 2:
+            river_tiles.remove([column, row])
+        else:
+            river_tiles.clear()
+
+        self._draw_rivers()
+
+    def _add_menu_item_set_nation(self, column, menu, nation, province, row):
+        a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Set nation', self,
+                             partial(self.set_nation_event.emit, row, column, nation, province))
+        menu.addAction(a)
+
+    def _add_menu_item_nation_info(self, column, menu, row):
+        nation = self.scenario.server_scenario.nation_at(row, column)
+        if nation:
+            a = qt.create_action(tools.load_ui_icon('icon.editor.nation_info.png'), 'Nation info', self,
+                                 partial(self.nation_info.emit, nation))
+            menu.addAction(a)
+        return nation
+
+    def _add_menu_item_province_info(self, column, menu, row):
+        province = self.scenario.server_scenario.province_at(column, row)
+        if province:
+            a = qt.create_action(tools.load_ui_icon('icon.editor.province_info.png'), 'Province info', self,
+                                 partial(self.province_info.emit, province))
+            menu.addAction(a)
+        return province
+
+    def _add_menu_item_set_resource(self, column, menu, row):
+        a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'), 'Set resource', self,
+                             partial(self.change_terrain_resource.emit, column, row))
+        menu.addAction(a)
 
     def change_texture_tile(self, row, column) -> None:
         logger.debug(f"change_texture {row}, {column}")
@@ -83,7 +229,7 @@ class EditorMainMap(MainMap):
         province = self.scenario.server_scenario.province_at(column, row)
         if province:
             if terrain == TerrainType.SEA.value:
-                    self.scenario.server_scenario.remove_province_map_tile(province, [column, row])
+                self.scenario.server_scenario.remove_province_map_tile(province, [column, row])
 
         self._draw_province_and_nation_borders()
 

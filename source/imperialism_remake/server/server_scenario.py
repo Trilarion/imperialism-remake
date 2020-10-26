@@ -139,12 +139,18 @@ class ServerScenario:
         river = {'name': name, 'tiles': tiles}
         self._scenario_base.properties[constants.ScenarioProperty.RIVERS].extend([river])
 
+    def get_rivers(self) -> []:
+        return self._scenario_base.properties[constants.ScenarioProperty.RIVERS]
+
     def add_road(self, start: (), stop: ()) -> None:
         """
             Adds road
         """
-        logger.debug('add_road section start:%s, stop:%s', start, stop)
-        self._scenario_base.maps[ServerScenarioBase.ROAD].append((start, stop))
+        if (start, stop) not in self._scenario_base.maps[ServerScenarioBase.ROAD] and (stop, start) not in self._scenario_base.maps[ServerScenarioBase.ROAD]:
+            logger.debug('add_road section start:%s, stop:%s', start, stop)
+            self._scenario_base.maps[ServerScenarioBase.ROAD].append((start, stop))
+        else:
+            logger.debug('add_road section start:%s, stop:%s already in roads. Skip.', start, stop)
 
     def get_roads(self) -> []:
         return self._scenario_base.maps[ServerScenarioBase.ROAD]
