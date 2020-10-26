@@ -57,7 +57,7 @@ class ChangeTextureWidget(QtWidgets.QGraphicsView):
 
             scene_utils.put_pixmap_in_tile_center(scene, self._mapper.get_pixmap_of_type(i), x, y, 1)
 
-    def _fill_texture(self, x, y):
+    def change_texture_tile(self, x, y):
         logger.debug("fill_texture x:%s, y:%s", x, y)
 
         tile_x = math.floor(self.COLUMNS_IN_A_ROW * x / self.width())

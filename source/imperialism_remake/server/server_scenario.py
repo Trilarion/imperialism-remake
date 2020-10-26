@@ -477,7 +477,7 @@ class ServerScenario:
         else:
             raise RuntimeError('Unknown province {} or property {}.'.format(province, key))
 
-    def add_province_map_tile(self, province, position):
+    def change_province_map_tile(self, province, position):
         """
         Adds a position to a province.
 
@@ -487,9 +487,9 @@ class ServerScenario:
         """
         logger.debug('add_province_map_tile province:%s, position:%s', province, position)
 
-        # TODO TODO we should check that this position is not yet in another province (it should be cleared before).
-        #     fail fast, fail often
-        if province in self._scenario_base.provinces and self.is_valid_position(position):
+        if province in self._scenario_base.provinces:
+            #todo remove from proper province
+            self.remove_province_map_tile(self.province_at(position[0], position[1]), position)
             self._scenario_base.provinces[province][constants.ProvinceProperty.TILES].append(position)
 
     def remove_province_map_tile(self, province, position):
@@ -503,8 +503,7 @@ class ServerScenario:
         logger.debug('remove_province_map_tile province:%s, position:%s', province, position)
 
         if province in self._scenario_base.provinces and position in self._scenario_base.provinces[province][constants.ProvinceProperty.TILES]:
-            index = self._scenario_base.provinces[province][constants.ProvinceProperty.TILES].index(position)
-            del self._scenario_base.provinces[province][constants.ProvinceProperty.TILES][index]
+            self._scenario_base.provinces[province][constants.ProvinceProperty.TILES].remove(position)
 
     def provinces(self):
         """

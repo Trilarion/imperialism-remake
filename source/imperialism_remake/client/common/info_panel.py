@@ -21,6 +21,7 @@ from imperialism_remake.base import constants
 from imperialism_remake.client.common.generic_scenario import GenericScenario
 from imperialism_remake.client.game.unit_buttons_widget import UnitButtonsWidget
 from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
+from imperialism_remake.server.models.terrain_type import TerrainType
 
 logger = logging.getLogger(__name__)
 
@@ -90,17 +91,18 @@ class InfoPanel(QtWidgets.QWidget):
         terrain_name = self.scenario.server_scenario.terrain_name(terrain)
         text += '<br>Terrain: {}'.format(terrain_name)
 
-        nation = self.scenario.server_scenario.nation_at(row, column)
-        if nation:
-            name = self.scenario.server_scenario.nation_property(nation, constants.NationProperty.NAME)
-            text += '<br>Nation: {}'.format(name)
+        if terrain != TerrainType.SEA.value:
+            nation = self.scenario.server_scenario.nation_at(row, column)
+            if nation is not None:
+                name = self.scenario.server_scenario.nation_property(nation, constants.NationProperty.NAME)
+                text += '<br>Nation: {}'.format(name)
 
-        province = self.scenario.server_scenario.province_at(column, row)
-        if province:
-            name = self.scenario.server_scenario.province_property(province, constants.ProvinceProperty.NAME)
-            text += '<br>Province: {}'.format(name)
+            province = self.scenario.server_scenario.province_at(column, row)
+            if province is not None:
+                name = self.scenario.server_scenario.province_property(province, constants.ProvinceProperty.NAME)
+                text += '<br>Province: {}'.format(name)
 
-        self._update_resource_info(column, row)
+            self._update_resource_info(column, row)
 
         self.tile_label.setText(text)
 

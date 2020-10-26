@@ -27,6 +27,7 @@ from imperialism_remake.client.editor.nation_properties_widget import NationProp
 from imperialism_remake.client.editor.new_scenario_widget import NewScenarioWidget
 from imperialism_remake.client.editor.province_property_widget import ProvincePropertiesWidget
 from imperialism_remake.client.editor.scenario_properties_widget import ScenarioPropertiesWidget
+from imperialism_remake.client.editor.set_nation_widget import SetNationWidget
 from imperialism_remake.client.graphics.game_dialog import GameDialog
 from imperialism_remake.lib import qt
 
@@ -63,6 +64,7 @@ class EditorScreen(GenericScreen):
         self.main_map.change_terrain_resource.connect(self.map_change_terrain_resource)
         self.main_map.province_info.connect(self.provinces_dialog)
         self.main_map.nation_info.connect(self.nations_dialog)
+        self.main_map.set_nation_event.connect(self.set_nation_dialog)
 
         # edit properties (general, nations, provinces) actions
         a = qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self,
@@ -131,6 +133,16 @@ class EditorScreen(GenericScreen):
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
+    def set_nation_dialog(self, row, col, nation, province):
+        if not self.scenario.server_scenario:
+            return
+
+        content_widget = SetNationWidget(self.scenario, self.main_map, row, col, nation, province)
+        dialog = GameDialog(self._client.main_window, content_widget, title='Nations', delete_on_close=True,
+                            help_callback=self._client.show_help_browser)
+        dialog.setFixedSize(QtCore.QSize(900, 700))
+        dialog.show()
+
     def nations_dialog(self, nation=None):
         """
         Show the modify nations dialog.
@@ -138,7 +150,7 @@ class EditorScreen(GenericScreen):
         if not self.scenario.server_scenario:
             return
 
-        content_widget = NationPropertiesWidget(self.scenario, nation)
+        content_widget = NationPropertiesWidget(self.scenario, self.main_map, nation)
         dialog = GameDialog(self._client.main_window, content_widget, title='Nations', delete_on_close=True,
                             help_callback=self._client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
