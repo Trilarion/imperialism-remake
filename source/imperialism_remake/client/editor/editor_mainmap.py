@@ -17,7 +17,7 @@ import logging
 import random
 from functools import partial
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
 from imperialism_remake.base import constants, tools
 from imperialism_remake.client.common.main_map import MainMap
@@ -28,6 +28,24 @@ logger = logging.getLogger(__name__)
 
 
 class EditorMainMap(MainMap):
+    #: signal, emitted if the change terrain context menu action is called on a terrain
+    change_terrain = QtCore.pyqtSignal(int, int)
+
+    #: signal, emitted if the change terrain resource context menu action is called on a terrain
+    change_terrain_resource = QtCore.pyqtSignal(int, int)
+
+    #: signal, emitted if a province info is requested
+    province_info = QtCore.pyqtSignal(object)
+
+    #: signal, emitted if a nation info is requested
+    nation_info = QtCore.pyqtSignal(object)
+
+    set_nation_event = QtCore.pyqtSignal(int, int, object, object)
+
+    add_workforce_event = QtCore.pyqtSignal(int, int)
+
+    remove_workforce_event = QtCore.pyqtSignal(object)
+
     def contextMenuEvent(self, event):  # noqa: N802
         """
         Right click (context click) on a tile. Shows the context menu, depending on the tile position
@@ -65,7 +83,33 @@ class EditorMainMap(MainMap):
 
             self._add_menu_item_roads(column, menu, row)
 
+            self._add_menu_item_workforce(column, menu, row)
+
         menu.exec(event.globalPos())
+
+    def _add_menu_item_workforce(self, column, menu, row):
+        on_workforce = None
+
+        selected_nation = self.scenario.server_scenario.nation_at(row, column)
+        workforces = self.scenario.server_scenario.get_nation_asset(selected_nation).get_workforces()
+
+        for id, w in workforces.items():
+            if w.get_current_position() == (row, column):
+                on_workforce = w
+                break
+
+        if on_workforce:
+            a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'),
+                                 'Delete ' + str(on_workforce.get_type()),
+                                 self,
+                                 partial(self.remove_workforce_event.emit, on_workforce))
+            menu.addAction(a)
+        else:
+            a = qt.create_action(tools.load_ui_icon('icon.editor.change_terrain_resource.png'),
+                                 'Add worker',
+                                 self,
+                                 partial(self.add_workforce_event.emit, row, column))
+            menu.addAction(a)
 
     def _add_menu_item_roads(self, column, menu, row):
         roads = self.scenario.server_scenario.get_roads()
@@ -239,3 +283,4 @@ class EditorMainMap(MainMap):
         self.scenario.server_scenario.change_province_map_tile(province, [column, row])
 
         self._draw_province_and_nation_borders()
+

@@ -22,7 +22,6 @@ from imperialism_remake.client.common.main_map import MainMap
 from imperialism_remake.client.graphics.mappers.workforce_to_action_cursor_mapper import WorkforceToActionCursorMapper
 from imperialism_remake.client.utils import scene_utils
 from imperialism_remake.lib.blinking_animated_widget import BlinkingAnimatedWidget
-from imperialism_remake.server.models.workforce import Workforce
 from imperialism_remake.server.models.workforce_action import WorkforceAction
 from imperialism_remake.server.workforce.workforce_common import WorkforceCommon
 
@@ -83,7 +82,8 @@ class WorkforceAnimatedWidget(BlinkingAnimatedWidget):
                      self._workforce_common.get_id(),
                      self._workforce_common.get_type(), new_row, new_column, workforce_action)
 
-        self._workforce_common.plan_action(new_row, new_column, workforce_action)
+        if workforce_action != WorkforceAction.EDITOR:
+            self._workforce_common.plan_action(new_row, new_column, workforce_action)
 
         self._display()
 

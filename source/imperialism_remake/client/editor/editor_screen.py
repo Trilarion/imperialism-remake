@@ -14,11 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 import logging
+import uuid
 
 from PyQt5 import QtCore
 
 from imperialism_remake.base import tools
 from imperialism_remake.client.common.generic_screen import GenericScreen
+from imperialism_remake.client.editor.add_workforce_widget import AddWorkforceWidget
 from imperialism_remake.client.editor.change_terrain_resource_widget import ChangeTerrainResourceWidget
 from imperialism_remake.client.editor.change_terrain_widget import ChangeTerrainWidget
 from imperialism_remake.client.editor.editor_mainmap import EditorMainMap
@@ -29,7 +31,12 @@ from imperialism_remake.client.editor.province_property_widget import ProvincePr
 from imperialism_remake.client.editor.scenario_properties_widget import ScenarioPropertiesWidget
 from imperialism_remake.client.editor.set_nation_widget import SetNationWidget
 from imperialism_remake.client.graphics.game_dialog import GameDialog
+from imperialism_remake.client.workforce.workforce_animated_widget import WorkforceAnimatedWidget
 from imperialism_remake.lib import qt
+from imperialism_remake.server.models.workforce import Workforce
+from imperialism_remake.server.models.workforce_action import WorkforceAction
+from imperialism_remake.server.models.workforce_type import WorkforceType
+from imperialism_remake.server.workforce.workforce_factory import WorkforceFactory
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +72,8 @@ class EditorScreen(GenericScreen):
         self.main_map.province_info.connect(self.provinces_dialog)
         self.main_map.nation_info.connect(self.nations_dialog)
         self.main_map.set_nation_event.connect(self.set_nation_dialog)
+        self.main_map.add_workforce_event.connect(self.add_workforce_dialog)
+        self.main_map.remove_workforce_event.connect(self.remove_workforce_event_impl)
 
         # edit properties (general, nations, provinces) actions
         a = qt.create_action(tools.load_ui_icon('icon.editor.general.png'), 'Edit general properties', self,
@@ -84,6 +93,8 @@ class EditorScreen(GenericScreen):
         self._layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
 
         self._add_help_and_exit_buttons(client)
+
+        self._workforce_widgets = {}
 
     def new_scenario_dialog(self):
         """
@@ -133,6 +144,23 @@ class EditorScreen(GenericScreen):
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
 
+    def add_workforce_dialog(self, row, col):
+        if not self.scenario.server_scenario:
+            return
+
+        content_widget = AddWorkforceWidget(row, col, self.scenario.server_scenario.get_workforce_settings(),
+                                            self.scenario.get_workforce_to_texture_mapper(),
+                                            self.create_workforce_widget)
+        dialog = GameDialog(self._client.main_window, content_widget, title='Workers', delete_on_close=True,
+                            help_callback=self._client.show_help_browser)
+        dialog.show()
+
+    def remove_workforce_event_impl(self, workforce):
+        self.scenario.server_scenario.get_nation_asset(workforce.get_nation()).delete_workforce(workforce)
+
+        self._workforce_widgets[workforce.get_id()].destroy()
+        del self._workforce_widgets[workforce.get_id()]
+
     def set_nation_dialog(self, row, col, nation, province):
         if not self.scenario.server_scenario:
             return
@@ -168,3 +196,26 @@ class EditorScreen(GenericScreen):
                             help_callback=self._client.show_help_browser)
         dialog.setFixedSize(QtCore.QSize(900, 700))
         dialog.show()
+
+    def create_workforce_widget(self, row, col, workforce_type):
+        if workforce_type not in WorkforceType:
+            logger.warning(f"Wrong workforce type: {workforce_type}")
+            return
+
+        selected_nation = self.scenario.server_scenario.nation_at(row, col)
+
+        workforce_primitive = Workforce(uuid.uuid4(), row, col, selected_nation, workforce_type)
+        workforce = WorkforceFactory.create_new_workforce(self.scenario.server_scenario,
+                                                          None,
+                                                          workforce_primitive)
+        if not workforce:
+            logger.warning(f"Was not able to create workforce type: {workforce_type}")
+            return
+
+        workforce_widget = WorkforceAnimatedWidget(self.main_map, self._info_panel, workforce)
+        workforce_widget.plan_action(row, col, WorkforceAction.EDITOR)
+
+        self._workforce_widgets[workforce_widget.get_workforce().get_id()] = workforce_widget
+
+        self.scenario.server_scenario.get_nation_asset(selected_nation).add_or_update_workforce(workforce_primitive)
+
