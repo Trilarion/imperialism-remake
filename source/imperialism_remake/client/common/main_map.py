@@ -35,20 +35,6 @@ class MainMap(QtWidgets.QGraphicsView):
     #: signal, emitted if the tile at the mouse pointer (focus) changes
     mouse_move_event = QtCore.pyqtSignal(int, int)
 
-    #: signal, emitted if the change terrain context menu action is called on a terrain
-    change_terrain = QtCore.pyqtSignal(int, int)
-
-    #: signal, emitted if the change terrain resource context menu action is called on a terrain
-    change_terrain_resource = QtCore.pyqtSignal(int, int)
-
-    #: signal, emitted if a province info is requested
-    province_info = QtCore.pyqtSignal(object)
-
-    #: signal, emitted if a nation info is requested
-    nation_info = QtCore.pyqtSignal(object)
-
-    set_nation_event = QtCore.pyqtSignal(int, int, object, object)
-
     mouse_press_event = QtCore.pyqtSignal(object, QtGui.QMouseEvent)
 
     def __init__(self, scenario, selected_nation):

@@ -23,3 +23,4 @@ class WorkforceAction(Enum):
     STAND = 3
     SLEEP = 4
     DONE = 5
+    EDITOR = 6
