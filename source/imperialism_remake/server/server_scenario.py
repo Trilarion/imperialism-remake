@@ -23,6 +23,7 @@ import logging
 import math
 
 from imperialism_remake.base import constants
+from imperialism_remake.base.constants import NationProperty
 from imperialism_remake.lib import utils
 from imperialism_remake.server.models.nation_asset import NationAsset
 from imperialism_remake.server.models.prospector_resource_state import ProspectorResourceState
@@ -689,7 +690,7 @@ class ServerScenario:
         scenario_base_for_nation = copy.deepcopy(self.get_scenario_base())
         for key, nation in scenario_base_for_nation.nations.items():
             if key != nation_id:
-                del nation
+                del nation[NationProperty.ASSETS]
 
         # Make prospector resources invisible on map for a client
         for i, terrain_resource_on_map in enumerate(scenario_base_for_nation.maps[ServerScenarioBase.RESOURCE]):

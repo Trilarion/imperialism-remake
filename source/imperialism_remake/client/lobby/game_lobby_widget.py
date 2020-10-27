@@ -118,8 +118,7 @@ class GameLobbyWidget(QtWidgets.QWidget):
             file_name = QtWidgets.QFileDialog.getOpenFileName(
                 self, 'Continue Single Player Scenario', constants.SCENARIO_FOLDER, 'Scenario Files (*.scenario)')[0]
             if file_name:
-                # TODO check that it is a valid single player scenario in play
-                pass
+                self.single_player_scenario_selection_preview(file_name)
 
     def toggled_server_lobby(self, checked):
         """
