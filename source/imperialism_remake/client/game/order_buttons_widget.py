@@ -18,6 +18,8 @@ import logging
 from PyQt5 import QtWidgets
 
 from imperialism_remake.base import tools, constants
+from imperialism_remake.client.game.game_scenario import GameScenario
+from imperialism_remake.client.game.order_screens.game_generic_order_screen import GameGenericOrderScreen
 
 BUTTON_WIDTH = constants.PANEL_VIEW_WIDTH // 5
 
@@ -25,8 +27,10 @@ logger = logging.getLogger(__name__)
 
 
 class OrderButtonsWidget(QtWidgets.QWidget):
-    def __init__(self):
+    def __init__(self, scenario: GameScenario, client):
         super().__init__()
+        self.scenario = scenario
+        self.client = client
 
         logger.debug('__init__')
 
@@ -70,11 +74,27 @@ class OrderButtonsWidget(QtWidgets.QWidget):
     def _transport_clicked(self):
         logger.debug("_transport_clicked")
 
+        widget = GameGenericOrderScreen(self.scenario, self.client)
+        widget.set_transport_screen()
+        self.client.widget_switcher.show(widget)
+
     def _industry_clicked(self):
         logger.debug("_industry_clicked")
+
+        widget = GameGenericOrderScreen(self.scenario, self.client)
+        widget.set_industry_screen()
+        self.client.widget_switcher.show(widget)
 
     def _market_clicked(self):
         logger.debug("_market_clicked")
 
+        widget = GameGenericOrderScreen(self.scenario, self.client)
+        widget.set_market_screen()
+        self.client.widget_switcher.show(widget)
+
     def _diplomacy_clicked(self):
         logger.debug("_diplomacy_clicked")
+
+        widget = GameGenericOrderScreen(self.scenario, self.client)
+        widget.set_diplomacy_screen()
+        self.client.widget_switcher.show(widget)

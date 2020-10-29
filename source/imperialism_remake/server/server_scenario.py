@@ -690,7 +690,8 @@ class ServerScenario:
         scenario_base_for_nation = copy.deepcopy(self.get_scenario_base())
         for key, nation in scenario_base_for_nation.nations.items():
             if key != nation_id:
-                del nation[NationProperty.ASSETS]
+                if NationProperty.ASSETS in nation:
+                    del nation[NationProperty.ASSETS]
 
         # Make prospector resources invisible on map for a client
         for i, terrain_resource_on_map in enumerate(scenario_base_for_nation.maps[ServerScenarioBase.RESOURCE]):

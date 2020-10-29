@@ -312,9 +312,8 @@ class Client:
             server_scenario_base = content['server_scenario_base']
             selected_nation = content['nation']
 
-            self.widget_switcher.remove_previous_widget()
-            widget = GameMainScreen(self, server_scenario_base, selected_nation)
-            self.widget_switcher.switch(widget)
+            self.game_widget = GameMainScreen(self, server_scenario_base, selected_nation)
+            self.widget_switcher.switch(self.game_widget)
 
     def quit(self):
         """

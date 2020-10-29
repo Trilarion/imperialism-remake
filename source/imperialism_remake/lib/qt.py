@@ -854,12 +854,18 @@ class WidgetSwitcher:
         This ensures that there is at most only one widget in the layout.
         """
 
-        self.remove_previous_widget()
+        self._remove_previous_widget(True)
 
         self._layout.addWidget(widget)
 
-    def remove_previous_widget(self):
+    def show(self, widget):
+        self._remove_previous_widget(False)
+
+        self._layout.addWidget(widget)
+
+    def _remove_previous_widget(self, destroy_flag):
         if self._layout.count() > 0:
-            item = self._layout.itemAt(0)
+            item = self._layout.itemAt(self._layout.count() - 1)
             self._layout.removeItem(item)
-            item.widget().deleteLater()
+            if destroy_flag:
+                item.widget().deleteLater()

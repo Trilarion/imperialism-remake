@@ -71,12 +71,12 @@ class GameMainScreen(GenericScreen):
         self._turn_manager.event_turn_completed.connect(self._event_turn_completed)
 
         turn_end_widget = TurnEndWidget(self._turn_manager)
-        order_buttons_widget = OrderButtonsWidget()
+        order_buttons_widget = OrderButtonsWidget(self.scenario, client)
 
         self._layout.addWidget(order_buttons_widget, 2, 0)
         self._layout.addWidget(self._info_panel, 3, 0)
         self._layout.addWidget(turn_end_widget, 4, 0)
-        self._layout.addWidget(self.main_map, 1, 1, 3, 1)
+        self._layout.addWidget(self.main_map, 1, 1, 4, 1)
         self._layout.setRowStretch(3, 1)  # the info box will take all vertical space left
         self._layout.setColumnStretch(1, 1)  # the main map will take all horizontal space left
 
