@@ -68,19 +68,19 @@ class GameGenericOrderScreen(QtWidgets.QGraphicsView):
         spacer.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self._toolbar.addWidget(spacer)
 
-        self._transport_top_button = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Transport', self)
+        self._transport_top_button = QtWidgets.QAction(tools.load_ui_icon('icon.order_screen.transport.png'), 'Transport', self)
         self._transport_top_button.triggered.connect(self._transport_clicked)
         self._toolbar.addAction(self._transport_top_button)
 
-        self._industry_top_button = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Industry', self)
+        self._industry_top_button = QtWidgets.QAction(tools.load_ui_icon('icon.order_screen.industry.png'), 'Industry', self)
         self._industry_top_button.triggered.connect(self._industry_clicked)
         self._toolbar.addAction(self._industry_top_button)
 
-        self._market_top_button = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Market', self)
+        self._market_top_button = QtWidgets.QAction(tools.load_ui_icon('icon.order_screen.market.png'), 'Market', self)
         self._market_top_button.triggered.connect(self._market_clicked)
         self._toolbar.addAction(self._market_top_button)
 
-        self._diplomacy_top_button = QtWidgets.QAction(tools.load_ui_icon('icon.help.png'), 'Diplomacy', self)
+        self._diplomacy_top_button = QtWidgets.QAction(tools.load_ui_icon('icon.order_screen.diplomacy.png'), 'Diplomacy', self)
         self._diplomacy_top_button.triggered.connect(self._diplomacy_clicked)
         self._toolbar.addAction(self._diplomacy_top_button)
 
